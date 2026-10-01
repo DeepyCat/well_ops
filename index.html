@@ -1,49 +1,43 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>PeakdleV2</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/DeepyCat/dle/refs/heads/main/img/Flogo.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image" content="https://raw.githubusercontent.com/DeepyCat/dle/refs/heads/main/img/all1-bg.jpg">
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PeakdleV2: The ultimate daily guessing game for Re:Zero, Konosuba, Mushoku Tensei, Yuri, Helldivers, F1, and Uma Musume!">
-</head>
-<body class="scroll-body">
-
-   
-    <div class="scroll-nav">
-        <button onclick="scrollToSection(0)" title="Top Section">▲</button>
-        <button onclick="scrollToSection(1)" title="Bottom Section">▼</button>
-    </div>
-
-    
-    <section class="landing-page" id="sec-0">
-        <a href="praxe.html" class="choice-btn rezero" data-text="praxe"></a>
-        
-        <a href="teorie.md" class="choice-btn yuri" data-text="Teorie"></a>
-    </section>
-
-    
-    <section class="landing-page" id="sec-1">
-        <a href="helldivers.html" class="choice-btn helldivers" data-text="Helldivers"></a>
-        <a href="umamusume.html" class="choice-btn umamusume" data-text="Uma Musume"></a>
-        <a href="f1.html" class="choice-btn f1" data-text="Formula 1"></a>
-        <a href="custom.html" class="choice-btn custom" data-text="Reklama <3"></a>
-    </section>
-
-    <script>
-        function scrollToSection(index) {
-            const sections = document.querySelectorAll('.landing-page');
-            if (sections[index]) {
-                sections[index].scrollIntoView({ behavior: 'smooth' });
-            }
+<!DOCTYPE html> 
+<html lang="en"> 
+<head>     
+    <meta charset="UTF-8">     
+    <title>PeakdleV2</title>     
+    <link rel="stylesheet" href="style.css">     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>     
+    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>     
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/DeepyCat/dle/refs/heads/main/img/Flogo.jpg">     
+    <meta property="og:image:width" content="1200">     
+    <meta property="og:image:height" content="630">     
+    <meta property="og:image" content="https://raw.githubusercontent.com/DeepyCat/dle/refs/heads/main/img/all1-bg.jpg">          
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">     
+    <meta name="description" content="PeakdleV2: The ultimate daily guessing game for Re:Zero, Konosuba, Mushoku Tensei, Yuri, Helldivers, F1, and Uma Musume!"> 
+    <style>
+        /* Úprava barev tlačítek na úvodní stránce */
+        .choice-btn.praxe-btn {
+            background-color: #2a2e39; /* Tmavší šedá */
         }
-    </script>
-</body>
+        .choice-btn.teorie-btn {
+            background-color: #484f58; /* Světlejší šedá */
+        }
+    </style>
+</head> 
+<body class="scroll-body">     
+    <div class="scroll-nav">         
+        <button onclick="scrollToSection(0)" title="Top Section"> </button>         
+        <button onclick="scrollToSection(1)" title="Bottom Section"> </button>     </div>          
+    <section class="landing-page" id="sec-0">         
+        <a href="praxe.html" class="choice-btn praxe-btn" data-text="Praxe"></a>                  
+        <a href="teorie.html" class="choice-btn teorie-btn" data-text="Teorie"></a>     </section>          
+    <section class="landing-page" id="sec-1">         
+    </section>     
+    <script>         
+        function scrollToSection(index) {             
+            const sections = document.querySelectorAll('.landing-page');             
+            if (sections[index]) {                 
+                sections[index].scrollIntoView({ behavior: 'smooth' });             
+            }         
+        }     
+    </script> 
+</body> 
 </html>
