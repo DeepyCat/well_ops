@@ -1,43 +1,102 @@
 <!DOCTYPE html> 
-<html lang="en"> 
+<html lang="cs"> 
 <head>     
     <meta charset="UTF-8">     
-    <title>PeakdleV2</title>     
+    <title>Architektura OS - Rozcestník</title>     
     <link rel="stylesheet" href="style.css">     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>     
     <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>     
     <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/DeepyCat/dle/refs/heads/main/img/Flogo.jpg">     
-    <meta property="og:image:width" content="1200">     
-    <meta property="og:image:height" content="630">     
-    <meta property="og:image" content="https://raw.githubusercontent.com/DeepyCat/dle/refs/heads/main/img/all1-bg.jpg">          
     <meta name="viewport" content="width=device-width, initial-scale=1.0">     
-    <meta name="description" content="PeakdleV2: The ultimate daily guessing game for Re:Zero, Konosuba, Mushoku Tensei, Yuri, Helldivers, F1, and Uma Musume!"> 
+    <meta name="description" content="Rozcestník pro správu virtuálních strojů a teorii operačních systémů."> 
     <style>
-        /* Úprava barev tlačítek na úvodní stránce */
-        .choice-btn.praxe-btn {
-            background-color: #2a2e39; /* Tmavší šedá */
+        :root {
+            --bg: #121417;
+            --panel: #1a1d23;
+            --border: #313744;
+            --border-light: #424a5b;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
         }
-        .choice-btn.teorie-btn {
-            background-color: #484f58; /* Světlejší šedá */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body.landing-body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .landing-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            width: 90%;
+            max-width: 900px;
+            height: 450px;
+        }
+        .choice-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        .choice-card.praxe {
+            background: linear-gradient(135deg, #181b22 0%, #1e222b 100%);
+        }
+        .choice-card.teorie {
+            background: linear-gradient(135deg, #212631 0%, #2a303c 100%);
+        }
+        .choice-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-light);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+        .card-title {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            padding: 14px 32px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 50px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        .choice-card:hover .card-title {
+            transform: scale(1.05);
+            background: rgba(0, 0, 0, 0.4);
+        }
+        @media screen and (max-width: 768px) {
+            .landing-container {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 16px;
+                padding: 20px;
+            }
+            .choice-card {
+                height: 180px;
+            }
         }
     </style>
 </head> 
-<body class="scroll-body">     
-    <div class="scroll-nav">         
-        <button onclick="scrollToSection(0)" title="Top Section"> </button>         
-        <button onclick="scrollToSection(1)" title="Bottom Section"> </button>     </div>          
-    <section class="landing-page" id="sec-0">         
-        <a href="praxe.html" class="choice-btn praxe-btn" data-text="Praxe"></a>                  
-        <a href="teorie.html" class="choice-btn teorie-btn" data-text="Teorie"></a>     </section>          
-    <section class="landing-page" id="sec-1">         
-    </section>     
-    <script>         
-        function scrollToSection(index) {             
-            const sections = document.querySelectorAll('.landing-page');             
-            if (sections[index]) {                 
-                sections[index].scrollIntoView({ behavior: 'smooth' });             
-            }         
-        }     
-    </script> 
+<body class="landing-body">     
+    <div class="landing-container">         
+        <a href="praxe.html" class="choice-card praxe">
+            <span class="card-title">Praxe</span>
+        </a>                  
+        <a href="teorie.html" class="choice-card teorie">
+            <span class="card-title">Teorie</span>
+        </a>     
+    </div>     
 </body> 
 </html>

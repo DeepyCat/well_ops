@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Architektura OS - Teorie</title>
   <link rel="stylesheet" href="style.css">
-  <!-- Knihovna pro převod Markdownu na HTML -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
       --bg: #121417;
@@ -39,25 +37,30 @@
       margin-bottom: 20px;
       border-bottom: 1px solid var(--border);
       padding-bottom: 12px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
     }
     h1 {
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       font-weight: 600;
       letter-spacing: -0.01em;
     }
     .back-btn {
       background: var(--panel);
       border: 1px solid var(--border);
-      color: var(--text);
+      color: var(--text-muted);
       padding: 6px 14px;
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.85rem;
       text-decoration: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, color 0.2s;
     }
     .back-btn:hover {
       border-color: var(--border-light);
+      color: var(--text);
     }
     .container {
       max-width: 900px;
@@ -70,67 +73,118 @@
     .box {
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 4px;
       overflow: hidden;
-      padding: 20px;
     }
-    /* Styly pro vyrenderovaný Markdown uvnitř boxu */
-    .box h1, .box h2, .box h3 {
-      color: var(--text);
-      margin-top: 16px;
-      margin-bottom: 8px;
+    .box-header {
+      padding: 8px 14px;
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
     }
-    .box p {
-      margin-bottom: 10px;
-    }
-    .box ul {
-      padding-left: 20px;
-      margin-bottom: 10px;
-    }
-    .box li {
-      margin-bottom: 4px;
-    }
-    .box code {
-      background: var(--code-bg);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: monospace;
+    .box-content {
+      padding: 16px;
       font-size: 0.9rem;
+      color: var(--text);
     }
-    .box pre {
-      background: var(--code-bg);
-      padding: 12px;
-      border-radius: 4px;
-      overflow-x: auto;
-      margin-top: 8px;
+    .box-content p {
+      margin-bottom: 10px;
+    }
+    .box-content ul {
+      padding-left: 20px;
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+    .box-content li {
+      margin-bottom: 6px;
+    }
+    .highlight {
+      color: #60a5fa;
+      font-weight: 500;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Architektura OS – Teorie</h1>
-      <a href="index.html" class="back-btn">← Zpět domů</a>
-    </header>
+  <header>
+    <h1>Architektura OS – Teorie</h1>
+    <a href="index.html" class="back-btn">← Zpět domů</a>
+  </header>
 
-    <div class="box" id="markdown-content">
-      Načítám obsah z teorie.md...
+  <div class="container">
+    <!-- Režimy a Mode bit -->
+    <div class="box">
+      <div class="box-header">Režimy procesoru a Mode bit</div>
+      <div class="box-content">
+        <p><strong>Mode bit:</strong> Hardwarový přepínač režimů v procesoru (<span class="highlight">"furt otočený zády"</span> k přímým požadavkům zvenčí) – slouží k ochraně systému a oddělení uživatelského prostoru od jádra.</p>
+      </div>
+    </div>
+
+    <!-- Bezpečnostní okruhy (Protection Rings) -->
+    <div class="box">
+      <div class="box-header">Bezpečnostní okruhy procesoru (Protection Rings)</div>
+      <div class="box-content">
+        <ul>
+          <li><strong>Ring 0 (Kernel):</strong> Přístup ke všem instrukcím a registrům (plná oprávnění).</li>
+          <li><strong>Ring 1 & Ring 2:</strong> Některé registry a instrukce (v praxi se běžně nevyužívají / nic).</li>
+          <li><strong>Ring 3 (User):</strong> Omezený přístup pro běžné aplikace a uživatelský prostor.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Rozdělení podle ringů -->
+    <div class="box">
+      <div class="box-header">Rozdělení komponent podle ringů</div>
+      <div class="box-content">
+        <div class="grid-2">
+          <div>
+            <p><strong style="color: #34d399;">Ring 0 (Jádro):</strong></p>
+            <ul style="color: var(--text-muted); font-size: 0.88rem;">
+              <li>Plánovač (Scheduler)</li>
+              <li>Dispečer</li>
+              <li>Správce paměti</li>
+              <li>IPC (Meziprocesová komunikace)</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong style="color: #f87171;">Ring 3 (Uživatelské prostředí):</strong></p>
+            <ul style="color: var(--text-muted); font-size: 0.88rem;">
+              <li>CLI (bash)</li>
+              <li>GUI (grafické prostředí)</li>
+              <li>Aplikace (Word, Xmail atd.)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Architektura jádra -->
+    <div class="box">
+      <div class="box-header">Architektura jádra (Kernel Types)</div>
+      <div class="box-content">
+        <div class="grid-2">
+          <div>
+            <p><strong>Monolitické jádro:</strong></p>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Vše běží pohromadě v Ring 0. Je velmi rychlé (fast), ale pád jedné komponenty ovlivní celý systém.</p>
+          </div>
+          <div>
+            <p><strong>Mikrokernel:</strong></p>
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">V Ring 0 běží jen nutný základ (cca 3 programy/služby), zbytek je venku. Je výrazně stabilnější.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
-  <script>
-    // Automaticky stáhne teorie.md a vykreslí ho do stránky
-    fetch('teorie.md')
-      .then(response => {
-        if (!response.ok) throw new Error('Soubor nelze načíst');
-        return response.text();
-      })
-      .then(markdown => {
-        document.getElementById('markdown-content').innerHTML = marked.parse(markdown);
-      })
-      .catch(error => {
-        document.getElementById('markdown-content').innerHTML = '<p style="color: #f87171;">Chyba při načítání souboru teorie.md</p>';
-      });
-  </script>
 </body>
 </html>
