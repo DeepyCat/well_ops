@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architektura OS - Teorie</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Knihovna pro převod Markdownu na HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg: #121417;
+      --panel: #1a1d23;
+      --card: #22262f;
+      --border: #313744;
+      --border-light: #424a5b;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #2563eb;
+      --accent-text: #ffffff;
+      --code-bg: #0d1117;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+         
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .back-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .back-btn:hover {
+      border-color: var(--border-light);
+    }
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      padding: 20px;
+    }
+    /* Styly pro vyrenderovaný Markdown uvnitř boxu */
+    .box h1, .box h2, .box h3 {
+      color: var(--text);
+      margin-top: 16px;
+      margin-bottom: 8px;
+    }
+    .box p {
+      margin-bottom: 10px;
+    }
+    .box ul {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    .box li {
+      margin-bottom: 4px;
+    }
+    .box code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .box pre {
+      background: var(--code-bg);
+      padding: 12px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Architektura OS – Teorie</h1>
+      <a href="index.html" class="back-btn">← Zpět domů</a>
+    </header>
+
+    <div class="box" id="markdown-content">
+      Načítám obsah z teorie.md...
+    </div>
+  </div>
+
+  <script>
+    // Automaticky stáhne teorie.md a vykreslí ho do stránky
+    fetch('teorie.md')
+      .then(response => {
+        if (!response.ok) throw new Error('Soubor nelze načíst');
+        return response.text();
+      })
+      .then(markdown => {
+        document.getElementById('markdown-content').innerHTML = marked.parse(markdown);
+      })
+      .catch(error => {
+        document.getElementById('markdown-content').innerHTML = '<p style="color: #f87171;">Chyba při načítání souboru teorie.md</p>';
+      });
+  </script>
+</body>
+</html>
