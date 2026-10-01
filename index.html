@@ -1,102 +1,151 @@
-<!DOCTYPE html> 
-<html lang="cs"> 
-<head>     
-    <meta charset="UTF-8">     
-    <title>Architektura OS - Rozcestník</title>     
-    <link rel="stylesheet" href="style.css">     
-    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>     
-    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/DeepyCat/dle/refs/heads/main/img/Flogo.jpg">     
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">     
-    <meta name="description" content="Rozcestník pro správu virtuálních strojů a teorii operačních systémů."> 
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rozcestník pro teoretické základy, praktické úlohy a prezentace.">
+    <title>OPS</title>
     <style>
-        :root {
-            --bg: #121417;
-            --panel: #1a1d23;
-            --border: #313744;
-            --border-light: #424a5b;
-            --text: #e6edf3;
-            --text-muted: #8b949e;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body.landing-body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-        .landing-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            width: 90%;
-            max-width: 900px;
-            height: 450px;
-        }
-        .choice-card {
+        body.custom-layout {
+            margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            background-color: #1a1a1a;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .top-row {
+            display: flex;
+            flex: 2;
+            width: 100%;
+            position: relative;
+        }
+        .bottom-row {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Základní styl pro tlačítka s obrázky na pozadí */
+        .choice-btn {
+            display: flex;
             justify-content: center;
             align-items: center;
             text-decoration: none;
-            color: var(--text);
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            color: white;
+            background-size: cover;
+            background-position: center;
             position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), filter 0.35s ease;
         }
-        .choice-card.praxe {
-            background: linear-gradient(135deg, #181b22 0%, #1e222b 100%);
+
+        /* Tmavý filtr přes obrázek, aby byl text skvěle vidět */
+        .choice-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4); /* Ztmavení obrázku */
+            transition: background 0.3s ease;
         }
-        .choice-card.teorie {
-            background: linear-gradient(135deg, #212631 0%, #2a303c 100%);
-        }
-        .choice-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-light);
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
-        }
-        .card-title {
-            font-size: 2rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            padding: 14px 32px;
-            background: rgba(0, 0, 0, 0.25);
+
+        /* Vzhled textu uvnitř tlačítek */
+        .choice-btn::after {
+            content: attr(data-text);
+            font-size: 2.2rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.35);
+            padding: 15px 30px;
             border-radius: 50px;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             transition: transform 0.3s ease, background 0.3s ease;
+            text-align: center;
+            z-index: 1;
         }
-        .choice-card:hover .card-title {
-            transform: scale(1.05);
-            background: rgba(0, 0, 0, 0.4);
+
+        /* Teorie – obrázek pozadí */
+        .choice-btn.teorie {
+            background-image: url('img/teorie-bg.jpg');
+            width: 53%;
+            clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%);
+            margin-left: 0;
+            z-index: 2;
         }
+
+        /* Praxe – obrázek pozadí */
+        .choice-btn.praxe {
+            background-image: url('img/praxe-bg.jpg');
+            width: 53%;
+            clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%);
+            margin-left: -4%;
+            z-index: 1;
+        }
+
+        /* Prezentace – obrázek pozadí, rovná přes celou šířku */
+        .choice-btn.prezentace {
+            background-image: url('img/prezentace-bg.jpg');
+            width: 100%;
+            clip-path: none;
+            margin-left: 0;
+        }
+
+        /* Hover efekt: zvětšení, posun nahoru a zjasnění obrázku */
+        .choice-btn:hover {
+            transform: translateY(-8px) scale(1.02);
+            filter: brightness(1.15);
+            z-index: 10;
+        }
+
+        .choice-btn:hover::before {
+            background: rgba(0, 0, 0, 0.2); /* Po najetí myši obrázek mírně projasní */
+        }
+
+        .choice-btn:hover::after {
+            transform: scale(1.08);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Responzivita pro mobily */
         @media screen and (max-width: 768px) {
-            .landing-container {
-                grid-template-columns: 1fr;
+            body.custom-layout {
                 height: auto;
-                gap: 16px;
-                padding: 20px;
+                overflow-y: auto;
             }
-            .choice-card {
-                height: 180px;
+            .top-row {
+                flex-direction: column;
+            }
+            .choice-btn.teorie, .choice-btn.praxe {
+                width: 100% !important;
+                clip-path: none !important;
+                margin-left: 0 !important;
+                height: 250px;
+            }
+            .choice-btn.prezentace {
+                height: 250px;
             }
         }
     </style>
-</head> 
-<body class="landing-body">     
-    <div class="landing-container">         
-        <a href="praxe.html" class="choice-card praxe">
-            <span class="card-title">Praxe</span>
-        </a>                  
-        <a href="teorie.html" class="choice-card teorie">
-            <span class="card-title">Teorie</span>
-        </a>     
-    </div>     
-</body> 
+</head>
+<body class="custom-layout">
+
+    <!-- Horní řada: Teorie a Praxe -->
+    <div class="top-row">
+        <a href="teorie.html" class="choice-btn teorie" data-text="Teorie"></a>
+        <a href="praxe.html" class="choice-btn praxe" data-text="Praxe"></a>
+    </div>
+
+    <!-- Dolní řada: Prezentace -->
+    <div class="bottom-row">
+        <a href="prezentace.html" class="choice-btn prezentace" data-text="Prezentace"></a>
+    </div>
+
+</body>
 </html>
