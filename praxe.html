@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kontrolní seznam přípravy VM - Modul 0</title>
+  <style>
+    :root {
+      --bg: #121417;
+      --panel: #1a1d23;
+      --card: #22262f;
+      --border: #313744;
+      --border-light: #424a5b;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --accent: #2563eb;
+      --accent-text: #ffffff;
+      --code-bg: #0d1117;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+
+    .vm-tabs {
+      display: flex;
+      gap: 6px;
+    }
+
+    .vm-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .vm-btn:hover {
+      border-color: var(--border-light);
+      color: var(--text);
+    }
+
+    .vm-btn.active {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    .vm-badge {
+      font-size: 0.75rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .sidebar {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .progress-bar-bg {
+      background: var(--code-bg);
+      border-radius: 2px;
+      height: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    .task-items {
+      overflow-y: auto;
+      list-style: none;
+      flex: 1;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      cursor: pointer;
+      gap: 10px;
+    }
+
+    .task-item:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .task-item.selected {
+      background: var(--card);
+      border-left: 3px solid var(--accent);
+    }
+
+    .task-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .task-label {
+      flex: 1;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-label.done {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .detail-pane {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .detail-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .box-header {
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .box-content {
+      padding: 12px;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+      color: var(--text);
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 3px;
+      padding: 2px 7px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--border-light);
+      color: var(--text);
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--border-light);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Kontrola konfigurace VM</h1>
+    <button class="reset-btn" onclick="resetCurrentVM()">Resetovat stav VM</button>
+  </header>
+
+  <div class="top-controls">
+    <div class="vm-tabs">
+      <button class="vm-btn active" id="btn-SRV1-DC" onclick="switchVM('SRV1-DC')">
+        SRV1-DC <span class="vm-badge" id="badge-SRV1-DC">0/11</span>
+      </button>
+      <button class="vm-btn" id="btn-SRV2-FS" onclick="switchVM('SRV2-FS')">
+        SRV2-FS <span class="vm-badge" id="badge-SRV2-FS">0/11</span>
+      </button>
+      <button class="vm-btn" id="btn-PC1-WIN" onclick="switchVM('PC1-WIN')">
+        PC1-WIN <span class="vm-badge" id="badge-PC1-WIN">0/12</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="workspace">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color: var(--text-muted);">
+          <span>Dokončeno</span>
+          <span id="progress-text">0 %</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-bar" class="progress-bar-fill"></div>
+        </div>
+      </div>
+      <ul class="task-items" id="task-list"></ul>
+    </div>
+
+    <div class="detail-pane" id="detail-pane"></div>
+  </div>
+
+  <script>
+    const taskDefinitions = [
+      {
+        id: "vm-specs",
+        title: "1. Parametry virtuálního stroje",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Zajištění hardwarových prostředků. SRV2-FS navíc vyžaduje 5 disků pro budoucí Storage Pool.",
+        how: (vm) => {
+          if (vm === "PC1-WIN") return "V hypervizoru: 2 vCPU, 8 GB RAM, 60 GB systémový disk.";
+          if (vm === "SRV2-FS") return "V hypervizoru: 2 vCPU, 8 GB RAM, 100 GB systémový disk + 5x virtuální disk o velikosti 10 GB.";
+          return "V hypervizoru: 2 vCPU, 8 GB RAM, 100 GB systémový disk.";
+        },
+        verify: (vm) => {
+          if (vm === "SRV2-FS") return "Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle\n# Ověřte systémový disk (~100 GB) a 5x RAW disků (~10 GB)";
+          return "Get-Disk | Select-Object Number, FriendlyName, Size";
+        }
+      },
+      {
+        id: "os-edition",
+        title: "2. Edice a instalace Windows",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Servery vyžadují Desktop Experience s licencí Datacenter. Klient vyžaduje Windows 11 Education N.",
+        how: (vm) => {
+          if (vm === "PC1-WIN") return "Instalace Windows 11 Education N (jazyk: English - United States).";
+          return "Instalace Windows Server 2025 Datacenter (Desktop Experience). Neinstalovat Server Core.";
+        },
+        verify: () => "Get-ComputerInfo | Select-Object WindowsProductName, OsServerLevel"
+      },
+      {
+        id: "hostname",
+        title: "3. Jméno počítače (Hostname)",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Jednoznačná identifikace v budoucí doméně Active Directory.",
+        how: (vm) => `Rename-Computer -NewName "${vm}" -Restart`,
+        verify: () => "hostname"
+      },
+      {
+        id: "networking",
+        title: "4. Nastavení TCP/IPv4",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Servery musí mít statické IP adresy pro běh síťových rolí. Klient zůstává na DHCP pro testování v dalším modulu.",
+        how: (vm) => {
+          if (vm === "SRV1-DC") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.10" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
+          if (vm === "SRV2-FS") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.20" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
+          return "Ponechte výchozí stav: Obtain an IP address automatically.";
+        },
+        verify: (vm) => {
+          if (vm === "PC1-WIN") return "Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select IPAddress, PrefixOrigin";
+          return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -AddressFamily IPv4`;
+        }
+      },
+      {
+        id: "admin-account",
+        title: "5. Účet administrátora a heslo",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Standardizovaný účet Administrator s heslem Pa55w.rd. Na Windows 11 je nutné jej povolit manuálně.",
+        how: (vm) => {
+          if (vm === "PC1-WIN") return `Enable-LocalUser -Name "Administrator"\nSet-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)\n# Odhlásit se, přihlásit pod Administrator a odstranit dočasný účet.`;
+          return "Při instalaci nastavit heslo účtu Administrator na: Pa55w.rd";
+        },
+        verify: () => "Get-LocalUser | Select-Object Name, Enabled"
+      },
+      {
+        id: "locale",
+        title: "6. Jazyk, region a formáty (cs-CZ)",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Rozhraní zůstává anglické, ale systémové konvence (datum, čísla) odpovídají českému prostředí.",
+        how: () => `Set-Culture cs-CZ\nSet-WinSystemLocale cs-CZ\nSet-WinHomeLocation -GeoId 0x3d`,
+        verify: () => `Get-Culture | Select-Object Name, DisplayName\nGet-WinSystemLocale\nGet-WinHomeLocation`
+      },
+      {
+        id: "datetime-format",
+        title: "7. Formáty data, času a měny",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Ověření správné interpretace formátu data d.M.yyyy a měny Kč.",
+        how: () => `Settings -> Time & language -> Language & region -> Regional format: Czech (Czechia)`,
+        verify: () => `Get-Date -Format "d.M.yyyy H:mm:ss"\n(12345.67).ToString("C")`
+      },
+      {
+        id: "timezone",
+        title: "8. Časové pásmo (Praha)",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Časová synchronizace je vyžadována autentizačním protokolem Kerberos.",
+        how: () => `Set-TimeZone -Id "Central Europe Standard Time"`,
+        verify: () => "Get-TimeZone"
+      },
+      {
+        id: "keyboards",
+        title: "9. Klávesnice US a Czech (QWERTZ)",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Výchozí US rozložení pro zadávání příkazů, CZ s možností rychlého přepnutí (Win + mezerník).",
+        how: () => `$List = New-WinUserLanguageList "en-US"\n$List.Add("cs-CZ")\nSet-WinUserLanguageList $List -Force`,
+        verify: () => "Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips"
+      },
+      {
+        id: "privacy",
+        title: "10. Telemetrie a diagnostika na minimum",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Omezení síťového provozu a vypnutí telemetrických služeb na pozadí.",
+        how: () => `reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry /t REG_DWORD /d 1 /f\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" /v DisableLocation /t REG_DWORD /d 1 /f\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo" /v DisabledByGroupPolicy /t REG_DWORD /d 1 /f`,
+        verify: () => `Get-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" -Name AllowTelemetry\nGet-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" -Name DisableLocation\nGet-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo" -Name DisabledByGroupPolicy`
+      },
+      {
+        id: "activation",
+        title: "11. Aktivace Windows (LAB KEY)",
+        forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+        why: "Odstranění časového limitu zkušební doby a systémových omezení.",
+        how: () => `slmgr.vbs /ipk XXXXX-XXXXX-XXXXX-XXXXX-XXXXX\nslmgr.vbs /ato`,
+        verify: () => "slmgr.vbs /xpr"
+      },
+      {
+        id: "local-user-only",
+        title: "12. Pouze lokální účet (bez Microsoft Account)",
+        forVMs: ["PC1-WIN"],
+        why: "Klientský stroj bude řízen doménovým řadičem, nesmí používat cloudový účet.",
+        how: () => "V instalačním rozhraní OOBE nepoužívat Microsoft účet. Účet musí mít typ Local account.",
+        verify: () => "Get-LocalUser | Select-Object Name, Enabled"
+      }
+    ];
+
+    let currentVM = "SRV1-DC";
+    let selectedTaskId = "vm-specs";
+
+    function getStorageKey(vm, taskId) {
+      return `vm_task_${vm}_${taskId}`;
+    }
+
+    function switchVM(vm) {
+      currentVM = vm;
+      document.querySelectorAll('.vm-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(`btn-${vm}`).classList.add('active');
+      
+      const relevant = taskDefinitions.filter(t => t.forVMs.includes(currentVM));
+      if (!relevant.find(t => t.id === selectedTaskId)) {
+        selectedTaskId = relevant[0].id;
+      }
+      render();
+    }
+
+    function toggleTask(taskId, checked, ev) {
+      if (ev) ev.stopPropagation();
+      localStorage.setItem(getStorageKey(currentVM, taskId), checked ? "1" : "0");
+      render();
+    }
+
+    function selectTask(taskId) {
+      selectedTaskId = taskId;
+      render();
+    }
+
+    function resetCurrentVM() {
+      if (confirm(`Resetovat záznamy pro ${currentVM}?`)) {
+        taskDefinitions.forEach(t => localStorage.removeItem(getStorageKey(currentVM, t.id)));
+        render();
+      }
+    }
+
+    function copyToClipboard(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = "Zkopírováno";
+        setTimeout(() => btn.innerText = orig, 1200);
+      });
+    }
+
+    function updateBadges() {
+      ["SRV1-DC", "SRV2-FS", "PC1-WIN"].forEach(vm => {
+        const tasks = taskDefinitions.filter(t => t.forVMs.includes(vm));
+        const done = tasks.filter(t => localStorage.getItem(getStorageKey(vm, t.id)) === "1").length;
+        document.getElementById(`badge-${vm}`).innerText = `${done}/${tasks.length}`;
+      });
+    }
+
+    function render() {
+      updateBadges();
+
+      const relevantTasks = taskDefinitions.filter(t => t.forVMs.includes(currentVM));
+      const listEl = document.getElementById("task-list");
+      listEl.innerHTML = "";
+
+      let doneCount = 0;
+
+      relevantTasks.forEach(t => {
+        const isDone = localStorage.getItem(getStorageKey(currentVM, t.id)) === "1";
+        if (isDone) doneCount++;
+
+        const li = document.createElement("li");
+        li.className = `task-item ${t.id === selectedTaskId ? 'selected' : ''}`;
+        li.onclick = () => selectTask(t.id);
+
+        li.innerHTML = `
+          <input type="checkbox" ${isDone ? "checked" : ""} onclick="toggleTask('${t.id}', this.checked, event)">
+          <span class="task-label ${isDone ? 'done' : ''}">${t.title}</span>
+        `;
+        listEl.appendChild(li);
+      });
+
+      const pct = Math.round((doneCount / relevantTasks.length) * 100);
+      document.getElementById("progress-bar").style.width = `${pct}%`;
+      document.getElementById("progress-text").innerText = `${pct} %`;
+
+      const currentTask = relevantTasks.find(t => t.id === selectedTaskId) || relevantTasks[0];
+      const isDone = localStorage.getItem(getStorageKey(currentVM, currentTask.id)) === "1";
+      const howText = typeof currentTask.how === "function" ? currentTask.how(currentVM) : currentTask.how;
+      const verifyText = typeof currentTask.verify === "function" ? currentTask.verify(currentVM) : currentTask.verify;
+
+      const detailEl = document.getElementById("detail-pane");
+      detailEl.innerHTML = `
+        <div class="detail-title">
+          <span>${currentTask.title}</span>
+          <label style="font-size:0.85rem; font-weight:normal; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <input type="checkbox" ${isDone ? "checked" : ""} style="width:16px;height:16px;accent-color:var(--accent);" onchange="toggleTask('${currentTask.id}', this.checked)">
+            Označit jako hotové
+          </label>
+        </div>
+
+        <div class="box">
+          <div class="box-header">Kontext</div>
+          <div class="box-content">${currentTask.why}</div>
+        </div>
+
+        <div class="box">
+          <div class="box-header">
+            <span>Konfigurace</span>
+            <button class="copy-btn" onclick="copyToClipboard(\`${howText.replace(/`/g, '\\`')}\`, this)">Kopírovat</button>
+          </div>
+          <div class="box-content"><pre>${howText}</pre></div>
+        </div>
+
+        <div class="box">
+          <div class="box-header">
+            <span>Ověření (PowerShell)</span>
+            <button class="copy-btn" onclick="copyToClipboard(\`${verifyText.replace(/`/g, '\\`')}\`, this)">Kopírovat</button>
+          </div>
+          <div class="box-content"><pre>${verifyText}</pre></div>
+        </div>
+      `;
+    }
+
+    render();
+  </script>
+</body>
+</html>
+
