@@ -3,116 +3,249 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Architektura OS - Teorie</title>
+  <title>Architektura OS – Teorie & Dokumentace</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Knihovna Marked.js pro převod Markdownu na HTML -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
-      --bg: #121417;
-      --panel: #1a1d23;
-      --card: #22262f;
-      --border: #313744;
-      --border-light: #424a5b;
+      --bg: #0d1117;
+      --panel: #161b22;
+      --card: #21262d;
+      --border: #30363d;
+      --border-light: #8b949e;
       --text: #e6edf3;
       --text-muted: #8b949e;
-      --accent: #2563eb;
+      --accent: #1f6feb;
+      --accent-hover: #388bfd;
       --accent-text: #ffffff;
-      --code-bg: #0d1117;
+      --code-bg: #010409;
+      --sidebar-width: 300px;
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
-         
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
-      padding: 20px;
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
+
+    /* Čistý a prostorný Header */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-      width: 100%;
-    }
-    h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-    .back-btn {
+      padding: 16px 30px;
       background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .back-btn {
+      background: var(--card);
       border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 6px 14px;
-      border-radius: 4px;
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 0.85rem;
       text-decoration: none;
-      transition: border-color 0.2s, color 0.2s;
+      transition: background 0.2s, border-color 0.2s;
     }
+
     .back-btn:hover {
+      background: var(--border);
       border-color: var(--border-light);
-      color: var(--text);
     }
-    .container {
-      max-width: 900px;
-      width: 100%;
-      margin: 0 auto;
+
+    /* Hlavní layout (Sidebar + Obsah) */
+    .layout {
       display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .box {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 4px;
+      flex: 1;
       overflow: hidden;
     }
-    .box-header {
-      padding: 8px 14px;
-      background: rgba(0, 0, 0, 0.2);
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
-      border-bottom: 1px solid var(--border);
+
+    /* Vylepšený Sidebar */
+    sidebar {
+      width: var(--sidebar-width);
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 20px 14px;
+      flex-shrink: 0;
     }
-    .box-content {
-      padding: 16px;
-      font-size: 0.9rem;
+
+    sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      padding-left: 8px;
+      letter-spacing: 0.08em;
+    }
+
+    .nav-group {
+      margin-bottom: 20px;
+    }
+
+    .nav-group-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #58a6ff;
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+
+    sidebar ul {
+      list-style: none;
+    }
+
+    sidebar li {
+      margin-bottom: 2px;
+    }
+
+    sidebar button {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    sidebar button:hover {
+      background: rgba(255, 255, 255, 0.04);
       color: var(--text);
     }
-    .box-content p {
-      margin-bottom: 10px;
-    }
-    .box-content ul {
-      padding-left: 20px;
-      margin-top: 6px;
-      margin-bottom: 10px;
-    }
-    .box-content li {
-      margin-bottom: 6px;
-    }
-    .highlight {
-      color: #60a5fa;
+
+    sidebar button.active {
+      background: var(--accent);
+      color: var(--accent-text);
       font-weight: 500;
     }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+
+    /* Hlavní obsahová část */
+    main {
+      flex: 1;
+      padding: 40px;
+      overflow-y: auto;
+      background: var(--bg);
     }
-    @media (max-width: 768px) {
-      .grid-2 { grid-template-columns: 1fr; }
+
+    .content-box {
+      max-width: 850px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Styly pro vykreslený Markdown */
+    .content-box h1, .content-box h2, .content-box h3 {
+      margin-top: 1.5em;
+      margin-bottom: 0.6em;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.3em;
+    }
+
+    .content-box h1:first-child, .content-box h2:first-child {
+      margin-top: 0;
+    }
+
+    .content-box p {
+      margin-bottom: 1em;
+      color: #c9d1d9;
+    }
+
+    .content-box ul, .content-box ol {
+      margin-left: 24px;
+      margin-bottom: 1em;
+      color: #c9d1d9;
+    }
+
+    .content-box li {
+      margin-bottom: 4px;
+    }
+
+    .content-box code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: #ff7b72;
+      border: 1px solid var(--border);
+    }
+
+    .content-box pre {
+      background: var(--code-bg);
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 1em;
+      border: 1px solid var(--border);
+    }
+
+    .content-box pre code {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 0;
+    }
+
+    .content-box table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1em;
+    }
+
+    .content-box th, .content-box td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .content-box th {
+      background: var(--card);
+      font-weight: 600;
+    }
+
+    .content-box blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+      color: var(--text-muted);
+      margin-bottom: 1em;
+    }
+
+    .placeholder-state {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .placeholder-state h2 {
+      border: none;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -122,69 +255,102 @@
     <a href="index.html" class="back-btn">← Zpět domů</a>
   </header>
 
-  <div class="container">
-    <!-- Režimy a Mode bit -->
-    <div class="box">
-      <div class="box-header">Režimy procesoru a Mode bit</div>
-      <div class="box-content">
-        <p><strong>Mode bit:</strong> Hardwarový přepínač režimů v procesoru (<span class="highlight">"furt otočený zády"</span> k přímým požadavkům zvenčí) – slouží k ochraně systému a oddělení uživatelského prostoru od jádra.</p>
-      </div>
-    </div>
-
-    <!-- Bezpečnostní okruhy (Protection Rings) -->
-    <div class="box">
-      <div class="box-header">Bezpečnostní okruhy procesoru (Protection Rings)</div>
-      <div class="box-content">
+  <div class="layout">
+    <!-- Sidebar s výběrem souborů -->
+    <sidebar>
+      <h3>Seznam témat (.md)</h3>
+      
+      <div class="nav-group">
+        <div class="nav-group-title">1. Úvod & Architektura</div>
         <ul>
-          <li><strong>Ring 0 (Kernel):</strong> Přístup ke všem instrukcím a registrům (plná oprávnění).</li>
-          <li><strong>Ring 1 & Ring 2:</strong> Některé registry a instrukce (v praxi se běžně nevyužívají / nic).</li>
-          <li><strong>Ring 3 (User):</strong> Omezený přístup pro běžné aplikace a uživatelský prostor.</li>
+          <li><button onclick="loadMarkdown('md/01_Vypocetni_system.md', this)">01_Vypocetni_system.md</button></li>
+          <li><button onclick="loadMarkdown('md/01_STRUKTURA_OPERAČNÍCH_SYSTÉMŮ (1).md', this)">01_STRUKTURA_OS</button></li>
+          <li><button onclick="loadMarkdown('md/02_Co_je_to_operacni_system.md', this)">02_Co_je_to_operacni_system.md</button></li>
+          <li><button onclick="loadMarkdown('md/02_BIOS_UEFI.md', this)">02_BIOS_UEFI.md</button></li>
+          <li><button onclick="loadMarkdown('md/03_Funkce_OS.md', this)">03_Funkce_OS.md</button></li>
+          <li><button onclick="loadMarkdown('md/04_Rozdeleni_OS.md', this)">04_Rozdeleni_OS.md</button></li>
+          <li><button onclick="loadMarkdown('md/05_Historie_OS.md', this)">05_Historie_OS.md</button></li>
         </ul>
       </div>
-    </div>
 
-    <!-- Rozdělení podle ringů -->
-    <div class="box">
-      <div class="box-header">Rozdělení komponent podle ringů</div>
-      <div class="box-content">
-        <div class="grid-2">
-          <div>
-            <p><strong style="color: #34d399;">Ring 0 (Jádro):</strong></p>
-            <ul style="color: var(--text-muted); font-size: 0.88rem;">
-              <li>Plánovač (Scheduler)</li>
-              <li>Dispečer</li>
-              <li>Správce paměti</li>
-              <li>IPC (Meziprocesová komunikace)</li>
-            </ul>
-          </div>
-          <div>
-            <p><strong style="color: #f87171;">Ring 3 (Uživatelské prostředí):</strong></p>
-            <ul style="color: var(--text-muted); font-size: 0.88rem;">
-              <li>CLI (bash)</li>
-              <li>GUI (grafické prostředí)</li>
-              <li>Aplikace (Word, Xmail atd.)</li>
-            </ul>
-          </div>
+      <div class="nav-group">
+        <div class="nav-group-title">2. Hardware, Periferie & Paměť</div>
+        <ul>
+          <li><button onclick="loadMarkdown('md/01_Sprava_periferii_a_preruseni.md', this)">01_Sprava_periferii</button></li>
+          <li><button onclick="loadMarkdown('md/01_Sprava_pameti_uvod.md', this)">01_Sprava_pameti_uvod.md</button></li>
+          <li><button onclick="loadMarkdown('md/02_Hlavni_pamet.md', this)">02_Hlavni_pamet.md</button></li>
+          <li><button onclick="loadMarkdown('md/03_Segmentace.md', this)">03_Segmentace.md</button></li>
+          <li><button onclick="loadMarkdown('md/04_Strankovani.md', this)">04_Strankovani.md</button></li>
+          <li><button onclick="loadMarkdown('md/05_Virtualni_pamet.md', this)">05_Virtualni_pamet.md</button></li>
+          <li><button onclick="loadMarkdown('md/03_Device_Drivers.md', this)">03_Device_Drivers.md</button></li>
+          <li><button onclick="loadMarkdown('md/01_Mass_Storage_Structure.md', this)">01_Mass_Storage</button></li>
+          <li><button onclick="loadMarkdown('md/02_Disk_Scheduling_Management.md', this)">02_Disk_Scheduling</button></li>
+          <li><button onclick="loadMarkdown('md/03_RAID_Stable_Storage.md', this)">03_RAID_Stable_Storage.md</button></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">3. Procesy & Plánování</div>
+        <ul>
+          <li><button onclick="loadMarkdown('md/01_Process_Concept.md', this)">01_Process_Concept.md</button></li>
+          <li><button onclick="loadMarkdown('md/02_Process_Scheduling.md', this)">02_Process_Scheduling.md</button></li>
+          <li><button onclick="loadMarkdown('md/03_Operations_on_Processes.md', this)">03_Operations_on_Processes.md</button></li>
+          <li><button onclick="loadMarkdown('md/04_IPC.md', this)">04_IPC.md</button></li>
+          <li><button onclick="loadMarkdown('md/05_Process_Synchronisation.md', this)">05_Process_Synchronisation.md</button></li>
+          <li><button onclick="loadMarkdown('md/06_CPU_Scheduling.md', this)">06_CPU_Scheduling.md</button></li>
+          <li><button onclick="loadMarkdown('md/07_Multitasking_Multithreading.md', this)">07_Multitasking</button></li>
+        </ul>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-group-title">4. Souborové systémy & Rozhraní</div>
+        <ul>
+          <li><button onclick="loadMarkdown('md/04_File_Concept_Access.md', this)">04_File_Concept_Access.md</button></li>
+          <li><button onclick="loadMarkdown('md/05_Directory_Structures.md', this)">05_Directory_Structures.md</button></li>
+          <li><button onclick="loadMarkdown('md/05_Souborove_systemy.md', this)">05_Souborove_systemy.md</button></li>
+          <li><button onclick="loadMarkdown('md/06_File_System_Implementation.md', this)">06_File_System_Implementation</button></li>
+          <li><button onclick="loadMarkdown('md/04_Systemova_volani.md', this)">04_Systemova_volani.md</button></li>
+          <li><button onclick="loadMarkdown('md/06_Zakladni_datove_struktury.md', this)">06_Zakladni_datove_struktury.md</button></li>
+        </ul>
+      </div>
+    </sidebar>
+
+    <!-- Hlavní obsah pro vykreslení -->
+    <main>
+      <div class="content-box" id="content">
+        <div class="placeholder-state">
+          <h2>Vyberte téma v levém menu</h2>
+          <p style="color: var(--text-muted);">Kliknutím na libovolný soubor se jeho obsah automaticky načte a vykreslí přímo zde.</p>
         </div>
       </div>
-    </div>
-
-    <!-- Architektura jádra -->
-    <div class="box">
-      <div class="box-header">Architektura jádra (Kernel Types)</div>
-      <div class="box-content">
-        <div class="grid-2">
-          <div>
-            <p><strong>Monolitické jádro:</strong></p>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Vše běží pohromadě v Ring 0. Je velmi rychlé (fast), ale pád jedné komponenty ovlivní celý systém.</p>
-          </div>
-          <div>
-            <p><strong>Mikrokernel:</strong></p>
-            <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">V Ring 0 běží jen nutný základ (cca 3 programy/služby), zbytek je venku. Je výrazně stabilnější.</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    </main>
   </div>
+
+  <script>
+    function loadMarkdown(filePath, btnElement) {
+      document.querySelectorAll('sidebar button').forEach(b => b.classList.remove('active'));
+      if(btnElement) btnElement.classList.add('active');
+
+      document.getElementById('content').innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Načítám data...</p>';
+
+      fetch(filePath)
+        .then(response => {
+          if (!response.ok) throw new Error('Soubor nenalezen');
+          return response.text();
+        })
+        .then(markdown => {
+          document.getElementById('content').innerHTML = marked.parse(markdown);
+        })
+        .catch(err => {
+          document.getElementById('content').innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+              <h3 style="color: #f87171; margin-bottom: 8px;">Chyba při načítání souboru</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Soubor <code>${filePath}</code> se nepodařilo načíst.</p>
+              <p style="color: #58a6ff; font-size: 0.85rem; margin-top: 12px;">Tip: Ujistěte se, že projekt spouštíte přes lokální server (např. Live Server ve VS Code), nikoliv přímo z disku (file:///), kvůli blokování CORS prohlížečem.</p>
+            </div>
+          `;
+        });
+    }
+  </script>
 </body>
 </html>
