@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="idk co tu napsat prostě nemáme rádi FUCKING OPS a tak vznikla tato stránka, kde je vše co budete potřebovat asi idk...">
+    <link rel="icon" type="image/x-icon" href="img/remielle.jpg">
     <title>OPS</title>
     <style>
         body.custom-layout {
@@ -49,7 +50,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* Ztmavení obrázku */
+            background: rgba(0, 0, 0, 0.4);
             transition: background 0.3s ease;
         }
 
@@ -71,27 +72,27 @@
             z-index: 1;
         }
 
-        /* Teorie – obrázek pozadí */
+        /* Teorie – výchozí obrázek (Safe) */
         .choice-btn.teorie {
-            background-image: url('img/teorie-bg.jpg');
+            background-image: url('img/teorieS-bg.jpg');
             width: 53%;
             clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%);
             margin-left: 0;
             z-index: 2;
         }
 
-        /* Praxe – obrázek pozadí */
+        /* Praxe – výchozí obrázek (Safe) */
         .choice-btn.praxe {
-            background-image: url('img/praxe-bg.jpg');
+            background-image: url('img/praxeS-bg.jpg');
             width: 53%;
             clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%);
             margin-left: -4%;
             z-index: 1;
         }
 
-        /* Prezentace – obrázek pozadí, rovná přes celou šířku */
+        /* Prezentace – výchozí obrázek (Safe) */
         .choice-btn.prezentace {
-            background-image: url('img/prezentace-bg.jpg');
+            background-image: url('img/prezentaceS-bg.jpg');
             width: 100%;
             clip-path: none;
             margin-left: 0;
@@ -105,12 +106,34 @@
         }
 
         .choice-btn:hover::before {
-            background: rgba(0, 0, 0, 0.2); /* Po najetí myši obrázek mírně projasní */
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .choice-btn:hover::after {
             transform: scale(1.08);
             background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Čisté tlačítko ♦ v rohu */
+        #mode-toggle-btn {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.4);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            border: none;
+        }
+
+        #mode-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
         }
 
         /* Responzivita pro mobily */
@@ -135,6 +158,8 @@
     </style>
 </head>
 <body class="custom-layout">
+    <!-- Čisté přepínací tlačítko -->
+    <button id="mode-toggle-btn" title="Přepnout režim">♦</button>
 
     <!-- Horní řada: Teorie a Praxe -->
     <div class="top-row">
@@ -144,8 +169,41 @@
 
     <!-- Dolní řada: Prezentace -->
     <div class="bottom-row">
-       <a href="https://frengp.sharepoint.com/:x:/r/sites/OPST3ASKA2026/Vukov%20materily/REFERÁTY-T3A2026.xlsx?d=wfb85ec39e54e4c3f956a90053bbc30f1&csf=1&web=1&e=5OsbBZ" target="_blank" rel="noopener noreferrer" class="choice-btn prezentace" data-text="Prezentace"></a>>
+        <a href="https://frengp.sharepoint.com/:x:/r/sites/OPST3ASKA2026/Vukov%20materily/REFERÁTY-T3A2026.xlsx?d=wfb85ec39e54e4c3f956a90053bbc30f1&csf=1&web=1&e=5OsbBZ" class="choice-btn prezentace" data-text="Prezentace"></a>
     </div>
 
+    <script>
+        function applyMode(mode) {
+            const teorieBtn = document.querySelector('.choice-btn.teorie');
+            const praxeBtn = document.querySelector('.choice-btn.praxe');
+            const prezentaceBtn = document.querySelector('.choice-btn.prezentace');
+
+            if (mode === 'funny') {
+                if (teorieBtn) teorieBtn.style.backgroundImage = "url('img/teorie-bg.jpg')";
+                if (praxeBtn) praxeBtn.style.backgroundImage = "url('img/praxe-bg.jpg')";
+                if (prezentaceBtn) prezentaceBtn.style.backgroundImage = "url('img/prezentace-bg.jpg')";
+            } else {
+                // safe (výchozí)
+                if (teorieBtn) teorieBtn.style.backgroundImage = "url('img/teorieS-bg.jpg')";
+                if (praxeBtn) praxeBtn.style.backgroundImage = "url('img/praxeS-bg.jpg')";
+                if (prezentaceBtn) prezentaceBtn.style.backgroundImage = "url('img/prezentaceS-bg.jpg')";
+            }
+            
+            localStorage.setItem('selectedBgMode', mode);
+        }
+
+        // Kliknutím na tlačítko se režim přepne na opačný
+        document.getElementById('mode-toggle-btn').addEventListener('click', function() {
+            const currentMode = localStorage.getItem('selectedBgMode') || 'safe';
+            const newMode = (currentMode === 'safe') ? 'funny' : 'safe';
+            applyMode(newMode);
+        });
+
+        // Načtení uloženého režimu při spuštění stránky (výchozí je 'safe')
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedMode = localStorage.getItem('selectedBgMode') || 'safe';
+            applyMode(savedMode);
+        });
+    </script>
 </body>
 </html>
