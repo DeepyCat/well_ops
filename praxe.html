@@ -964,33 +964,45 @@
 
     .t-line.empty {
       height: 8px;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .t-ps-prompt {
       color: #58a6ff;
       font-weight: 700;
       user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
       flex-shrink: 0;
     }
 
     .t-cmd-text {
       color: #e6edf3;
+      user-select: text;
+      -webkit-user-select: text;
     }
 
-    .t-line.t-comment {
+    .t-line.t-comment,
+    .t-comment-text {
       color: #8b949e;
       font-style: italic;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      cursor: default;
     }
 
     .t-prefix {
       color: #6e7681;
       font-weight: 700;
       user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
       flex-shrink: 0;
-    }
-
-    .t-comment-text {
-      color: #8b949e;
     }
 
     @media screen and (max-width: 900px) {
@@ -1134,14 +1146,20 @@
                   <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}"><strong>5× 10 GB</strong> (Storage Pool)</td>
                   <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">—</td>
                 </tr>
+                <tr>
+                  <td><strong>Sítě v CyLab</strong></td>
+                  <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">NIC 1, <strong>NIC 2 (zapnout!)</strong>, NIC 3</td>
+                  <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}">NIC 1, <strong>NIC 2 (zapnout!)</strong>, NIC 3</td>
+                  <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">NIC 1, <strong>NIC 2 (zapnout!)</strong>, NIC 3</td>
+                </tr>
               </tbody>
             </table>
           </div>
         `,
         how: (vm) => {
-          if (vm === "PC1-WIN") return "V hypervizoru: 2 vCPU, 8 GB RAM, 60 GB systémový disk.";
-          if (vm === "SRV2-FS") return "V hypervizoru: 2 vCPU, 8 GB RAM, 100 GB systémový disk + 5x virtuální disk o velikosti 10 GB.";
-          return "V hypervizoru: 2 vCPU, 8 GB RAM, 100 GB systémový disk.";
+          if (vm === "PC1-WIN") return "V hypervizoru (CyLab): 2 vCPU, 8 GB RAM, 60 GB systémový disk. Zkontrolujte, že je zapnutý síťový adaptér NIC 2.";
+          if (vm === "SRV2-FS") return "V hypervizoru (CyLab): 2 vCPU, 8 GB RAM, 100 GB systémový disk + 5x virtuální disk 10 GB. Zkontrolujte, že je zapnutý adaptér NIC 2.";
+          return "V hypervizoru (CyLab): 2 vCPU, 8 GB RAM, 100 GB systémový disk. Zkontrolujte, že je zapnutý síťový adaptér NIC 2.";
         },
         verify: (vm) => {
           if (vm === "SRV2-FS") return "Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle\n# Ověřte systémový disk (~100 GB) a 5x RAW disků (~10 GB)";
@@ -1233,7 +1251,7 @@
                 <div class="nic-list-row">
                   <span class="nic-name">NIC 2 (Ethernet 1)</span>
                   <span class="nic-tag-badge success">INTERNÍ LAB SÍŤ</span>
-                  <span><strong>ZDE NASTAVUJETE IP!</strong> Propojuje všechny vaše lokální VM (DC, FS, PC). Podsíť: <code>192.168.${workstationX}.0/24</code>.</span>
+                  <span><strong>ZDE NASTAVUJETE IP!</strong> Rozhraní musí být <strong>ZAPNUTÉ V HYPERVIZORU (CyLab)</strong>. Propojuje všechny vaše lokální VM (DC, FS, PC). Podsíť: <code>192.168.${workstationX}.0/24</code>.</span>
                 </div>
                 <div class="nic-list-row">
                   <span class="nic-name">NIC 3 (Ethernet 2)</span>
@@ -1243,7 +1261,10 @@
               </div>
               <div class="nic-note">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                <span>Před spuštěním ověřte příkazem <code>Get-NetAdapter</code> název NIC 2 adaptéru. V příkazu je použit obvyklý alias <code>Ethernet 1</code>. Pokud se u vás jmenuje např. <code>Ethernet 2</code> nebo <code>vEthernet</code>, upravte parametr <code>-InterfaceAlias</code>.</span>
+                <div>
+                  <strong>DŮLEŽITÉ UPOZORNĚNÍ PRO CYLAB:</strong> Síťový adaptér <strong>NIC 2 musíte mít v rozhraní hypervizoru (CyLab) zapnutý / připojený</strong> u všech svých VM, jinak virtuální stroje nebudou navzájem komunikovat!<br>
+                  Před spuštěním ověřte příkazem <code>Get-NetAdapter</code> název NIC 2 adaptéru. V příkazu je použit obvyklý alias <code>Ethernet 1</code>. Pokud se u vás jmenuje např. <code>Ethernet 2</code> nebo <code>vEthernet</code>, upravte parametr <code>-InterfaceAlias</code>.
+                </div>
               </div>
             </div>
           `;
@@ -1267,12 +1288,12 @@
         },
         how: (vm) => {
           if (vm === "SRV1-DC") {
-            return `# 1. Zkontrolujte adaptéry (hledáme NIC 2 pro interní propojení labu):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet 1" -IPAddress "192.168.${workstationX}.10" -PrefixLength 24 -DefaultGateway "192.168.${workstationX}.1"\n\n# 3. Nastavte DNS na adresu budoucího řadiče (sám na sebe):\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ServerAddresses ("192.168.${workstationX}.10")`;
+            return `# 1. Zkontrolujte adaptéry (NIC 2 musí být zapnutý v hypervizoru CyLab!):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet 1" -IPAddress "192.168.${workstationX}.10" -PrefixLength 24 -DefaultGateway "192.168.${workstationX}.1"\n\n# 3. Nastavte DNS na adresu budoucího řadiče (sám na sebe):\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ServerAddresses ("192.168.${workstationX}.10")`;
           }
           if (vm === "SRV2-FS") {
-            return `# 1. Zkontrolujte adaptéry (hledáme NIC 2 pro interní propojení labu):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet 1" -IPAddress "192.168.${workstationX}.20" -PrefixLength 24 -DefaultGateway "192.168.${workstationX}.1"\n\n# 3. Nastavte DNS směřující na SRV1-DC:\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ServerAddresses ("192.168.${workstationX}.10")`;
+            return `# 1. Zkontrolujte adaptéry (NIC 2 musí být zapnutý v hypervizoru CyLab!):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet 1" -IPAddress "192.168.${workstationX}.20" -PrefixLength 24 -DefaultGateway "192.168.${workstationX}.1"\n\n# 3. Nastavte DNS směřující na SRV1-DC:\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ServerAddresses ("192.168.${workstationX}.10")`;
           }
-          return `# Ověřte, že NIC 2 je nakonfigurován pro automatické DHCP:\nSet-NetIPInterface -InterfaceAlias "Ethernet 1" -Dhcp Enabled\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ResetServerAddresses`;
+          return `# 1. Zkontrolujte adaptéry (NIC 2 musí být zapnutý v hypervizoru CyLab!):\nGet-NetAdapter\n\n# 2. Ověřte, že NIC 2 je nakonfigurován pro automatické DHCP:\nSet-NetIPInterface -InterfaceAlias "Ethernet 1" -Dhcp Enabled\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ResetServerAddresses`;
         },
         verify: (vm) => {
           if (vm === "PC1-WIN") {
@@ -1484,13 +1505,25 @@
     function copyTaskCode(taskId, type, btn) {
       const task = taskDefinitions.find(t => t.id === taskId);
       if (!task) return;
-      let code = "";
+      let rawCode = "";
       if (type === "how") {
-        code = typeof task.how === "function" ? task.how(currentVM) : task.how;
+        rawCode = typeof task.how === "function" ? task.how(currentVM) : task.how;
       } else if (type === "verify") {
-        code = typeof task.verify === "function" ? task.verify(currentVM) : task.verify;
+        rawCode = typeof task.verify === "function" ? task.verify(currentVM) : task.verify;
       }
-      navigator.clipboard.writeText(code).then(() => {
+      if (!rawCode) return;
+
+      // Zkopírovat pouze spustitelné příkazy (vynechat komentáře začínající na #)
+      const commandLines = rawCode
+        .split("\n")
+        .filter(line => !line.trim().startsWith("#"))
+        .join("\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+
+      const textToCopy = commandLines || rawCode.trim();
+
+      navigator.clipboard.writeText(textToCopy).then(() => {
         const origHtml = btn.innerHTML;
         btn.innerHTML = `
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
