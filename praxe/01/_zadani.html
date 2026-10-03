@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zadání: Modul 01 – Základní konfigurace VM (__zadani.md)</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --text-bright: #f0f6fc;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --accent-bg: rgba(56, 139, 253, 0.12);
+      --code-bg: #090d13;
+      --table-header: #1c2128;
+      --table-row-alt: #12161c;
+      --quote-border: #f59e0b;
+      --quote-bg: rgba(245, 158, 11, 0.08);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(22, 27, 34, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .nav-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-bg);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #21262d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #30363d;
+      border-color: #8b949e;
+      color: #fff;
+    }
+
+    .btn-primary {
+      background-color: #1f6feb;
+      border-color: rgba(240, 246, 252, 0.1);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background-color: #388bfd;
+      border-color: rgba(240, 246, 252, 0.2);
+    }
+
+    /* Document Container */
+    .container {
+      max-width: 960px;
+      margin: 32px auto 80px auto;
+      padding: 0 24px;
+    }
+
+    .markdown-body {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Markdown Typography */
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid rgba(48, 54, 61, 0.6);
+      padding-bottom: 8px;
+      margin-top: 36px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    p, ul, ol {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    ul, ol {
+      padding-left: 28px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    strong {
+      color: #fff;
+    }
+
+    /* Links */
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Blockquotes */
+    blockquote {
+      margin: 18px 0;
+      padding: 12px 18px;
+      background: var(--quote-bg);
+      border-left: 4px solid var(--quote-border);
+      border-radius: 0 6px 6px 0;
+      color: #fed7aa;
+      font-size: 0.95rem;
+    }
+
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 24px 0;
+      font-size: 0.92rem;
+      background: var(--bg);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid rgba(48, 54, 61, 0.5);
+    }
+
+    th:last-child, td:last-child {
+      border-right: none;
+    }
+
+    th {
+      background-color: var(--table-header);
+      color: var(--text-bright);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--table-row-alt);
+    }
+
+    tr:hover {
+      background-color: rgba(56, 139, 253, 0.05);
+    }
+
+    /* Inline Code */
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background-color: rgba(110, 118, 129, 0.2);
+      color: #ff7b72;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(240, 246, 252, 0.05);
+    }
+
+    /* Code Blocks */
+    .code-block-wrapper {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 16px 0 20px 0;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #161b22;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #e6edf3;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: inherit;
+    }
+
+    .copy-code-btn {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #c9d1d9;
+      font-size: 0.74rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .copy-code-btn:hover {
+      background: #30363d;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .markdown-body { padding: 20px 16px; }
+      .container { padding: 0 12px; margin-top: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-breadcrumb">
+      <a href="../../praxe.html">Interaktivní lab</a>
+      <span>/</span>
+      <span>praxe</span>
+      <span>/</span>
+      <span>01</span>
+      <span>/</span>
+      <span class="file-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        __zadani.md
+      </span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="__reseni.html" class="btn btn-primary" title="Přepnout na řešení a kontrolní seznam">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>Otevřít řešení (__reseni.md)</span>
+      </a>
+      <a href="../../praxe.html" class="btn" title="Zpět do interaktivního portálu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Zpět do labu</span>
+      </a>
+      <a href="__zadani.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Raw .md</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Document Body -->
+  <main class="container">
+    <article class="markdown-body">
+      <h1>[Co má být na konci modulu a jak to vypadá?]</h1>
+
+      <p><strong>Přibližný potřebný čas</strong>: 1 vyučovací hodina na stroj — postup se v projektu opakuje <strong>třikrát</strong>: pro <strong>SRV1-DC</strong>, <strong>SRV2-FS</strong> a klienta <strong>PC1-WIN</strong>.</p>
+
+      <h2>Kontext (proč to děláme)</h2>
+      <p>Než začneme řešit role (doména, DHCP, souborové služby...), potřebuje každý stroj — servery i klient — stejný, pečlivě připravený základ: správné jméno v síti, funkční síťové nastavení, bezpečný přístup administrátora, aktivovaný Windows a <strong>lokalizaci</strong> (jazyk, časové pásmo, formát data/času/měny), aby se dalo rozumně administrovat v českém prostředí a zároveň se studenti naučili anglickou terminologii, se kterou se v praxi i na certifikacích setkají. Tento modul je "nulový" — dělá se <strong>před</strong> Modulem 1 (na SRV1-DC), znovu <strong>před</strong> Modulem 6 (na SRV2-FS) a znovu pro klienta <strong>PC1-WIN</strong> (než začnete Modul 2 — DHCP), vždy se stejnými principy lokalizace, jen jiným typem OS a jinými síťovými hodnotami.</p>
+
+      <h2>Cílový stav</h2>
+      <p>Na konci tohoto modulu jsou nainstalované a připravené tři virtuální stroje s těmito <strong>konkrétními</strong> parametry:</p>
+
+      <h3>Parametry virtuálního stroje</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Parametr</th>
+            <th>SRV1-DC</th>
+            <th>SRV2-FS</th>
+            <th>PC1-WIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>vCPU</td>
+            <td>2 jádra</td>
+            <td>2 jádra</td>
+            <td>2 jádra</td>
+          </tr>
+          <tr>
+            <td>RAM</td>
+            <td>8 GB</td>
+            <td>8 GB</td>
+            <td>8 GB</td>
+          </tr>
+          <tr>
+            <td>Systémový disk</td>
+            <td>100 GB</td>
+            <td>100 GB</td>
+            <td>60 GB</td>
+          </tr>
+          <tr>
+            <td>Další disky</td>
+            <td>—</td>
+            <td><strong>5× 10 GB</strong> (pro Storage Pool a simulaci výpadku disku v Modulu 6)</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Všech 5 dodatečných disků u SRV2-FS se přidává do VM <strong>už v tomto modulu</strong>, spolu s vytvořením virtuálního stroje — v Modulu 6 se pak jen inicializují a poskládají do Storage Pool.</p>
+
+      <h3>Instalační edice</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Stroj</th>
+            <th>Edice</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>SRV1-DC, SRV2-FS</strong></td>
+            <td><strong>Windows Server 2025 Datacenter (Desktop Experience)</strong> — vždy s grafickým rozhraním, nikdy varianta Server Core. Datacenter edice je zvolena kvůli neomezenému počtu virtualizovaných instancí a plné sadě funkcí (Storage Spaces, atd.), i když si škola vystačí i se Standard — v projektu záměrně používáme Datacenter, aby žádná funkce z probíraných modulů nebyla licenčně omezená.</td>
+          </tr>
+          <tr>
+            <td><strong>PC1-WIN</strong></td>
+            <td><strong>Windows 11 Education N</strong> — edice Education je určená přímo pro nasazení ve školách (obsahuje stejné funkce jako Enterprise, včetně doménového joinu a centrální správy přes GPO/Intune); varianta <strong>N</strong> neobsahuje přeinstalované mediální technologie (Windows Media Player, Zprávy, kamera...) — v souladu s požadavky EU, dodávají se/instalují se zvlášť, pokud jsou potřeba.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Jazyk instalačního média je u všech tří strojů <strong>English (United States)</strong>.</p>
+
+      <h3>Účet administrátora</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Položka</th>
+            <th>Hodnota</th>
+            <th>Poznámka</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Účet (SRV1-DC, SRV2-FS)</td>
+            <td>vestavěný <code>Administrator</code></td>
+            <td>vytváří ho přímo instalace serveru</td>
+          </tr>
+          <tr>
+            <td>Účet (PC1-WIN)</td>
+            <td><code>Administrator</code></td>
+            <td>u Windows 11 je vestavěný účet <code>Administrator</code> ve výchozím stavu <strong>vypnutý</strong> a OOBE nedovolí založit nový účet pod tímto jménem — musí se <strong>ručně povolit</strong> po instalaci</td>
+          </tr>
+          <tr>
+            <td>Heslo</td>
+            <td><code>Pa55w.rd</code> (u všech tří strojů stejné)</td>
+            <td>standardizované labové heslo</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný administrátorský účet.</p>
+
+      <h3>Jméno počítače a síť</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Parametr</th>
+            <th>SRV1-DC</th>
+            <th>SRV2-FS</th>
+            <th>PC1-WIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hostname</td>
+            <td><code>SRV1-DC</code></td>
+            <td><code>SRV2-FS</code></td>
+            <td><code>PC1-WIN</code></td>
+          </tr>
+          <tr>
+            <td>Způsob přidělení IP</td>
+            <td>statická</td>
+            <td>statická</td>
+            <td><strong>automaticky přes DHCP</strong> (viz Modul 2 — v tomto modulu se síť u klienta neřeší, necháváme výchozí DHCP)</td>
+          </tr>
+          <tr>
+            <td>IP adresa</td>
+            <td><code>192.168.X.10</code></td>
+            <td><code>192.168.X.20</code></td>
+            <td>přidělena DHCP serverem z rozsahu <code>192.168.X.100</code>–<code>.200</code></td>
+          </tr>
+          <tr>
+            <td>Maska podsítě</td>
+            <td><code>255.255.255.0</code> (/24)</td>
+            <td><code>255.255.255.0</code> (/24)</td>
+            <td>přidělena DHCP</td>
+          </tr>
+          <tr>
+            <td>Výchozí brána</td>
+            <td><code>192.168.X.1</code></td>
+            <td><code>192.168.X.1</code></td>
+            <td>přidělena DHCP</td>
+          </tr>
+          <tr>
+            <td>Preferovaný DNS server</td>
+            <td><code>192.168.X.10</code> (sám na sebe)</td>
+            <td><code>192.168.X.10</code> (SRV1-DC)</td>
+            <td>přidělen DHCP</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <blockquote>
+        <p><strong>Upozornění k síti:</strong> PC1-WIN v tomto modulu ještě nemá funkční síť se zbytkem infrastruktury (DHCP server ještě neexistuje) — připojení k internetu/síti během vlastní instalace Windows 11 řešíme jen kvůli aktivaci a případnému stažení aktualizací.</p>
+      </blockquote>
+
+      <h3>Aktivace Windows</h3>
+      <p>Všechny tři instalace se aktivují <strong>produktovým klíčem "LAB KEY"</strong>, který mají žáci k dispozici (školní volume-licencovaný klíč pro výukové/laboratorní nasazení — v dokumentaci jako placeholder <code>XXXXX-XXXXX-XXXXX-XXXXX-XXXXX</code>).</p>
+      <ul>
+        <li>Klíč lze zadat <strong>buď přímo během instalace</strong> (obrazovka "Product Key"), <strong>nebo až po instalaci</strong> přes <strong>Settings → System → Activation → Change product key</strong>, případně příkazy:
+          <div class="code-block-wrapper">
+            <div class="code-block-header">
+              <span>PowerShell / Command Prompt</span>
+              <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+            </div>
+            <pre><code>slmgr.vbs /ipk &lt;LAB-KEY&gt;
+slmgr.vbs /ato</code></pre>
+          </div>
+        </li>
+        <li>Ověření aktivace: <strong>Settings → System → Activation</strong> ukazuje "Windows is activated", případně příkazem <code>slmgr.vbs /xpr</code> vypíše trvalou aktivaci.</li>
+      </ul>
+
+      <h3>Jazyk, region a lokalizace</h3>
+      <p>Tato část je pro všechny tři stroje <strong>stejná</strong> (nezávisí na roli):</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Parametr</th>
+            <th>Hodnota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Windows display language (jazyk rozhraní)</td>
+            <td><strong>English (United States)</strong> — konzole, chybové hlášky i menu zůstávají anglicky kvůli mezinárodní terminologii a certifikacím</td>
+          </tr>
+          <tr>
+            <td>Formát regionu (Region format)</td>
+            <td><strong>Czech (Czech Republic)</strong> — datum, čas, měna a čísla podle českých standardů</td>
+          </tr>
+          <tr>
+            <td>Časové pásmo</td>
+            <td><strong>(UTC+01:00) Praha, Bratislava, Budapešť, Lublaň</strong> (Time zone ID: <code>Central Europe Standard Time</code>)</td>
+          </tr>
+          <tr>
+            <td>Formát data</td>
+            <td><code>d.M.yyyy</code> (např. <code>20.9.2026</code>)</td>
+          </tr>
+          <tr>
+            <td>Formát času</td>
+            <td><code>H:mm:ss</code> (24hodinový formát, např. <code>13:45:02</code>)</td>
+          </tr>
+          <tr>
+            <td>Formát měny</td>
+            <td><code>Kč</code> (např. <code>1 234,56 Kč</code>)</td>
+          </tr>
+          <tr>
+            <td>Rozložení klávesnice</td>
+            <td><strong>US i Czech (QWERTZ) zároveň</strong> s přepínáním přes <code>Win + mezerník</code></td>
+          </tr>
+          <tr>
+            <td>Home location (GeoId)</td>
+            <td><strong>Czech Republic</strong> (GeoId: <code>0x4b</code> / decimálně <code>75</code>)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Soukromí a telemetrie</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Nastavení</th>
+            <th>Požadovaná hodnota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Přihlášení Microsoft účtem</td>
+            <td>nepoužívá se nikde — jen lokální/vestavěný účet <code>Administrator</code></td>
+          </tr>
+          <tr>
+            <td>Diagnostická data (telemetrie)</td>
+            <td><strong>Required diagnostic data</strong> (minimální úroveň)</td>
+          </tr>
+          <tr>
+            <td>Vylepšování psaní rukou a psaní (inking &amp; typing)</td>
+            <td>vypnuto</td>
+          </tr>
+          <tr>
+            <td>Přizpůsobené (tailored) zážitky na základě diagnostických dat</td>
+            <td>vypnuto</td>
+          </tr>
+          <tr>
+            <td>Služby určování polohy (Location services)</td>
+            <td><strong>vypnuto</strong></td>
+          </tr>
+          <tr>
+            <td>Reklamní ID (Advertising ID)</td>
+            <td>vypnuto</td>
+          </tr>
+          <tr>
+            <td>Find My Device (jen PC1-WIN)</td>
+            <td>vypnuto</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Ověření (shrnutí, detaily viz `_vysledek.md`)</h2>
+      <ul>
+        <li>Server/klient odpovídá na <code>ping</code> a hostname sedí přesně podle tabulky výše.</li>
+        <li>Přihlášení jako <code>Administrator</code> / <code>Pa55w.rd</code> funguje na všech třech strojích (u PC1-WIN jako lokální účet).</li>
+        <li><code>Get-TimeZone</code>, <code>Get-Culture</code> / <code>Get-WinSystemLocale</code> a <code>Get-WinHomeLocation</code> v PowerShellu vrací hodnoty odpovídající tabulce.</li>
+        <li>Datum a čas (nebo výstup <code>Get-Date</code>) je ve formátu <code>d.M.yyyy H:mm:ss</code>.</li>
+        <li><strong>Settings → System → Activation</strong> ukazuje aktivovaný Windows na všech třech strojích.</li>
+      </ul>
+    </article>
+  </main>
+
+  <script>
+    function copySnippet(btn) {
+      const code = btn.closest('.code-block-wrapper').querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Zkopírováno!';
+        setTimeout(() => { btn.innerText = orig; }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

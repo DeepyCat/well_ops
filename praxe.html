@@ -52,6 +52,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
       border-bottom: 2px solid var(--border-color);
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       box-sizing: border-box;
@@ -71,7 +73,42 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .doc-link-btn {
+      background-color: #202428;
+      border: 1px solid #373e47;
+      color: #c9d1d9;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .doc-link-btn:hover {
+      background-color: #2b323a;
+      color: #58a6ff;
+      border-color: #58a6ff;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    .doc-link-btn .external-icon {
+      color: #8b949e;
+      transition: color 0.2s ease;
+      margin-left: 2px;
+    }
+
+    .doc-link-btn:hover .external-icon {
+      color: #58a6ff;
     }
 
     .back-btn {
@@ -1043,6 +1080,16 @@
   <header>
     <h1>Konfigurace zkurvených VM</h1>
     <div class="header-actions">
+      <a href="praxe/01/__zadani.html" target="_blank" rel="noopener noreferrer" class="doc-link-btn" title="Otevřít zformátované zadání (_zadani.md) v nové záložce">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        <span>_zadani.md</span>
+        <svg class="external-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+      </a>
+      <a href="praxe/01/__reseni.html" target="_blank" rel="noopener noreferrer" class="doc-link-btn" title="Otevřít zformátované řešení (__reseni.md) v nové záložce">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>__reseni.md</span>
+        <svg class="external-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+      </a>
       <button class="reset-btn" onclick="resetCurrentVM()">Resetovat stav VM</button>
       <a href="index.html" class="back-btn">Chcu zpět</a>
     </div>
