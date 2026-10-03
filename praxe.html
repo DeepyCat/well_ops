@@ -676,24 +676,71 @@
       font-weight: 600;
     }
 
-    .ws-number-input {
-      width: 52px;
+    .ws-stepper {
+      display: inline-flex;
+      align-items: center;
       background: #141414;
-      border: 1px solid #555;
-      border-radius: 4px;
-      color: #fff;
-      font-size: 0.95rem;
-      font-weight: bold;
-      padding: 4px 6px;
-      text-align: center;
-      outline: none;
+      border: 1px solid #444;
+      border-radius: 6px;
+      overflow: hidden;
       transition: all 0.2s ease;
     }
 
-    .ws-number-input:focus {
+    .ws-stepper:focus-within {
       border-color: var(--accent);
-      box-shadow: 0 0 6px rgba(255, 85, 85, 0.4);
-      background: #1d1717;
+      box-shadow: 0 0 8px rgba(255, 85, 85, 0.4);
+    }
+
+    .ws-step-btn {
+      width: 28px;
+      height: 28px;
+      background: #252525;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      user-select: none;
+      outline: none;
+      padding: 0;
+    }
+
+    .ws-step-btn:hover {
+      background: #353535;
+      color: #fff;
+    }
+
+    .ws-step-btn:active {
+      background: var(--accent);
+      color: #fff;
+      transform: scale(0.92);
+    }
+
+    .ws-number-input {
+      width: 44px;
+      height: 28px;
+      background: transparent;
+      border: none;
+      border-left: 1px solid #333;
+      border-right: 1px solid #333;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: bold;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+      appearance: textfield;
+      font-family: ui-monospace, monospace;
+      padding: 0;
+      margin: 0;
+    }
+
+    .ws-number-input::-webkit-outer-spin-button,
+    .ws-number-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
 
     .ws-info-pill {
@@ -717,144 +764,108 @@
       color: #555;
     }
 
-    /* Varovný a navigační banner pro síťová rozhraní NIC 1 / 2 / 3 */
+    /* Sjednocený varovný blok pro síťová rozhraní NIC 1 / 2 / 3 */
     .nic-warning-banner {
-      background: #1a1612;
-      border: 1px solid #452b12;
-      border-left: 4px solid #f59e0b;
+      background: #20170d;
+      border: 1px solid #5a3a14;
+      border-left: 5px solid #f59e0b;
       border-radius: 8px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
 
     .nic-warning-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       color: #fbbf24;
       font-weight: 700;
-      font-size: 0.88rem;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 12px;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.25);
     }
 
-    .nic-roles {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .nic-role-item {
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: 6px;
-      padding: 10px 12px;
-      border: 1px solid rgba(255, 255, 255, 0.06);
+    .nic-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 10px;
+      margin-bottom: 14px;
     }
 
-    .nic-role-item.nic-locked {
-      border-color: #552525;
-      background: rgba(45, 15, 15, 0.3);
-    }
-
-    .nic-role-item.nic-active {
-      border-color: #1e4a2a;
-      background: rgba(16, 45, 24, 0.35);
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.08);
-    }
-
-    .nic-role-item.nic-class {
-      border-color: #1d334e;
-      background: rgba(15, 30, 48, 0.3);
-    }
-
-    .nic-role-top {
+    .nic-list-row {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #e5e7eb;
     }
 
-    .nic-badge {
-      font-size: 0.75rem;
+    .nic-name {
       font-weight: 700;
-      font-family: ui-monospace, monospace;
+      color: #fff;
+      min-width: 130px;
+    }
+
+    .nic-tag-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
       padding: 2px 7px;
       border-radius: 4px;
+      text-transform: uppercase;
+      font-family: ui-monospace, monospace;
+      flex-shrink: 0;
     }
 
-    .nic-badge.danger {
-      background: rgba(239, 68, 68, 0.2);
+    .nic-tag-badge.danger {
+      background: rgba(239, 68, 68, 0.25);
       color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.4);
+      border: 1px solid rgba(239, 68, 68, 0.5);
     }
 
-    .nic-badge.success {
-      background: rgba(34, 197, 94, 0.2);
+    .nic-tag-badge.success {
+      background: rgba(34, 197, 94, 0.25);
       color: #86efac;
       border: 1px solid rgba(34, 197, 94, 0.5);
     }
 
-    .nic-badge.info {
-      background: rgba(59, 130, 246, 0.2);
+    .nic-tag-badge.info {
+      background: rgba(59, 130, 246, 0.25);
       color: #93c5fd;
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      border: 1px solid rgba(59, 130, 246, 0.5);
     }
 
-    .nic-tag {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-    }
-
-    .nic-tag.active {
-      color: #4ade80;
-    }
-
-    .nic-role-desc {
-      font-size: 0.8rem;
-      color: #d1d5db;
-      line-height: 1.45;
-    }
-
-    .nic-role-desc code {
-      background: rgba(0, 0, 0, 0.4);
-      padding: 1px 4px;
-      border-radius: 3px;
-      color: #fef08a;
-      font-family: ui-monospace, monospace;
-    }
-
-    .nic-alert-note {
+    .nic-note {
+      font-size: 0.82rem;
+      color: #fde68a;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      line-height: 1.5;
       display: flex;
       align-items: flex-start;
-      gap: 8px;
-      font-size: 0.78rem;
-      color: #fde68a;
-      background: rgba(245, 158, 11, 0.1);
-      padding: 8px 10px;
-      border-radius: 5px;
-      border: 1px solid rgba(245, 158, 11, 0.25);
-      line-height: 1.45;
+      gap: 10px;
     }
 
-    .nic-alert-note svg {
+    .nic-note svg {
       flex-shrink: 0;
-      margin-top: 2px;
+      margin-top: 3px;
       color: #f59e0b;
     }
 
-    .nic-alert-note code {
-      background: rgba(0, 0, 0, 0.4);
+    .nic-note code, .nic-list-row code {
+      background: rgba(0, 0, 0, 0.5);
       color: #fff;
-      padding: 1px 4px;
-      border-radius: 3px;
+      padding: 2px 6px;
+      border-radius: 4px;
       font-family: ui-monospace, monospace;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     /* Terminal Console Styling */
@@ -1043,7 +1054,15 @@
         <div class="ws-header">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
           <span class="ws-title">Pracoviště X:</span>
-          <input type="number" id="workstation-input" class="ws-number-input" min="1" max="254" value="2" oninput="changeWorkstation(this.value)">
+          <div class="ws-stepper">
+            <button type="button" class="ws-step-btn" onclick="stepWorkstation(-1)" title="Snížit číslo pracoviště">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <input type="number" id="workstation-input" class="ws-number-input" min="1" max="254" value="2" oninput="changeWorkstation(this.value)">
+            <button type="button" class="ws-step-btn" onclick="stepWorkstation(1)" title="Zvýšit číslo pracoviště">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+          </div>
         </div>
         <div class="ws-info-pill" id="ws-info-text">
           <span>Podsíť: <strong>192.168.2.0/24</strong></span>
@@ -1202,34 +1221,28 @@
           const nicBanner = `
             <div class="nic-warning-banner">
               <div class="nic-warning-header">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 <span>DŮLEŽITÉ: Pravidla síťových rozhraní (NIC) a kontrola adaptéru</span>
               </div>
-              <div class="nic-roles">
-                <div class="nic-role-item nic-locked">
-                  <div class="nic-role-top">
-                    <span class="nic-badge danger">NIC 1 (Ethernet)</span>
-                    <span class="nic-tag">NEŠAHAT</span>
-                  </div>
-                  <div class="nic-role-desc">Ponechat na pokoji. Slouží pro NAT, internetový přístup a management hypervizoru.</div>
+              <div class="nic-list">
+                <div class="nic-list-row">
+                  <span class="nic-name">NIC 1 (Ethernet)</span>
+                  <span class="nic-tag-badge danger">NEŠAHAT</span>
+                  <span>Ponechat na pokoji. Slouží pro NAT, internetový přístup a management hypervizoru.</span>
                 </div>
-                <div class="nic-role-item nic-active">
-                  <div class="nic-role-top">
-                    <span class="nic-badge success">NIC 2 (Ethernet 1)</span>
-                    <span class="nic-tag active">INTERNÍ LAB SÍŤ</span>
-                  </div>
-                  <div class="nic-role-desc"><strong>ZDE NASTAVUJETE IP!</strong> Propojuje všechny vaše lokální VM (DC, FS, PC). Podsíť: <code>192.168.${workstationX}.0/24</code>.</div>
+                <div class="nic-list-row">
+                  <span class="nic-name">NIC 2 (Ethernet 1)</span>
+                  <span class="nic-tag-badge success">INTERNÍ LAB SÍŤ</span>
+                  <span><strong>ZDE NASTAVUJETE IP!</strong> Propojuje všechny vaše lokální VM (DC, FS, PC). Podsíť: <code>192.168.${workstationX}.0/24</code>.</span>
                 </div>
-                <div class="nic-role-item nic-class">
-                  <div class="nic-role-top">
-                    <span class="nic-badge info">NIC 3 (Ethernet 2)</span>
-                    <span class="nic-tag">TŘÍDNÍ SÍŤ</span>
-                  </div>
-                  <div class="nic-role-desc">Propojení se všemi VM v učebně pro společné úlohy (ponechat dle pokynů lektora).</div>
+                <div class="nic-list-row">
+                  <span class="nic-name">NIC 3 (Ethernet 2)</span>
+                  <span class="nic-tag-badge info">TŘÍDNÍ SÍŤ</span>
+                  <span>Propojení se všemi VM v učebně pro společné úlohy (ponechat dle pokynů lektora).</span>
                 </div>
               </div>
-              <div class="nic-alert-note">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <div class="nic-note">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                 <span>Před spuštěním ověřte příkazem <code>Get-NetAdapter</code> název NIC 2 adaptéru. V příkazu je použit obvyklý alias <code>Ethernet 1</code>. Pokud se u vás jmenuje např. <code>Ethernet 2</code> nebo <code>vEthernet</code>, upravte parametr <code>-InterfaceAlias</code>.</span>
               </div>
             </div>
@@ -1376,6 +1389,13 @@
       localStorage.setItem('lab_workstation_x', workstationX.toString());
       updateWorkstationUI();
       render();
+    }
+
+    function stepWorkstation(delta) {
+      let num = workstationX + delta;
+      if (num < 1) num = 1;
+      if (num > 254) num = 254;
+      changeWorkstation(num);
     }
 
     function updateWorkstationUI() {
