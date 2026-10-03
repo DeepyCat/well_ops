@@ -19,7 +19,13 @@
       --code-bg: #151515;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scrollbar-width: thin;
+      scrollbar-color: #444 var(--bg-main);
+    }
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -165,12 +171,11 @@
 
     .workspace {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 320px minmax(0, 1fr);
       grid-template-rows: minmax(0, 1fr);
       gap: 18px;
       flex: 1;
       min-height: 0;
-      height: 100%;
       overflow: hidden;
     }
 
@@ -182,7 +187,6 @@
       flex-direction: column;
       overflow: hidden;
       min-height: 0;
-      height: 100%;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
@@ -363,28 +367,30 @@
       border-radius: 8px;
       padding: 22px 25px 35px 25px;
       overflow-y: auto;
+      overflow-x: hidden;
       min-height: 0;
-      height: 100%;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       gap: 16px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      scrollbar-width: thin;
+      scrollbar-color: #555 #1c1c1c;
     }
 
-    .detail-pane::-webkit-scrollbar, .task-items::-webkit-scrollbar, .terminal-body::-webkit-scrollbar {
+    .detail-pane::-webkit-scrollbar, .task-items::-webkit-scrollbar {
       width: 7px;
       height: 7px;
     }
-    .detail-pane::-webkit-scrollbar-track, .task-items::-webkit-scrollbar-track, .terminal-body::-webkit-scrollbar-track {
+    .detail-pane::-webkit-scrollbar-track, .task-items::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 4px;
     }
-    .detail-pane::-webkit-scrollbar-thumb, .task-items::-webkit-scrollbar-thumb, .terminal-body::-webkit-scrollbar-thumb {
+    .detail-pane::-webkit-scrollbar-thumb, .task-items::-webkit-scrollbar-thumb {
       background: #383838;
       border-radius: 4px;
     }
-    .detail-pane::-webkit-scrollbar-thumb:hover, .task-items::-webkit-scrollbar-thumb:hover, .terminal-body::-webkit-scrollbar-thumb:hover {
+    .detail-pane::-webkit-scrollbar-thumb:hover, .task-items::-webkit-scrollbar-thumb:hover {
       background: #555;
     }
 
@@ -921,15 +927,22 @@
       line-height: 1.6;
       color: #e6edf3;
       overflow-x: auto;
-      max-height: 380px;
-      overflow-y: auto;
+      overflow-y: visible;
+    }
+
+    .terminal-body::-webkit-scrollbar {
+      height: 6px;
+    }
+    .terminal-body::-webkit-scrollbar-thumb {
+      background: #383838;
+      border-radius: 3px;
     }
 
     .t-line {
       display: flex;
       align-items: baseline;
       gap: 10px;
-      word-break: break-all;
+      white-space: pre;
     }
 
     .t-line.empty {
@@ -963,7 +976,7 @@
       color: #8b949e;
     }
 
-    @media screen and (max-width: 860px) {
+    @media screen and (max-width: 860px), screen and (max-height: 740px) {
       body {
         height: auto;
         min-height: 100vh;
