@@ -1333,10 +1333,10 @@
         id: "locale",
         title: "6. Jazyk, region a formáty (cs-CZ)",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        what: () => "Nastavte regionální konvence a polohu na Česko (cs-CZ, GeoId 0x3d), přičemž jazyk rozhraní systému zůstane v angličtině (English US) kvůli odborné terminologii.",
-        how: () => `Set-Culture cs-CZ\nSet-WinSystemLocale cs-CZ\nSet-WinHomeLocation -GeoId 0x3d`,
+        what: () => "Nastavte regionální konvence a polohu na Česko (cs-CZ, GeoId 0x4b / 75), přičemž jazyk rozhraní systému zůstane v angličtině (English US) kvůli odborné terminologii.",
+        how: () => `Set-Culture cs-CZ\nSet-WinSystemLocale cs-CZ\nSet-WinHomeLocation -GeoId 0x4b`,
         verify: () => `Get-Culture | Select-Object Name, DisplayName\nGet-WinSystemLocale\nGet-WinHomeLocation\nGet-WinUILanguageOverride`,
-        expected: () => "Name : cs-CZ, DisplayName : Czech (Czechia)\nGet-WinSystemLocale: cs-CZ\nHomeLocation: 61 / Czech Republic\nGet-WinUILanguageOverride: prázdné nebo en-US (UI rozhraní zůstává anglicky)"
+        expected: () => "Name : cs-CZ, DisplayName : Czech (Czechia)\nGet-WinSystemLocale: cs-CZ\nHomeLocation: 75 / Czech Republic (GeoId: 0x4b)\nGet-WinUILanguageOverride: prázdné nebo en-US (UI rozhraní zůstává anglicky)"
       },
       {
         id: "datetime-format",
