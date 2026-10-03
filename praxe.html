@@ -27,30 +27,37 @@
       scrollbar-color: #444 var(--bg-main);
     }
     
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg-main);
       color: var(--text-main);
       line-height: 1.5;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       margin: 0;
       padding: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     header {
       width: 100%;
       background-color: var(--bg-sidebar);
-      padding: 15px 25px;
+      padding: 12px 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid var(--border-color);
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
       box-sizing: border-box;
-      z-index: 10;
+      z-index: 100;
+      position: sticky;
+      top: 0;
       flex-shrink: 0;
     }
 
@@ -108,10 +115,9 @@
       display: flex;
       flex-direction: column;
       flex: 1;
-      padding: 25px;
-      overflow: hidden;
-      min-height: 0;
+      padding: 20px 25px 60px 25px;
       box-sizing: border-box;
+      width: 100%;
     }
 
     .top-controls {
@@ -172,11 +178,8 @@
     .workspace {
       display: grid;
       grid-template-columns: 320px minmax(0, 1fr);
-      grid-template-rows: minmax(0, 1fr);
-      gap: 18px;
-      flex: 1;
-      min-height: 0;
-      overflow: hidden;
+      gap: 20px;
+      align-items: start;
     }
 
     .sidebar {
@@ -185,15 +188,18 @@
       border-radius: 8px;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
-      min-height: 0;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 75px;
+      max-height: calc(100vh - 95px);
+      overflow: hidden;
     }
 
     .sidebar-header {
       padding: 12px 16px;
       border-bottom: 1px solid var(--border-color);
       background: rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
     }
 
     .progress-bar-bg {
@@ -218,6 +224,9 @@
       flex: 1;
       padding: 0;
       margin: 0;
+      max-height: calc(100vh - 165px);
+      scrollbar-width: thin;
+      scrollbar-color: #555 #181818;
     }
 
     .task-item {
@@ -365,32 +374,29 @@
       background: var(--bg-box);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 22px 25px 35px 25px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      min-height: 0;
+      padding: 24px 28px 40px 28px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-      scrollbar-width: thin;
-      scrollbar-color: #555 #1c1c1c;
+      min-width: 0;
+      min-height: 400px;
     }
 
-    .detail-pane::-webkit-scrollbar, .task-items::-webkit-scrollbar {
+    .task-items::-webkit-scrollbar {
       width: 7px;
       height: 7px;
     }
-    .detail-pane::-webkit-scrollbar-track, .task-items::-webkit-scrollbar-track {
+    .task-items::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 4px;
     }
-    .detail-pane::-webkit-scrollbar-thumb, .task-items::-webkit-scrollbar-thumb {
+    .task-items::-webkit-scrollbar-thumb {
       background: #383838;
       border-radius: 4px;
     }
-    .detail-pane::-webkit-scrollbar-thumb:hover, .task-items::-webkit-scrollbar-thumb:hover {
+    .task-items::-webkit-scrollbar-thumb:hover {
       background: #555;
     }
 
@@ -976,16 +982,9 @@
       color: #8b949e;
     }
 
-    @media screen and (max-width: 860px), screen and (max-height: 740px) {
-      body {
-        height: auto;
-        min-height: 100vh;
-        overflow-y: auto;
-      }
+    @media screen and (max-width: 900px) {
       .main-content {
-        padding: 14px;
-        overflow: visible;
-        height: auto;
+        padding: 14px 14px 40px 14px;
       }
       .top-controls {
         flex-direction: column;
@@ -997,18 +996,17 @@
       }
       .workspace {
         grid-template-columns: 1fr;
-        grid-template-rows: auto;
-        overflow: visible;
-        height: auto;
+        gap: 16px;
       }
       .sidebar {
-        max-height: 260px;
-        height: auto;
+        position: static;
+        max-height: 280px;
+      }
+      .task-items {
+        max-height: 200px;
       }
       .detail-pane {
-        height: auto;
-        overflow: visible;
-        padding-bottom: 25px;
+        padding: 18px 18px 30px 18px;
       }
       .header-actions {
         flex-direction: row;
@@ -1422,6 +1420,13 @@
     function selectTask(taskId) {
       selectedTaskId = taskId;
       render();
+      const detailEl = document.getElementById("detail-pane");
+      if (detailEl) {
+        const topPos = detailEl.getBoundingClientRect().top + window.pageYOffset - 75;
+        if (window.pageYOffset > topPos || window.innerHeight + window.pageYOffset < topPos) {
+          window.scrollTo({ top: Math.max(0, topPos), behavior: "smooth" });
+        }
+      }
     }
 
     function resetCurrentVM() {
