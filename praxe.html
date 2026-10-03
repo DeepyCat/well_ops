@@ -164,9 +164,12 @@
     .workspace {
       display: grid;
       grid-template-columns: 320px 1fr;
+      grid-template-rows: minmax(0, 1fr);
       gap: 18px;
       flex: 1;
       min-height: 0;
+      height: 100%;
+      overflow: hidden;
     }
 
     .sidebar {
@@ -176,6 +179,8 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      min-height: 0;
+      height: 100%;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
@@ -354,12 +359,31 @@
       background: var(--bg-box);
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 25px;
+      padding: 22px 25px 35px 25px;
       overflow-y: auto;
+      min-height: 0;
+      height: 100%;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       gap: 16px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .detail-pane::-webkit-scrollbar, .task-items::-webkit-scrollbar, .terminal-body::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    .detail-pane::-webkit-scrollbar-track, .task-items::-webkit-scrollbar-track, .terminal-body::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    .detail-pane::-webkit-scrollbar-thumb, .task-items::-webkit-scrollbar-thumb, .terminal-body::-webkit-scrollbar-thumb {
+      background: #383838;
+      border-radius: 4px;
+    }
+    .detail-pane::-webkit-scrollbar-thumb:hover, .task-items::-webkit-scrollbar-thumb:hover, .terminal-body::-webkit-scrollbar-thumb:hover {
+      background: #555;
     }
 
     .detail-title {
@@ -618,21 +642,358 @@
       border-bottom: 1px solid rgba(255, 85, 85, 0.35);
     }
 
-    @media screen and (max-width: 768px) {
+    /* Ovládání čísla pracoviště X */
+    .workstation-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .ws-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .ws-number-input {
+      width: 52px;
+      background: #141414;
+      border: 1px solid #555;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: bold;
+      padding: 4px 6px;
+      text-align: center;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .ws-number-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 6px rgba(255, 85, 85, 0.4);
+      background: #1d1717;
+    }
+
+    .ws-info-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .ws-info-pill strong {
+      color: var(--accent-hover);
+      font-family: ui-monospace, monospace;
+    }
+
+    .ws-sep {
+      color: #555;
+    }
+
+    /* Varovný a navigační banner pro síťová rozhraní NIC 1 / 2 / 3 */
+    .nic-warning-banner {
+      background: #1a1612;
+      border: 1px solid #452b12;
+      border-left: 4px solid #f59e0b;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .nic-warning-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fbbf24;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 12px;
+    }
+
+    .nic-roles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .nic-role-item {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 6px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nic-role-item.nic-locked {
+      border-color: #552525;
+      background: rgba(45, 15, 15, 0.3);
+    }
+
+    .nic-role-item.nic-active {
+      border-color: #1e4a2a;
+      background: rgba(16, 45, 24, 0.35);
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.08);
+    }
+
+    .nic-role-item.nic-class {
+      border-color: #1d334e;
+      background: rgba(15, 30, 48, 0.3);
+    }
+
+    .nic-role-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nic-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: ui-monospace, monospace;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .nic-badge.danger {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .nic-badge.success {
+      background: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.5);
+    }
+
+    .nic-badge.info {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .nic-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .nic-tag.active {
+      color: #4ade80;
+    }
+
+    .nic-role-desc {
+      font-size: 0.8rem;
+      color: #d1d5db;
+      line-height: 1.45;
+    }
+
+    .nic-role-desc code {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: #fef08a;
+      font-family: ui-monospace, monospace;
+    }
+
+    .nic-alert-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.1);
+      padding: 8px 10px;
+      border-radius: 5px;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      line-height: 1.45;
+    }
+
+    .nic-alert-note svg {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: #f59e0b;
+    }
+
+    .nic-alert-note code {
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: ui-monospace, monospace;
+    }
+
+    /* Terminal Console Styling */
+    .terminal-box {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+      font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    }
+
+    .terminal-header {
+      background: #161b22;
+      border-bottom: 1px solid #21262d;
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .terminal-controls {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .t-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .t-dot.red { background: #ff5f56; }
+    .t-dot.yellow { background: #ffbd2e; }
+    .t-dot.green { background: #27c93f; }
+
+    .terminal-title-text {
+      color: #8b949e;
+      font-size: 0.78rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      letter-spacing: 0.3px;
+    }
+
+    .terminal-copy-btn {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #c9d1d9;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .terminal-copy-btn:hover {
+      background: #30363d;
+      color: #fff;
+      border-color: #58a6ff;
+    }
+
+    .terminal-body {
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #e6edf3;
+      overflow-x: auto;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .t-line {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      word-break: break-all;
+    }
+
+    .t-line.empty {
+      height: 8px;
+    }
+
+    .t-ps-prompt {
+      color: #58a6ff;
+      font-weight: 700;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .t-cmd-text {
+      color: #e6edf3;
+    }
+
+    .t-line.t-comment {
+      color: #8b949e;
+      font-style: italic;
+    }
+
+    .t-prefix {
+      color: #6e7681;
+      font-weight: 700;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .t-comment-text {
+      color: #8b949e;
+    }
+
+    @media screen and (max-width: 860px) {
       body {
         height: auto;
+        min-height: 100vh;
         overflow-y: auto;
       }
       .main-content {
-        padding: 15px;
+        padding: 14px;
         overflow: visible;
+        height: auto;
+      }
+      .top-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+      .workstation-card {
+        justify-content: space-between;
       }
       .workspace {
         grid-template-columns: 1fr;
+        grid-template-rows: auto;
         overflow: visible;
+        height: auto;
       }
       .sidebar {
-        max-height: 280px;
+        max-height: 260px;
+        height: auto;
+      }
+      .detail-pane {
+        height: auto;
+        overflow: visible;
+        padding-bottom: 25px;
       }
       .header-actions {
         flex-direction: row;
@@ -663,6 +1024,21 @@
         <button class="vm-btn" id="btn-PC1-WIN" onclick="switchVM('PC1-WIN')">
           PC1-WIN <span class="vm-badge" id="badge-PC1-WIN">0/12</span>
         </button>
+      </div>
+
+      <div class="workstation-card">
+        <div class="ws-header">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+          <span class="ws-title">Pracoviště X:</span>
+          <input type="number" id="workstation-input" class="ws-number-input" min="1" max="254" value="2" oninput="changeWorkstation(this.value)">
+        </div>
+        <div class="ws-info-pill" id="ws-info-text">
+          <span>Podsíť: <strong>192.168.2.0/24</strong></span>
+          <span class="ws-sep">•</span>
+          <span>GW: <strong>192.168.2.1</strong></span>
+          <span class="ws-sep">•</span>
+          <span>DC: <strong>.10</strong> | FS: <strong>.20</strong></span>
+        </div>
       </div>
     </div>
 
@@ -810,23 +1186,82 @@
         title: "4. Nastavení TCP/IPv4",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
         what: (vm) => {
-          if (vm === "SRV1-DC") return "Nastavte statickou IP adresu 192.168.200.10/24, výchozí bránu 192.168.200.1 a preferovaný DNS 192.168.200.10 (sám na sebe).";
-          if (vm === "SRV2-FS") return "Nastavte statickou IP adresu 192.168.200.20/24, výchozí bránu 192.168.200.1 a preferovaný DNS 192.168.200.10 (směřující na SRV1-DC).";
-          return "Ponechte síťové rozhraní ve výchozím stavu na DHCP (automatické přidělení adresy). Klient dostane IP v Modulu 2 po spuštění DHCP serveru.";
+          const nicBanner = `
+            <div class="nic-warning-banner">
+              <div class="nic-warning-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                <span>DŮLEŽITÉ: Pravidla síťových rozhraní (NIC) a kontrola adaptéru</span>
+              </div>
+              <div class="nic-roles">
+                <div class="nic-role-item nic-locked">
+                  <div class="nic-role-top">
+                    <span class="nic-badge danger">NIC 1 (Ethernet)</span>
+                    <span class="nic-tag">NEŠAHAT</span>
+                  </div>
+                  <div class="nic-role-desc">Ponechat na pokoji. Slouží pro NAT, internetový přístup a management hypervizoru.</div>
+                </div>
+                <div class="nic-role-item nic-active">
+                  <div class="nic-role-top">
+                    <span class="nic-badge success">NIC 2 (Ethernet 1)</span>
+                    <span class="nic-tag active">INTERNÍ LAB SÍŤ</span>
+                  </div>
+                  <div class="nic-role-desc"><strong>ZDE NASTAVUJETE IP!</strong> Propojuje všechny vaše lokální VM (DC, FS, PC). Podsíť: <code>192.168.${workstationX}.0/24</code>.</div>
+                </div>
+                <div class="nic-role-item nic-class">
+                  <div class="nic-role-top">
+                    <span class="nic-badge info">NIC 3 (Ethernet 2)</span>
+                    <span class="nic-tag">TŘÍDNÍ SÍŤ</span>
+                  </div>
+                  <div class="nic-role-desc">Propojení se všemi VM v učebně pro společné úlohy (ponechat dle pokynů lektora).</div>
+                </div>
+              </div>
+              <div class="nic-alert-note">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <span>Před spuštěním ověřte příkazem <code>Get-NetAdapter</code> název NIC 2 adaptéru. V příkazu je použit obvyklý alias <code>Ethernet 1</code>. Pokud se u vás jmenuje např. <code>Ethernet 2</code> nebo <code>vEthernet</code>, upravte parametr <code>-InterfaceAlias</code>.</span>
+              </div>
+            </div>
+          `;
+
+          if (vm === "SRV1-DC") {
+            return `
+              ${nicBanner}
+              <p>Pro pracoviště <strong>č. ${workstationX}</strong> nastavte na rozhraní <strong>NIC 2 (Ethernet 1)</strong> statickou IP adresu <strong>192.168.${workstationX}.10/24</strong>, výchozí bránu <strong>192.168.${workstationX}.1</strong> a preferovaný DNS server <strong>192.168.${workstationX}.10</strong> (sám na sebe pro budoucí roli doménového řadiče a DNS).</p>
+            `;
+          }
+          if (vm === "SRV2-FS") {
+            return `
+              ${nicBanner}
+              <p>Pro pracoviště <strong>č. ${workstationX}</strong> nastavte na rozhraní <strong>NIC 2 (Ethernet 1)</strong> statickou IP adresu <strong>192.168.${workstationX}.20/24</strong> (servery mají krok po 10), výchozí bránu <strong>192.168.${workstationX}.1</strong> a preferovaný DNS <strong>192.168.${workstationX}.10</strong> (směřující na SRV1-DC).</p>
+            `;
+          }
+          return `
+            ${nicBanner}
+            <p>Pro klientskou stanici <strong>PC1-WIN</strong> ponechte síťové rozhraní NIC 2 ve výchozím nastavení <strong>DHCP</strong> (automatické přidělení adresy). Klient obdrží IP z dynamického rozsahu <strong>192.168.${workstationX}.100 – 192.168.${workstationX}.200</strong> v Modulu 2 po spuštění a autorizaci DHCP serveru na SRV1-DC.</p>
+          `;
         },
         how: (vm) => {
-          if (vm === "SRV1-DC") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.10" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
-          if (vm === "SRV2-FS") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.20" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
-          return "Ponechte výchozí stav: Obtain an IP address automatically (DHCP).";
+          if (vm === "SRV1-DC") {
+            return `# 1. Zkontrolujte adaptéry (hledáme NIC 2 pro interní propojení labu):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet 1" -IPAddress "192.168.${workstationX}.10" -PrefixLength 24 -DefaultGateway "192.168.${workstationX}.1"\n\n# 3. Nastavte DNS na adresu budoucího řadiče (sám na sebe):\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ServerAddresses ("192.168.${workstationX}.10")`;
+          }
+          if (vm === "SRV2-FS") {
+            return `# 1. Zkontrolujte adaptéry (hledáme NIC 2 pro interní propojení labu):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet 1" -IPAddress "192.168.${workstationX}.20" -PrefixLength 24 -DefaultGateway "192.168.${workstationX}.1"\n\n# 3. Nastavte DNS směřující na SRV1-DC:\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ServerAddresses ("192.168.${workstationX}.10")`;
+          }
+          return `# Ověřte, že NIC 2 je nakonfigurován pro automatické DHCP:\nSet-NetIPInterface -InterfaceAlias "Ethernet 1" -Dhcp Enabled\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -ResetServerAddresses`;
         },
         verify: (vm) => {
-          if (vm === "PC1-WIN") return "Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixOrigin";
-          return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -AddressFamily IPv4`;
+          if (vm === "PC1-WIN") {
+            return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias "Ethernet 1" | Select-Object IPAddress, PrefixOrigin\nGet-NetIPInterface -InterfaceAlias "Ethernet 1" -AddressFamily IPv4 | Select-Object InterfaceAlias, Dhcp`;
+          }
+          return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias "Ethernet 1" | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias "Ethernet 1" | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -InterfaceAlias "Ethernet 1" -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses`;
         },
         expected: (vm) => {
-          if (vm === "SRV1-DC") return "IPAddress     : 192.168.200.10\nPrefixLength  : 24\nPrefixOrigin  : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)  : 192.168.200.1\nServerAddresses : {192.168.200.10}";
-          if (vm === "SRV2-FS") return "IPAddress     : 192.168.200.20\nPrefixLength  : 24\nPrefixOrigin  : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)  : 192.168.200.1\nServerAddresses : {192.168.200.10}";
-          return "PrefixOrigin : Dhcp (případně AutoConfiguration, pokud DHCP server v síti ještě neběží). Adresa nesmí být statická (Manual).";
+          if (vm === "SRV1-DC") {
+            return `IPAddress       : 192.168.${workstationX}.10\nPrefixLength    : 24\nPrefixOrigin    : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)    : 192.168.${workstationX}.1\nServerAddresses : {192.168.${workstationX}.10}`;
+          }
+          if (vm === "SRV2-FS") {
+            return `IPAddress       : 192.168.${workstationX}.20\nPrefixLength    : 24\nPrefixOrigin    : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)    : 192.168.${workstationX}.1\nServerAddresses : {192.168.${workstationX}.10}`;
+          }
+          return `Dhcp         : Enabled\nPrefixOrigin : Dhcp (případně AutoConfiguration před spuštěním DHCP serveru v Modulu 2)\nU klientského PC nesmí být zadána ruční statická adresa (Manual).`;
         }
       },
       {
@@ -914,6 +1349,38 @@
 
     let currentVM = "SRV1-DC";
     let selectedTaskId = "vm-specs";
+    let workstationX = parseInt(localStorage.getItem('lab_workstation_x') || '2', 10);
+    if (isNaN(workstationX) || workstationX < 1 || workstationX > 254) {
+      workstationX = 2;
+    }
+
+    function changeWorkstation(val) {
+      let num = parseInt(val, 10);
+      if (isNaN(num) || num < 1 || num > 254) {
+        num = 2;
+      }
+      workstationX = num;
+      localStorage.setItem('lab_workstation_x', workstationX.toString());
+      updateWorkstationUI();
+      render();
+    }
+
+    function updateWorkstationUI() {
+      const inputEl = document.getElementById("workstation-input");
+      if (inputEl && inputEl.value !== workstationX.toString()) {
+        inputEl.value = workstationX;
+      }
+      const infoEl = document.getElementById("ws-info-text");
+      if (infoEl) {
+        infoEl.innerHTML = `
+          <span>Podsíť: <strong>192.168.${workstationX}.0/24</strong></span>
+          <span class="ws-sep">•</span>
+          <span>GW: <strong>192.168.${workstationX}.1</strong></span>
+          <span class="ws-sep">•</span>
+          <span>DC: <strong>.10</strong> | FS: <strong>.20</strong></span>
+        `;
+      }
+    }
 
     function getStorageKey(vm, taskId) {
       return `vm_task_${vm}_${taskId}`;
@@ -949,11 +1416,47 @@
       }
     }
 
-    function copyToClipboard(text, btn) {
-      navigator.clipboard.writeText(text).then(() => {
-        const orig = btn.innerText;
-        btn.innerText = "Zkopírováno";
-        setTimeout(() => btn.innerText = orig, 1200);
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatTerminalPowerShell(rawCode) {
+      if (!rawCode) return "";
+      const lines = rawCode.trim().split("\n");
+      return lines.map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return '<div class="t-line empty">&nbsp;</div>';
+        }
+        if (trimmed.startsWith("#")) {
+          return `<div class="t-line t-comment"><span class="t-prefix">#</span> <span class="t-comment-text">${escapeHtml(trimmed.substring(1).trim())}</span></div>`;
+        }
+        return `<div class="t-line"><span class="t-ps-prompt">PS C:\\&gt;</span> <span class="t-cmd-text">${escapeHtml(line)}</span></div>`;
+      }).join("");
+    }
+
+    function copyTaskCode(taskId, type, btn) {
+      const task = taskDefinitions.find(t => t.id === taskId);
+      if (!task) return;
+      let code = "";
+      if (type === "how") {
+        code = typeof task.how === "function" ? task.how(currentVM) : task.how;
+      } else if (type === "verify") {
+        code = typeof task.verify === "function" ? task.verify(currentVM) : task.verify;
+      }
+      navigator.clipboard.writeText(code).then(() => {
+        const origHtml = btn.innerHTML;
+        btn.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Zkopírováno</span>
+        `;
+        setTimeout(() => { btn.innerHTML = origHtml; }, 1400);
       });
     }
 
@@ -967,6 +1470,7 @@
 
     function render() {
       updateBadges();
+      updateWorkstationUI();
 
       const relevantTasks = taskDefinitions.filter(t => t.forVMs.includes(currentVM));
       const listEl = document.getElementById("task-list");
@@ -1028,43 +1532,74 @@
           <div class="step-card-body">${whatText}</div>
         </div>
 
-        <!-- 2. PŘÍKAZ K PROVEDENÍ -->
+        <!-- 2. PŘÍKAZ K PROVEDENÍ (TERMINÁL) -->
         <div class="step-card step-action">
           <div class="step-card-header">
             <div class="step-header-left">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
               <span>1. Příkaz k provedení</span>
             </div>
-            <button class="copy-btn copy-btn-action" onclick="copyToClipboard(\`${howText.replace(/`/g, '\\`')}\`, this)">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Kopírovat příkaz
-            </button>
           </div>
           <div class="step-card-body">
-            <pre class="action-code">${howText}</pre>
+            <div class="terminal-box">
+              <div class="terminal-header">
+                <div class="terminal-controls">
+                  <span class="t-dot red"></span>
+                  <span class="t-dot yellow"></span>
+                  <span class="t-dot green"></span>
+                </div>
+                <div class="terminal-title-text">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                  <span>Administrator: Windows PowerShell</span>
+                </div>
+                <button class="terminal-copy-btn" onclick="copyTaskCode('${currentTask.id}', 'how', this)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>Kopírovat příkaz</span>
+                </button>
+              </div>
+              <div class="terminal-body">
+                ${formatTerminalPowerShell(howText)}
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- 3. KONTROLA VÝSLEDKU -->
+        <!-- 3. KONTROLA VÝSLEDKU (TERMINÁL + OČEKÁVANÝ VÝSTUP) -->
         <div class="step-card step-verify">
           <div class="step-card-header">
             <div class="step-header-left">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              <span>2. Kontrola výsledku (PowerShell)</span>
+              <span>2. Kontrola výsledku</span>
             </div>
-            <button class="copy-btn copy-btn-verify" onclick="copyToClipboard(\`${verifyText.replace(/`/g, '\\`')}\`, this)">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              Kopírovat test
-            </button>
           </div>
           <div class="step-card-body">
-            <pre class="verify-code">${verifyText}</pre>
+            <div class="terminal-box">
+              <div class="terminal-header">
+                <div class="terminal-controls">
+                  <span class="t-dot red"></span>
+                  <span class="t-dot yellow"></span>
+                  <span class="t-dot green"></span>
+                </div>
+                <div class="terminal-title-text">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                  <span>Administrator: Windows PowerShell (Test)</span>
+                </div>
+                <button class="terminal-copy-btn" onclick="copyTaskCode('${currentTask.id}', 'verify', this)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  <span>Kopírovat test</span>
+                </button>
+              </div>
+              <div class="terminal-body">
+                ${formatTerminalPowerShell(verifyText)}
+              </div>
+            </div>
+
             <div class="expected-output-box">
               <div class="expected-output-header">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span>Správný výstup konzole (musí odpovídat):</span>
               </div>
-              <div class="expected-output-content">${expectedText}</div>
+              <div class="expected-output-content">${escapeHtml(expectedText)}</div>
             </div>
           </div>
         </div>
