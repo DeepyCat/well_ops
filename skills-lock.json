@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "hardening-windows-endpoint-with-cis-benchmark": {
+      "source": "mukul975/anthropic-cybersecurity-skills",
+      "sourceType": "github",
+      "skillPath": "skills/hardening-windows-endpoint-with-cis-benchmark/SKILL.md",
+      "computedHash": "59fbb3a71d75e9ed38190270e066418739fc7d4c61eb4b808f596532e2fb4567"
+    },
+    "sysadmin-toolbox": {
+      "source": "aaaaqwq/agi-super-team",
+      "sourceType": "github",
+      "skillPath": "skills/sysadmin-toolbox/SKILL.md",
+      "computedHash": "7534aade5a6c401ead18610bc25b63731f5f53b36786a4da2d60149a23799ec8"
+    },
+    "windows-hardening": {
+      "source": "bagelhole/devops-security-agent-skills",
+      "sourceType": "github",
+      "skillPath": "security/hardening/windows-hardening/SKILL.md",
+      "computedHash": "900c4fbc88b0be33ef5d559712e76abbd1bed6dfbe338291922004b69d266095"
+    }
+  }
+}
