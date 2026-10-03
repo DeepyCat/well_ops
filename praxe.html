@@ -6,46 +6,104 @@
   <title>Kontrolní seznam přípravy VM - Modul 0</title>
   <style>
     :root {
-      --bg: #121417;
-      --panel: #1a1d23;
-      --card: #22262f;
-      --border: #313744;
-      --border-light: #424a5b;
-      --text: #e6edf3;
-      --text-muted: #8b949e;
-      --accent: #2563eb;
-      --accent-text: #ffffff;
-      --code-bg: #0d1117;
+      --bg-main: #1a1a1a;
+      --bg-sidebar: #222;
+      --bg-box: #242424;
+      --border-color: #333;
+      --text-main: #e0e0e0;
+      --text-muted: #888;
+      --accent: #ff5555;
+      --accent-hover: #ff7777;
+      --code-bg: #151515;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
       line-height: 1.5;
-      padding: 20px;
       height: 100vh;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
     }
 
     header {
+      width: 100%;
+      background-color: var(--bg-sidebar);
+      padding: 15px 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      border-bottom: 2px solid var(--border-color);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      box-sizing: border-box;
+      z-index: 10;
       flex-shrink: 0;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 12px;
     }
 
-    h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .back-btn:hover {
+      background-color: #333;
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .reset-btn {
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: #333;
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 25px;
+      overflow: hidden;
+      min-height: 0;
+      box-sizing: border-box;
     }
 
     .top-controls {
@@ -53,107 +111,125 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 18px;
       flex-shrink: 0;
     }
 
     .vm-tabs {
       display: flex;
-      gap: 6px;
-    }
-
-    .vm-btn {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 7px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
       gap: 8px;
     }
 
+    .vm-btn {
+      background-color: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
     .vm-btn:hover {
-      border-color: var(--border-light);
-      color: var(--text);
+      background-color: #2a2a2a;
+      border-color: #444;
+      color: #fff;
     }
 
     .vm-btn.active {
-      background: var(--card);
-      color: var(--text);
+      background-color: #332222;
+      color: var(--accent-hover);
       border-color: var(--accent);
+      font-weight: bold;
     }
 
     .vm-badge {
       font-size: 0.75rem;
-      padding: 1px 6px;
-      border-radius: 3px;
+      padding: 2px 7px;
+      border-radius: 4px;
       background: rgba(255, 255, 255, 0.08);
       color: var(--text-muted);
+    }
+
+    .vm-btn.active .vm-badge {
+      background: rgba(255, 85, 85, 0.25);
+      color: var(--accent-hover);
     }
 
     .workspace {
       display: grid;
       grid-template-columns: 320px 1fr;
-      gap: 14px;
+      gap: 18px;
       flex: 1;
       min-height: 0;
     }
 
     .sidebar {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 4px;
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     .sidebar-header {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(0, 0, 0, 0.2);
     }
 
     .progress-bar-bg {
       background: var(--code-bg);
-      border-radius: 2px;
-      height: 4px;
+      border-radius: 4px;
+      height: 6px;
       overflow: hidden;
-      margin-top: 6px;
+      margin-top: 8px;
+      border: 1px solid var(--border-color);
     }
 
     .progress-bar-fill {
       height: 100%;
       background: var(--accent);
       width: 0%;
-      transition: width 0.2s ease;
+      transition: width 0.25s ease;
     }
 
     .task-items {
       overflow-y: auto;
       list-style: none;
       flex: 1;
+      padding: 0;
+      margin: 0;
     }
 
     .task-item {
       display: flex;
       align-items: center;
-      padding: 9px 12px;
+      padding: 10px 14px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.03);
       cursor: pointer;
       gap: 10px;
+      transition: all 0.2s ease;
+      color: var(--text-main);
     }
 
     .task-item:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background-color: #2a2a2a;
+      color: #fff;
     }
 
     .task-item.selected {
-      background: var(--card);
+      background-color: #332222;
       border-left: 3px solid var(--accent);
+      color: var(--accent-hover);
+      font-weight: 600;
     }
 
     .task-item input[type="checkbox"] {
@@ -177,90 +253,106 @@
     }
 
     .detail-pane {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 20px;
+      background: var(--bg-box);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 25px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
 
     .detail-title {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       font-weight: 600;
+      color: #fff;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
     }
 
     .box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 4px;
+      background: #1e1e1e;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
       overflow: hidden;
     }
 
     .box-header {
-      padding: 6px 12px;
-      background: rgba(0, 0, 0, 0.2);
-      font-size: 0.75rem;
+      padding: 8px 14px;
+      background: #262626;
+      font-size: 0.8rem;
       text-transform: uppercase;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: var(--text-muted);
+      font-weight: bold;
+      letter-spacing: 1px;
+      color: var(--accent);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--border-color);
     }
 
     .box-content {
-      padding: 12px;
+      padding: 14px;
       font-size: 0.88rem;
-      color: var(--text);
+      color: var(--text-main);
+      line-height: 1.6;
     }
 
     pre {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.82rem;
-      color: var(--text);
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 0.85rem;
+      color: #e6edf3;
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-all;
+      background: var(--code-bg);
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
     }
 
     .copy-btn {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      border-radius: 3px;
-      padding: 2px 7px;
-      font-size: 0.72rem;
+      background-color: #2a2a2a;
+      border: 1px solid #444;
+      color: var(--text-main);
+      border-radius: 4px;
+      padding: 3px 9px;
+      font-size: 0.75rem;
       cursor: pointer;
+      transition: all 0.2s ease;
     }
 
     .copy-btn:hover {
-      border-color: var(--border-light);
-      color: var(--text);
+      background-color: #333;
+      color: #fff;
+      border-color: var(--accent);
     }
 
-    .reset-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 5px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
-
-    .reset-btn:hover {
-      border-color: var(--border-light);
-      color: var(--text);
+    @media screen and (max-width: 768px) {
+      body {
+        height: auto;
+        overflow-y: auto;
+      }
+      .main-content {
+        padding: 15px;
+        overflow: visible;
+      }
+      .workspace {
+        grid-template-columns: 1fr;
+        overflow: visible;
+      }
+      .sidebar {
+        max-height: 280px;
+      }
+      .header-actions {
+        flex-direction: row;
+        gap: 8px;
+      }
     }
   </style>
 </head>
@@ -268,38 +360,43 @@
 
   <header>
     <h1>Kontrola konfigurace VM</h1>
-    <button class="reset-btn" onclick="resetCurrentVM()">Resetovat stav VM</button>
+    <div class="header-actions">
+      <button class="reset-btn" onclick="resetCurrentVM()">Resetovat stav VM</button>
+      <a href="index.html" class="back-btn">Chcu zpět</a>
+    </div>
   </header>
 
-  <div class="top-controls">
-    <div class="vm-tabs">
-      <button class="vm-btn active" id="btn-SRV1-DC" onclick="switchVM('SRV1-DC')">
-        SRV1-DC <span class="vm-badge" id="badge-SRV1-DC">0/11</span>
-      </button>
-      <button class="vm-btn" id="btn-SRV2-FS" onclick="switchVM('SRV2-FS')">
-        SRV2-FS <span class="vm-badge" id="badge-SRV2-FS">0/11</span>
-      </button>
-      <button class="vm-btn" id="btn-PC1-WIN" onclick="switchVM('PC1-WIN')">
-        PC1-WIN <span class="vm-badge" id="badge-PC1-WIN">0/12</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="workspace">
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color: var(--text-muted);">
-          <span>Dokončeno</span>
-          <span id="progress-text">0 %</span>
-        </div>
-        <div class="progress-bar-bg">
-          <div id="progress-bar" class="progress-bar-fill"></div>
-        </div>
+  <div class="main-content">
+    <div class="top-controls">
+      <div class="vm-tabs">
+        <button class="vm-btn active" id="btn-SRV1-DC" onclick="switchVM('SRV1-DC')">
+          SRV1-DC <span class="vm-badge" id="badge-SRV1-DC">0/11</span>
+        </button>
+        <button class="vm-btn" id="btn-SRV2-FS" onclick="switchVM('SRV2-FS')">
+          SRV2-FS <span class="vm-badge" id="badge-SRV2-FS">0/11</span>
+        </button>
+        <button class="vm-btn" id="btn-PC1-WIN" onclick="switchVM('PC1-WIN')">
+          PC1-WIN <span class="vm-badge" id="badge-PC1-WIN">0/12</span>
+        </button>
       </div>
-      <ul class="task-items" id="task-list"></ul>
     </div>
 
-    <div class="detail-pane" id="detail-pane"></div>
+    <div class="workspace">
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <div style="display:flex; justify-content:space-between; font-size: 0.8rem; color: var(--text-muted);">
+            <span>Dokončeno</span>
+            <span id="progress-text">0 %</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="progress-bar" class="progress-bar-fill"></div>
+          </div>
+        </div>
+        <ul class="task-items" id="task-list"></ul>
+      </div>
+
+      <div class="detail-pane" id="detail-pane"></div>
+    </div>
   </div>
 
   <script>
