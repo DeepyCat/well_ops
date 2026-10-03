@@ -431,6 +431,41 @@
       border-color: var(--accent);
     }
 
+    /* Očekávaný výstup ověření */
+    .expected-output-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: #141414;
+      border: 1px solid var(--border-color);
+      border-left: 3px solid #22c55e;
+      border-radius: 4px;
+    }
+
+    .expected-output-header {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      color: #4ade80;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .expected-output-content {
+      font-size: 0.84rem;
+      color: #d1d5db;
+      line-height: 1.55;
+      white-space: pre-line;
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      background: #0d0d0d;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #262626;
+      overflow-x: auto;
+    }
+
     @media screen and (max-width: 768px) {
       body {
         height: auto;
@@ -503,7 +538,11 @@
         id: "vm-specs",
         title: "1. Parametry virtuálního stroje",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Zajištění hardwarových prostředků. SRV2-FS navíc vyžaduje 5 disků pro budoucí Storage Pool.",
+        what: (vm) => {
+          if (vm === "PC1-WIN") return "Vytvořte virtuální stroj se 2 vCPU, 8 GB RAM a 60 GB systémovým diskem. Slouží jako klientská stanice pro ověřování doménových a síťových služeb.";
+          if (vm === "SRV2-FS") return "Vytvořte virtuální stroj se 2 vCPU, 8 GB RAM, 100 GB systémovým diskem a přidejte 5× virtuální disk o velikosti 10 GB. Těchto 5 disků bude v Modulu 6 sloužit pro Storage Pool a simulaci výpadku disku.";
+          return "Vytvořte virtuální stroj se 2 vCPU, 8 GB RAM a 100 GB systémovým diskem. Připravuje se čistý základ pro primární doménový řadič.";
+        },
         how: (vm) => {
           if (vm === "PC1-WIN") return "V hypervizoru: 2 vCPU, 8 GB RAM, 60 GB systémový disk.";
           if (vm === "SRV2-FS") return "V hypervizoru: 2 vCPU, 8 GB RAM, 100 GB systémový disk + 5x virtuální disk o velikosti 10 GB.";
@@ -512,13 +551,21 @@
         verify: (vm) => {
           if (vm === "SRV2-FS") return "Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle\n# Ověřte systémový disk (~100 GB) a 5x RAW disků (~10 GB)";
           return "Get-Disk | Select-Object Number, FriendlyName, Size";
+        },
+        expected: (vm) => {
+          if (vm === "SRV2-FS") return "Výpis obsahuje systémový disk (~100 GB) a 5x neinicializovaných disků (~10 GB) ve stavu RAW:\nNumber  FriendlyName            Size  PartitionStyle\n------  ------------            ----  --------------\n0       ... (Systémový disk)  ~100 GB  GPT/MBR\n1-5     ... (5x datový disk)   ~10 GB  RAW";
+          if (vm === "PC1-WIN") return "Výpis obsahuje systémový disk o velikosti přibližně 60 GB:\nNumber  FriendlyName  Size\n0       ...          ~60 GB";
+          return "Výpis obsahuje systémový disk o velikosti přibližně 100 GB:\nNumber  FriendlyName  Size\n0       ...          ~100 GB";
         }
       },
       {
         id: "os-edition",
         title: "2. Edice a instalace Windows",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Servery vyžadují Desktop Experience s licencí Datacenter. Klient vyžaduje Windows 11 Education N.",
+        what: (vm) => {
+          if (vm === "PC1-WIN") return "Nainstalujte Windows 11 Education N v jazyce English (United States). Edice N neobsahuje multimediální aplikace a podporuje doménový join i centrální správu přes GPO.";
+          return "Nainstalujte Windows Server 2025 Datacenter s grafickým rozhraním (Desktop Experience) v jazyce English (United States). Zásadně neinstalovat Server Core.";
+        },
         how: (vm) => {
           if (vm === "PC1-WIN") return "Instalace Windows 11 Education N (jazyk: English - United States).";
           return "Instalace Windows Server 2025 Datacenter (Desktop Experience). Neinstalovat Server Core.";
@@ -526,21 +573,30 @@
         verify: (vm) => {
           if (vm === "PC1-WIN") return "Get-ComputerInfo | Select-Object WindowsProductName";
           return "Get-ComputerInfo | Select-Object WindowsProductName, OsServerLevel";
+        },
+        expected: (vm) => {
+          if (vm === "PC1-WIN") return "WindowsProductName : Windows 11 Education N (případně Windows 11 Education)";
+          return "WindowsProductName : Windows Server 2025 Datacenter\nOsServerLevel      : FullServer (potvrzuje Desktop Experience, nikoliv ServerCore)";
         }
       },
       {
         id: "hostname",
         title: "3. Jméno počítače (Hostname)",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Jednoznačná identifikace v budoucí doméně Active Directory.",
+        what: (vm) => `Přejmenujte stroj na přesný název "${vm}" a restartujte jej. Jednoznačné jméno je klíčové pro komunikaci v síti a budoucí řadič domény.`,
         how: (vm) => `Rename-Computer -NewName "${vm}" -Restart`,
-        verify: () => "hostname"
+        verify: () => "hostname",
+        expected: (vm) => `Vrátí přesný název stroje:\n${vm}`
       },
       {
         id: "networking",
         title: "4. Nastavení TCP/IPv4",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Servery musí mít statické IP adresy pro běh síťových rolí. Klient zůstává na DHCP pro testování v dalším modulu.",
+        what: (vm) => {
+          if (vm === "SRV1-DC") return "Nastavte statickou IP adresu 192.168.200.10/24, výchozí bránu 192.168.200.1 a preferovaný DNS 192.168.200.10 (sám na sebe).";
+          if (vm === "SRV2-FS") return "Nastavte statickou IP adresu 192.168.200.20/24, výchozí bránu 192.168.200.1 a preferovaný DNS 192.168.200.10 (směřující na SRV1-DC).";
+          return "Ponechte síťové rozhraní ve výchozím stavu na DHCP (automatické přidělení adresy). Klient dostane IP v Modulu 2 po spuštění DHCP serveru.";
+        },
         how: (vm) => {
           if (vm === "SRV1-DC") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.10" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
           if (vm === "SRV2-FS") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.20" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
@@ -549,74 +605,93 @@
         verify: (vm) => {
           if (vm === "PC1-WIN") return "Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixOrigin";
           return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -AddressFamily IPv4`;
+        },
+        expected: (vm) => {
+          if (vm === "SRV1-DC") return "IPAddress     : 192.168.200.10\nPrefixLength  : 24\nPrefixOrigin  : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)  : 192.168.200.1\nServerAddresses : {192.168.200.10}";
+          if (vm === "SRV2-FS") return "IPAddress     : 192.168.200.20\nPrefixLength  : 24\nPrefixOrigin  : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)  : 192.168.200.1\nServerAddresses : {192.168.200.10}";
+          return "PrefixOrigin : Dhcp (případně AutoConfiguration, pokud DHCP server v síti ještě neběží). Adresa nesmí být statická (Manual).";
         }
       },
       {
         id: "admin-account",
         title: "5. Účet administrátora a heslo",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Standardizovaný účet Administrator s heslem Pa55w.rd. Na Windows 11 je nutné jej povolit manuálně.",
+        what: (vm) => {
+          if (vm === "PC1-WIN") return "U Windows 11 je vestavěný účet Administrator vypnutý. Povolte jej, nastavte standardizované heslo Pa55w.rd, přihlaste se pod ním a odstraňte dočasný instalační účet.";
+          return "Zajistěte funkční vestavěný účet Administrator s heslem Pa55w.rd. Žádný jiný/personalizovaný administrátorský účet se nevytváří.";
+        },
         how: (vm) => {
           if (vm === "PC1-WIN") return `Enable-LocalUser -Name "Administrator"\nSet-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)\n# Odhlásit se, přihlásit pod Administrator a odstranit dočasný účet.`;
           return "Při instalaci nastavit heslo účtu Administrator na: Pa55w.rd";
         },
-        verify: () => "Get-LocalUser | Select-Object Name, Enabled"
+        verify: () => "Get-LocalUser | Select-Object Name, Enabled",
+        expected: (vm) => {
+          if (vm === "PC1-WIN") return "Name          Enabled\n----          -------\nAdministrator True\n(Dočasný instalační účet Setup/User byl odstraněn, přihlášení s heslem Pa55w.rd funguje lokálně)";
+          return "Name          Enabled\n----          -------\nAdministrator True\n(Přihlášení s heslem Pa55w.rd funguje lokálně)";
+        }
       },
       {
         id: "locale",
         title: "6. Jazyk, region a formáty (cs-CZ)",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Rozhraní zůstává anglické, ale systémové konvence (datum, čísla) odpovídají českému prostředí.",
+        what: () => "Nastavte regionální konvence a polohu na Česko (cs-CZ, GeoId 0x3d), přičemž jazyk rozhraní systému zůstane v angličtině (English US) kvůli odborné terminologii.",
         how: () => `Set-Culture cs-CZ\nSet-WinSystemLocale cs-CZ\nSet-WinHomeLocation -GeoId 0x3d`,
-        verify: () => `Get-Culture | Select-Object Name, DisplayName\nGet-WinSystemLocale\nGet-WinHomeLocation\nGet-WinUILanguageOverride`
+        verify: () => `Get-Culture | Select-Object Name, DisplayName\nGet-WinSystemLocale\nGet-WinHomeLocation\nGet-WinUILanguageOverride`,
+        expected: () => "Name : cs-CZ, DisplayName : Czech (Czechia)\nGet-WinSystemLocale: cs-CZ\nHomeLocation: 61 / Czech Republic\nGet-WinUILanguageOverride: prázdné nebo en-US (UI rozhraní zůstává anglicky)"
       },
       {
         id: "datetime-format",
         title: "7. Formáty data, času a měny",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Ověření správné interpretace formátu data d.M.yyyy a měny Kč.",
+        what: () => "Ověřte a nastavte správné české formátování: datum d.M.yyyy, 24hodinový čas H:mm:ss a symbol měny Kč.",
         how: () => `Settings -> Time & language -> Language & region -> Regional format: Czech (Czechia)`,
-        verify: () => `Get-Date -Format "d.M.yyyy H:mm:ss"\n(12345.67).ToString("C")`
+        verify: () => `Get-Date -Format "d.M.yyyy H:mm:ss"\n(12345.67).ToString("C")`,
+        expected: () => "Get-Date : vypíše datum a čas ve tvaru např. 20.9.2026 13:45:02\nToString : vypíše 12 345,67 Kč (s mezerou jako oddělovačem tisíců a symbolem Kč)"
       },
       {
         id: "timezone",
         title: "8. Časové pásmo (Praha)",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Časová synchronizace je vyžadována autentizačním protokolem Kerberos.",
+        what: () => "Nastavte časové pásmo na Praha / Bratislava (Central Europe Standard Time, UTC+1). Synchronizace času je nezbytná pro autentizaci Kerberos v Active Directory.",
         how: () => `Set-TimeZone -Id "Central Europe Standard Time"`,
-        verify: () => "Get-TimeZone"
+        verify: () => "Get-TimeZone",
+        expected: () => "Id                         : Central Europe Standard Time\nDisplayName                : (UTC+01:00) Belgrade, Bratislava, Budapest, Ljubljana, Prague\nBaseUtcOffset              : 01:00:00\nSupportsDaylightSavingTime : True"
       },
       {
         id: "keyboards",
         title: "9. Klávesnice US a Czech (QWERTZ)",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Výchozí US rozložení pro zadávání příkazů, CZ s možností rychlého přepnutí (Win + mezerník).",
+        what: () => "Nakonfigurujte dvě klávesnice: US jako primární/výchozí (snadné psaní příkazů v PowerShellu) a Czech QWERTZ jako sekundární s přepínáním přes Win + mezerník.",
         how: () => `$List = New-WinUserLanguageList "en-US"\n$List.Add("cs-CZ")\nSet-WinUserLanguageList $List -Force`,
-        verify: () => "Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips"
+        verify: () => "Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips",
+        expected: () => "LanguageTag InputMethodTips\n----------- ---------------\nen-US       {0409:00000409}\ncs-CZ       {0405:00000405}\n(Na hlavním panelu u hodin je dostupný přepínač ENG / CES)"
       },
       {
         id: "privacy",
         title: "10. Telemetrie a diagnostika na minimum",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Omezení síťového provozu a vypnutí telemetrických služeb na pozadí.",
+        what: () => "Omezte síťový provoz na pozadí: nastavte telemetrii na minimální úroveň (Required data), vypněte lokalizační služby (Location) a zakažte reklamní ID.",
         how: () => `reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" /v AllowTelemetry /t REG_DWORD /d 1 /f\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" /v DisableLocation /t REG_DWORD /d 1 /f\nreg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo" /v DisabledByGroupPolicy /t REG_DWORD /d 1 /f`,
-        verify: () => `Get-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" -Name AllowTelemetry\nGet-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" -Name DisableLocation\nGet-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo" -Name DisabledByGroupPolicy`
+        verify: () => `Get-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection" -Name AllowTelemetry\nGet-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors" -Name DisableLocation\nGet-ItemProperty -Path "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AdvertisingInfo" -Name DisabledByGroupPolicy`,
+        expected: () => "AllowTelemetry         : 1 (Required diagnostic data)\nDisableLocation        : 1 (poloha vypnuta)\nDisabledByGroupPolicy  : 1 (reklamní ID vypnuto)"
       },
       {
         id: "activation",
         title: "11. Aktivace Windows (LAB KEY)",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        why: "Odstranění časového limitu zkušební doby a systémových omezení.",
+        what: () => "Aktivujte systém pomocí školního produktového klíče LAB KEY (placeholder XXXXX-XXXXX-XXXXX-XXXXX-XXXXX). Cílem je odstranit časové omezení zkušební verze a vodoznak.",
         how: () => `slmgr.vbs /ipk XXXXX-XXXXX-XXXXX-XXXXX-XXXXX\nslmgr.vbs /ato`,
-        verify: () => "slmgr.vbs /xpr"
+        verify: () => "slmgr.vbs /xpr",
+        expected: () => "Dialogové okno Windows Script Host oznámí:\n\"The machine is permanently activated\"\n(nebo datum příští kontroly licence u KMS multilicence).\nV Settings -> System -> Activation svítí \"Windows is activated\"."
       },
       {
         id: "local-user-only",
         title: "12. Pouze lokální účet (bez Microsoft Account)",
         forVMs: ["PC1-WIN"],
-        why: "Klientský stroj bude řízen doménovým řadičem, nesmí používat cloudový účet.",
+        what: () => "Zajistěte, že klientský počítač PC1-WIN nepoužívá cloudový Microsoft účet, ale je provozován výhradně pod lokálním účtem Administrator.",
         how: () => "V instalačním rozhraní OOBE nepoužívat Microsoft účet. Účet musí mít typ Local account.",
-        verify: () => "Get-LocalUser | Select-Object Name, Enabled"
+        verify: () => "Get-LocalUser | Select-Object Name, Enabled",
+        expected: () => "Name          Enabled\n----          -------\nAdministrator True\n(V Settings -> Accounts -> Your info je uveden typ \"Local account\", nikoliv e-mailová adresa Microsoft účtu.)"
       }
     ];
 
@@ -703,8 +778,10 @@
 
       const currentTask = relevantTasks.find(t => t.id === selectedTaskId) || relevantTasks[0];
       const isDone = localStorage.getItem(getStorageKey(currentVM, currentTask.id)) === "1";
+      const whatText = typeof currentTask.what === "function" ? currentTask.what(currentVM) : (currentTask.what || currentTask.why);
       const howText = typeof currentTask.how === "function" ? currentTask.how(currentVM) : currentTask.how;
       const verifyText = typeof currentTask.verify === "function" ? currentTask.verify(currentVM) : currentTask.verify;
+      const expectedText = typeof currentTask.expected === "function" ? currentTask.expected(currentVM) : currentTask.expected;
 
       const currentIndex = relevantTasks.findIndex(t => t.id === currentTask.id);
       const prevTask = currentIndex > 0 ? relevantTasks[currentIndex - 1] : null;
@@ -721,8 +798,8 @@
         </div>
 
         <div class="box">
-          <div class="box-header">Kontext</div>
-          <div class="box-content">${currentTask.why}</div>
+          <div class="box-header">Kontext (Co se má udělat)</div>
+          <div class="box-content">${whatText}</div>
         </div>
 
         <div class="box">
@@ -738,7 +815,16 @@
             <span>Ověření (PowerShell)</span>
             <button class="copy-btn" onclick="copyToClipboard(\`${verifyText.replace(/`/g, '\\`')}\`, this)">Kopírovat</button>
           </div>
-          <div class="box-content"><pre>${verifyText}</pre></div>
+          <div class="box-content">
+            <pre>${verifyText}</pre>
+            <div class="expected-output-box">
+              <div class="expected-output-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Co by to mělo vyplivnout (očekávaný výsledek):
+              </div>
+              <div class="expected-output-content">${expectedText}</div>
+            </div>
+          </div>
         </div>
 
         <div class="detail-nav-footer">
