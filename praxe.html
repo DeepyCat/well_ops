@@ -466,6 +466,73 @@
       overflow-x: auto;
     }
 
+    /* Přehledná tabulka parametrů */
+    .params-table-wrapper {
+      overflow-x: auto;
+      width: 100%;
+      margin: 4px 0 8px 0;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .params-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: #181818;
+      text-align: left;
+    }
+
+    .params-table th, .params-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #282828;
+      border-right: 1px solid #242424;
+      white-space: nowrap;
+    }
+
+    .params-table th:last-child, .params-table td:last-child {
+      border-right: none;
+    }
+
+    .params-table th {
+      background-color: #222;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .params-table tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .params-table .active-col {
+      background-color: rgba(255, 85, 85, 0.1);
+      color: #fff;
+      font-weight: 600;
+      border-left: 1px solid rgba(255, 85, 85, 0.35);
+      border-right: 1px solid rgba(255, 85, 85, 0.35);
+    }
+
+    .params-table th.active-col {
+      background-color: rgba(255, 85, 85, 0.22);
+      color: var(--accent-hover);
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .params-table tr.active-row {
+      background-color: rgba(255, 85, 85, 0.1);
+      font-weight: 600;
+    }
+
+    .params-table tr.active-row td {
+      color: #fff;
+      border-top: 1px solid rgba(255, 85, 85, 0.35);
+      border-bottom: 1px solid rgba(255, 85, 85, 0.35);
+    }
+
     @media screen and (max-width: 768px) {
       body {
         height: auto;
@@ -538,11 +605,46 @@
         id: "vm-specs",
         title: "1. Parametry virtuálního stroje",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        what: (vm) => {
-          if (vm === "PC1-WIN") return "Vytvořte virtuální stroj se 2 vCPU, 8 GB RAM a 60 GB systémovým diskem. Slouží jako klientská stanice pro ověřování doménových a síťových služeb.";
-          if (vm === "SRV2-FS") return "Vytvořte virtuální stroj se 2 vCPU, 8 GB RAM, 100 GB systémovým diskem a přidejte 5× virtuální disk o velikosti 10 GB. Těchto 5 disků bude v Modulu 6 sloužit pro Storage Pool a simulaci výpadku disku.";
-          return "Vytvořte virtuální stroj se 2 vCPU, 8 GB RAM a 100 GB systémovým diskem. Připravuje se čistý základ pro primární doménový řadič.";
-        },
+        what: (vm) => `
+          <div class="params-table-wrapper">
+            <table class="params-table">
+              <thead>
+                <tr>
+                  <th>Parametr</th>
+                  <th class="${vm === 'SRV1-DC' ? 'active-col' : ''}">SRV1-DC</th>
+                  <th class="${vm === 'SRV2-FS' ? 'active-col' : ''}">SRV2-FS</th>
+                  <th class="${vm === 'PC1-WIN' ? 'active-col' : ''}">PC1-WIN</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>vCPU</strong></td>
+                  <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">2 jádra</td>
+                  <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}">2 jádra</td>
+                  <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">2 jádra</td>
+                </tr>
+                <tr>
+                  <td><strong>RAM</strong></td>
+                  <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">8 GB</td>
+                  <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}">8 GB</td>
+                  <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">8 GB</td>
+                </tr>
+                <tr>
+                  <td><strong>Systémový disk</strong></td>
+                  <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">100 GB</td>
+                  <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}">100 GB</td>
+                  <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">60 GB</td>
+                </tr>
+                <tr>
+                  <td><strong>Další disky</strong></td>
+                  <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">—</td>
+                  <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}"><strong>5× 10 GB</strong> (Storage Pool)</td>
+                  <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `,
         how: (vm) => {
           if (vm === "PC1-WIN") return "V hypervizoru: 2 vCPU, 8 GB RAM, 60 GB systémový disk.";
           if (vm === "SRV2-FS") return "V hypervizoru: 2 vCPU, 8 GB RAM, 100 GB systémový disk + 5x virtuální disk o velikosti 10 GB.";
@@ -562,10 +664,40 @@
         id: "os-edition",
         title: "2. Edice a instalace Windows",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
-        what: (vm) => {
-          if (vm === "PC1-WIN") return "Nainstalujte Windows 11 Education N v jazyce English (United States). Edice N neobsahuje multimediální aplikace a podporuje doménový join i centrální správu přes GPO.";
-          return "Nainstalujte Windows Server 2025 Datacenter s grafickým rozhraním (Desktop Experience) v jazyce English (United States). Zásadně neinstalovat Server Core.";
-        },
+        what: (vm) => `
+          <div class="params-table-wrapper">
+            <table class="params-table">
+              <thead>
+                <tr>
+                  <th>Stroj</th>
+                  <th>Edice Windows</th>
+                  <th>Typ rozhraní</th>
+                  <th>Jazyk média</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="${vm === 'SRV1-DC' ? 'active-row' : ''}">
+                  <td><strong>SRV1-DC</strong></td>
+                  <td>Windows Server 2025 Datacenter</td>
+                  <td>Desktop Experience (s GUI)</td>
+                  <td>English (United States)</td>
+                </tr>
+                <tr class="${vm === 'SRV2-FS' ? 'active-row' : ''}">
+                  <td><strong>SRV2-FS</strong></td>
+                  <td>Windows Server 2025 Datacenter</td>
+                  <td>Desktop Experience (s GUI)</td>
+                  <td>English (United States)</td>
+                </tr>
+                <tr class="${vm === 'PC1-WIN' ? 'active-row' : ''}">
+                  <td><strong>PC1-WIN</strong></td>
+                  <td>Windows 11 Education N</td>
+                  <td>Bez multimédií (EU edice)</td>
+                  <td>English (United States)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `,
         how: (vm) => {
           if (vm === "PC1-WIN") return "Instalace Windows 11 Education N (jazyk: English - United States).";
           return "Instalace Windows Server 2025 Datacenter (Desktop Experience). Neinstalovat Server Core.";
