@@ -204,6 +204,31 @@
             border: 1px solid var(--border-color);
             height: fit-content;
             min-height: 400px;
+            position: relative;
+        }
+
+        /* Stylování tlačítka pro stažení uvnitř boxu */
+        .download-btn {
+            display: none;
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            align-items: center;
+            gap: 6px;
+        }
+        .download-btn:hover {
+            background-color: #333;
+            color: #fff;
+            border-color: var(--accent);
         }
 
         .placeholder-state {
@@ -216,7 +241,7 @@
             margin-bottom: 10px;
         }
 
-        /* --- VYLEPŠENÉ VYKRESLENÍ .MD SOUBORŮ (ROZSTUPY A ČITELNOST) --- */
+        /* --- VYLEPŠENÉ VYKRESLENÍ .MD SOUBORŮ --- */
         .content-box h1, 
         .content-box h2, 
         .content-box h3 {
@@ -296,6 +321,11 @@
             main {
                 padding: 15px;
             }
+            .download-btn {
+                position: static;
+                margin-bottom: 20px;
+                display: inline-flex;
+            }
         }
     </style>
 </head>
@@ -372,25 +402,35 @@
         <!-- Hlavní obsah pro vykreslení -->
         <main>
             <div class="content-box" id="content">
-                <div class="placeholder-state">
+                <!-- Tlačítko pro stažení souboru (dynamicky se zobrazí) -->
+                <a id="downloadBtn" class="download-btn" href="#" download>📥 Stáhnout .md</a>
+
+                <div class="placeholder-state" id="placeholderState">
                     <h2>😢😢😢 - nechcu to dělat</h2>
                     <p style="color: var(--text-muted);">Kliknutím na libovolný soubor se jeho obsah z .md souboru automaticky načte a vykreslí přímo zde. Bezbolestně</p>
                     <div style="background: #1f1f1f; border-left: 4px solid var(--accent); padding: 12px; margin-top: 30px; border-radius: 0 6px 6px 0; font-style: italic; color: #bbb; text-align: left;">
                         „Teorie je, když víte všechno, ale nic nefunguje. V předmětu OPS nefunguje ani jedno, tak hodně štěstí při klikání.“
                     </div>
                 </div>
+                <div id="markdownContent"></div>
             </div>
         </main>
     </div>
 
     <script>
+        let currentFilePath = '';
+
         function loadMarkdown(filePath, btnElement) {
+            currentFilePath = filePath;
+
             // Označení aktivního tlačítka v menu
             document.querySelectorAll('sidebar button').forEach(b => b.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
 
-            // Zobrazení načítacího stavu
-            document.getElementById('content').innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px;">Načítám moudra z Markdownu...</p>';
+            // Skrytí placeholderu a zobrazení načítání
+            document.getElementById('placeholderState').style.display = 'none';
+            document.getElementById('downloadBtn').style.display = 'none';
+            document.getElementById('markdownContent').innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px;">Načítám moudra z Markdownu...</p>';
 
             fetch(filePath)
                 .then(response => {
@@ -399,10 +439,18 @@
                 })
                 .then(markdown => {
                     // Vykreslení markdownu pomocí knihovny Marked
-                    document.getElementById('content').innerHTML = marked.parse(markdown);
+                    document.getElementById('markdownContent').innerHTML = marked.parse(markdown);
+                    
+                    // Nastavení a zobrazení tlačítka pro stažení
+                    let downloadBtn = document.getElementById('downloadBtn');
+                    let fileName = filePath.split('/').pop();
+                    downloadBtn.href = filePath;
+                    downloadBtn.download = fileName;
+                    downloadBtn.innerText = `📥 Stáhnout ${fileName}`;
+                    downloadBtn.style.display = 'inline-flex';
                 })
                 .catch(err => {
-                    document.getElementById('content').innerHTML = `
+                    document.getElementById('markdownContent').innerHTML = `
                         <div style="text-align: center; padding: 30px;">
                             <h3 style="color: #f87171; margin-bottom: 8px;">Nejde</h3>
                             <p style="color: var(--text-muted); font-size: 0.9rem;">Soubor se nepodařilo načíst.</p>
@@ -433,7 +481,6 @@
                     }
                 });
 
-                // Skryje celou sekci/skupinu, pokud v ní nezbyla žádná viditelná položka
                 group.style.display = hasVisibleItems ? "" : "none";
             });
         }
