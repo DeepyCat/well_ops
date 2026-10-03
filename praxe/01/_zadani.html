@@ -520,26 +520,17 @@
       </blockquote>
 
       <h3>Aktivace Windows (LAB KEY)</h3>
-      <p>Všechny tři instalace se aktivují školními produktovými klíči <strong>LAB KEY</strong>:</p>
-      <ul>
-        <li><strong>Windows Server 2025 (SRV1-DC, SRV2-FS):</strong> <code>MTV3N-22C4V-24QX3-3H2BH-PWJ3G</code></li>
-        <li><strong>Windows 11 Education N (PC1-WIN):</strong> <code>68NC9-PYVD7-MWGMH-H4JGM-VQWWK</code></li>
-      </ul>
+      <p>Všechny tři instalace se aktivují školními produktovými klíči <strong>LAB KEY</strong>.</p>
+      <div style="background: rgba(56, 139, 253, 0.1); border: 1px solid rgba(56, 139, 253, 0.35); border-left: 4px solid #1f6feb; border-radius: 6px; padding: 12px 16px; margin: 14px 0; color: #c9d1d9;">
+        <strong>Produktové klíče:</strong> Příslušné produktové klíče (pro <em>Windows Server 2025</em> i <em>Windows 11 Education N</em>) si <strong>zkopírujte přímo ze zadání v Microsoft Teams</strong>.
+      </div>
       <p>Aktivaci provedete buď přímo v instalačním průvodci, v <strong>Settings → System → Activation</strong>, nebo v příkazové řádce / PowerShellu:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
-          <span>PowerShell / CMD (Servery SRV1-DC a SRV2-FS)</span>
+          <span>PowerShell / CMD</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G
-slmgr.vbs /ato</code></pre>
-      </div>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell / CMD (Klient PC1-WIN)</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-        </div>
-        <pre><code>slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK
+        <pre><code>slmgr.vbs /ipk &lt;LAB-KEY-Z-TEAMS&gt;
 slmgr.vbs /ato</code></pre>
       </div>
       <p>Ověření aktivace: <strong>Settings → System → Activation</strong> ukazuje "Windows is activated", případně příkazem <code>slmgr.vbs /xpr</code> vypíše "The machine is permanently activated".</p>

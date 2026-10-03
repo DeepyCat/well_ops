@@ -436,25 +436,17 @@ Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInf
       <p><code>AllowTelemetry = 1</code> (Required diagnostic data), <code>DisableLocation = 1</code> (poloha vypnutá), <code>DisabledByGroupPolicy = 1</code> (reklamní ID vypnuté). V <strong>Settings → Privacy &amp; security</strong> odpovídají přepínače stejným hodnotám i vizuálně.</p>
 
       <h3>11. Aktivace je hotová (SRV1-DC, SRV2-FS i PC1-WIN)</h3>
-      <p>Aktivace probíhá pomocí školních klíčů <strong>LAB KEY</strong>:</p>
-      <ul>
-        <li><strong>Windows Server 2025 (SRV1-DC, SRV2-FS):</strong> <code>MTV3N-22C4V-24QX3-3H2BH-PWJ3G</code></li>
-        <li><strong>Windows 11 Education N (PC1-WIN):</strong> <code>68NC9-PYVD7-MWGMH-H4JGM-VQWWK</code></li>
-      </ul>
+      <p>Aktivace probíhá pomocí školních klíčů <strong>LAB KEY</strong>, které si <strong>zkopírujte ze zadání v Microsoft Teams</strong> (zvlášť klíč pro servery Windows Server 2025 a zvlášť pro klienta Windows 11 Education N).</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
           <span>PowerShell / CMD — Aktivace a ověření licence</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code># Pro servery (SRV1-DC, SRV2-FS):
-slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G
+        <pre><code># 1. Zadejte příslušný klíč ze zadání na Teams:
+slmgr.vbs /ipk &lt;LAB-KEY-Z-TEAMS&gt;
 slmgr.vbs /ato
 
-# Pro klienta (PC1-WIN):
-slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK
-slmgr.vbs /ato
-
-# Ověření stavu aktivace:
+# 2. Ověření stavu aktivace:
 slmgr.vbs /xpr</code></pre>
       </div>
       <p>Příkaz <code>slmgr.vbs /xpr</code> vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u multilicence). V <strong>Settings → System → Activation</strong> je zobrazeno <strong>"Windows is activated"</strong> (server), resp. <strong>"Windows is activated with a digital license"</strong> (klient), bez varovných hlášek či vodoznaku na ploše.</p>
