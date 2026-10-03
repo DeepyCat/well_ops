@@ -1462,15 +1462,10 @@
         title: "11. Aktivace Windows (LAB KEY)",
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
         what: (vm) => {
-          if (vm === "PC1-WIN") {
-            return `Aktivujte systém <strong>Windows 11 Education N</strong> pomocí školního produktového klíče LAB KEY: <code>68NC9-PYVD7-MWGMH-H4JGM-VQWWK</code>. Cílem je odstranit časové omezení zkušební verze a vodoznak.`;
-          }
-          return `Aktivujte systém <strong>Windows Server 2025 Datacenter</strong> (${vm}) pomocí školního produktového klíče LAB KEY: <code>MTV3N-22C4V-24QX3-3H2BH-PWJ3G</code>. Cílem je odstranit časové omezení zkušební verze a vodoznak.`;
+          const osName = vm === "PC1-WIN" ? "Windows 11 Education N" : `Windows Server 2025 Datacenter (${vm})`;
+          return `Aktivujte systém <strong>${osName}</strong> pomocí školního produktového klíče <strong>LAB KEY</strong>. Produktový klíč si <strong>zkopírujte ze zadání v Microsoft Teams</strong>. Cílem je odstranit časové omezení zkušební verze a vodoznak.`;
         },
-        how: (vm) => {
-          const key = vm === "PC1-WIN" ? "68NC9-PYVD7-MWGMH-H4JGM-VQWWK" : "MTV3N-22C4V-24QX3-3H2BH-PWJ3G";
-          return `# 1. Zadejte produktový klíč pro ${vm}:\nslmgr.vbs /ipk ${key}\n\n# 2. Spusťte online aktivaci:\nslmgr.vbs /ato`;
-        },
+        how: (vm) => `# 1. Zadejte produktový klíč pro ${vm} (zkopírujte ze zadání na Teams):\nslmgr.vbs /ipk <LAB-KEY-Z-TEAMS>\n\n# 2. Spusťte aktivaci systému:\nslmgr.vbs /ato`,
         verify: () => "slmgr.vbs /xpr",
         expected: () => "Dialogové okno Windows Script Host oznámí:\n\"The machine is permanently activated\"\n(nebo datum příští kontroly licence u KMS multilicence).\nV Settings -> System -> Activation svítí \"Windows is activated\"."
       },

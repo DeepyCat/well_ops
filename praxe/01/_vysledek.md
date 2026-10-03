@@ -77,20 +77,14 @@ Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInf
 `AllowTelemetry = 1` (Required diagnostic data), `DisableLocation = 1` (poloha vypnutá), `DisabledByGroupPolicy = 1` (reklamní ID vypnuté). V **Settings → Privacy & security** odpovídají přepínače stejným hodnotám i vizuálně.
 
 ### 11. Aktivace je hotová (SRV1-DC, SRV2-FS i PC1-WIN)
-Aktivace probíhá pomocí školních klíčů **LAB KEY**:
-- **Windows Server 2025 (SRV1-DC, SRV2-FS):** `MTV3N-22C4V-24QX3-3H2BH-PWJ3G`
-- **Windows 11 Education N (PC1-WIN):** `68NC9-PYVD7-MWGMH-H4JGM-VQWWK`
+Aktivace probíhá pomocí školních klíčů **LAB KEY**, které si **zkopírujte ze zadání v Microsoft Teams** (zvlášť pro Windows Server 2025 a zvlášť pro Windows 11 Education N).
 
 ```powershell
-# Pro servery (SRV1-DC, SRV2-FS):
-slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G
+# 1. Zadejte klíč ze zadání na Teams:
+slmgr.vbs /ipk <LAB-KEY-Z-TEAMS>
 slmgr.vbs /ato
 
-# Pro klienta (PC1-WIN):
-slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK
-slmgr.vbs /ato
-
-# Ověření:
+# 2. Ověření:
 slmgr.vbs /xpr
 ```
 Vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u KMS/LAB KEY s omezenou platností) — ne "notification experience" upozorňující na neaktivovaný Windows. V **Settings → System → Activation** je zobrazeno **"Windows is activated"** (server), resp. **"Windows is activated with a digital license"** (klient), bez tlačítka "Activate" navíc.

@@ -55,13 +55,15 @@ Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný a
 
 ### Aktivace Windows (LAB KEY)
 
-Všechny tři instalace se aktivují školními produktovými klíči **LAB KEY**:
-- **Windows Server 2025 Datacenter (SRV1-DC, SRV2-FS):** `MTV3N-22C4V-24QX3-3H2BH-PWJ3G`
-- **Windows 11 Education N (PC1-WIN):** `68NC9-PYVD7-MWGMH-H4JGM-VQWWK`
+Všechny tři instalace se aktivují školními produktovými klíči **LAB KEY**.
+
+> **Produktové klíče:** Konkrétní produktové klíče pro servery (Windows Server 2025 Datacenter) i klienta (Windows 11 Education N) si **zkopírujte přímo ze zadání v Microsoft Teams**.
 
 - Klíč lze zadat **buď přímo během instalace** (obrazovka "Product Key" v instalačním průvodci), **nebo až po instalaci** přes **Settings → System → Activation → Change product key** (GUI), případně příkazy v příkazové řádce či PowerShellu:
-  - Servery: `slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G` a následně `slmgr.vbs /ato`
-  - Klient: `slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK` a následně `slmgr.vbs /ato`
+  ```powershell
+  slmgr.vbs /ipk <LAB-KEY-Z-TEAMS>
+  slmgr.vbs /ato
+  ```
 - Pokud instalační médium nabídne možnost **"I don't have a product key"** / **"Skip"**, lze pokračovat bez aktivace a doplnit klíč později (Windows běží v neaktivovaném/evaluačním režimu s časovým omezením a vodoznakem "Activate Windows") — pro účely výuky to nevadí, ale **cílový stav modulu je aktivovaný Windows** na všech třech strojích.
 - Ověření aktivace: **Settings → System → Activation** ukazuje "Windows is activated" (server), resp. "Windows is activated with a digital license" nebo obdobu u klienta po zadání LAB KEY — případně `slmgr.vbs /xpr` (Windows) vypíše "The machine is permanently activated" nebo datum příští kontroly u KMS aktivace.
 
