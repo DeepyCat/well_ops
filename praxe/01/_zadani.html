@@ -519,21 +519,30 @@
         <p><strong>Upozornění k síti:</strong> PC1-WIN v tomto modulu ještě nemá funkční síť se zbytkem infrastruktury (DHCP server ještě neexistuje) — připojení k internetu/síti během vlastní instalace Windows 11 řešíme jen kvůli aktivaci a případnému stažení aktualizací.</p>
       </blockquote>
 
-      <h3>Aktivace Windows</h3>
-      <p>Všechny tři instalace se aktivují <strong>produktovým klíčem "LAB KEY"</strong>, který mají žáci k dispozici (školní volume-licencovaný klíč pro výukové/laboratorní nasazení — v dokumentaci jako placeholder <code>XXXXX-XXXXX-XXXXX-XXXXX-XXXXX</code>).</p>
+      <h3>Aktivace Windows (LAB KEY)</h3>
+      <p>Všechny tři instalace se aktivují školními produktovými klíči <strong>LAB KEY</strong>:</p>
       <ul>
-        <li>Klíč lze zadat <strong>buď přímo během instalace</strong> (obrazovka "Product Key"), <strong>nebo až po instalaci</strong> přes <strong>Settings → System → Activation → Change product key</strong>, případně příkazy:
-          <div class="code-block-wrapper">
-            <div class="code-block-header">
-              <span>PowerShell / Command Prompt</span>
-              <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-            </div>
-            <pre><code>slmgr.vbs /ipk &lt;LAB-KEY&gt;
-slmgr.vbs /ato</code></pre>
-          </div>
-        </li>
-        <li>Ověření aktivace: <strong>Settings → System → Activation</strong> ukazuje "Windows is activated", případně příkazem <code>slmgr.vbs /xpr</code> vypíše trvalou aktivaci.</li>
+        <li><strong>Windows Server 2025 (SRV1-DC, SRV2-FS):</strong> <code>MTV3N-22C4V-24QX3-3H2BH-PWJ3G</code></li>
+        <li><strong>Windows 11 Education N (PC1-WIN):</strong> <code>68NC9-PYVD7-MWGMH-H4JGM-VQWWK</code></li>
       </ul>
+      <p>Aktivaci provedete buď přímo v instalačním průvodci, v <strong>Settings → System → Activation</strong>, nebo v příkazové řádce / PowerShellu:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell / CMD (Servery SRV1-DC a SRV2-FS)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G
+slmgr.vbs /ato</code></pre>
+      </div>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell / CMD (Klient PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK
+slmgr.vbs /ato</code></pre>
+      </div>
+      <p>Ověření aktivace: <strong>Settings → System → Activation</strong> ukazuje "Windows is activated", případně příkazem <code>slmgr.vbs /xpr</code> vypíše "The machine is permanently activated".</p>
 
       <h3>Jazyk, region a lokalizace</h3>
       <p>Tato část je pro všechny tři stroje <strong>stejná</strong> (nezávisí na roli):</p>

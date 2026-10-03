@@ -318,6 +318,13 @@
         <p>Tento modul se ověřuje <strong>přímo na konzoli připravovaného stroje</strong> (SRV1-DC, SRV2-FS nebo PC1-WIN) — v tuto chvíli ještě neexistuje doména, ze které by šlo testovat vzdáleně. Body 1–10 platí pro oba servery, bod 11 navíc jen pro PC1-WIN.</p>
       </blockquote>
 
+      <div style="background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.4); border-left: 4px solid #22c55e; border-radius: 6px; padding: 12px 16px; margin: 18px 0; color: #bbf7d0; display: flex; align-items: center; gap: 12px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <div>
+          <strong style="color: #4ade80;">SRV1-DC je v labu ověřený:</strong> Všechny PowerShell příkazy a konfigurace byly na stroji SRV1-DC otestovány a jsou 100% v pořádku a funkční!
+        </div>
+      </div>
+
       <h3>1. Parametry virtuálního stroje odpovídají zadání</h3>
       <p>V nastavení virtuálního stroje ve vašem hypervizoru (CyLab): <code>SRV1-DC</code> i <code>SRV2-FS</code> mají přiděleny <strong>2 vCPU</strong>, <strong>8 GB RAM</strong> a <strong>100 GB</strong> systémový disk. U <code>SRV2-FS</code> navíc existuje <strong>5 dalších disků po 10 GB</strong>, viditelných uvnitř hosta:</p>
       <div class="code-block-wrapper">
@@ -429,14 +436,28 @@ Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInf
       <p><code>AllowTelemetry = 1</code> (Required diagnostic data), <code>DisableLocation = 1</code> (poloha vypnutá), <code>DisabledByGroupPolicy = 1</code> (reklamní ID vypnuté). V <strong>Settings → Privacy &amp; security</strong> odpovídají přepínače stejným hodnotám i vizuálně.</p>
 
       <h3>11. Aktivace je hotová (SRV1-DC, SRV2-FS i PC1-WIN)</h3>
+      <p>Aktivace probíhá pomocí školních klíčů <strong>LAB KEY</strong>:</p>
+      <ul>
+        <li><strong>Windows Server 2025 (SRV1-DC, SRV2-FS):</strong> <code>MTV3N-22C4V-24QX3-3H2BH-PWJ3G</code></li>
+        <li><strong>Windows 11 Education N (PC1-WIN):</strong> <code>68NC9-PYVD7-MWGMH-H4JGM-VQWWK</code></li>
+      </ul>
       <div class="code-block-wrapper">
         <div class="code-block-header">
-          <span>Command / PowerShell</span>
+          <span>PowerShell / CMD — Aktivace a ověření licence</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>slmgr.vbs /xpr</code></pre>
+        <pre><code># Pro servery (SRV1-DC, SRV2-FS):
+slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G
+slmgr.vbs /ato
+
+# Pro klienta (PC1-WIN):
+slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK
+slmgr.vbs /ato
+
+# Ověření stavu aktivace:
+slmgr.vbs /xpr</code></pre>
       </div>
-      <p>Vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u KMS/LAB KEY s omezenou platností) — ne "notification experience" upozorňující na neaktivovaný Windows. V <strong>Settings → System → Activation</strong> je zobrazeno <strong>"Windows is activated"</strong> (server), resp. <strong>"Windows is activated with a digital license"</strong> (klient), bez tlačítka "Activate" navíc.</p>
+      <p>Příkaz <code>slmgr.vbs /xpr</code> vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u multilicence). V <strong>Settings → System → Activation</strong> je zobrazeno <strong>"Windows is activated"</strong> (server), resp. <strong>"Windows is activated with a digital license"</strong> (klient), bez varovných hlášek či vodoznaku na ploše.</p>
 
       <h3>12. PC1-WIN: lokální účet, žádný Microsoft účet (jen u klienta)</h3>
       <div class="code-block-wrapper">
