@@ -179,14 +179,14 @@
             const prezentaceBtn = document.querySelector('.choice-btn.prezentace');
 
             if (mode === 'funny') {
-                if (teorieBtn) teorieBtn.style.backgroundImage = "url('img/teorieS-bg.jpg')";
-                if (praxeBtn) praxeBtn.style.backgroundImage = "url('img/praxeS-bg.jpg')";
-                if (prezentaceBtn) prezentaceBtn.style.backgroundImage = "url('img/prezentaceS-bg.jpg')";
-            } else {
-                // safe (výchozí)
                 if (teorieBtn) teorieBtn.style.backgroundImage = "url('img/teorie-bg.jpg')";
                 if (praxeBtn) praxeBtn.style.backgroundImage = "url('img/praxe-bg.jpg')";
                 if (prezentaceBtn) prezentaceBtn.style.backgroundImage = "url('img/prezentace-bg.jpg')";
+            } else {
+                // safe (výchozí)
+                if (teorieBtn) teorieBtn.style.backgroundImage = "url('img/teorieS-bg.jpg')";
+                if (praxeBtn) praxeBtn.style.backgroundImage = "url('img/praxeS-bg.jpg')";
+                if (prezentaceBtn) prezentaceBtn.style.backgroundImage = "url('img/prezentaceS-bg.jpg')";
             }
             
             localStorage.setItem('selectedBgMode', mode);
