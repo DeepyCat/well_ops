@@ -2,6 +2,8 @@
 
 > Tento modul se ověřuje **přímo na konzoli připravovaného stroje** (SRV1-DC, SRV2-FS nebo PC1-WIN) — v tuto chvíli ještě neexistuje doména, ze které by šlo testovat vzdáleně. Body 1–10 platí pro oba servery, bod 11 navíc jen pro PC1-WIN.
 
+> **SRV1-DC je v labu ověřený:** Všechny PowerShell příkazy a konfigurace pro stroj **SRV1-DC** byly v praxi otestovány a jsou 100% OK!
+
 ### 1. Parametry virtuálního stroje odpovídají zadání
 V nastavení virtuálního stroje ve vašem hypervizoru: `SRV1-DC` i `SRV2-FS` mají přiděleny **2 vCPU**, **8 GB RAM** a **100 GB** systémový disk. U `SRV2-FS` navíc existuje **5 dalších disků po 10 GB**, viditelných uvnitř hosta:
 ```powershell
@@ -75,7 +77,20 @@ Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInf
 `AllowTelemetry = 1` (Required diagnostic data), `DisableLocation = 1` (poloha vypnutá), `DisabledByGroupPolicy = 1` (reklamní ID vypnuté). V **Settings → Privacy & security** odpovídají přepínače stejným hodnotám i vizuálně.
 
 ### 11. Aktivace je hotová (SRV1-DC, SRV2-FS i PC1-WIN)
-```
+Aktivace probíhá pomocí školních klíčů **LAB KEY**:
+- **Windows Server 2025 (SRV1-DC, SRV2-FS):** `MTV3N-22C4V-24QX3-3H2BH-PWJ3G`
+- **Windows 11 Education N (PC1-WIN):** `68NC9-PYVD7-MWGMH-H4JGM-VQWWK`
+
+```powershell
+# Pro servery (SRV1-DC, SRV2-FS):
+slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G
+slmgr.vbs /ato
+
+# Pro klienta (PC1-WIN):
+slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK
+slmgr.vbs /ato
+
+# Ověření:
 slmgr.vbs /xpr
 ```
 Vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u KMS/LAB KEY s omezenou platností) — ne "notification experience" upozorňující na neaktivovaný Windows. V **Settings → System → Activation** je zobrazeno **"Windows is activated"** (server), resp. **"Windows is activated with a digital license"** (klient), bez tlačítka "Activate" navíc.

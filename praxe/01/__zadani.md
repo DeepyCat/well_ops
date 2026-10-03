@@ -53,11 +53,15 @@ Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný a
 
 > PC1-WIN v tomto modulu ještě nemá funkční síť se zbytkem infrastruktury (DHCP server ještě neexistuje) — připojení k internetu/síti během vlastní instalace Windows 11 řešíme jen kvůli aktivaci a případnému stažení aktualizací, viz níže.
 
-### Aktivace Windows
+### Aktivace Windows (LAB KEY)
 
-Všechny tři instalace se aktivují **produktovým klíčem "LAB KEY"**, který mají žáci k dispozici (školní volume-licencovaný klíč pro výukové/laboratorní nasazení — konkrétní hodnotu klíče doplní vyučující/škola, v dokumentaci je uveden jako placeholder `XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`).
+Všechny tři instalace se aktivují školními produktovými klíči **LAB KEY**:
+- **Windows Server 2025 Datacenter (SRV1-DC, SRV2-FS):** `MTV3N-22C4V-24QX3-3H2BH-PWJ3G`
+- **Windows 11 Education N (PC1-WIN):** `68NC9-PYVD7-MWGMH-H4JGM-VQWWK`
 
-- Klíč lze zadat **buď přímo během instalace** (obrazovka "Product Key" v instalačním průvodci), **nebo až po instalaci** přes **Settings → System → Activation → Change product key** (GUI), případně příkazem `slmgr.vbs /ipk <LAB-KEY>` + `slmgr.vbs /ato` (PowerShell/cmd) — obě cesty vedou ke stejnému výsledku, vzorový postup ukazuje obě varianty.
+- Klíč lze zadat **buď přímo během instalace** (obrazovka "Product Key" v instalačním průvodci), **nebo až po instalaci** přes **Settings → System → Activation → Change product key** (GUI), případně příkazy v příkazové řádce či PowerShellu:
+  - Servery: `slmgr.vbs /ipk MTV3N-22C4V-24QX3-3H2BH-PWJ3G` a následně `slmgr.vbs /ato`
+  - Klient: `slmgr.vbs /ipk 68NC9-PYVD7-MWGMH-H4JGM-VQWWK` a následně `slmgr.vbs /ato`
 - Pokud instalační médium nabídne možnost **"I don't have a product key"** / **"Skip"**, lze pokračovat bez aktivace a doplnit klíč později (Windows běží v neaktivovaném/evaluačním režimu s časovým omezením a vodoznakem "Activate Windows") — pro účely výuky to nevadí, ale **cílový stav modulu je aktivovaný Windows** na všech třech strojích.
 - Ověření aktivace: **Settings → System → Activation** ukazuje "Windows is activated" (server), resp. "Windows is activated with a digital license" nebo obdobu u klienta po zadání LAB KEY — případně `slmgr.vbs /xpr` (Windows) vypíše "The machine is permanently activated" nebo datum příští kontroly u KMS aktivace.
 
