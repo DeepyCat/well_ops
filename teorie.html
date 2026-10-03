@@ -19,6 +19,30 @@
             --accent-hover: #ff7777;
         }
 
+        /* --- VLASTNÍ SCROLLBAR LADÍCÍ K DESIGNU --- */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #444 var(--bg-main);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -83,6 +107,30 @@
             overflow-y: auto;
             padding: 20px;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Stylování vyhledávacího pole */
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        #mdSearchInput {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 0.9rem;
+            background-color: #1a1a1a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-main);
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        #mdSearchInput:focus {
+            border-color: var(--accent);
         }
 
         .nav-group {
@@ -168,16 +216,46 @@
             margin-bottom: 10px;
         }
 
-        /* Stylování pro vykreslený Markdown */
-        .content-box h1, .content-box h2, .content-box h3 {
+        /* --- VYLEPŠENÉ VYKRESLENÍ .MD SOUBORŮ (ROZSTUPY A ČITELNOST) --- */
+        .content-box h1, 
+        .content-box h2, 
+        .content-box h3 {
             color: #fff;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 6px;
+            padding-bottom: 8px;
+            margin-top: 25px;
+            margin-bottom: 15px;
         }
-        .content-box p, .content-box li {
+        
+        .content-box h1:first-child, 
+        .content-box h2:first-child, 
+        .content-box h3:first-child {
+            margin-top: 0;
+        }
+
+        .content-box p {
+            line-height: 1.7;
+            color: #d1d1d1;
+            margin-bottom: 16px;
+        }
+
+        .content-box ul, 
+        .content-box ol {
+            margin-top: 10px;
+            margin-bottom: 16px;
+            padding-left: 25px;
+        }
+
+        .content-box li {
             line-height: 1.6;
             color: #ccc;
+            margin-bottom: 8px;
         }
+
+        .content-box strong {
+            color: #fff;
+        }
+
         .content-box code {
             background: #151515;
             padding: 2px 6px;
@@ -185,13 +263,16 @@
             color: #ff7b72;
             font-size: 0.9em;
         }
+
         .content-box pre {
             background: #151515;
             padding: 15px;
             border-radius: 8px;
             overflow-x: auto;
             border: 1px solid var(--border-color);
+            margin-bottom: 16px;
         }
+
         .content-box pre code {
             background: none;
             color: #e6edf3;
@@ -210,7 +291,7 @@
             }
             sidebar {
                 width: 100%;
-                max-height: 250px;
+                max-height: 300px;
             }
             main {
                 padding: 15px;
@@ -226,8 +307,13 @@
     </header>
 
     <div class="app-layout">
-        <!-- Sidebar s tlačítky -->
+        <!-- Sidebar s vyhledáváním a tlačítky -->
         <sidebar>
+            <!-- Vyhledávací pole -->
+            <div class="search-container">
+                <input type="text" id="mdSearchInput" placeholder="Hledat v názvech .md..." onkeyup="filterMarkdownDocs()">
+            </div>
+
             <div class="nav-group">
                 <div class="nav-group-title">1. Úvod & Architektura</div>
                 <ul>
@@ -319,10 +405,37 @@
                     document.getElementById('content').innerHTML = `
                         <div style="text-align: center; padding: 30px;">
                             <h3 style="color: #f87171; margin-bottom: 8px;">Nejde</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Soubor <code>$.idk funguj</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Soubor se nepodařilo načíst.</p>
                         </div>
                     `;
                 });
+        }
+
+        // Funkce pro živé vyhledávání / filtrování tlačítek podle názvu souboru
+        function filterMarkdownDocs() {
+            let input = document.getElementById('mdSearchInput');
+            let filter = input.value.toLowerCase();
+            let navGroups = document.querySelectorAll('.nav-group');
+
+            navGroups.forEach(group => {
+                let items = group.querySelectorAll('li');
+                let hasVisibleItems = false;
+
+                items.forEach(li => {
+                    let button = li.querySelector('button');
+                    let textValue = button.textContent || button.innerText;
+
+                    if (textValue.toLowerCase().indexOf(filter) > -1) {
+                        li.style.display = "";
+                        hasVisibleItems = true;
+                    } else {
+                        li.style.display = "none";
+                    }
+                });
+
+                // Skryje celou sekci/skupinu, pokud v ní nezbyla žádná viditelná položka
+                group.style.display = hasVisibleItems ? "" : "none";
+            });
         }
     </script>
 </body>
