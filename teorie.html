@@ -204,26 +204,30 @@
             border: 1px solid var(--border-color);
             height: fit-content;
             min-height: 400px;
-            position: relative;
         }
 
-        /* Stylování tlačítka pro stažení uvnitř boxu */
-        .download-btn {
+        /* Kontejner a stylování pro tlačítko stažení na konci */
+        .download-container {
             display: none;
-            position: absolute;
-            top: 25px;
-            right: 30px;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .download-btn {
             background-color: #2a2a2a;
             border: 1px solid #444;
             color: var(--text-main);
-            padding: 6px 12px;
+            padding: 10px 20px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.95rem;
             text-decoration: none;
             transition: all 0.2s ease;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
         .download-btn:hover {
             background-color: #333;
@@ -321,11 +325,6 @@
             main {
                 padding: 15px;
             }
-            .download-btn {
-                position: static;
-                margin-bottom: 20px;
-                display: inline-flex;
-            }
         }
     </style>
 </head>
@@ -402,9 +401,6 @@
         <!-- Hlavní obsah pro vykreslení -->
         <main>
             <div class="content-box" id="content">
-                <!-- Tlačítko pro stažení souboru (dynamicky se zobrazí) -->
-                <a id="downloadBtn" class="download-btn" href="#" download>📥 Stáhnout .md</a>
-
                 <div class="placeholder-state" id="placeholderState">
                     <h2>😢😢😢 - nechcu to dělat</h2>
                     <p style="color: var(--text-muted);">Kliknutím na libovolný soubor se jeho obsah z .md souboru automaticky načte a vykreslí přímo zde. Bezbolestně</p>
@@ -412,7 +408,13 @@
                         „Teorie je, když víte všechno, ale nic nefunguje. V předmětu OPS nefunguje ani jedno, tak hodně štěstí při klikání.“
                     </div>
                 </div>
+                
                 <div id="markdownContent"></div>
+
+                <!-- Tlačítko pro stažení souboru umístěné až na konci -->
+                <div id="downloadContainer" class="download-container">
+                    <a id="downloadBtn" class="download-btn" href="#" download>📥 Stáhnout .md</a>
+                </div>
             </div>
         </main>
     </div>
@@ -427,9 +429,9 @@
             document.querySelectorAll('sidebar button').forEach(b => b.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
 
-            // Skrytí placeholderu a zobrazení načítání
+            // Skrytí placeholderu a schování tlačítka během načítání
             document.getElementById('placeholderState').style.display = 'none';
-            document.getElementById('downloadBtn').style.display = 'none';
+            document.getElementById('downloadContainer').style.display = 'none';
             document.getElementById('markdownContent').innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px;">Načítám moudra z Markdownu...</p>';
 
             fetch(filePath)
@@ -441,13 +443,13 @@
                     // Vykreslení markdownu pomocí knihovny Marked
                     document.getElementById('markdownContent').innerHTML = marked.parse(markdown);
                     
-                    // Nastavení a zobrazení tlačítka pro stažení
+                    // Nastavení a zobrazení tlačítka pro stažení až na konci obsahu
                     let downloadBtn = document.getElementById('downloadBtn');
                     let fileName = filePath.split('/').pop();
                     downloadBtn.href = filePath;
                     downloadBtn.download = fileName;
                     downloadBtn.innerText = `📥 Stáhnout ${fileName}`;
-                    downloadBtn.style.display = 'inline-flex';
+                    document.getElementById('downloadContainer').style.display = 'block';
                 })
                 .catch(err => {
                     document.getElementById('markdownContent').innerHTML = `
