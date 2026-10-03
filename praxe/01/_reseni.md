@@ -60,8 +60,11 @@ Vrátí `Id: Central Europe Standard Time`, `DisplayName` obsahující `Prague` 
 ### 9. Klávesnice — US i Czech (QWERTZ), přepínatelné
 ```powershell
 Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips
+# Alternativně kontrola rozložení přímo z registru:
+Get-ItemProperty "HKCU:\Keyboard Layout\Preload"
 ```
-Výstup obsahuje jak `en-US`, tak `cs-CZ` s příslušnou metodou vstupu (`0409:00000409` pro US, `0405:00000405` pro Czech). V praxi: kliknutím na jazykovou ikonu na hlavním panelu (nebo `Win + mezerník`) jde přepnout mezi `ENG` a `CZE` a po přepnutí na CZE funguje psaní diakritiky (`ř`, `ů`, `ě`) bez dalšího nastavování.
+Výstup obsahuje jak `en-US`, tak `cs-CZ` s příslušnou metodou vstupu (`0409:00000409` pro US, `0405:00000405` pro Czech), případně v registru `1 : 00000409` a `2 : 00000405`.
+Pokud už na liště u hodin vidíte přepínač ENG / CES a funguje vám psaní českých znaků (ěščřž), máte úkol splněný.
 
 ### 10. Soukromí je nastaveno na minimum
 ```powershell

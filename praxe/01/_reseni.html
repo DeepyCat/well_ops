@@ -409,9 +409,12 @@ Get-WinHomeLocation</code></pre>
           <span>PowerShell</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips</code></pre>
+        <pre><code>Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips
+# Alternativně kontrola rozložení přímo z registru:
+Get-ItemProperty "HKCU:\Keyboard Layout\Preload"</code></pre>
       </div>
-      <p>Výstup obsahuje jak <code>en-US</code>, tak <code>cs-CZ</code> s příslušnou metodou vstupu (<code>0409:00000409</code> pro US, <code>0405:00000405</code> pro Czech). V praxi: kliknutím na jazykovou ikonu na hlavním panelu (nebo <code>Win + mezerník</code>) jde přepnout mezi <code>ENG</code> a <code>CZE</code> a po přepnutí na CZE funguje psaní diakritiky (<code>ř</code>, <code>ů</code>, <code>ě</code>) bez dalšího nastavování.</p>
+      <p>Výstup obsahuje jak <code>en-US</code>, tak <code>cs-CZ</code> s příslušnou metodou vstupu (<code>0409:00000409</code> pro US, <code>0405:00000405</code> pro Czech), případně v registru <code>1 : 00000409</code> a <code>2 : 00000405</code>.</p>
+      <p><strong>Pokud už na liště u hodin vidíte přepínač ENG / CES a funguje vám psaní českých znaků (ěščřž), máte úkol splněný.</strong></p>
 
       <h3>10. Soukromí je nastaveno na minimum</h3>
       <div class="code-block-wrapper">
