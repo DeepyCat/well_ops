@@ -232,11 +232,109 @@
       font-weight: 600;
     }
 
-    .task-item input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--accent);
+    /* Vlastní stylování checkboxů */
+    .custom-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid #555;
+      border-radius: 4px;
+      background-color: #181818;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+    }
+
+    .custom-checkbox:hover {
+      border-color: var(--accent);
+      background-color: #222;
+      box-shadow: 0 0 6px rgba(255, 85, 85, 0.3);
+    }
+
+    .custom-checkbox:checked {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2.5-2.5a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+      background-size: 13px 13px;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: 0 0 8px rgba(255, 85, 85, 0.45);
+    }
+
+    .custom-checkbox:active {
+      transform: scale(0.9);
+    }
+
+    /* Moderní přepínač stavu v detailu úkolu */
+    .status-toggle {
+      font-size: 0.82rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      background: #1c1c1c;
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 20px;
+      transition: all 0.2s ease;
+      user-select: none;
+      color: var(--text-muted);
+    }
+
+    .status-toggle:hover {
+      background: #252525;
+      border-color: #555;
+      color: var(--text-main);
+    }
+
+    .status-toggle.is-done {
+      background: rgba(255, 85, 85, 0.12);
+      border-color: var(--accent);
+      color: var(--accent-hover);
+    }
+
+    /* Navigace mezi úkoly v patce detailu */
+    .detail-nav-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .nav-step-btn {
+      background-color: var(--bg-sidebar);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-step-btn:hover:not(:disabled) {
+      background-color: #2a2a2a;
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .nav-step-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      border-color: var(--border-color);
     }
 
     .task-label {
@@ -425,7 +523,10 @@
           if (vm === "PC1-WIN") return "Instalace Windows 11 Education N (jazyk: English - United States).";
           return "Instalace Windows Server 2025 Datacenter (Desktop Experience). Neinstalovat Server Core.";
         },
-        verify: () => "Get-ComputerInfo | Select-Object WindowsProductName, OsServerLevel"
+        verify: (vm) => {
+          if (vm === "PC1-WIN") return "Get-ComputerInfo | Select-Object WindowsProductName";
+          return "Get-ComputerInfo | Select-Object WindowsProductName, OsServerLevel";
+        }
       },
       {
         id: "hostname",
@@ -443,10 +544,10 @@
         how: (vm) => {
           if (vm === "SRV1-DC") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.10" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
           if (vm === "SRV2-FS") return `New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress "192.168.200.20" -PrefixLength 24 -DefaultGateway "192.168.200.1"\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("192.168.200.10")`;
-          return "Ponechte výchozí stav: Obtain an IP address automatically.";
+          return "Ponechte výchozí stav: Obtain an IP address automatically (DHCP).";
         },
         verify: (vm) => {
-          if (vm === "PC1-WIN") return "Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select IPAddress, PrefixOrigin";
+          if (vm === "PC1-WIN") return "Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixOrigin";
           return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -AddressFamily IPv4`;
         }
       },
@@ -467,7 +568,7 @@
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
         why: "Rozhraní zůstává anglické, ale systémové konvence (datum, čísla) odpovídají českému prostředí.",
         how: () => `Set-Culture cs-CZ\nSet-WinSystemLocale cs-CZ\nSet-WinHomeLocation -GeoId 0x3d`,
-        verify: () => `Get-Culture | Select-Object Name, DisplayName\nGet-WinSystemLocale\nGet-WinHomeLocation`
+        verify: () => `Get-Culture | Select-Object Name, DisplayName\nGet-WinSystemLocale\nGet-WinHomeLocation\nGet-WinUILanguageOverride`
       },
       {
         id: "datetime-format",
@@ -590,7 +691,7 @@
         li.onclick = () => selectTask(t.id);
 
         li.innerHTML = `
-          <input type="checkbox" ${isDone ? "checked" : ""} onclick="toggleTask('${t.id}', this.checked, event)">
+          <input type="checkbox" class="custom-checkbox" ${isDone ? "checked" : ""} onclick="toggleTask('${t.id}', this.checked, event)">
           <span class="task-label ${isDone ? 'done' : ''}">${t.title}</span>
         `;
         listEl.appendChild(li);
@@ -605,13 +706,17 @@
       const howText = typeof currentTask.how === "function" ? currentTask.how(currentVM) : currentTask.how;
       const verifyText = typeof currentTask.verify === "function" ? currentTask.verify(currentVM) : currentTask.verify;
 
+      const currentIndex = relevantTasks.findIndex(t => t.id === currentTask.id);
+      const prevTask = currentIndex > 0 ? relevantTasks[currentIndex - 1] : null;
+      const nextTask = currentIndex < relevantTasks.length - 1 ? relevantTasks[currentIndex + 1] : null;
+
       const detailEl = document.getElementById("detail-pane");
       detailEl.innerHTML = `
         <div class="detail-title">
           <span>${currentTask.title}</span>
-          <label style="font-size:0.85rem; font-weight:normal; display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <input type="checkbox" ${isDone ? "checked" : ""} style="width:16px;height:16px;accent-color:var(--accent);" onchange="toggleTask('${currentTask.id}', this.checked)">
-            Označit jako hotové
+          <label class="status-toggle ${isDone ? 'is-done' : ''}">
+            <input type="checkbox" class="custom-checkbox" ${isDone ? "checked" : ""} onchange="toggleTask('${currentTask.id}', this.checked)">
+            <span>${isDone ? 'Hotovo ✓' : 'Označit jako hotové'}</span>
           </label>
         </div>
 
@@ -634,6 +739,15 @@
             <button class="copy-btn" onclick="copyToClipboard(\`${verifyText.replace(/`/g, '\\`')}\`, this)">Kopírovat</button>
           </div>
           <div class="box-content"><pre>${verifyText}</pre></div>
+        </div>
+
+        <div class="detail-nav-footer">
+          <button class="nav-step-btn" ${prevTask ? `onclick="selectTask('${prevTask.id}')"` : "disabled"}>
+            ← Předchozí úkol
+          </button>
+          <button class="nav-step-btn" ${nextTask ? `onclick="selectTask('${nextTask.id}')"` : "disabled"}>
+            Další úkol →
+          </button>
         </div>
       `;
     }
