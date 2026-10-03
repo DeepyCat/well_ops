@@ -373,79 +373,164 @@
       padding-bottom: 12px;
     }
 
-    .box {
-      background: #1e1e1e;
+    .vm-tag {
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
-      overflow: hidden;
+      color: var(--accent-hover);
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: ui-monospace, monospace;
     }
 
-    .box-header {
-      padding: 8px 14px;
-      background: #262626;
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      font-weight: bold;
-      letter-spacing: 1px;
-      color: var(--accent);
+    /* 3-krokové karty pro hlavní okno */
+    .step-card {
+      background: #1c1c1c;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .step-card.step-goal {
+      border-left: 4px solid #6b7280;
+    }
+
+    .step-card.step-action {
+      border-left: 4px solid var(--accent);
+      border-color: #3d2a2c;
+    }
+
+    .step-card.step-verify {
+      border-left: 4px solid #3b82f6;
+      border-color: #1e2c3f;
+    }
+
+    .step-card-header {
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-color);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
     }
 
-    .box-content {
-      padding: 14px;
+    .step-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-goal .step-card-header {
+      background: #222222;
+      color: #9ca3af;
+      border-bottom-color: #2e2e2e;
+    }
+
+    .step-action .step-card-header {
+      background: #251c1d;
+      color: var(--accent-hover);
+      border-bottom-color: #382424;
+    }
+
+    .step-verify .step-card-header {
+      background: #16202e;
+      color: #60a5fa;
+      border-bottom-color: #1e2d42;
+    }
+
+    .step-card-body {
+      padding: 14px 16px;
       font-size: 0.88rem;
       color: var(--text-main);
       line-height: 1.6;
     }
 
-    pre {
+    pre.action-code {
       font-family: 'Consolas', 'Courier New', Courier, monospace;
-      font-size: 0.85rem;
-      color: #e6edf3;
+      font-size: 0.88rem;
+      color: #ffc9c2;
       overflow-x: auto;
       white-space: pre-wrap;
       word-break: break-all;
       background: var(--code-bg);
-      padding: 6px 10px;
-      border-radius: 4px;
-      border: 1px solid var(--border-color);
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid #382424;
+      margin: 0;
+    }
+
+    pre.verify-code {
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: 0.88rem;
+      color: #bfdbfe;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: var(--code-bg);
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid #1e293b;
+      margin: 0;
     }
 
     .copy-btn {
-      background-color: #2a2a2a;
-      border: 1px solid #444;
-      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       border-radius: 4px;
-      padding: 3px 9px;
+      padding: 5px 11px;
       font-size: 0.75rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
-    .copy-btn:hover {
-      background-color: #333;
+    .copy-btn-action {
+      background: rgba(255, 85, 85, 0.18);
+      border: 1px solid rgba(255, 85, 85, 0.45);
       color: #fff;
+    }
+
+    .copy-btn-action:hover {
+      background: rgba(255, 85, 85, 0.35);
       border-color: var(--accent);
+      color: #fff;
+    }
+
+    .copy-btn-verify {
+      background: rgba(59, 130, 246, 0.18);
+      border: 1px solid rgba(59, 130, 246, 0.45);
+      color: #fff;
+    }
+
+    .copy-btn-verify:hover {
+      background: rgba(59, 130, 246, 0.35);
+      border-color: #60a5fa;
+      color: #fff;
     }
 
     /* Očekávaný výstup ověření */
     .expected-output-box {
       margin-top: 14px;
       padding: 12px 14px;
-      background: #141414;
-      border: 1px solid var(--border-color);
+      background: #101712;
+      border: 1px solid #1c3222;
       border-left: 3px solid #22c55e;
-      border-radius: 4px;
+      border-radius: 6px;
     }
 
     .expected-output-header {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       text-transform: uppercase;
-      font-weight: bold;
-      letter-spacing: 0.8px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
       color: #4ade80;
       margin-bottom: 8px;
       display: flex;
@@ -455,14 +540,14 @@
 
     .expected-output-content {
       font-size: 0.84rem;
-      color: #d1d5db;
+      color: #d1fae5;
       line-height: 1.55;
       white-space: pre-line;
       font-family: 'Consolas', 'Courier New', Courier, monospace;
-      background: #0d0d0d;
+      background: #090e0b;
       padding: 8px 12px;
       border-radius: 4px;
-      border: 1px solid #262626;
+      border: 1px solid #162a1c;
       overflow-x: auto;
     }
 
@@ -922,37 +1007,62 @@
       const detailEl = document.getElementById("detail-pane");
       detailEl.innerHTML = `
         <div class="detail-title">
-          <span>${currentTask.title}</span>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="vm-tag">${currentVM}</span>
+            <span>${currentTask.title}</span>
+          </div>
           <label class="status-toggle ${isDone ? 'is-done' : ''}">
             <input type="checkbox" class="custom-checkbox" ${isDone ? "checked" : ""} onchange="toggleTask('${currentTask.id}', this.checked)">
-            <span>${isDone ? 'Hotovo ✓' : 'Označit jako hotové'}</span>
+            <span>${isDone ? 'Hotovo' : 'Označit jako hotové'}</span>
           </label>
         </div>
 
-        <div class="box">
-          <div class="box-header">Kontext (Co se má udělat)</div>
-          <div class="box-content">${whatText}</div>
+        <!-- 1. CÍL ÚKOLU -->
+        <div class="step-card step-goal">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+              <span>Cíl úkolu</span>
+            </div>
+          </div>
+          <div class="step-card-body">${whatText}</div>
         </div>
 
-        <div class="box">
-          <div class="box-header">
-            <span>Konfigurace</span>
-            <button class="copy-btn" onclick="copyToClipboard(\`${howText.replace(/`/g, '\\`')}\`, this)">Kopírovat</button>
+        <!-- 2. PŘÍKAZ K PROVEDENÍ -->
+        <div class="step-card step-action">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+              <span>1. Příkaz k provedení</span>
+            </div>
+            <button class="copy-btn copy-btn-action" onclick="copyToClipboard(\`${howText.replace(/`/g, '\\`')}\`, this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              Kopírovat příkaz
+            </button>
           </div>
-          <div class="box-content"><pre>${howText}</pre></div>
+          <div class="step-card-body">
+            <pre class="action-code">${howText}</pre>
+          </div>
         </div>
 
-        <div class="box">
-          <div class="box-header">
-            <span>Ověření (PowerShell)</span>
-            <button class="copy-btn" onclick="copyToClipboard(\`${verifyText.replace(/`/g, '\\`')}\`, this)">Kopírovat</button>
+        <!-- 3. KONTROLA VÝSLEDKU -->
+        <div class="step-card step-verify">
+          <div class="step-card-header">
+            <div class="step-header-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <span>2. Kontrola výsledku (PowerShell)</span>
+            </div>
+            <button class="copy-btn copy-btn-verify" onclick="copyToClipboard(\`${verifyText.replace(/`/g, '\\`')}\`, this)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              Kopírovat test
+            </button>
           </div>
-          <div class="box-content">
-            <pre>${verifyText}</pre>
+          <div class="step-card-body">
+            <pre class="verify-code">${verifyText}</pre>
             <div class="expected-output-box">
               <div class="expected-output-header">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                Co by to mělo vyplivnout (očekávaný výsledek):
+                <span>Správný výstup konzole (musí odpovídat):</span>
               </div>
               <div class="expected-output-content">${expectedText}</div>
             </div>
@@ -961,10 +1071,12 @@
 
         <div class="detail-nav-footer">
           <button class="nav-step-btn" ${prevTask ? `onclick="selectTask('${prevTask.id}')"` : "disabled"}>
-            ← Předchozí úkol
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Předchozí úkol
           </button>
           <button class="nav-step-btn" ${nextTask ? `onclick="selectTask('${nextTask.id}')"` : "disabled"}>
-            Další úkol →
+            Další úkol
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
           </button>
         </div>
       `;
