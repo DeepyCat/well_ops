@@ -1409,8 +1409,8 @@
         forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
         what: () => "Nakonfigurujte dvě klávesnice: US jako primární/výchozí (snadné psaní příkazů v PowerShellu) a Czech QWERTZ jako sekundární s přepínáním přes Win + mezerník.",
         how: () => `$List = New-WinUserLanguageList "en-US"\n$List.Add("cs-CZ")\nSet-WinUserLanguageList $List -Force`,
-        verify: () => "Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips",
-        expected: () => "LanguageTag InputMethodTips\n----------- ---------------\nen-US       {0409:00000409}\ncs-CZ       {0405:00000405}\n(Na hlavním panelu u hodin je dostupný přepínač ENG / CES)"
+        verify: () => `Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips\n# Nebo kontrola rozložení přímo z registru:\nGet-ItemProperty "HKCU:\\Keyboard Layout\\Preload"`,
+        expected: () => `LanguageTag InputMethodTips\n----------- ---------------\nen-US       {0409:00000409}\ncs-CZ       {0405:00000405}\n\nNebo v registru (1 : 00000409 pro US, 2 : 00000405 pro CZ).\nPokud už na liště u hodin vidíte přepínač ENG / CES a funguje vám psaní českých znaků (ěščřž), máte úkol splněný.`
       },
       {
         id: "privacy",
