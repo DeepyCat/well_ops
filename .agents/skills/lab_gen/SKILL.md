@@ -16,3 +16,14 @@ Při generování nového cvičení:
 6. Dodržuj pravidla síťových rozhraní (NIC 1 = NAT / nesahat, NIC 2 = interní síť pro VM / sem patří IP, NIC 3 = třída) a zobrazuj `.nic-warning-banner`.
 7. Příkazy a ověření renderuj v autentickém terminálovém boxu `.terminal-box` (PowerShell console).
 8. Zachovej tmavý motiv a třídy v `praxe.html`.
+
+## Znalostní báze a referenční příručky (Hardening & Sysadmin)
+
+Pro přesné parametry zabezpečení, auditování a ověřené PowerShell one-linery využívej podklady uložené v `references/`:
+
+| Referenční modul | Umístění | Kdy využít |
+|-------------------|----------|------------|
+| **Windows Hardening** | `references/windows-hardening/SKILL.md` | Microsoft Security Baselines, zabezpečení účtů, LAPS, BitLocker, Windows Defender, ASR pravidla, Firewall, vypnutí SMBv1/LLMNR/NetBIOS |
+| **CIS Benchmark Hardening** | `references/hardening-windows-endpoint-with-cis-benchmark/SKILL.md` | CIS Level 1 & Level 2 doporučení pro Windows Server / Windows 11, GPO šablony, politiky hesel, auditování a compliance |
+| **Sysadmin Toolbox** | `references/sysadmin-toolbox/SKILL.md` | Rychlé vyhledání síťových, diagnostických a systémových nástrojů, shell one-linery (DNS, TCP, procesy, logy) |
+
