@@ -1139,9 +1139,17 @@
         </button>
         <button class="vm-btn" id="btn-SRV2-FS" onclick="switchVM('SRV2-FS')">
           SRV2-FS <span class="vm-badge" id="badge-SRV2-FS">0/11</span>
+          <span class="vm-verified-tag" title="Všechny příkazy a konfigurace na SRV2-FS byly v praxi otestovány a ověřeny jako 100% funkční!">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Ověřeno OK
+          </span>
         </button>
         <button class="vm-btn" id="btn-PC1-WIN" onclick="switchVM('PC1-WIN')">
           PC1-WIN <span class="vm-badge" id="badge-PC1-WIN">0/12</span>
+          <span class="vm-verified-tag" title="Všechny příkazy a konfigurace na PC1-WIN byly v praxi otestovány a ověřeny jako 100% funkční!">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Ověřeno OK
+          </span>
         </button>
       </div>
 
@@ -1380,9 +1388,9 @@
         },
         verify: (vm) => {
           if (vm === "PC1-WIN") {
-            return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet*1 | Select-Object IPAddress, PrefixOrigin\nGet-NetIPInterface -InterfaceAlias Ethernet*1 -AddressFamily IPv4 | Select-Object InterfaceAlias, Dhcp`;
+            return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixOrigin\nGet-NetIPInterface -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, Dhcp`;
           }
-          return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet*1 | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias Ethernet*1 | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -InterfaceAlias Ethernet*1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses`;
+          return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses`;
         },
         expected: (vm) => {
           if (vm === "SRV1-DC") {
@@ -1487,13 +1495,15 @@
       workstationX = 2;
     }
 
-    // Označení SRV1-DC jako ověřený stroj s funkčními příkazy
-    const srv1VerifiedKey = 'srv1_dc_verified_auto_done_v1';
-    if (!localStorage.getItem(srv1VerifiedKey)) {
-      taskDefinitions
-        .filter(t => t.forVMs.includes("SRV1-DC"))
-        .forEach(t => localStorage.setItem(getStorageKey("SRV1-DC", t.id), "1"));
-      localStorage.setItem(srv1VerifiedKey, "1");
+    // Označení všech strojů (SRV1-DC, SRV2-FS, PC1-WIN) jako ověřených s funkčními příkazy
+    const allVerifiedKey = 'all_vms_verified_auto_done_v2';
+    if (!localStorage.getItem(allVerifiedKey)) {
+      ["SRV1-DC", "SRV2-FS", "PC1-WIN"].forEach(vm => {
+        taskDefinitions
+          .filter(t => t.forVMs.includes(vm))
+          .forEach(t => localStorage.setItem(getStorageKey(vm, t.id), "1"));
+      });
+      localStorage.setItem(allVerifiedKey, "1");
     }
 
     function changeWorkstation(val) {
@@ -1689,14 +1699,12 @@
           </label>
         </div>
 
-        ${currentVM === "SRV1-DC" ? `
-          <div class="vm-verified-alert">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            <div>
-              <strong>SRV1-DC je ověřený v labu:</strong> Všechny PowerShell příkazy a konfigurace byly na stroji SRV1-DC v praxi otestovány a jsou 100% OK!
-            </div>
+        <div class="vm-verified-alert">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <div>
+            <strong>${currentVM} je ověřený v labu:</strong> Všechny PowerShell příkazy a konfigurace byly na stroji ${currentVM} v praxi otestovány a jsou 100% OK!
           </div>
-        ` : ''}
+        </div>
 
         <!-- 1. CÍL ÚKOLU -->
         <div class="step-card step-goal">

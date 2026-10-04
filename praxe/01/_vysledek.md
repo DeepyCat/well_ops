@@ -2,7 +2,7 @@
 
 > Tento modul se ověřuje **přímo na konzoli připravovaného stroje** (SRV1-DC, SRV2-FS nebo PC1-WIN) — v tuto chvíli ještě neexistuje doména, ze které by šlo testovat vzdáleně. Body 1–10 platí pro oba servery, bod 11 navíc jen pro PC1-WIN.
 
-> **SRV1-DC je v labu ověřený:** Všechny PowerShell příkazy a konfigurace pro stroj **SRV1-DC** byly v praxi otestovány a jsou 100% OK!
+> **Všechny stroje (SRV1-DC, SRV2-FS i PC1-WIN) jsou v labu ověřené:** Všechny PowerShell příkazy a konfigurace byly v praxi otestovány a jsou 100% OK!
 
 ### 1. Parametry virtuálního stroje odpovídají zadání
 V nastavení virtuálního stroje ve vašem hypervizoru: `SRV1-DC` i `SRV2-FS` mají přiděleny **2 vCPU**, **8 GB RAM** a **100 GB** systémový disk. U `SRV2-FS` navíc existuje **5 dalších disků po 10 GB**, viditelných uvnitř hosta:
@@ -25,9 +25,9 @@ Vrátí přesně `SRV1-DC`, resp. `SRV2-FS` — ne výchozí vygenerované jmén
 
 ### 4. TCP/IPv4 je nastavené staticky a podle tabulky
 ```powershell
-Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet* | Select-Object IPAddress, PrefixLength
-Get-NetIPConfiguration | Select-Object -ExpandProperty IPv4DefaultGateway
-Get-DnsClientServerAddress -AddressFamily IPv4
+Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixLength
+Get-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway
+Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4
 ```
 IP adresa, prefix (`24` = maska `255.255.255.0`), brána i DNS server odpovídají hodnotám v `__zadani.md` pro daný server. Adresa **není** převzatá z DHCP (`Get-NetIPAddress ... | Select PrefixOrigin` ukazuje `Manual`, ne `Dhcp`).
 
