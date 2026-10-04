@@ -1,82 +1,148 @@
 ---
 name: lab_gen
-description: Návod a metodika pro AI asistenty, jak na základě podkladů (např. __zadani.md, _vysledek.md) vygenerovat a integrovat nová praktická cvičení (Modul 02, 03...) do webového portálu OPS.
+description: Komplexní návod a metodika pro AI asistenty, jak na základě podkladů (__zadani.md, _vysledek.md) vygenerovat a plně integrovat nové praktické cvičení (Modul 02, 03...) do dynamického portálu OPS.
 ---
 
-# 🛠️ Metodika generování praktických cvičení (LAB GEN)
+# 🛠️ Metodika generování a integrace praktických cvičení (LAB GEN)
 
-Tento dokument slouží jako **standardizovaný návod pro libovolné AI**, které má za úkol vytvořit nebo integrovat další lekci/cvičení (např. `02`, `03`...) v rámci praktické části projektu **OPS (Operační systémy / sítě)**.
-
----
-
-## 🎯 Cíl a kontext projektu
-
-Webová aplikace **well_ops** je statický výukový portál pro studenty předmětu Operační systémy (běžící na GitHub Pages).
-Sekce **Praxe** (`praxe.html`) slouží jako **interaktivní laboratorní průvodce (checklist)**, kde studenti konfigurují virtuální servery a klienty (typicky `SRV1-DC`, `SRV2-FS`, `PC1-WIN`).
-
-Každé cvičení studentům poskytuje:
-1. **Přepínání virtuálních strojů** – úkoly se filtrují podle zvoleného stroje.
-2. **Postup krok za krokem** – každý krok obsahuje:
-   - **Kontext (Co se má udělat)** – srozumitelný cíl úkolu (u parametrů instalace **vždy přehledná tabulka** s aktivním zvýrazněním vybraného VM).
-   - **Konfigurace** – přesný příkaz (PowerShell, cmd, reg) s tlačítkem pro zkopírování do schránky.
-   - **Ověření (PowerShell)** – testovací příkaz pro kontrolu správnosti.
-   - **Co by to mělo vyplivnout** – přesný očekávaný výstup konzole/PowerShellu pro vizuální porovnání.
-3. **Ukládání stavu** – splněné úkoly se ukládají do `localStorage` prohlížeče a počítá se celkový progress bar.
+Tento dokument slouží jako **komplexní a závazný standard pro libovolné AI**, které má za úkol vytvořit, zpracovat nebo integrovat další lekci/cvičení (např. `Modul 02: DHCP`, `Modul 03: DNS`...) v rámci praktické části projektu **OPS (Operační systémy / sítě)**.
 
 ---
 
-## 📂 Struktura vstupních dat pro nové cvičení
+## 🎯 Architektura a princip fungování webu
 
-Uživatel poskytne složku nového cvičení (např. `praxe/02/`), která typicky obsahuje:
-- `__zadani.md` – kontext, parametry, tabulky hodnot, co je cílem modulu.
-- `_vysledek.md` – kontrolní seznam bod po bodu: jak se pozná hotový stav, jaké příkazy spustit a co přesně mají vrátit.
-- *(volitelně)* `_postup.md` / `cast1.md` / `cast2.md` – detailní kroky a návody.
+Aplikace běží jako **dynamický webový portál** s centrální stránkou [praxe.html](file:///D:/%21Documents/VSCode/well_ops/praxe.html):
+1. **Přepínač zadání (Module Switcher):** Vlevo nahoře v hlavičce umožňuje studentům přepínat mezi jednotlivými moduly. Výběr se promítá do URL (`praxe.html?modul=02`).
+2. **Dynamická data modulů:** Každé cvičení má vlastní složku v `praxe/XX/` (např. `praxe/02/`) obsahující definici úkolů `tasks.js`, stav ověření `verified.json`, formátované zadání a vzorové řešení.
+3. **Centrální registr:** Všechny moduly jsou registrovány v `praxe/modules.js` a `praxe/modules.json`.
+4. **Per-VM ověření (`verified.json`):** Každý modul má svůj soubor `verified.json`, kde je pro každý server hodnota `true` / `false`. Pokud je `true`, na webu se zobrazí zelený štítek **„Ověřeno OK“** a zelený banner. Pokud je `false`, štítek a banner se nezobrazují.
 
 ---
 
-## 🏗️ Datová struktura úkolu v JavaScriptu
+## 📂 Co VŠE musí AI vytvořit při požadavku „Zpracuj X. zadání (Modul XX)“
 
-Pro každý úkol v daném cvičení se vytváří JavaScriptový objekt v poli `taskDefinitions` s těmito povinnými klíči:
+Při zpracování nového modulu (např. `02`) AI **VŽDY** provede následující kroky v tomto pořadí:
 
-```javascript
+### Krok 1: Vytvoření složky `praxe/XX/` a souborů zadání
+Vytvořte složku `praxe/XX/` (např. `praxe/02/`) a v ní:
+1. `__zadani.md` a jeho identické zrcadlo `_zadani.md` (Markdown zadání s kontextem, tabulkami parametrů a cílovým stavem).
+2. `__zadani.html` a `_zadani.html` (plnohodnotná, stylová HTML stránka v tmavém GitHub motivu s breadcrumbs, tlačítky pro kopírování kódů a SVG ikonami bez emoji).
+3. `_vysledek.md` a jeho identická zrcadla `__reseni.md` a `_reseni.md` (kontrolní seznam bod po bodu: jak se pozná, že je úkol splněný, s přesnými PowerShell testy a očekávanými výstupy).
+4. `__reseni.html`, `_reseni.html` a `_vysledek.html` (plnohodnotná HTML stránka vzorového řešení).
+
+### Krok 2: Vytvoření konfiguračního souboru `verified.json`
+Vytvořte `praxe/XX/verified.json`. **Ve výchozím stavu nastavte pro nově vytvořený modul všechny stroje na `false`** (protože ještě nebyly v reálném labu fyzicky otestovány):
+```json
 {
-  id: "kebab-case-unikatni-identifikator",
-  title: "X. Číslo a název úkolu",
-  forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"], // Pole strojů, pro které je úkol relevantní
-  
-  // 1. CO SE MÁ UDĚLAT (zobrazuje se v boxu Kontext)
-  // Může být text, funkce vracející text, nebo HTML řetězec s tabulkou
-  what: (vm) => {
-    // Pro parametry instalace použijte <div class="params-table-wrapper"><table class="params-table">...</table></div>
-    // Jinak vraťte jasný popis, co se má na daném stroji provést
-  },
-
-  // 2. KONFIGURACE (příkaz k provedení)
-  how: (vm) => {
-    // Vrací přesný příkaz nebo postup. Pozor na zpětné apostrofy (escapovat \`)
-  },
-
-  // 3. PŘÍKAZ PRO OVĚŘENÍ (PowerShell test)
-  verify: (vm) => {
-    // Vrací PowerShell příkaz pro ověření stavu
-  },
-
-  // 4. OČEKÁVANÝ VÝSTUP (co má konzole vypsat)
-  expected: (vm) => {
-    // Vrací přesnou textovou ukázku toho, co má PowerShell vypsat
-  }
+  "SRV1-DC": false,
+  "SRV2-FS": false,
+  "PC1-WIN": false
 }
+```
+*(Pokud modul obsahuje jen např. `SRV1-DC` a `PC1-WIN`, uveďte pouze relevantní stroje).*
+
+### Krok 3: Vytvoření definičního souboru úkolů `praxe/XX/tasks.js`
+Vytvořte skript `praxe/XX/tasks.js`, který zaregistruje úkoly do globálního objektu `window.OPS_MODULE_TASKS["XX"]`:
+```javascript
+/**
+ * Modul XX: Název modulu
+ * Definice úkolů pro interaktivní checklist v praxe.html
+ */
+window.OPS_MODULE_TASKS = window.OPS_MODULE_TASKS || {};
+
+window.OPS_MODULE_TASKS["XX"] = [
+  {
+    id: "unikatni-kebab-case-id",
+    title: "1. Název úkolu",
+    forVMs: ["SRV1-DC", "PC1-WIN"], // Kterých strojů se krok týká
+    
+    // 1. Kontext / cíl úkolu (přijímá vm a číslo pracoviště wsX)
+    what: (vm, wsX) => {
+      const x = wsX || 2;
+      return `Popis úkolu s dynamickou IP 192.168.${x}.10...`;
+    },
+
+    // 2. Příkaz k provedení (přijímá vm a wsX)
+    // Komentáře začínající na # jsou povoleny (kopírovací tlačítko je automaticky vyfiltruje)
+    how: (vm, wsX) => {
+      const x = wsX || 2;
+      return `# 1. Instalace role:\nInstall-WindowsFeature -Name DHCP -IncludeManagementTools`;
+    },
+
+    // 3. Testovací příkaz pro kontrolu (PowerShell)
+    verify: (vm, wsX) => {
+      return `Get-Service -Name DHCPServer | Select-Object Status, StartType`;
+    },
+
+    // 4. Přesný očekávaný výstup konzole
+    expected: (vm, wsX) => {
+      return `Status  StartType\n------  ---------\nRunning Automatic`;
+    }
+  }
+];
+```
+
+### Krok 4: Registrace modulu v `praxe/modules.js` a `praxe/modules.json`
+Přidejte nový modul do pole `window.OPS_MODULES` v `praxe/modules.js`:
+```javascript
+  {
+    id: "XX",
+    code: "MXX",
+    title: "Modul XX: Název modulu",
+    shortTitle: "Modul XX",
+    folder: "praxe/XX",
+    vms: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+    defaultVM: "SRV1-DC",
+    tasksFile: "praxe/XX/tasks.js",
+    verifiedFile: "praxe/XX/verified.json"
+  }
+```
+A do `window.OPS_MODULE_VERIFIED["XX"]`:
+```javascript
+  "XX": {
+    "SRV1-DC": false,
+    "SRV2-FS": false,
+    "PC1-WIN": false
+  }
+```
+Stejný JSON objekt doplňte do `praxe/modules.json`.
+
+### Krok 5: Přidání skriptu do `praxe.html`
+V souboru [praxe.html](file:///D:/%21Documents/VSCode/well_ops/praxe.html) přidejte do hlavičky `<head>` tag pro načtení úkolů:
+```html
+<script src="praxe/XX/tasks.js"></script>
 ```
 
 ---
 
-## 📐 Pravidla formátování a UX standardy
+## 📐 Striktní pravidla pro PowerShell příkazy a formátování
 
-Při generování nového cvičení **striktně dodržujte tyto standardy**:
+Při vytváření úkolů **VŽDY bez výjimky** dodržujte tato pravidla:
 
-### 1. Parametry instalace a konfigurace VŽDY jako tabulka
-Kdykoliv zadání definuje parametry (HW, disky, IP adresy, porty, účty), v poli `what` **nikdy nepište dlouhý odstavec**, ale vygenerujte čistou HTML tabulku s třídou `params-table`:
+### 1. ZÁKAZ HVĚZDIČEK V `-InterfaceAlias`
+- ❌ **NIKDY NEPOUŽÍVAT:** `Get-NetIPAddress -InterfaceAlias Ethernet*1` ani `Ethernet*`.
+- ✅ **VŽDY POUŽÍVAT PŘESNÝ NÁZEV:** `Get-NetIPAddress -InterfaceAlias Ethernet1` (případně `"Ethernet1"`). V prostředí VMware/CyLab se interní adaptér NIC 2 jmenuje `Ethernet1` bez hvězdiček a bez mezer.
 
+### 2. ŽÁDNÉ HARDCODED PRODUKTOVÉ KLÍČE
+- ❌ **NIKDY NEVKLÁDAT:** konkrétní licenční klíče Windows do kódu ani do dokumentace.
+- ✅ **VŽDY ODKÁZAT NA TEAMS:** Použijte zástupný text `<LAB-KEY-Z-TEAMS>` a napište:
+  > *„Produktový klíč (LAB KEY) si zkopírujte přímo ze zadání v Microsoft Teams.“*
+
+### 3. ZÁKAZ EMOJI V HTML DOKUMENTACI
+- ❌ **NIKDY NEPOUŽÍVAT:** Unicode smajlíky jako 🚀, 💻, ⚙️, ✅.
+- ✅ **VŽDY POUŽÍVAT ČISTÉ VEKTOROVÉ SVG:** Používejte inline SVG ikony (Lucide / Feather styl, `width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"`).
+
+### 4. DYNAMICKÉ PRÁCOVIŠTĚ (Workstation X)
+- Síťové konfigurace musí být navázány na proměnnou `wsX` (`x = wsX || 2`):
+  - Podsíť: `192.168.X.0/24`
+  - Výchozí brána: `192.168.X.1`
+  - `SRV1-DC`: `192.168.X.10`
+  - `SRV2-FS`: `192.168.X.20`
+  - DHCP rozsah pro klienty: `192.168.X.100` – `192.168.X.200`
+  - DNS: `192.168.X.10`
+
+### 5. PARAMETRY VŽDY JAKO TABULKA (`.params-table`)
+Pokud zadání definuje konfigurace více strojů, v poli `what` **nikdy nepište pouze odstavec**, ale tabulku s třídami `.params-table-wrapper`, `.params-table` a aktivním zvýrazněním sloupce/řádku:
 ```html
 <div class="params-table-wrapper">
   <table class="params-table">
@@ -89,58 +155,31 @@ Kdykoliv zadání definuje parametry (HW, disky, IP adresy, porty, účty), v po
     </thead>
     <tbody>
       <tr>
-        <td><strong>IP adresa</strong></td>
-        <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">192.168.200.10</td>
-        <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">DHCP (rozsah .100–.200)</td>
+        <td><strong>Rozsah DHCP</strong></td>
+        <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">192.168.${x}.100 – .200</td>
+        <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">přiděleno automaticky</td>
       </tr>
     </tbody>
   </table>
 </div>
 ```
-### 2. Síťové standardy a číslování pracoviště (Workstation X)
-Všechny síťové konfigurace musí být dynamicky vázány na číslo pracoviště studenta (`workstationX`):
-- **Adresní rozsah:** `192.168.X.0/24` (např. pro pracoviště 2 je to `192.168.2.0/24`).
-- **Výchozí brána (Gateway):** první použitelná adresa v síti – `192.168.X.1`.
-- **Servery:** adresace roste s **krokem po 10**:
-  - `SRV1-DC`: `192.168.X.10`
-  - `SRV2-FS`: `192.168.X.20`
-  - DNS server: směřuje vždy na doménový řadič `192.168.X.10` (příp. `127.0.0.1` u samotného DC).
-- **Klientské stanice:** adresace s **krokem po 1**:
-  - `PC1-WIN`: dynamicky z DHCP rozsahu `192.168.X.100` – `192.168.X.200` (při statickém nastavení začíná od `.100`).
 
-### 3. Pravidla síťových adaptérů (NIC 1, NIC 2, NIC 3)
-Virtuální stroje v labu mají 3 síťové adaptéry se striktně daným účelem:
-1. **NIC 1 (`Ethernet` / NAT):** **NEŠAHAT!** Slouží pro vnější konektivitu, stahování balíčků, aktivaci Windows a management.
-2. **NIC 2 (`Ethernet 1` / Interní VM síť):** **SEM PATŘÍ STATICKÁ IP ADRESA.** Propojuje všechny lokální stroje daného pracoviště (`SRV1-DC`, `SRV2-FS`, `PC1-WIN`).
-3. **NIC 3 (`Ethernet 2` / Třídní síť):** Společné propojení se všemi VM v celé učebně (ponechat dle pokynů lektora).
-*U každého síťového úkolu musí být uveden banner `.nic-warning-banner` a varování na kontrolu přes `Get-NetAdapter`, protože druhý adaptér se může jmenovat např. `Ethernet 1` nebo `Ethernet 2`.*
-
-### 4. Formátování příkazů jako Terminál (PowerShell Console)
-Všechny příkazy k provedení a ověřovací testy se v UI zobrazují v autentickém terminálovém boxu (`.terminal-box`) s okenními tlačítky, titulkem `Administrator: Windows PowerShell`, prefixem řádků `PS C:\>` a integrovaným tlačítkem pro kopírování.
-
-### 5. Očekávaný výstup (`expected`)
-- Musí obsahovat reálný výstup cmdletu (včetně názvů vlastností, např. `IPAddress : ...`, `Status : OK`).
-- Uvádějte i případné chybové stavy nebo upozornění, pokud jsou v `_vysledek.md` zmíněny.
-- Vykresluje se do monospace bloku s jemným zeleným orámováním a ikonou fajfky (`.expected-output-box`).
-
-### 6. Zvláštnosti operačních systémů (Servery vs Klient)
-- **Windows Server (Datacenter Desktop Experience)**: Administrátorský účet je vestavěný, role se instalují přes `Install-WindowsFeature`.
-- **Windows 11 (Education N)**: Účet Administrator je ve výchozím stavu zakázán (nutno povolit), nepoužívat Microsoft účet (pouze lokální), cmdlety serveru zde nefungují.
-
-### 7. Escapování v šablonách
-Jelikož se kód vkládá do JavaScriptových Template Literals (zpětných apostrofů), jakékoliv zpětné apostrofy v PowerShell kódu musí být escapovány jako `\`` a znak dolaru `$`, pokud nemá být interpretován v JS, ošetřete opatrně. Pro kopírování kódu používejte funkci `copyTaskCode(taskId, type, btn)` pro eliminaci chyb s uvozovkami.
+### 6. VAROVÁNÍ PRO SÍŤOVÉ ADAPTÉRY (`.nic-warning-banner`)
+Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-banner`:
+- **NIC 1 (Ethernet0 / NAT):** NEŠAHAT!
+- **NIC 2 (Ethernet1 / Interní síť):** SEM PATŘÍ IP! Musí být zapnutý v CyLabu.
+- **NIC 3 (Ethernet2 / Třídní síť):** Třída.
 
 ---
 
-## 📋 Kontrolní seznam před dokončením lekce
+## 🔍 Ověřovací checklist pro AI před odevzdáním práce
 
-Před odevzdáním nově vygenerovaného cvičení zkontrolujte:
-- [ ] Všechny úkoly v `taskDefinitions` odpovídají bodům v `__zadani.md` i `_vysledek.md`.
-- [ ] Žádný úkol nemá prázdný `what`, `how`, `verify` ani `expected`.
-- [ ] Síťová nastavení respektují číslo pracoviště `workstationX` (`192.168.X.0/24`, GW `.1`, servery `.10`/`.20`, klienti `.100+`).
-- [ ] U síťových úkolů je zobrazen `nic-warning-banner` a příkazy cílí na NIC 2 (`Ethernet 1`).
-- [ ] U parametrů a tabulkových hodnot je použita tabulka `.params-table` s dynamickým zvýrazněním.
-- [ ] Příkazy jsou renderovány v `.terminal-box` formátu Windows PowerShell.
-- [ ] Tlačítka pro přepínání VM v záhlaví obsahují všechny stroje, které v tomto cvičení figurují.
-- [ ] Všechny PowerShell příkazy jsou syntakticky správné pro daný OS.
-- [ ] Je zachován vizuální tmavý motiv a třídy CSS.
+Než označíte úkol za dokončený, zkontrolujte v terminálu:
+1. `praxe/XX/verified.json` existuje a má platný JSON formát.
+2. `praxe/XX/tasks.js` je syntakticky validní JS (`node -e "new Function(fs.readFileSync('praxe/XX/tasks.js'))"`).
+3. `praxe/modules.js` a `praxe/modules.json` obsahují nový modul.
+4. `praxe.html` má v `<head>` tag `<script src="praxe/XX/tasks.js"></script>`.
+5. V `praxe.html` nedošlo k syntaktické chybě v JS.
+6. Žádný příkaz neobsahuje `Ethernet*`.
+7. Žádné heslo ani klíč nejsou v rozporu se zadáním (klíče z Teams, heslo `Pa55w.rd`).
+8. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).

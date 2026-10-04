@@ -1,0 +1,13 @@
+[
+  {
+    "id": "01",
+    "code": "M01",
+    "title": "Modul 01: Příprava a instalace OS",
+    "shortTitle": "Modul 01",
+    "folder": "praxe/01",
+    "vms": ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+    "defaultVM": "SRV1-DC",
+    "tasksFile": "praxe/01/tasks.js",
+    "verifiedFile": "praxe/01/verified.json"
+  }
+]
