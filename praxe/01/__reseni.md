@@ -1,101 +1,54 @@
 # [Jak se pozná, že už to mám?]
 
-> Tento modul se ověřuje **přímo na konzoli připravovaného stroje** (SRV1-DC, SRV2-FS nebo PC1-WIN) — v tuto chvíli ještě neexistuje doména, ze které by šlo testovat vzdáleně. Body 1–10 platí pro oba servery, bod 11 navíc jen pro PC1-WIN.
+> Verze: 2026-10-03
 
-> **Všechny stroje (SRV1-DC, SRV2-FS i PC1-WIN) jsou v labu ověřené:** Všechny PowerShell příkazy a konfigurace byly v praxi otestovány a jsou 100% OK!
+Tento modul se ověřuje přímo na serveru **SRV1-DC** (klient PC1-WIN ani server SRV2-FS v tomto modulu do domény ještě nevstupují — to následuje v dalších modulech).
 
-### 1. Parametry virtuálního stroje odpovídají zadání
-V nastavení virtuálního stroje ve vašem hypervizoru: `SRV1-DC` i `SRV2-FS` mají přiděleny **2 vCPU**, **8 GB RAM** a **100 GB** systémový disk. U `SRV2-FS` navíc existuje **5 dalších disků po 10 GB**, viditelných uvnitř hosta:
+### 1. Server je nainstalovaný a dostupný v síti
+Přímo na konzoli SRV1-DC se úspěšně přihlásíte jako `Administrator` s heslem `Pa55w.rd`. Ověřte IP konfiguraci na interním rozhraní `Ethernet1`:
 ```powershell
-Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle
+Get-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object IPAddress, PrefixLength
 ```
-U SRV2-FS výstup obsahuje systémový disk (~100 GB) a 5 dalších disků o velikosti ~10 GB, zatím ve stavu `RAW`/neinicializované (inicializují se až v Modulu 6).
+Vrátí statickou IP adresu `192.168.X.10` a prefix `24` (kde `X` je číslo vašeho pracoviště).
 
-### 2. Edice a instalace odpovídá zadání
+### 2. AD DS role je nainstalovaná
+V **Server Manageru** na Dashboardu vidíte v seznamu rolí položky **AD DS** a **DNS** (obě zelené, bez chyb).
+V PowerShellu ověříte stav instalace komponent:
 ```powershell
-Get-ComputerInfo | Select-Object WindowsProductName, OsServerLevel
+Get-WindowsFeature -Name AD-Domain-Services, DNS, RSAT-ADDS | Select-Object Name, InstallState
 ```
-Vrátí `WindowsProductName` obsahující `Windows Server 2025 Datacenter` a `OsServerLevel` = `FullServer` (potvrzuje Desktop Experience, nikoliv `ServerCore`).
+Obě role i RSAT nástroje mají hodnotu `InstallState: Installed`.
 
-### 3. Hostname odpovídá tabulce
+### 3. Server je řadičem domény
+V **Server Manager → Local Server** je u položky *Domain* uvedeno `prijmeni.cyberschool.internal` (nikoliv `WORKGROUP`).
+V PowerShellu:
 ```powershell
-hostname
+Get-ADDomain | Select-Object Name, Forest, DomainMode
 ```
-Vrátí přesně `SRV1-DC`, resp. `SRV2-FS` — ne výchozí vygenerované jméno typu `WIN-XXXXXXXXXXX`.
+Vrátí název domény odpovídající vašemu příjmení (např. `novak`), les `novak.cyberschool.internal` a funkční úroveň domény.
 
-### 4. TCP/IPv4 je nastavené staticky a podle tabulky
+### 4. SRV1-DC drží role FSMO a je Global Catalog
+Ověřte rozdělení rolí FSMO a stav Global Catalog:
 ```powershell
-Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixLength
-Get-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway
-Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4
+netdom query fsmo
+Get-ADDomainController -Identity SRV1-DC | Select-Object Name, IsGlobalCatalog, OperationMasterRoles
 ```
-IP adresa, prefix (`24` = maska `255.255.255.0`), brána i DNS server odpovídají hodnotám v `__zadani.md` pro daný server. Adresa **není** převzatá z DHCP (`Get-NetIPAddress ... | Select PrefixOrigin` ukazuje `Manual`, ne `Dhcp`).
+Příkaz `netdom query fsmo` vypíše u všech pěti rolí (Schema master, Domain naming master, PDC, RID pool manager, Infrastructure master) server `SRV1-DC.prijmeni.cyberschool.internal`. Vlastnost `IsGlobalCatalog` je `True`.
 
-### 5. Přihlášení administrátora funguje
-Po odhlášení a novém přihlášení funguje přihlášení jako `Administrator` s heslem `Pa55w.rd` (lokálně — server ještě není v doméně). Žádný Microsoft účet u přihlášení nefiguruje — `Get-LocalUser` neobsahuje žádný účet typu Microsoft, jen vestavěné lokální účty.
-
-### 6. Jazyk rozhraní a regionální formát odpovídají zadání
+### 5. Nástroje pro správu domény fungují
+V **Server Manager → Tools** je dostupná položka **Active Directory Users and Computers** (ADUC) a po jejím otevření vidíte strukturu domény `prijmeni.cyberschool.internal` (výchozí kontejnery `Users`, `Computers`, `Domain Controllers`).
+V PowerShellu:
 ```powershell
-Get-WinUILanguageOverride      # nebo (Get-Culture).Parent u UI jazyka dle kontextu
-Get-Culture | Select-Object Name, DisplayName
-Get-WinSystemLocale
-Get-WinHomeLocation
+Get-ADOrganizationalUnit -Filter * | Select-Object Name, DistinguishedName
+Get-ADDomainController -Filter * | Select-Object Name, Site
 ```
-- `Get-Culture` vrací `cs-CZ` (Czech (Czech Republic)) — určuje formáty data/času/měny.
-- Rozhraní (menu, hlášky) zůstává v angličtině — display language nebyl měněn.
-- `Get-WinSystemLocale` vrací `cs-CZ`.
-- `Get-WinHomeLocation` vrací `Czech Republic`.
+Výpis obsahuje výchozí kontejnery v doméně a řadič `SRV1-DC` v defaultním site `Default-First-Site-Name`.
 
-### 7. Formáty data, času a měny sedí
+### 6. Restart nic nerozbije a přihlášení funguje
+Po restartu serveru SRV1-DC proběhne přihlášení bez chyby jako `PRIJMENI\Administrator`, např. `NOVAK\Administrator` (nikoliv jako lokální účet).
+V PowerShellu ověříte aktuálně přihlášený účet:
 ```powershell
-Get-Date -Format "d.M.yyyy H:mm:ss"
-(12345.67).ToString("C")
+whoami
+Get-ADUser -Identity Administrator | Select-Object SamAccountName, UserPrincipalName, Enabled
 ```
-Datum/čas se vypíše ve tvaru `20.9.2026 13:45:02` a měna jako `12 345,67 Kč`.
-
-### 8. Časové pásmo je správně
-```powershell
-Get-TimeZone
-```
-Vrátí `Id: Central Europe Standard Time`, `DisplayName` obsahující `Prague` (nebo `Bratislava`/`Budapest`), `BaseUtcOffset: 01:00:00`.
-
-### 9. Klávesnice — US i Czech (QWERTZ), přepínatelné
-```powershell
-Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips
-# Alternativně kontrola rozložení přímo z registru:
-Get-ItemProperty "HKCU:\Keyboard Layout\Preload"
-```
-Výstup obsahuje jak `en-US`, tak `cs-CZ` s příslušnou metodou vstupu (`0409:00000409` pro US, `0405:00000405` pro Czech), případně v registru `1 : 00000409` a `2 : 00000405`.
-Pokud už na liště u hodin vidíte přepínač ENG / CES a funguje vám psaní českých znaků (ěščřž), máte úkol splněný.
-
-### 10. Soukromí je nastaveno na minimum
-```powershell
-Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name AllowTelemetry
-Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name DisableLocation
-Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" -Name DisabledByGroupPolicy
-```
-`AllowTelemetry = 1` (Required diagnostic data), `DisableLocation = 1` (poloha vypnutá), `DisabledByGroupPolicy = 1` (reklamní ID vypnuté). V **Settings → Privacy & security** odpovídají přepínače stejným hodnotám i vizuálně.
-
-### 11. Aktivace je hotová (SRV1-DC, SRV2-FS i PC1-WIN)
-Aktivace probíhá pomocí školních klíčů **LAB KEY**, které si **zkopírujte ze zadání v Microsoft Teams** (zvlášť pro Windows Server 2025 a zvlášť pro Windows 11 Education N).
-
-```powershell
-# 1. Zadejte klíč ze zadání na Teams:
-slmgr.vbs /ipk <LAB-KEY-Z-TEAMS>
-slmgr.vbs /ato
-
-# 2. Ověření:
-slmgr.vbs /xpr
-```
-Vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u KMS/LAB KEY s omezenou platností) — ne "notification experience" upozorňující na neaktivovaný Windows. V **Settings → System → Activation** je zobrazeno **"Windows is activated"** (server), resp. **"Windows is activated with a digital license"** (klient), bez tlačítka "Activate" navíc.
-
-### 12. PC1-WIN: lokální účet, žádný Microsoft účet (jen u klienta)
-```powershell
-Get-LocalUser | Select-Object Name, Enabled
-```
-Výstup obsahuje aktivní `Administrator` a **neobsahuje** žádný dočasný účet (`Setup` byl odstraněn). V **Settings → Accounts → Your info** je typ účtu **"Local account"**, nikoli e-mailová adresa Microsoft účtu — přihlášení do Windows nevyžaduje žádné internetové ověření.
-
-Po úspěšném ověření pokračujte modulem, pro který jste stroj právě připravovali:
-- `SRV1-DC` → [[../Modul 1 Domain Controller/__zadani|Modul 1 — Domain Controller]]
-- `SRV2-FS` → [[../Modul 6 File Server a Storage/__zadani|Modul 6 — File Server a Storage]]
-- `PC1-WIN` → [[../Modul 2 DHCP/__zadani|Modul 2 — DHCP]]
+Výstup je ve tvaru `PRIJMENI\Administrator` a účet má `Enabled: True`. Všechny služby Active Directory a DNS běží bez červených varování.
