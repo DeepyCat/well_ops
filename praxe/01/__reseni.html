@@ -458,7 +458,13 @@ Get-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object I
         </div>
         <pre><code>Get-ADDomain | Select-Object Name, Forest, DomainMode</code></pre>
       </div>
-      <p>Vrátí název domény odpovídající vašemu příjmení (např. <code>novak</code>), les <code>novak.cyberschool.internal</code> a funkční úroveň domény.</p>
+      <span class="expected-badge">Očekávaný výstup:</span>
+      <div class="code-block-wrapper">
+        <pre><code>Name     Forest                         DomainMode
+----     ------                         ----------
+pachomov pachomov.cyberschool.internal Windows2025Domain</code></pre>
+      </div>
+      <p>Vrátí název domény odpovídající vašemu příjmení (např. <code>pachomov</code>), kořenový les <code>pachomov.cyberschool.internal</code> a funkční úroveň domény <code>Windows2025Domain</code>.</p>
 
       <h3>4. SRV1-DC drží role FSMO a je Global Catalog</h3>
       <div class="code-block-wrapper">

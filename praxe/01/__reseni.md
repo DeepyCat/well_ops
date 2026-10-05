@@ -25,7 +25,13 @@ V PowerShellu:
 ```powershell
 Get-ADDomain | Select-Object Name, Forest, DomainMode
 ```
-Vrátí název domény odpovídající vašemu příjmení (např. `novak`), les `novak.cyberschool.internal` a funkční úroveň domény.
+Očekávaný výstup:
+```text
+Name     Forest                         DomainMode
+----     ------                         ----------
+pachomov pachomov.cyberschool.internal Windows2025Domain
+```
+Vrátí název domény odpovídající vašemu příjmení (např. `pachomov`), kořenový les `pachomov.cyberschool.internal` a funkční úroveň domény `Windows2025Domain`.
 
 ### 4. SRV1-DC drží role FSMO a je Global Catalog
 Ověřte rozdělení rolí FSMO a stav Global Catalog:
