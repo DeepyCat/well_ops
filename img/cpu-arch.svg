@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="260" viewBox="0 0 560 260">
+  <rect width="560" height="260" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Výpočetní systém — CPU &amp; Sběrnice</text>
+  <!-- CPU box -->
+  <rect x="20" y="45" width="200" height="180" rx="8" fill="#1a2030" stroke="#3b82f6" stroke-width="2"/>
+  <text x="120" y="65" text-anchor="middle" font-family="Arial" font-size="12" fill="#3b82f6" font-weight="bold">CPU / Procesor</text>
+  <rect x="32" y="74" width="176" height="24" rx="3" fill="#1e3050" stroke="#3b82f6" stroke-width="1"/>
+  <text x="120" y="90" text-anchor="middle" font-family="Arial" font-size="9" fill="#7dd3fc">ALU (aritmetická a logická jednotka)</text>
+  <rect x="32" y="104" width="80" height="22" rx="3" fill="#1e2a40" stroke="#2563eb" stroke-width="1"/>
+  <text x="72" y="119" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">PC (Program Counter)</text>
+  <rect x="118" y="104" width="90" height="22" rx="3" fill="#1e2a40" stroke="#2563eb" stroke-width="1"/>
+  <text x="163" y="119" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">SP (Stack Pointer)</text>
+  <rect x="32" y="132" width="80" height="22" rx="3" fill="#1e2a40" stroke="#2563eb" stroke-width="1"/>
+  <text x="72" y="147" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">PS (Status Reg.)</text>
+  <rect x="118" y="132" width="90" height="22" rx="3" fill="#1e2a40" stroke="#2563eb" stroke-width="1"/>
+  <text x="163" y="147" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">Obecné registry</text>
+  <rect x="32" y="160" width="80" height="18" rx="3" fill="#152030" stroke="#1d4ed8" stroke-width="1"/>
+  <text x="72" y="173" text-anchor="middle" font-family="Arial" font-size="8" fill="#60a5fa">Cache L1</text>
+  <rect x="118" y="160" width="90" height="18" rx="3" fill="#152030" stroke="#1d4ed8" stroke-width="1"/>
+  <text x="163" y="173" text-anchor="middle" font-family="Arial" font-size="8" fill="#60a5fa">Cache L2/L3</text>
+  <text x="120" y="210" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">Hodinový signál (Clock · MHz/GHz)</text>
+  <!-- BUS -->
+  <rect x="240" y="100" width="20" height="110" rx="2" fill="#333"/>
+  <text x="250" y="95" text-anchor="middle" font-family="Arial" font-size="9" fill="#666" transform="rotate(-90,250,95)">S</text>
+  <text x="250" y="100" text-anchor="middle" font-family="Arial" font-size="8" fill="#555" writing-mode="vertical-rl">Sběrnice (BUS)</text>
+  <!-- RAM -->
+  <rect x="275" y="60" width="130" height="60" rx="6" fill="#1e2a1a" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="340" y="82" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">RAM</text>
+  <text x="340" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#86efac">Hlavní paměť (volatile)</text>
+  <text x="340" y="111" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">DDR4/DDR5 · rychlá · dočasná</text>
+  <!-- Disk -->
+  <rect x="275" y="135" width="130" height="60" rx="6" fill="#2a1a1a" stroke="#f87171" stroke-width="1.5"/>
+  <text x="340" y="157" text-anchor="middle" font-family="Arial" font-size="11" fill="#f87171" font-weight="bold">HDD / SSD</text>
+  <text x="340" y="173" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">Sekundární paměť (non-volatile)</text>
+  <text x="340" y="186" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">Trvalé uložení · pomalejší než RAM</text>
+  <!-- I/O -->
+  <rect x="425" y="60" width="120" height="135" rx="6" fill="#1e2020" stroke="#888" stroke-width="1.5"/>
+  <text x="485" y="80" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa" font-weight="bold">I/O Periferie</text>
+  <text x="485" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">⌨ Klávesnice</text>
+  <text x="485" y="114" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">🖥 Monitor (GPU)</text>
+  <text x="485" y="130" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">🌐 Síťová karta</text>
+  <text x="485" y="146" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">🔊 Zvuková karta</text>
+  <text x="485" y="162" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">🖨 Tiskárna</text>
+  <text x="485" y="178" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">Řadiče zařízení</text>
+  <!-- Arrows -->
+  <line x1="220" y1="130" x2="240" y2="130" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="260" y1="90" x2="275" y2="90" stroke="#4ade80" stroke-width="1.5"/>
+  <line x1="260" y1="165" x2="275" y2="165" stroke="#f87171" stroke-width="1.5"/>
+  <line x1="405" y1="127" x2="425" y2="127" stroke="#888" stroke-width="1.5"/>
+  <!-- Legend -->
+  <text x="280" y="240" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">Von Neumannova architektura: CPU · Paměť · I/O propojené Sběrnicí</text>
+</svg>

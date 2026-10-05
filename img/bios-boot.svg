@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="180" viewBox="0 0 560 180">
+  <rect width="560" height="180" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Bootovací sekvence BIOS/UEFI</text>
+  <defs><marker id="aBoot" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#34d399"/></marker></defs>
+  <!-- Steps -->
+  <rect x="15" y="50" width="90" height="50" rx="6" fill="#1e2a1a" stroke="#34d399" stroke-width="1.5"/>
+  <text x="60" y="70" text-anchor="middle" font-family="Arial" font-size="10" fill="#34d399" font-weight="bold">1. Power ON</text>
+  <text x="60" y="85" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">CPU spustí</text>
+  <text x="60" y="96" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">ROM kód</text>
+  <line x1="105" y1="75" x2="120" y2="75" stroke="#34d399" stroke-width="1.5" marker-end="url(#aBoot)"/>
+  <rect x="120" y="50" width="90" height="50" rx="6" fill="#1e2a1a" stroke="#34d399" stroke-width="1.5"/>
+  <text x="165" y="68" text-anchor="middle" font-family="Arial" font-size="10" fill="#34d399" font-weight="bold">2. POST</text>
+  <text x="165" y="83" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">Otestuje RAM</text>
+  <text x="165" y="94" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">CPU · periferie</text>
+  <line x1="210" y1="75" x2="225" y2="75" stroke="#34d399" stroke-width="1.5" marker-end="url(#aBoot)"/>
+  <rect x="225" y="50" width="90" height="50" rx="6" fill="#1e2a1a" stroke="#34d399" stroke-width="1.5"/>
+  <text x="270" y="68" text-anchor="middle" font-family="Arial" font-size="10" fill="#34d399" font-weight="bold">3. Bootloader</text>
+  <text x="270" y="83" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">Najde OS na</text>
+  <text x="270" y="94" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">disku/sítě</text>
+  <line x1="315" y1="75" x2="330" y2="75" stroke="#34d399" stroke-width="1.5" marker-end="url(#aBoot)"/>
+  <rect x="330" y="50" width="90" height="50" rx="6" fill="#1e2a1a" stroke="#34d399" stroke-width="1.5"/>
+  <text x="375" y="68" text-anchor="middle" font-family="Arial" font-size="10" fill="#34d399" font-weight="bold">4. Kernel</text>
+  <text x="375" y="83" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">Nahraje jádro</text>
+  <text x="375" y="94" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">do RAM</text>
+  <line x1="420" y1="75" x2="435" y2="75" stroke="#34d399" stroke-width="1.5" marker-end="url(#aBoot)"/>
+  <rect x="435" y="50" width="105" height="50" rx="6" fill="#1e2a1a" stroke="#34d399" stroke-width="1.5"/>
+  <text x="487" y="68" text-anchor="middle" font-family="Arial" font-size="10" fill="#34d399" font-weight="bold">5. init / systemd</text>
+  <text x="487" y="83" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">Spustí systémové</text>
+  <text x="487" y="94" text-anchor="middle" font-family="Arial" font-size="8" fill="#6ee7b7">démony · služby</text>
+  <!-- BIOS vs UEFI -->
+  <rect x="15" y="118" width="250" height="50" rx="6" fill="#1a2020" stroke="#555"/>
+  <text x="140" y="135" text-anchor="middle" font-family="Arial" font-size="10" fill="#888" font-weight="bold">Starý BIOS</text>
+  <text x="140" y="150" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">16bit · MBR disk · max 2 TB · pomalý</text>
+  <text x="140" y="163" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">Flash ROM + CMOS + Firmware</text>
+  <rect x="290" y="118" width="250" height="50" rx="6" fill="#1a2030" stroke="#4db8ff"/>
+  <text x="415" y="135" text-anchor="middle" font-family="Arial" font-size="10" fill="#4db8ff" font-weight="bold">Moderní UEFI</text>
+  <text x="415" y="150" text-anchor="middle" font-family="Arial" font-size="9" fill="#7dd3fc">32/64bit · GPT · Secure Boot · rychlý</text>
+  <text x="415" y="163" text-anchor="middle" font-family="Arial" font-size="9" fill="#7dd3fc">GUI Setup · síťový flash update</text>
+</svg>

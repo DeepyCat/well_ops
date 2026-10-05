@@ -13,6 +13,8 @@ tags: [os]
 - U moderních OS je struktura vytvářena především s ohledem na ==bezpečnost a stabilitu== celého systému.
 
 ### Hardwarová ochrana prostředků
+![Protection Rings — Ring 0/1/2/3](../img/rings.svg)
+
 
 - Moderní operační systémy využívají **hardwarovou ochranu prostředků**.
 - Na procesorech řady x86 je tato ochrana implementována ve formě ==čtyř okruhů (RING 0 až RING 3)==.
@@ -95,6 +97,8 @@ tags: [os]
 ![[Pasted image 20261001123754.png]]
 
 #### MONOLITICKÁ
+![Typy jádra OS — Monolithic vs Microkernel](../img/kernel-types.svg)
+
 
 - Monolitická struktura je **nejjednodušší** struktura používaná v jádrech operačních systémů nebo v zařízeních.
 - Systém se skládá z **jádra** a **rozhraní**, které zprostředkovává komunikaci mezi jádrem a okolím.

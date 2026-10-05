@@ -26,6 +26,8 @@ Speciální (vyhrazené) registry:
 - **Stavový registr (Processor Status, PS)** – uchovává informace o momentálním stavu procesoru, včetně režimu činnosti (režim jádra / uživatelský režim).
 
 ## Sběrnice (BUS)
+![Výpočetní systém — CPU, RAM, I/O a Sběrnice](../img/cpu-arch.svg)
+
 
 Obvody na základní desce propojuje **sběrnice**, dělí se na tři logické celky:
 

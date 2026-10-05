@@ -44,6 +44,8 @@ Mnoho systémů (včetně PC) používá **oba přístupy zároveň** – I/O in
 - **[[DMA]]** – hostitel zapíše do paměti DMA příkazový blok (zdroj, cíl, počet bajtů) a předá jeho adresu DMA řadiči; ten pak sám ovládá paměťovou sběrnici bez zásahu CPU
 
 ## Správa přerušení
+![Přerušení — Interrupt flow a DMA](../img/interrupt.svg)
+
 
 ### Základní mechanismus
 
