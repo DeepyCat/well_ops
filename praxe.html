@@ -1155,9 +1155,182 @@
         gap: 8px;
       }
     }
+
+    /* Warning Modal Overlay for Modul 02 */
+    .warning-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 12, 16, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeInModal 0.25s ease forwards;
+    }
+
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .warning-modal-card {
+      background: #161b22;
+      border: 2px solid rgba(248, 81, 73, 0.7);
+      border-radius: 14px;
+      max-width: 540px;
+      width: 100%;
+      padding: 32px 28px;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(248, 81, 73, 0.15);
+      text-align: center;
+      position: relative;
+      animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes slideUpModal {
+      from { transform: translateY(24px) scale(0.96); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .warning-icon-wrapper {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 18px auto;
+      border-radius: 50%;
+      background: rgba(248, 81, 73, 0.15);
+      border: 1px solid rgba(248, 81, 73, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulseWarning 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseWarning {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.4); }
+      50% { box-shadow: 0 0 0 12px rgba(248, 81, 73, 0); }
+    }
+
+    .warning-modal-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ff7b72;
+      margin: 0 0 14px 0;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .warning-modal-text {
+      color: #c9d1d9;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .warning-modal-text p {
+      margin-bottom: 12px;
+    }
+
+    .warning-modal-text .warning-highlight {
+      background: rgba(248, 81, 73, 0.1);
+      border-left: 3px solid #f85149;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      color: #ffa198;
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    .hold-btn-container {
+      width: 100%;
+      margin: 16px 0 8px 0;
+    }
+
+    .hold-btn {
+      position: relative;
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: 8px;
+      border: 1px solid #da3633;
+      background: #21262d;
+      color: #f0f6fc;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: border-color 0.2s ease, transform 0.1s ease;
+      outline: none;
+    }
+
+    .hold-btn:active {
+      transform: scale(0.99);
+      border-color: #f85149;
+    }
+
+    .hold-progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #b62324 0%, #da3633 60%, #f85149 100%);
+      pointer-events: none;
+      transition: width 0.05s linear;
+      box-shadow: 0 0 14px rgba(248, 81, 73, 0.6);
+    }
+
+    .hold-btn-label {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .hold-hint-text {
+      font-size: 0.76rem;
+      color: #8b949e;
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Warning Modal for Modul 02 -->
+  <div id="mod2-warning-modal" class="warning-modal-overlay" style="display: none;">
+    <div class="warning-modal-card">
+      <div class="warning-icon-wrapper">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f85149" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h2 class="warning-modal-title">DŮRAZNÉ VAROVÁNÍ: ČTI SI TY PŘÍKAZY!</h2>
+      <div class="warning-modal-text">
+        <p><strong>Není to naše zodpovědnost, když si na serveru něco „pojebeš“!</strong></p>
+        <p>V tomto modulu povyšuješ server na <strong>Domain Controller (AD DS)</strong> a vytváříš kořenový les. Pokud bezmyšlenkovitě zkopíruješ příkazy bez nahrazení <code>&lt;prijmeni&gt;</code> nebo bez ověření statické IP, server se restartuje do chybového stavu a budeš muset začít od nuly.</p>
+        <p class="warning-highlight">Pro odemčení a potvrzení, že bereš plnou zodpovědnost na sebe, <strong>podrž tlačítko níže po dobu celých 10 sekund</strong>.</p>
+      </div>
+      <div class="hold-btn-container">
+        <button id="hold-confirm-btn" class="hold-btn" type="button">
+          <div id="hold-progress-bar" class="hold-progress-fill"></div>
+          <span id="hold-btn-text" class="hold-btn-label">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Držte stisknuté pro pokračování (0.0s / 10s)</span>
+          </span>
+        </button>
+      </div>
+      <div id="hold-hint" class="hold-hint-text">Při předčasném uvolnění se odpočet restartuje.</div>
+    </div>
+  </div>
 
   <header>
     <div class="header-left">
@@ -1747,6 +1920,133 @@
       }
 
       render();
+      checkMod2Warning();
+    }
+
+    // ----------------------------------------------------
+    // Modul 02: 10sekundové varování před spuštěním
+    // ----------------------------------------------------
+    const MOD2_WARNING_KEY = "ops_mod02_warning_acknowledged";
+    let holdStartTime = null;
+    let holdRafId = null;
+    const HOLD_DURATION_MS = 10000; // 10 sekund
+
+    function checkMod2Warning() {
+      if (currentModuleId === "02" && !localStorage.getItem(MOD2_WARNING_KEY)) {
+        showMod2WarningModal();
+      } else {
+        hideMod2WarningModal();
+      }
+    }
+
+    function showMod2WarningModal() {
+      const modal = document.getElementById("mod2-warning-modal");
+      if (modal) {
+        modal.style.display = "flex";
+        setupHoldButton();
+      }
+    }
+
+    function hideMod2WarningModal() {
+      const modal = document.getElementById("mod2-warning-modal");
+      if (modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    function setupHoldButton() {
+      const btn = document.getElementById("hold-confirm-btn");
+      const progressFill = document.getElementById("hold-progress-bar");
+      const btnText = document.getElementById("hold-btn-text");
+      if (!btn || btn.hasAttribute("data-bound")) return;
+
+      btn.setAttribute("data-bound", "true");
+
+      function resetHold() {
+        if (holdRafId) {
+          cancelAnimationFrame(holdRafId);
+          holdRafId = null;
+        }
+        holdStartTime = null;
+        if (progressFill) progressFill.style.width = "0%";
+        if (btnText) {
+          btnText.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Držte stisknuté pro pokračování (0.0s / 10s)</span>
+          `;
+        }
+      }
+
+      function onHoldSuccess() {
+        if (holdRafId) {
+          cancelAnimationFrame(holdRafId);
+          holdRafId = null;
+        }
+        if (progressFill) progressFill.style.width = "100%";
+        if (btnText) {
+          btnText.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>Potvrzeno! Otevírám Modul 02...</span>
+          `;
+        }
+        localStorage.setItem(MOD2_WARNING_KEY, "1");
+        setTimeout(() => {
+          const modal = document.getElementById("mod2-warning-modal");
+          if (modal) {
+            modal.style.transition = "opacity 0.4s ease";
+            modal.style.opacity = "0";
+            setTimeout(() => {
+              modal.style.display = "none";
+              modal.style.opacity = "1";
+            }, 400);
+          }
+        }, 500);
+      }
+
+      function updateHold() {
+        if (!holdStartTime) return;
+        const elapsed = Date.now() - holdStartTime;
+        const pct = Math.min(100, (elapsed / HOLD_DURATION_MS) * 100);
+        const secondsLeft = (elapsed / 1000).toFixed(1);
+
+        if (progressFill) progressFill.style.width = `${pct}%`;
+        if (btnText) {
+          btnText.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Držte... (${secondsLeft}s / 10.0s)</span>
+          `;
+        }
+
+        if (elapsed >= HOLD_DURATION_MS) {
+          onHoldSuccess();
+        } else {
+          holdRafId = requestAnimationFrame(updateHold);
+        }
+      }
+
+      function startHold(e) {
+        if (e.type === "touchstart") e.preventDefault();
+        if (localStorage.getItem(MOD2_WARNING_KEY)) return;
+        holdStartTime = Date.now();
+        holdRafId = requestAnimationFrame(updateHold);
+      }
+
+      function stopHold() {
+        if (localStorage.getItem(MOD2_WARNING_KEY)) return;
+        resetHold();
+      }
+
+      btn.addEventListener("mousedown", startHold);
+      window.addEventListener("mouseup", () => {
+        if (holdStartTime) stopHold();
+      });
+      btn.addEventListener("mouseleave", () => {
+        if (holdStartTime) stopHold();
+      });
+
+      btn.addEventListener("touchstart", startHold, { passive: false });
+      btn.addEventListener("touchend", stopHold);
+      btn.addEventListener("touchcancel", stopHold);
     }
 
     // Inicializace aplikace
