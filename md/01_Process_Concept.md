@@ -29,7 +29,7 @@ Program se stane procesem, když se spustitelný soubor nahraje do paměti (dvoj
 Proces může sám sloužit jako prostředí pro spuštění dalšího kódu – typický příklad je **Java Virtual Machine (JVM)**. JVM běží jako obyčejný proces, který interpretuje nahraný Java bajtkód a provádí akce (přes nativní instrukce) jeho jménem.
 
 ## Stavy procesu
-![Stavy procesu — Process Lifecycle](../img/process-states.svg)
+![Stavy procesu — Process Lifecycle](img/process-states.svg)
 
 
 Proces během svého běhu mění stav:
