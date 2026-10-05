@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Řešení a ověření: Modul 02 – Active Directory Domain Services (__reseni.md)</title>
+  <title>Řešení a kontrolní seznam: Modul 00 – Výsledky (__reseni.md)</title>
   <style>
     :root {
       --bg: #1a1a1a;
@@ -389,11 +389,11 @@
   <!-- Top Navigation -->
   <nav class="top-nav">
     <div class="nav-breadcrumb">
-      <a href="../../praxe.html?modul=02">Interaktivní lab</a>
+      <a href="../../praxe.html">Interaktivní lab</a>
       <span>/</span>
       <span>praxe</span>
       <span>/</span>
-      <span>02</span>
+      <span>00</span>
       <span>/</span>
       <span class="file-badge">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
@@ -406,7 +406,7 @@
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
         <span>Otevřít zadání (__zadani.md)</span>
       </a>
-      <a href="../../praxe.html?modul=02" class="btn" title="Zpět do interaktivního portálu">
+      <a href="../../praxe.html" class="btn" title="Zpět do interaktivního portálu">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span>Zpět do labu</span>
       </a>
@@ -423,76 +423,158 @@
       <h1>[Jak se pozná, že už to mám?]</h1>
 
       <blockquote>
-        <p>Tento modul se ověřuje přímo na konzoli serveru <strong>SRV1-DC</strong> (klient PC1-WIN ani server SRV2-FS v tomto modulu do domény ještě nevstupují — to následuje v dalších lekcích).</p>
+        <p>Tento modul se ověřuje <strong>přímo na konzoli připravovaného stroje</strong> (SRV1-DC, SRV2-FS nebo PC1-WIN) — v tuto chvíli ještě neexistuje doména, ze které by šlo testovat vzdáleně. Body 1–10 platí pro oba servery, bod 11 navíc jen pro PC1-WIN.</p>
       </blockquote>
 
-      <h3>1. Server je nainstalovaný a dostupný v síti</h3>
-      <p>Přímo na konzoli SRV1-DC se úspěšně přihlásíte jako <code>Administrator</code> s heslem <code>Pa55w.rd</code>. Statická IP adresa na interním rozhraní <code>Ethernet1</code> je nastavena správně:</p>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+      <div style="background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.4); border-left: 4px solid #22c55e; border-radius: 6px; padding: 12px 16px; margin: 18px 0; color: #bbf7d0; display: flex; align-items: center; gap: 12px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <div>
+          <strong style="color: #4ade80;">Všechny stroje (SRV1-DC, SRV2-FS i PC1-WIN) jsou v labu ověřené:</strong> Všechny PowerShell příkazy a konfigurace byly v praxi otestovány a jsou 100% v pořádku a funkční!
         </div>
-        <pre><code>hostname
-Get-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object IPAddress, PrefixLength</code></pre>
-      </div>
-      <p>Hostname je <code>SRV1-DC</code> a IP adresa je <code>192.168.X.10</code> s prefixem <code>24</code> (kde X je číslo vašeho pracoviště).</p>
-
-      <h3>2. AD DS role je nainstalovaná</h3>
-      <p>V <strong>Server Manageru</strong> na Dashboardu vidíte v seznamu rolí položky <strong>AD DS</strong> a <strong>DNS</strong> (obě zelené, bez chyb). V PowerShellu:</p>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-        </div>
-        <pre><code>Get-WindowsFeature -Name AD-Domain-Services, DNS, RSAT-ADDS | Select-Object Name, InstallState</code></pre>
-      </div>
-      <p>Všechny komponenty mají stav <code>Installed</code>.</p>
-
-      <h3>3. Server je řadičem domény</h3>
-      <p>V <strong>Server Manager → Local Server</strong> je u položky <em>Domain</em> uvedeno <code>prijmeni.cyberschool.internal</code> (nikoliv <code>WORKGROUP</code>). V PowerShellu:</p>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-        </div>
-        <pre><code>Get-ADDomain | Select-Object Name, Forest, DomainMode</code></pre>
-      </div>
-      <p>Vrátí název domény odpovídající vašemu příjmení (např. <code>novak</code>), les <code>novak.cyberschool.internal</code> a funkční úroveň domény.</p>
-
-      <h3>4. SRV1-DC drží role FSMO a je Global Catalog</h3>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-        </div>
-        <pre><code>netdom query fsmo
-Get-ADDomainController -Identity SRV1-DC | Select-Object Name, IsGlobalCatalog, OperationMasterRoles</code></pre>
-      </div>
-      <p>Příkaz <code>netdom query fsmo</code> vypíše u všech pěti rolí (Schema master, Domain naming master, PDC, RID pool manager, Infrastructure master) server <code>SRV1-DC.prijmeni.cyberschool.internal</code>. Vlastnost <code>IsGlobalCatalog</code> má hodnotu <code>True</code>.</p>
-
-      <h3>5. Nástroje pro správu domény fungují</h3>
-      <p>V <strong>Server Manager → Tools</strong> je dostupná položka <strong>Active Directory Users and Computers</strong> (ADUC) a po jejím otevření vidíte strukturu domény <code>prijmeni.cyberschool.internal</code> (výchozí kontejnery <code>Users</code>, <code>Computers</code>, <code>Domain Controllers</code>).</p>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-        </div>
-        <pre><code>Get-ADOrganizationalUnit -Filter * | Select-Object Name, DistinguishedName
-Get-ADDomainController -Filter * | Select-Object Name, Site</code></pre>
       </div>
 
-      <h3>6. Restart nic nerozbije a přihlášení funguje</h3>
-      <p>Po restartu serveru SRV1-DC proběhne přihlášení bez chyby jako <code>PRIJMENI\Administrator</code>, např. <code>NOVAK\Administrator</code> (nikoliv jako lokální účet). V PowerShellu:</p>
+      <h3>1. Parametry virtuálního stroje odpovídají zadání</h3>
+      <p>V nastavení virtuálního stroje ve vašem hypervizoru (CyLab): <code>SRV1-DC</code> i <code>SRV2-FS</code> mají přiděleny <strong>2 vCPU</strong>, <strong>8 GB RAM</strong> a <strong>100 GB</strong> systémový disk. U <code>SRV2-FS</code> navíc existuje <strong>5 dalších disků po 10 GB</strong>, viditelných uvnitř hosta:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
           <span>PowerShell</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>whoami
-Get-ADUser -Identity Administrator | Select-Object SamAccountName, UserPrincipalName, Enabled</code></pre>
+        <pre><code>Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle</code></pre>
       </div>
-      <p>Výstup je ve tvaru <code>PRIJMENI\Administrator</code> a účet má <code>Enabled: True</code>. Všechny služby Active Directory i integrovaného DNS serveru běží bez červených chyb.</p>
+      <p>U SRV2-FS výstup obsahuje systémový disk (~100 GB) a 5 dalších disků o velikosti ~10 GB, zatím ve stavu <code>RAW</code>/neinicializované (inicializují se až v Modulu 6).</p>
+
+      <h3>2. Edice a instalace odpovídá zadání</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ComputerInfo | Select-Object WindowsProductName, OsServerLevel</code></pre>
+      </div>
+      <p>Vrátí <code>WindowsProductName</code> obsahující <code>Windows Server 2025 Datacenter</code> a <code>OsServerLevel</code> = <code>FullServer</code> (potvrzuje Desktop Experience, nikoliv <code>ServerCore</code>).</p>
+
+      <h3>3. Hostname odpovídá tabulce</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>hostname</code></pre>
+      </div>
+      <p>Vrátí přesně <code>SRV1-DC</code>, resp. <code>SRV2-FS</code> — ne výchozí vygenerované jméno typu <code>WIN-XXXXXXXXXXX</code>.</p>
+
+      <h3>4. TCP/IPv4 je nastavené staticky a podle tabulky</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixLength
+Get-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway
+Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4</code></pre>
+      </div>
+      <p>IP adresa, prefix (<code>24</code> = maska <code>255.255.255.0</code>), brána i DNS server odpovídají hodnotám v <code>__zadani.md</code> pro daný server. Adresa <strong>není</strong> převzatá z DHCP (<code>Get-NetIPAddress ... | Select PrefixOrigin</code> ukazuje <code>Manual</code>, ne <code>Dhcp</code>).</p>
+
+      <h3>5. Přihlášení administrátora funguje</h3>
+      <p>Po odhlášení a novém přihlášení funguje přihlášení jako <code>Administrator</code> s heslem <code>Pa55w.rd</code> (lokálně — server ještě není v doméně). Žádný Microsoft účet u přihlášení nefiguruje — <code>Get-LocalUser</code> neobsahuje žádný účet typu Microsoft, jen vestavěné lokální účty.</p>
+
+      <h3>6. Jazyk rozhraní a regionální formát odpovídají zadání</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-WinUILanguageOverride      # nebo (Get-Culture).Parent u UI jazyka dle kontextu
+Get-Culture | Select-Object Name, DisplayName
+Get-WinSystemLocale
+Get-WinHomeLocation</code></pre>
+      </div>
+      <ul>
+        <li><code>Get-Culture</code> vrací <code>cs-CZ</code> (Czech (Czechia)) — určuje formáty data/času/měny.</li>
+        <li>Rozhraní (menu, hlášky) zůstává v angličtině — display language nebyl měněn.</li>
+        <li><code>Get-WinSystemLocale</code> vrací <code>cs-CZ</code>.</li>
+        <li><code>Get-WinHomeLocation</code> vrací <code>75 / Czech Republic</code> (GeoId: <code>0x4b</code>).</li>
+      </ul>
+
+      <h3>7. Formáty data, času a měny sedí</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-Date -Format "d.M.yyyy H:mm:ss"
+(12345.67).ToString("C")</code></pre>
+      </div>
+      <p>Datum/čas se vypíše ve tvaru <code>20.9.2026 13:45:02</code> a měna jako <code>12 345,67 Kč</code>.</p>
+
+      <h3>8. Časové pásmo je správně</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-TimeZone</code></pre>
+      </div>
+      <p>Vrátí <code>Id: Central Europe Standard Time</code>, <code>DisplayName</code> obsahující <code>Prague</code> (nebo <code>Bratislava</code>/<code>Budapest</code>), <code>BaseUtcOffset: 01:00:00</code>.</p>
+
+      <h3>9. Klávesnice — US i Czech (QWERTZ), přepínatelné</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-WinUserLanguageList | Select-Object LanguageTag, InputMethodTips
+# Alternativně kontrola rozložení přímo z registru:
+Get-ItemProperty "HKCU:\Keyboard Layout\Preload"</code></pre>
+      </div>
+      <p>Výstup obsahuje jak <code>en-US</code>, tak <code>cs-CZ</code> s příslušnou metodou vstupu (<code>0409:00000409</code> pro US, <code>0405:00000405</code> pro Czech), případně v registru <code>1 : 00000409</code> a <code>2 : 00000405</code>.</p>
+      <p><strong>Pokud už na liště u hodin vidíte přepínač ENG / CES a funguje vám psaní českých znaků (ěščřž), máte úkol splněný.</strong></p>
+
+      <h3>10. Soukromí je nastaveno na minimum</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name AllowTelemetry
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name DisableLocation
+Get-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" -Name DisabledByGroupPolicy</code></pre>
+      </div>
+      <p><code>AllowTelemetry = 1</code> (Required diagnostic data), <code>DisableLocation = 1</code> (poloha vypnutá), <code>DisabledByGroupPolicy = 1</code> (reklamní ID vypnuté). V <strong>Settings → Privacy &amp; security</strong> odpovídají přepínače stejným hodnotám i vizuálně.</p>
+
+      <h3>11. Aktivace je hotová (SRV1-DC, SRV2-FS i PC1-WIN)</h3>
+      <p>Aktivace probíhá pomocí školních klíčů <strong>LAB KEY</strong>, které si <strong>zkopírujte ze zadání v Microsoft Teams</strong> (zvlášť klíč pro servery Windows Server 2025 a zvlášť pro klienta Windows 11 Education N).</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell / CMD — Aktivace a ověření licence</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code># 1. Zadejte příslušný klíč ze zadání na Teams:
+slmgr.vbs /ipk &lt;LAB-KEY-Z-TEAMS&gt;
+slmgr.vbs /ato
+
+# 2. Ověření stavu aktivace:
+slmgr.vbs /xpr</code></pre>
+      </div>
+      <p>Příkaz <code>slmgr.vbs /xpr</code> vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u multilicence). V <strong>Settings → System → Activation</strong> je zobrazeno <strong>"Windows is activated"</strong> (server), resp. <strong>"Windows is activated with a digital license"</strong> (klient), bez varovných hlášek či vodoznaku na ploše.</p>
+
+      <h3>12. PC1-WIN: lokální účet, žádný Microsoft účet (jen u klienta)</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-LocalUser | Select-Object Name, Enabled</code></pre>
+      </div>
+      <p>Výstup obsahuje aktivní <code>Administrator</code> a <strong>neobsahuje</strong> žádný dočasný účet (<code>Setup</code> byl odstraněn). V <strong>Settings → Accounts → Your info</strong> je typ účtu <strong>"Local account"</strong>, nikoli e-mailová adresa Microsoft účtu — přihlášení do Windows nevyžaduje žádné internetové ověření.</p>
+
+      <blockquote style="margin-top: 32px;">
+        <p><strong>Následující krok:</strong> Po úspěšném ověření pokračujte modulem, pro který jste stroj právě připravovali:<br>
+        • <code>SRV1-DC</code> → Modul 1 — Domain Controller<br>
+        • <code>SRV2-FS</code> → Modul 6 — File Server a Storage<br>
+        • <code>PC1-WIN</code> → Modul 2 — DHCP</p>
+      </blockquote>
     </article>
   </main>
 

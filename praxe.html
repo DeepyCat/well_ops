@@ -6,8 +6,8 @@
   <title>Kontrolní seznam přípravy VM - Modul 0</title>
   <link rel="icon" type="image/x-icon" href="img/remielle.jpg">
   <script src="praxe/modules.js"></script>
+  <script src="praxe/00/tasks.js"></script>
   <script src="praxe/01/tasks.js"></script>
-  <script src="praxe/02/tasks.js"></script>
 
   <style>
     :root {
@@ -1156,7 +1156,7 @@
       }
     }
 
-    /* Warning Modal Overlay for Modul 02 */
+    /* Warning Modal Overlay */
     .warning-modal-overlay {
       position: fixed;
       inset: 0;
@@ -1484,8 +1484,8 @@
 </head>
 <body>
 
-  <!-- Warning Modal for Modul 02 -->
-  <div id="mod2-warning-modal" class="warning-modal-overlay" style="display: none;">
+  <!-- Warning Modal for Modul 01 (AD DS) -->
+  <div id="mod1-warning-modal" class="warning-modal-overlay" style="display: none;">
     <div class="warning-modal-card">
       <div class="warning-icon-wrapper">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f85149" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1578,12 +1578,12 @@
       <h1 id="page-title">Konfigurace zkurvených VM</h1>
     </div>
     <div class="header-actions">
-      <a href="praxe/01/__zadani.html" target="_blank" rel="noopener noreferrer" class="doc-link-btn" id="btn-doc-zadani" title="Otevřít zformátované zadání (_zadani.md) v nové záložce">
+      <a href="praxe/00/__zadani.html" target="_blank" rel="noopener noreferrer" class="doc-link-btn" id="btn-doc-zadani" title="Otevřít zformátované zadání (_zadani.md) v nové záložce">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         <span>_zadani.md</span>
         <svg class="external-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
       </a>
-      <a href="praxe/01/__reseni.html" target="_blank" rel="noopener noreferrer" class="doc-link-btn" id="btn-doc-reseni" title="Otevřít zformátované řešení (__reseni.md) v nové záložce">
+      <a href="praxe/00/__reseni.html" target="_blank" rel="noopener noreferrer" class="doc-link-btn" id="btn-doc-reseni" title="Otevřít zformátované řešení (__reseni.md) v nové záložce">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
         <span>__reseni.md</span>
         <svg class="external-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
@@ -1642,7 +1642,7 @@
   </div>
 
   <script>
-    let currentModuleId = "01";
+    let currentModuleId = "00";
     let currentModuleConfig = null;
     let currentVerifiedConfig = {};
     let taskDefinitions = [];
@@ -1663,7 +1663,7 @@
       if (mod && modules.find(m => m.id === mod)) {
         return mod;
       }
-      return modules.length > 0 ? modules[0].id : "01";
+      return modules.length > 0 ? modules[0].id : "00";
     }
 
     function initModuleSelect() {
@@ -1741,7 +1741,7 @@
       const key = getStorageKey(vm, taskId);
       const val = localStorage.getItem(key);
       if (val !== null) return val === "1";
-      if (currentModuleId === "01") {
+      if (currentModuleId === "00" || currentModuleId === "01") {
         return localStorage.getItem(`vm_task_${vm}_${taskId}`) === "1" || localStorage.getItem(`lab_${vm}_${taskId}`) === "1";
       }
       return false;
@@ -1754,7 +1754,7 @@
       } else {
         localStorage.removeItem(key);
       }
-      if (currentModuleId === "01") {
+      if (currentModuleId === "00" || currentModuleId === "01") {
         if (done) {
           localStorage.setItem(`vm_task_${vm}_${taskId}`, "1");
         } else {
@@ -2113,10 +2113,10 @@
     async function loadModule(moduleId) {
       const modules = window.OPS_MODULES || [];
       const config = modules.find(m => m.id === moduleId) || modules[0] || {
-        id: "01",
-        code: "M01",
-        title: "Modul 01: Příprava a instalace OS",
-        folder: "praxe/01",
+        id: "00",
+        code: "M00",
+        title: "Modul 00: Příprava a instalace OS",
+        folder: "praxe/00",
         vms: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
         defaultVM: "SRV1-DC"
       };
@@ -2157,11 +2157,12 @@
     }
 
     function checkModuleWarnings() {
-      if (currentModuleId === "02" && !localStorage.getItem(MOD2_WARNING_KEY)) {
+      const isAdModAcknowledged = localStorage.getItem("ops_mod01_warning_acknowledged") || localStorage.getItem("ops_mod02_warning_acknowledged");
+      if (currentModuleId === "01" && !isAdModAcknowledged) {
         hideWorkstationWarningModal();
-        showMod2WarningModal();
+        showMod1WarningModal();
       } else {
-        hideMod2WarningModal();
+        hideMod1WarningModal();
         checkWorkstationWarning();
       }
     }
@@ -2172,9 +2173,9 @@
     const WS_WARNING_PREFIX = "ops_ws_warning_ack_";
 
     function checkWorkstationWarning() {
-      // Pokud je právě zobrazen modal pro modul 02, počkáme na jeho odemčení
-      const mod2Modal = document.getElementById("mod2-warning-modal");
-      if (mod2Modal && mod2Modal.style.display === "flex") {
+      // Pokud je právě zobrazen modal pro modul 01 (AD DS), počkáme na jeho odemčení
+      const mod1Modal = document.getElementById("mod1-warning-modal");
+      if (mod1Modal && mod1Modal.style.display === "flex") {
         return;
       }
 
@@ -2254,27 +2255,27 @@
     }
 
     // ----------------------------------------------------
-    // Modul 02: 10sekundové varování před spuštěním
+    // Modul 01 (AD DS): 10sekundové varování před spuštěním
     // ----------------------------------------------------
-    const MOD2_WARNING_KEY = "ops_mod02_warning_acknowledged";
+    const MOD1_WARNING_KEY = "ops_mod01_warning_acknowledged";
     let holdStartTime = null;
     let holdRafId = null;
     const HOLD_DURATION_MS = 10000; // 10 sekund
 
-    function checkMod2Warning() {
+    function checkMod1Warning() {
       checkModuleWarnings();
     }
 
-    function showMod2WarningModal() {
-      const modal = document.getElementById("mod2-warning-modal");
+    function showMod1WarningModal() {
+      const modal = document.getElementById("mod1-warning-modal");
       if (modal) {
         modal.style.display = "flex";
         setupHoldButton();
       }
     }
 
-    function hideMod2WarningModal() {
-      const modal = document.getElementById("mod2-warning-modal");
+    function hideMod1WarningModal() {
+      const modal = document.getElementById("mod1-warning-modal");
       if (modal) {
         modal.style.display = "none";
       }
@@ -2312,12 +2313,12 @@
         if (btnText) {
           btnText.innerHTML = `
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            <span>Potvrzeno! Otevírám Modul 02...</span>
+            <span>Potvrzeno! Otevírám Modul 01...</span>
           `;
         }
-        localStorage.setItem(MOD2_WARNING_KEY, "1");
+        localStorage.setItem(MOD1_WARNING_KEY, "1");
         setTimeout(() => {
-          const modal = document.getElementById("mod2-warning-modal");
+          const modal = document.getElementById("mod1-warning-modal");
           if (modal) {
             modal.style.transition = "opacity 0.4s ease";
             modal.style.opacity = "0";
@@ -2353,13 +2354,15 @@
 
       function startHold(e) {
         if (e.type === "touchstart") e.preventDefault();
-        if (localStorage.getItem(MOD2_WARNING_KEY)) return;
+        const isAck = localStorage.getItem(MOD1_WARNING_KEY) || localStorage.getItem("ops_mod02_warning_acknowledged");
+        if (isAck) return;
         holdStartTime = Date.now();
         holdRafId = requestAnimationFrame(updateHold);
       }
 
       function stopHold() {
-        if (localStorage.getItem(MOD2_WARNING_KEY)) return;
+        const isAck = localStorage.getItem(MOD1_WARNING_KEY) || localStorage.getItem("ops_mod02_warning_acknowledged");
+        if (isAck) return;
         resetHold();
       }
 

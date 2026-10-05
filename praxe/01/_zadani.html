@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zadání: Modul 01 – Základní konfigurace VM (__zadani.md)</title>
+  <title>Zadání: Modul 01 – Active Directory Domain Services (__zadani.md)</title>
   <style>
     :root {
       --bg: #1a1a1a;
@@ -389,28 +389,28 @@
   <!-- Top Navigation -->
   <nav class="top-nav">
     <div class="nav-breadcrumb">
-      <a href="../../praxe.html">Interaktivní lab</a>
+      <a href="../../praxe.html?modul=02">Interaktivní lab</a>
       <span>/</span>
       <span>praxe</span>
       <span>/</span>
       <span>01</span>
       <span>/</span>
       <span class="file-badge">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
         __zadani.md
       </span>
     </div>
 
     <div class="nav-actions">
-      <a href="__reseni.html" class="btn btn-primary" title="Přepnout na řešení a kontrolní seznam">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      <a href="__reseni.html" class="btn btn-primary" title="Zobrazit vzorové ověření výsledku">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
         <span>Otevřít řešení (__reseni.md)</span>
       </a>
-      <a href="../../praxe.html" class="btn" title="Zpět do interaktivního portálu">
+      <a href="../../praxe.html?modul=02" class="btn" title="Zpět do interaktivního portálu">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         <span>Zpět do labu</span>
       </a>
-      <a href="__zadani.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
+      <a href="_zadani.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         <span>Raw .md</span>
       </a>
@@ -422,268 +422,103 @@
     <article class="markdown-body">
       <h1>[Co má být na konci modulu a jak to vypadá?]</h1>
 
-      <p><strong>Přibližný potřebný čas</strong>: 1 vyučovací hodina na stroj — postup se v projektu opakuje <strong>třikrát</strong>: pro <strong>SRV1-DC</strong>, <strong>SRV2-FS</strong> a klienta <strong>PC1-WIN</strong>.</p>
-
-      <h2>Kontext (proč to děláme)</h2>
-      <p>Než začneme řešit role (doména, DHCP, souborové služby...), potřebuje každý stroj — servery i klient — stejný, pečlivě připravený základ: správné jméno v síti, funkční síťové nastavení, bezpečný přístup administrátora, aktivovaný Windows a <strong>lokalizaci</strong> (jazyk, časové pásmo, formát data/času/měny), aby se dalo rozumně administrovat v českém prostředí a zároveň se studenti naučili anglickou terminologii, se kterou se v praxi i na certifikacích setkají. Tento modul je "nulový" — dělá se <strong>před</strong> Modulem 1 (na SRV1-DC), znovu <strong>před</strong> Modulem 6 (na SRV2-FS) a znovu pro klienta <strong>PC1-WIN</strong> (než začnete Modul 2 — DHCP), vždy se stejnými principy lokalizace, jen jiným typem OS a jinými síťovými hodnotami.</p>
-
-      <h2>Cílový stav</h2>
-      <p>Na konci tohoto modulu jsou nainstalované a připravené tři virtuální stroje s těmito <strong>konkrétními</strong> parametry:</p>
-
-      <h3>Parametry virtuálního stroje</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Parametr</th>
-            <th>SRV1-DC</th>
-            <th>SRV2-FS</th>
-            <th>PC1-WIN</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>vCPU</td>
-            <td>2 jádra</td>
-            <td>2 jádra</td>
-            <td>2 jádra</td>
-          </tr>
-          <tr>
-            <td>RAM</td>
-            <td>8 GB</td>
-            <td>8 GB</td>
-            <td>8 GB</td>
-          </tr>
-          <tr>
-            <td>Systémový disk</td>
-            <td>100 GB</td>
-            <td>100 GB</td>
-            <td>60 GB</td>
-          </tr>
-          <tr>
-            <td>Další disky</td>
-            <td>—</td>
-            <td><strong>5× 10 GB</strong> (pro Storage Pool a simulaci výpadku disku v Modulu 6)</td>
-            <td>—</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p>Všech 5 dodatečných disků u SRV2-FS se přidává do VM <strong>už v tomto modulu</strong>, spolu s vytvořením virtuálního stroje — v Modulu 6 se pak jen inicializují a poskládají do Storage Pool.</p>
-
-      <h3>Instalační edice</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Stroj</th>
-            <th>Edice</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>SRV1-DC, SRV2-FS</strong></td>
-            <td><strong>Windows Server 2025 Datacenter (Desktop Experience)</strong> — vždy s grafickým rozhraním, nikdy varianta Server Core. Datacenter edice je zvolena kvůli neomezenému počtu virtualizovaných instancí a plné sadě funkcí (Storage Spaces, atd.), i když si škola vystačí i se Standard — v projektu záměrně používáme Datacenter, aby žádná funkce z probíraných modulů nebyla licenčně omezená.</td>
-          </tr>
-          <tr>
-            <td><strong>PC1-WIN</strong></td>
-            <td><strong>Windows 11 Education N</strong> — edice Education je určená přímo pro nasazení ve školách (obsahuje stejné funkce jako Enterprise, včetně doménového joinu a centrální správy přes GPO/Intune); varianta <strong>N</strong> neobsahuje přeinstalované mediální technologie (Windows Media Player, Zprávy, kamera...) — v souladu s požadavky EU, dodávají se/instalují se zvlášť, pokud jsou potřeba.</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p>Jazyk instalačního média je u všech tří strojů <strong>English (United States)</strong>.</p>
-
-      <h3>Účet administrátora</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Položka</th>
-            <th>Hodnota</th>
-            <th>Poznámka</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Účet (SRV1-DC, SRV2-FS)</td>
-            <td>vestavěný <code>Administrator</code></td>
-            <td>vytváří ho přímo instalace serveru</td>
-          </tr>
-          <tr>
-            <td>Účet (PC1-WIN)</td>
-            <td><code>Administrator</code></td>
-            <td>u Windows 11 je vestavěný účet <code>Administrator</code> ve výchozím stavu <strong>vypnutý</strong> a OOBE nedovolí založit nový účet pod tímto jménem — musí se <strong>ručně povolit</strong> po instalaci</td>
-          </tr>
-          <tr>
-            <td>Heslo</td>
-            <td><code>Pa55w.rd</code> (u všech tří strojů stejné)</td>
-            <td>standardizované labové heslo</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p>Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný administrátorský účet.</p>
-
-      <h3>Jméno počítače a síť</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Parametr</th>
-            <th>SRV1-DC</th>
-            <th>SRV2-FS</th>
-            <th>PC1-WIN</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Hostname</td>
-            <td><code>SRV1-DC</code></td>
-            <td><code>SRV2-FS</code></td>
-            <td><code>PC1-WIN</code></td>
-          </tr>
-          <tr>
-            <td>Způsob přidělení IP</td>
-            <td>statická</td>
-            <td>statická</td>
-            <td><strong>automaticky přes DHCP</strong> (viz Modul 2 — v tomto modulu se síť u klienta neřeší, necháváme výchozí DHCP)</td>
-          </tr>
-          <tr>
-            <td>IP adresa</td>
-            <td><code>192.168.X.10</code></td>
-            <td><code>192.168.X.20</code></td>
-            <td>přidělena DHCP serverem z rozsahu <code>192.168.X.100</code>–<code>.200</code></td>
-          </tr>
-          <tr>
-            <td>Maska podsítě</td>
-            <td><code>255.255.255.0</code> (/24)</td>
-            <td><code>255.255.255.0</code> (/24)</td>
-            <td>přidělena DHCP</td>
-          </tr>
-          <tr>
-            <td>Výchozí brána</td>
-            <td><code>192.168.X.1</code></td>
-            <td><code>192.168.X.1</code></td>
-            <td>přidělena DHCP</td>
-          </tr>
-          <tr>
-            <td>Preferovaný DNS server</td>
-            <td><code>192.168.X.10</code> (sám na sebe)</td>
-            <td><code>192.168.X.10</code> (SRV1-DC)</td>
-            <td>přidělen DHCP</td>
-          </tr>
-        </tbody>
-      </table>
-
       <blockquote>
-        <p><strong>Upozornění k síti:</strong> PC1-WIN v tomto modulu ještě nemá funkční síť se zbytkem infrastruktury (DHCP server ještě neexistuje) — připojení k internetu/síti během vlastní instalace Windows 11 řešíme jen kvůli aktivaci a případnému stažení aktualizací.</p>
+        <p><strong>Přibližný potřebný čas:</strong> 2 vyučovací hodiny &nbsp;|&nbsp; <strong>Verze:</strong> 2026-10-03</p>
       </blockquote>
 
-      <h3>Aktivace Windows (LAB KEY)</h3>
-      <p>Všechny tři instalace se aktivují školními produktovými klíči <strong>LAB KEY</strong>.</p>
-      <div style="background: rgba(255, 85, 85, 0.08); border: 1px solid rgba(255, 85, 85, 0.3); border-left: 4px solid #ff5555; border-radius: 6px; padding: 12px 16px; margin: 14px 0; color: #e0e0e0;">
-        <strong>Produktové klíče:</strong> Příslušné produktové klíče (pro <em>Windows Server 2025</em> i <em>Windows 11 Education N</em>) si <strong>zkopírujte přímo ze zadání v Microsoft Teams</strong>.
+      <h2>Kontext (proč to děláme)</h2>
+      <p>Paní učitelka <strong>Nováková</strong> má dost přihlašování na "univerzální" lokální účty typu <code>ucitel</code>/<code>ucitel</code>, které zná celá škola. Chce, aby každý žák a učitel měl <strong>svůj vlastní</strong> účet, který funguje na libovolném počítači ve škole. To je přesně to, co řeší <strong>Active Directory Domain Services (AD DS)</strong>.</p>
+
+      <h2>Předpoklad: server je připravený (Modul 01 — Příprava VM)</h2>
+      <p>Tento modul předpokládá, že server <strong>SRV1-DC</strong> už prošel přípravným modulem: má nainstalovaný Windows Server 2025 Datacenter (Desktop Experience), hostname <code>SRV1-DC</code>, statickou IP adresu <code>192.168.X.10/24</code> na rozhraní <code>Ethernet1</code>, funkční účet <code>Administrator</code> s heslem <code>Pa55w.rd</code> a hotovou lokalizaci. Pokud jste Modul 00 ještě nedokončili, vraťte se k němu nejprve.</p>
+
+      <h2>Cílový stav: Povýšení na řadič domény</h2>
+      <p>Server SRV1-DC bude mít nainstalovanou roli <strong>Active Directory Domain Services (AD DS)</strong> a bude povýšen na řadič nového lesa a domény <code>prijmeni.cyberschool.internal</code>.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Parametr</th>
+              <th>Hodnota na SRV1-DC</th>
+              <th>Poznámka</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Role serveru</strong></td>
+              <td>Active Directory Domain Services (AD DS), DNS Server</td>
+              <td>Instaluje se včetně RSAT nástrojů pro správu</td>
+            </tr>
+            <tr>
+              <td><strong>Název domény (FQDN)</strong></td>
+              <td><code>prijmeni.cyberschool.internal</code></td>
+              <td>Vaše příjmení malými písmeny bez diakritiky (např. <code>novak.cyberschool.internal</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>NetBIOS jméno domény</strong></td>
+              <td><code>PRIJMENI</code></td>
+              <td>Odvozuje se automaticky velkými písmeny (např. <code>NOVAK</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>DSRM heslo</strong></td>
+              <td><code>Pa55w.rd</code></td>
+              <td>Heslo pro SafeModeAdministratorPassword (režim obnovení adresářových služeb)</td>
+            </tr>
+            <tr>
+              <td><strong>FSMO role</strong></td>
+              <td>Všech 5 rolí na <code>SRV1-DC</code></td>
+              <td>Schema Master, Domain Naming Master, PDC Emulator, RID Master, Infrastructure Master</td>
+            </tr>
+            <tr>
+              <td><strong>Global Catalog (GC)</strong></td>
+              <td><code>True</code></td>
+              <td>První řadič v doméně je automaticky globálním katalogem</td>
+            </tr>
+            <tr>
+              <td><strong>Přihlášení po restartu</strong></td>
+              <td><code>PRIJMENI\Administrator</code></td>
+              <td>Heslo zůstává standardní <code>Pa55w.rd</code></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <p>Aktivaci provedete buď přímo v instalačním průvodci, v <strong>Settings → System → Activation</strong>, nebo v příkazové řádce / PowerShellu:</p>
+
+      <ul>
+        <li>Doména <code>prijmeni.cyberschool.internal</code> existuje a SRV1-DC je jejím primárním řadičem (Domain Controller).</li>
+        <li>Server zároveň funguje jako integrovaný DNS server pro tuto doménu (role DNS se konfiguruje automaticky spolu s AD DS).</li>
+        <li>Po dokončení instalace a automatickém restartu se přihlašujete jako <code>PRIJMENI\Administrator</code> (nebo <code>Administrator@prijmeni.cyberschool.internal</code>).</li>
+      </ul>
+
+      <h2>Instalace a povýšení v PowerShellu</h2>
+      <p>Krok 1: Instalace role AD DS s nástroji pro správu:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
-          <span>PowerShell / CMD</span>
+          <span>PowerShell (Spustit jako Administrator)</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>slmgr.vbs /ipk &lt;LAB-KEY-Z-TEAMS&gt;
-slmgr.vbs /ato</code></pre>
+        <pre><code>Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools</code></pre>
       </div>
-      <p>Ověření aktivace: <strong>Settings → System → Activation</strong> ukazuje "Windows is activated", případně příkazem <code>slmgr.vbs /xpr</code> vypíše "The machine is permanently activated".</p>
 
-      <h3>Jazyk, region a lokalizace</h3>
-      <p>Tato část je pro všechny tři stroje <strong>stejná</strong> (nezávisí na roli):</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Parametr</th>
-            <th>Hodnota</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Windows display language (jazyk rozhraní)</td>
-            <td><strong>English (United States)</strong> — konzole, chybové hlášky i menu zůstávají anglicky kvůli mezinárodní terminologii a certifikacím</td>
-          </tr>
-          <tr>
-            <td>Formát regionu (Region format)</td>
-            <td><strong>Czech (Czech Republic)</strong> — datum, čas, měna a čísla podle českých standardů</td>
-          </tr>
-          <tr>
-            <td>Časové pásmo</td>
-            <td><strong>(UTC+01:00) Praha, Bratislava, Budapešť, Lublaň</strong> (Time zone ID: <code>Central Europe Standard Time</code>)</td>
-          </tr>
-          <tr>
-            <td>Formát data</td>
-            <td><code>d.M.yyyy</code> (např. <code>20.9.2026</code>)</td>
-          </tr>
-          <tr>
-            <td>Formát času</td>
-            <td><code>H:mm:ss</code> (24hodinový formát, např. <code>13:45:02</code>)</td>
-          </tr>
-          <tr>
-            <td>Formát měny</td>
-            <td><code>Kč</code> (např. <code>1 234,56 Kč</code>)</td>
-          </tr>
-          <tr>
-            <td>Rozložení klávesnice</td>
-            <td><strong>US i Czech (QWERTZ) zároveň</strong> s přepínáním přes <code>Win + mezerník</code></td>
-          </tr>
-          <tr>
-            <td>Home location (GeoId)</td>
-            <td><strong>Czech Republic</strong> (GeoId: <code>0x4b</code> / decimálně <code>75</code>)</td>
-          </tr>
-        </tbody>
-      </table>
+      <p>Krok 2: Povýšení na řadič domény a vytvoření nového lesa (nahraďte <code>&lt;prijmeni&gt;</code> vaším příjmením, např. <code>novak</code>):</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$DomainName = "&lt;prijmeni&gt;.cyberschool.internal"
+$SecurePassword = ConvertTo-SecureString "Pa55w.rd" -AsPlainText -Force
 
-      <h3>Soukromí a telemetrie</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Nastavení</th>
-            <th>Požadovaná hodnota</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Přihlášení Microsoft účtem</td>
-            <td>nepoužívá se nikde — jen lokální/vestavěný účet <code>Administrator</code></td>
-          </tr>
-          <tr>
-            <td>Diagnostická data (telemetrie)</td>
-            <td><strong>Required diagnostic data</strong> (minimální úroveň)</td>
-          </tr>
-          <tr>
-            <td>Vylepšování psaní rukou a psaní (inking &amp; typing)</td>
-            <td>vypnuto</td>
-          </tr>
-          <tr>
-            <td>Přizpůsobené (tailored) zážitky na základě diagnostických dat</td>
-            <td>vypnuto</td>
-          </tr>
-          <tr>
-            <td>Služby určování polohy (Location services)</td>
-            <td><strong>vypnuto</strong></td>
-          </tr>
-          <tr>
-            <td>Reklamní ID (Advertising ID)</td>
-            <td>vypnuto</td>
-          </tr>
-          <tr>
-            <td>Find My Device (jen PC1-WIN)</td>
-            <td>vypnuto</td>
-          </tr>
-        </tbody>
-      </table>
+Install-ADDSForest -DomainName $DomainName -SafeModeAdministratorPassword $SecurePassword -InstallDns:$true -Force:$true</code></pre>
+      </div>
 
-      <h2>Ověření (shrnutí, detaily viz `_vysledek.md`)</h2>
+      <h2>Ověření nástroji</h2>
+      <p>Na SRV1-DC jsou po restartu plně dostupné administrační nástroje pro správu domény:</p>
       <ul>
-        <li>Server/klient odpovídá na <code>ping</code> a hostname sedí přesně podle tabulky výše.</li>
-        <li>Přihlášení jako <code>Administrator</code> / <code>Pa55w.rd</code> funguje na všech třech strojích (u PC1-WIN jako lokální účet).</li>
-        <li><code>Get-TimeZone</code>, <code>Get-Culture</code> / <code>Get-WinSystemLocale</code> a <code>Get-WinHomeLocation</code> v PowerShellu vrací hodnoty odpovídající tabulce.</li>
-        <li>Datum a čas (nebo výstup <code>Get-Date</code>) je ve formátu <code>d.M.yyyy H:mm:ss</code>.</li>
-        <li><strong>Settings → System → Activation</strong> ukazuje aktivovaný Windows na všech třech strojích.</li>
+        <li><strong>Active Directory Users and Computers (ADUC)</strong> – správa uživatelů, skupin a organizačních jednotek.</li>
+        <li><strong>DNS Manager</strong> – správa primární dopředné zóny <code>prijmeni.cyberschool.internal</code>.</li>
+        <li><strong>Active Directory Administrative Center (ADAC)</strong> – moderní grafické rozhraní správy domény.</li>
+        <li><strong>Active Directory Domains and Trusts</strong> – správa důvěryhodností a funkčních úrovní lesa.</li>
       </ul>
     </article>
   </main>
