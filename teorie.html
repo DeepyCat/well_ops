@@ -133,9 +133,6 @@
             border-color: var(--accent);
         }
 
-        .nav-group {
-            margin-bottom: 20px;
-        }
 
         .nav-group-title {
             font-size: 0.85rem;
@@ -308,6 +305,25 @@
             padding: 0;
         }
 
+        /* Obrázky v nav-group hlavičkách */
+        .nav-group-img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border-color);
+            opacity: 0.85;
+            transition: opacity 0.2s ease;
+            display: block;
+        }
+        .nav-group-img:hover {
+            opacity: 1;
+        }
+        .nav-group {
+            margin-bottom: 20px;
+        }
+
         /* Responzivita pro menší obrazovky */
         @media screen and (max-width: 768px) {
             .app-layout {
@@ -344,6 +360,7 @@
             </div>
 
             <div class="nav-group">
+                <img src="img/teorie-uvod-architektura.svg" alt="Uvod a Architektura OS" class="nav-group-img">
                 <div class="nav-group-title">1. Úvod & Architektura</div>
                 <ul>
                     <li><button onclick="loadMarkdown('md/01_Vypocetni_system.md', this)">01_Vypocetni_system.md</button></li>
@@ -357,6 +374,7 @@
             </div>
 
             <div class="nav-group">
+                <img src="img/teorie-hardware-pamet.svg" alt="Hardware, Periferie a Pamet" class="nav-group-img">
                 <div class="nav-group-title">2. Hardware, Periferie & Paměť</div>
                 <ul>
                     <li><button onclick="loadMarkdown('md/01_Sprava_periferii_a_preruseni.md', this)">01_Sprava_periferii</button></li>
@@ -373,6 +391,7 @@
             </div>
 
             <div class="nav-group">
+                <img src="img/teorie-procesy-planovani.svg" alt="Procesy a Planovani" class="nav-group-img">
                 <div class="nav-group-title">3. Procesy & Plánování</div>
                 <ul>
                     <li><button onclick="loadMarkdown('md/01_Process_Concept.md', this)">01_Process_Concept.md</button></li>
@@ -386,6 +405,7 @@
             </div>
 
             <div class="nav-group">
+                <img src="img/teorie-soubory-rozhrani.svg" alt="Souborove systemy a Rozhrani" class="nav-group-img">
                 <div class="nav-group-title">4. Souborové systémy & Rozhraní</div>
                 <ul>
                     <li><button onclick="loadMarkdown('md/04_File_Concept_Access.md', this)">04_File_Concept_Access.md</button></li>

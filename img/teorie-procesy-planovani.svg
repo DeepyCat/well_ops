@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="220" viewBox="0 0 800 220">
+  <rect width="800" height="220" fill="#1a0d0d"/>
+  <text x="400" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="15" fill="#ff5555" font-weight="bold" letter-spacing="2">PROCESY · VLÁKNA · PLÁNOVÁNÍ CPU</text>
+  <!-- Process lifecycle -->
+  <defs>
+    <marker id="arrowR" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#ff7777"/>
+    </marker>
+  </defs>
+  <!-- States -->
+  <ellipse cx="100" cy="100" rx="55" ry="28" fill="#2a1111" stroke="#ff5555" stroke-width="1.5"/>
+  <text x="100" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#ff7777">NEW</text>
+  <ellipse cx="260" cy="70" rx="55" ry="28" fill="#2a1111" stroke="#ff5555" stroke-width="1.5"/>
+  <text x="260" y="74" text-anchor="middle" font-family="Arial" font-size="11" fill="#ffa0a0">READY</text>
+  <ellipse cx="420" cy="100" rx="55" ry="28" fill="#3a1111" stroke="#ff5555" stroke-width="2"/>
+  <text x="420" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#ff5555" font-weight="bold">RUNNING</text>
+  <ellipse cx="580" cy="70" rx="55" ry="28" fill="#2a1111" stroke="#ff5555" stroke-width="1.5"/>
+  <text x="580" y="74" text-anchor="middle" font-family="Arial" font-size="11" fill="#ffa0a0">WAITING</text>
+  <ellipse cx="700" cy="100" rx="60" ry="28" fill="#1a0d0d" stroke="#888" stroke-width="1.5"/>
+  <text x="700" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#888">TERMINATED</text>
+  <!-- Arrows -->
+  <line x1="155" y1="87" x2="205" y2="74" stroke="#ff7777" stroke-width="1.5" marker-end="url(#arrowR)"/>
+  <line x1="315" y1="76" x2="365" y2="90" stroke="#ff7777" stroke-width="1.5" marker-end="url(#arrowR)"/>
+  <line x1="475" y1="90" x2="525" y2="76" stroke="#ff7777" stroke-width="1.5" marker-end="url(#arrowR)"/>
+  <line x1="535" y1="76" x2="315" y2="76" stroke="#ff5555" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrowR)"/>
+  <line x1="475" y1="110" x2="640" y2="110" stroke="#888" stroke-width="1.5" marker-end="url(#arrowR)"/>
+  <text x="215" y="70" font-family="Arial" font-size="8" fill="#888">admit</text>
+  <text x="325" y="70" font-family="Arial" font-size="8" fill="#888">dispatch</text>
+  <text x="480" y="68" font-family="Arial" font-size="8" fill="#888">I/O wait</text>
+  <text x="395" y="80" font-family="Arial" font-size="8" fill="#888">preempt</text>
+  <!-- Scheduling timeline -->
+  <text x="30" y="158" font-family="Arial" font-size="10" fill="#ff7777">CPU:</text>
+  <rect x="60" y="148" width="80" height="20" rx="3" fill="#3a1111" stroke="#ff5555" stroke-width="1"/>
+  <text x="100" y="162" text-anchor="middle" font-family="Arial" font-size="9" fill="#ff7777">P1</text>
+  <rect x="142" y="148" width="50" height="20" rx="3" fill="#2a1520" stroke="#a855f7" stroke-width="1"/>
+  <text x="167" y="162" text-anchor="middle" font-family="Arial" font-size="9" fill="#a855f7">P2</text>
+  <rect x="194" y="148" width="70" height="20" rx="3" fill="#1a2030" stroke="#3b82f6" stroke-width="1"/>
+  <text x="229" y="162" text-anchor="middle" font-family="Arial" font-size="9" fill="#3b82f6">P3</text>
+  <rect x="266" y="148" width="60" height="20" rx="3" fill="#3a1111" stroke="#ff5555" stroke-width="1"/>
+  <text x="296" y="162" text-anchor="middle" font-family="Arial" font-size="9" fill="#ff7777">P1</text>
+  <rect x="328" y="148" width="40" height="20" rx="3" fill="#2a1520" stroke="#a855f7" stroke-width="1"/>
+  <text x="348" y="162" text-anchor="middle" font-family="Arial" font-size="9" fill="#a855f7">P2</text>
+  <text x="400" y="162" font-family="Arial" font-size="9" fill="#555">…  Round Robin / FCFS / SJF / Priority</text>
+  <text x="400" y="185" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">PCB · Context Switch · IPC · Semaphory · Mutexy · Deadlock</text>
+  <text x="400" y="200" text-anchor="middle" font-family="Arial" font-size="9" fill="#444">Multitasking · Multithreading · Synchronizace procesů</text>
+</svg>
