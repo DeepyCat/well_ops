@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Řešení a ověření: Modul 02 – Active Directory Domain Services (__reseni.md)</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --text-bright: #f0f6fc;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --accent-bg: rgba(56, 139, 253, 0.12);
+      --code-bg: #090d13;
+      --quote-border: #238636;
+      --quote-bg: rgba(35, 134, 54, 0.1);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(22, 27, 34, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .nav-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(46, 160, 67, 0.15);
+      border: 1px solid rgba(46, 160, 67, 0.35);
+      color: #3fb950;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #21262d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #30363d;
+      border-color: #8b949e;
+      color: #fff;
+    }
+
+    .btn-primary {
+      background-color: #1f6feb;
+      border-color: rgba(240, 246, 252, 0.1);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background-color: #388bfd;
+    }
+
+    /* Document Container */
+    .container {
+      max-width: 960px;
+      margin: 32px auto 80px auto;
+      padding: 0 24px;
+    }
+
+    .markdown-body {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #3fb950;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    p, ul, ol {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    ul, ol {
+      padding-left: 28px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    strong {
+      color: #fff;
+    }
+
+    blockquote {
+      margin: 18px 0;
+      padding: 12px 18px;
+      background: var(--quote-bg);
+      border-left: 4px solid var(--quote-border);
+      border-radius: 0 6px 6px 0;
+      color: #d1fae5;
+      font-size: 0.95rem;
+    }
+
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background-color: rgba(110, 118, 129, 0.2);
+      color: #79c0ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(240, 246, 252, 0.05);
+    }
+
+    .code-block-wrapper {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 14px 0 18px 0;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #161b22;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #e6edf3;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: inherit;
+    }
+
+    .copy-code-btn {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #c9d1d9;
+      font-size: 0.74rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .copy-code-btn:hover {
+      background: #30363d;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .markdown-body { padding: 20px 16px; }
+      .container { padding: 0 12px; margin-top: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-breadcrumb">
+      <a href="../../praxe.html?modul=02">Interaktivní lab</a>
+      <span>/</span>
+      <span>praxe</span>
+      <span>/</span>
+      <span>02</span>
+      <span>/</span>
+      <span class="file-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        __reseni.md
+      </span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="__zadani.html" class="btn btn-primary" title="Přepnout na původní zadání">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <span>Otevřít zadání (__zadani.md)</span>
+      </a>
+      <a href="../../praxe.html?modul=02" class="btn" title="Zpět do interaktivního portálu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Zpět do labu</span>
+      </a>
+      <a href="_vysledek.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Raw .md</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Document Body -->
+  <main class="container">
+    <article class="markdown-body">
+      <h1>[Jak se pozná, že už to mám?]</h1>
+
+      <blockquote>
+        <p>Tento modul se ověřuje přímo na konzoli serveru <strong>SRV1-DC</strong> (klient PC1-WIN ani server SRV2-FS v tomto modulu do domény ještě nevstupují — to následuje v dalších lekcích).</p>
+      </blockquote>
+
+      <h3>1. Server je nainstalovaný a dostupný v síti</h3>
+      <p>Přímo na konzoli SRV1-DC se úspěšně přihlásíte jako <code>Administrator</code> s heslem <code>Pa55w.rd</code>. Statická IP adresa na interním rozhraní <code>Ethernet1</code> je nastavena správně:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>hostname
+Get-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object IPAddress, PrefixLength</code></pre>
+      </div>
+      <p>Hostname je <code>SRV1-DC</code> a IP adresa je <code>192.168.X.10</code> s prefixem <code>24</code> (kde X je číslo vašeho pracoviště).</p>
+
+      <h3>2. AD DS role je nainstalovaná</h3>
+      <p>V <strong>Server Manageru</strong> na Dashboardu vidíte v seznamu rolí položky <strong>AD DS</strong> a <strong>DNS</strong> (obě zelené, bez chyb). V PowerShellu:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-WindowsFeature -Name AD-Domain-Services, DNS, RSAT-ADDS | Select-Object Name, InstallState</code></pre>
+      </div>
+      <p>Všechny komponenty mají stav <code>Installed</code>.</p>
+
+      <h3>3. Server je řadičem domény</h3>
+      <p>V <strong>Server Manager → Local Server</strong> je u položky <em>Domain</em> uvedeno <code>prijmeni.cyberschool.internal</code> (nikoliv <code>WORKGROUP</code>). V PowerShellu:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ADDomain | Select-Object Name, Forest, DomainMode</code></pre>
+      </div>
+      <p>Vrátí název domény odpovídající vašemu příjmení (např. <code>novak</code>), les <code>novak.cyberschool.internal</code> a funkční úroveň domény.</p>
+
+      <h3>4. SRV1-DC drží role FSMO a je Global Catalog</h3>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>netdom query fsmo
+Get-ADDomainController -Identity SRV1-DC | Select-Object Name, IsGlobalCatalog, OperationMasterRoles</code></pre>
+      </div>
+      <p>Příkaz <code>netdom query fsmo</code> vypíše u všech pěti rolí (Schema master, Domain naming master, PDC, RID pool manager, Infrastructure master) server <code>SRV1-DC.prijmeni.cyberschool.internal</code>. Vlastnost <code>IsGlobalCatalog</code> má hodnotu <code>True</code>.</p>
+
+      <h3>5. Nástroje pro správu domény fungují</h3>
+      <p>V <strong>Server Manager → Tools</strong> je dostupná položka <strong>Active Directory Users and Computers</strong> (ADUC) a po jejím otevření vidíte strukturu domény <code>prijmeni.cyberschool.internal</code> (výchozí kontejnery <code>Users</code>, <code>Computers</code>, <code>Domain Controllers</code>).</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ADOrganizationalUnit -Filter * | Select-Object Name, DistinguishedName
+Get-ADDomainController -Filter * | Select-Object Name, Site</code></pre>
+      </div>
+
+      <h3>6. Restart nic nerozbije a přihlášení funguje</h3>
+      <p>Po restartu serveru SRV1-DC proběhne přihlášení bez chyby jako <code>PRIJMENI\Administrator</code>, např. <code>NOVAK\Administrator</code> (nikoliv jako lokální účet). V PowerShellu:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>whoami
+Get-ADUser -Identity Administrator | Select-Object SamAccountName, UserPrincipalName, Enabled</code></pre>
+      </div>
+      <p>Výstup je ve tvaru <code>PRIJMENI\Administrator</code> a účet má <code>Enabled: True</code>. Všechny služby Active Directory i integrovaného DNS serveru běží bez červených chyb.</p>
+    </article>
+  </main>
+
+  <script>
+    function copySnippet(btn) {
+      const code = btn.closest('.code-block-wrapper').querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Zkopírováno!';
+        setTimeout(() => { btn.innerText = orig; }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -13,6 +13,17 @@ window.OPS_MODULES = [
     defaultVM: "SRV1-DC",
     tasksFile: "praxe/01/tasks.js",
     verifiedFile: "praxe/01/verified.json"
+  },
+  {
+    id: "02",
+    code: "M02",
+    title: "Modul 02: Active Directory Domain Services",
+    shortTitle: "Modul 02",
+    folder: "praxe/02",
+    vms: ["SRV1-DC"],
+    defaultVM: "SRV1-DC",
+    tasksFile: "praxe/02/tasks.js",
+    verifiedFile: "praxe/02/verified.json"
   }
 ];
 
@@ -22,5 +33,8 @@ window.OPS_MODULE_VERIFIED = {
     "SRV1-DC": true,
     "SRV2-FS": true,
     "PC1-WIN": true
+  },
+  "02": {
+    "SRV1-DC": false
   }
 };
