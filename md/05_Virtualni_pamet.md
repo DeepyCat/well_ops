@@ -16,6 +16,9 @@ Není to ale zadarmo – špatně použitá virtuální paměť může výrazně
 
 ## Demand Paging (stránkování na vyžádání)
 
+![Demand Paging a výpadek stránky Page Fault](img/virtual-memory-page-fault.svg)
+
+
 Místo nahrání **celého** programu do paměti při spuštění se stránky nahrávají **jen když jsou potřeba**. Stránky, ke kterým se program nikdy nedostane, se do paměti vůbec nenahrají.
 
 Systém je podobný [[swapping|swappingu]], ale místo přesunu **celého procesu** pracuje s jednotlivými **stránkami** – proto se nepoužívá termín "swapper", ale **pager** ("líný swapper", lazy swapper).

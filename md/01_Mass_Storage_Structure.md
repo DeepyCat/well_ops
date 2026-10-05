@@ -8,6 +8,9 @@ První komerční pevný disk byl **IBM 350 Disk Storage System** – 54 plotens
 
 ## Pevný disk (Hard Disk)
 
+![Fyzická geometrie pevného disku HDD](img/hdd-geometry.svg)
+
+
 Talíř (platter) je plochý kruhový disk (jako CD), obě strany pokryté magnetickým materiálem. Nad povrchem "létá" čtecí/zapisovací hlava, připevněná k rameni, které pohybuje všemi hlavami najednou.
 
 - **Track (stopa)** – kruhová dráha na talíři

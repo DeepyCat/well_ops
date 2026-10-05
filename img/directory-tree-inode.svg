@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300">
+  <rect width="640" height="300" fill="#16181d" rx="10"/>
+  <text x="320" y="28" text-anchor="middle" font-family="Segoe UI,Arial" font-size="15" fill="#a855f7" font-weight="bold">Struktura souborového systému: Adresářový strom &amp; Unix Inode</text>
+
+  <!-- Tree Structure on Left -->
+  <g transform="translate(30, 50)">
+    <rect width="250" height="225" rx="6" fill="#1e222b" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="125" y="24" text-anchor="middle" font-family="Arial" font-size="11" fill="#c084fc" font-weight="bold">Hierarchický strom (Tree Directory)</text>
+    
+    <!-- Tree Nodes -->
+    <rect x="95" y="40" width="60" height="24" rx="4" fill="#6b21a8"/><text x="125" y="56" text-anchor="middle" font-size="10" fill="#fff" font-weight="bold">/ (root)</text>
+    <line x1="125" y1="64" x2="65" y2="90" stroke="#a855f7" stroke-width="1.5"/>
+    <line x1="125" y1="64" x2="125" y2="90" stroke="#a855f7" stroke-width="1.5"/>
+    <line x1="125" y1="64" x2="185" y2="90" stroke="#a855f7" stroke-width="1.5"/>
+
+    <rect x="35" y="90" width="60" height="22" rx="3" fill="#3b0764"/><text x="65" y="105" text-anchor="middle" font-size="9" fill="#e9d5ff">/home</text>
+    <rect x="95" y="90" width="60" height="22" rx="3" fill="#3b0764"/><text x="125" y="105" text-anchor="middle" font-size="9" fill="#e9d5ff">/etc</text>
+    <rect x="155" y="90" width="60" height="22" rx="3" fill="#3b0764"/><text x="185" y="105" text-anchor="middle" font-size="9" fill="#e9d5ff">/var</text>
+
+    <line x1="65" y1="112" x2="65" y2="135" stroke="#a855f7" stroke-width="1.5"/>
+    <rect x="30" y="135" width="70" height="22" rx="3" fill="#1e1b4b"/><text x="65" y="150" text-anchor="middle" font-size="9" fill="#c7d2fe">/user1</text>
+    
+    <line x1="65" y1="157" x2="65" y2="175" stroke="#a855f7" stroke-width="1.5"/>
+    <rect x="25" y="175" width="80" height="22" rx="3" fill="#065f46"/><text x="65" y="190" text-anchor="middle" font-size="8" fill="#a7f3d0">📄 data.txt</text>
+  </g>
+
+  <!-- Inode Structure on Right -->
+  <g transform="translate(310, 50)">
+    <rect width="300" height="225" rx="6" fill="#1e222b" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="150" y="24" text-anchor="middle" font-family="Arial" font-size="11" fill="#38bdf8" font-weight="bold">Struktura Unix Inode (Index Node)</text>
+    
+    <!-- Inode attributes -->
+    <rect x="15" y="40" width="120" height="165" rx="4" fill="#0f172a" stroke="#0284c7"/>
+    <text x="75" y="58" text-anchor="middle" font-family="Arial" font-size="9" fill="#38bdf8" font-weight="bold">Metadata souboru</text>
+    <text x="25" y="78" font-family="monospace" font-size="8" fill="#94a3b8">Typ &amp; Oprávnění</text>
+    <text x="25" y="96" font-family="monospace" font-size="8" fill="#94a3b8">Vlastník (UID/GID)</text>
+    <text x="25" y="114" font-family="monospace" font-size="8" fill="#94a3b8">Velikost (Size)</text>
+    <text x="25" y="132" font-family="monospace" font-size="8" fill="#94a3b8">Časové značky</text>
+    <text x="25" y="150" font-family="monospace" font-size="8" fill="#94a3b8">Počet odkazů</text>
+    <text x="25" y="175" font-family="monospace" font-size="8" fill="#38bdf8">Ukazatele na bloky</text>
+
+    <!-- Data Blocks -->
+    <rect x="155" y="40" width="130" height="40" rx="3" fill="#0369a1"/>
+    <text x="220" y="58" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">Přímé bloky (Direct)</text>
+    <text x="220" y="72" text-anchor="middle" font-size="7" fill="#bfdbfe">Ukazuje rovnou na data disku</text>
+
+    <rect x="155" y="90" width="130" height="45" rx="3" fill="#0f766e"/>
+    <text x="220" y="108" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">Nepřímý blok (Indirect)</text>
+    <text x="220" y="122" text-anchor="middle" font-size="7" fill="#99f6e4">Ukazuje na blok plný ukazatelů</text>
+
+    <rect x="155" y="145" width="130" height="60" rx="3" fill="#4338ca"/>
+    <text x="220" y="165" text-anchor="middle" font-size="8" fill="#fff" font-weight="bold">Dvojitý / Trojitý nepřímý</text>
+    <text x="220" y="180" text-anchor="middle" font-size="7" fill="#c7d2fe">Pro gigabajtové a terabajtové</text>
+    <text x="220" y="195" text-anchor="middle" font-size="7" fill="#c7d2fe">velikosti velkých souborů</text>
+  </g>
+</svg>

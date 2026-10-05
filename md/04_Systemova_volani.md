@@ -4,6 +4,9 @@ aliases: [System Calls, Systémová volání]
 
 # Systémová volání
 
+![Průběh systémového volání mezi User a Kernel módem](img/syscall-flow.svg)
+
+
 **[[systémové volání|Systémová volání]]** poskytují rozhraní ke službám operačního systému. Obvykle jsou dostupná jako funkce v jazyce C/C++, ale některé nízkoúrovňové úlohy (přímý přístup k hardwaru) je nutné psát v assembleru.
 
 ## Příklad – kopírování souboru

@@ -18,6 +18,9 @@ aliases: [Multitasking, Multithreading]
 
 ## Multitasking
 
+![Architektura paměti: Proces vs Vícevláknový proces](img/process-vs-thread.svg)
+
+
 Schopnost systému zdánlivě vykonávat víc úloh zároveň, přepínáním [[CPU]] mezi procesy po **časových kvantech**.
 
 - **Kooperativní multitasking** – proces sám dobrovolně předává řízení jinému procesu (starší přístup, riziko: nekorektní proces nikdy nepředá řízení a zablokuje celý systém)

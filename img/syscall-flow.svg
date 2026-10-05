@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="280" viewBox="0 0 620 280">
+  <rect width="620" height="280" fill="#16181d" rx="10"/>
+  <text x="310" y="28" text-anchor="middle" font-family="Segoe UI,Arial" font-size="15" fill="#f43f5e" font-weight="bold">Průběh systémového volání (System Call Flow)</text>
+  
+  <defs>
+    <marker id="scArr" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f43f5e"/></marker>
+    <marker id="scArrGreen" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#22c55e"/></marker>
+  </defs>
+
+  <!-- User Space -->
+  <rect x="30" y="50" width="560" height="90" rx="6" fill="#1e222b" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="50" y="70" font-family="Segoe UI,Arial" font-size="11" fill="#38bdf8" font-weight="bold">UŽIVATELSKÝ REŽIM (User Mode - Ring 3)</text>
+  <rect x="50" y="80" width="130" height="45" rx="4" fill="#0369a1"/>
+  <text x="115" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Uživatelská aplikace</text>
+  <text x="115" y="114" text-anchor="middle" font-family="Arial" font-size="9" fill="#bfdbfe">printf("Ahoj")</text>
+
+  <line x1="180" y1="102" x2="240" y2="102" stroke="#38bdf8" stroke-width="2"/>
+
+  <rect x="240" y="80" width="130" height="45" rx="4" fill="#0f172a" stroke="#38bdf8"/>
+  <text x="305" y="100" text-anchor="middle" font-family="Arial" font-size="10" fill="#38bdf8" font-weight="bold">Knihovna C (libc)</text>
+  <text x="305" y="114" text-anchor="middle" font-family="monospace" font-size="9" fill="#94a3b8">write(fd, buf, n)</text>
+
+  <!-- Transition Trap / Syscall -->
+  <line x1="305" y1="125" x2="305" y2="168" stroke="#f43f5e" stroke-width="3" marker-end="url(#scArr)"/>
+  <text x="380" y="152" text-anchor="middle" font-family="monospace" font-size="10" fill="#f43f5e" font-weight="bold">syscall / int 0x80 (Trap)</text>
+
+  <!-- Kernel Space -->
+  <rect x="30" y="170" width="560" height="95" rx="6" fill="#2a1215" stroke="#f43f5e" stroke-width="1.5"/>
+  <text x="50" y="190" font-family="Segoe UI,Arial" font-size="11" fill="#f43f5e" font-weight="bold">REŽIM JÁDRA (Kernel Mode - Ring 0)</text>
+
+  <rect x="50" y="200" width="150" height="50" rx="4" fill="#4c0519" stroke="#f43f5e"/>
+  <text x="125" y="222" text-anchor="middle" font-family="Arial" font-size="10" fill="#fda4af" font-weight="bold">System Call Handler</text>
+  <text x="125" y="238" text-anchor="middle" font-family="monospace" font-size="8" fill="#cbd5e1">sys_call_table[EAX]</text>
+
+  <line x1="200" y1="225" x2="250" y2="225" stroke="#f43f5e" stroke-width="2"/>
+
+  <rect x="250" y="200" width="150" height="50" rx="4" fill="#881337"/>
+  <text x="325" y="222" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Obsluha: sys_write()</text>
+  <text x="325" y="238" text-anchor="middle" font-family="Arial" font-size="8" fill="#fda4af">komunikace s hardwarem</text>
+
+  <!-- Return line -->
+  <path d="M 400 225 L 490 225 L 490 102 L 370 102" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#scArrGreen)"/>
+  <text x="535" y="160" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e">Návrat hodnoty<br/>do Ring 3</text>
+</svg>
