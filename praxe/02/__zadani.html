@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zadání: Modul 02 – Active Directory Domain Services (__zadani.md)</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --text-bright: #f0f6fc;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --accent-bg: rgba(56, 139, 253, 0.12);
+      --code-bg: #090d13;
+      --table-header: #1c2128;
+      --table-row-alt: #12161c;
+      --quote-border: #f59e0b;
+      --quote-bg: rgba(245, 158, 11, 0.08);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(22, 27, 34, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .nav-breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-bg);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #21262d;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #30363d;
+      border-color: #8b949e;
+      color: #fff;
+    }
+
+    .btn-primary {
+      background-color: #238636;
+      border-color: rgba(240, 246, 252, 0.1);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background-color: #2ea043;
+    }
+
+    /* Document Container */
+    .container {
+      max-width: 960px;
+      margin: 32px auto 80px auto;
+      padding: 0 24px;
+    }
+
+    .markdown-body {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid rgba(48, 54, 61, 0.6);
+      padding-bottom: 8px;
+      margin-top: 36px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+
+    p, ul, ol {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    ul, ol {
+      padding-left: 28px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    strong {
+      color: #fff;
+    }
+
+    blockquote {
+      margin: 18px 0;
+      padding: 12px 18px;
+      background: var(--quote-bg);
+      border-left: 4px solid var(--quote-border);
+      border-radius: 0 6px 6px 0;
+      color: #fde68a;
+      font-size: 0.95rem;
+    }
+
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background-color: rgba(110, 118, 129, 0.2);
+      color: #79c0ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(240, 246, 252, 0.05);
+    }
+
+    /* Tables */
+    .table-wrapper {
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--table-header);
+      color: var(--text-bright);
+      font-weight: 600;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: var(--table-row-alt);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Code blocks with copy */
+    .code-block-wrapper {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 14px 0 18px 0;
+      overflow: hidden;
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #161b22;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #e6edf3;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: inherit;
+    }
+
+    .copy-code-btn {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #c9d1d9;
+      font-size: 0.74rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .copy-code-btn:hover {
+      background: #30363d;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .markdown-body { padding: 20px 16px; }
+      .container { padding: 0 12px; margin-top: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-breadcrumb">
+      <a href="../../praxe.html?modul=02">Interaktivní lab</a>
+      <span>/</span>
+      <span>praxe</span>
+      <span>/</span>
+      <span>02</span>
+      <span>/</span>
+      <span class="file-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        __zadani.md
+      </span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="__reseni.html" class="btn btn-primary" title="Zobrazit vzorové ověření výsledku">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>Otevřít řešení (__reseni.md)</span>
+      </a>
+      <a href="../../praxe.html?modul=02" class="btn" title="Zpět do interaktivního portálu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Zpět do labu</span>
+      </a>
+      <a href="_zadani.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Raw .md</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Document Body -->
+  <main class="container">
+    <article class="markdown-body">
+      <h1>[Co má být na konci modulu a jak to vypadá?]</h1>
+
+      <blockquote>
+        <p><strong>Přibližný potřebný čas:</strong> 2 vyučovací hodiny &nbsp;|&nbsp; <strong>Verze:</strong> 2026-10-03</p>
+      </blockquote>
+
+      <h2>Kontext (proč to děláme)</h2>
+      <p>Paní učitelka <strong>Nováková</strong> má dost přihlašování na "univerzální" lokální účty typu <code>ucitel</code>/<code>ucitel</code>, které zná celá škola. Chce, aby každý žák a učitel měl <strong>svůj vlastní</strong> účet, který funguje na libovolném počítači ve škole. To je přesně to, co řeší <strong>Active Directory Domain Services (AD DS)</strong>.</p>
+
+      <h2>Předpoklad: server je připravený (Modul 01 — Příprava VM)</h2>
+      <p>Tento modul předpokládá, že server <strong>SRV1-DC</strong> už prošel přípravným modulem: má nainstalovaný Windows Server 2025 Datacenter (Desktop Experience), hostname <code>SRV1-DC</code>, statickou IP adresu <code>192.168.X.10/24</code> na rozhraní <code>Ethernet1</code>, funkční účet <code>Administrator</code> s heslem <code>Pa55w.rd</code> a hotovou lokalizaci. Pokud jste Modul 01 ještě nedokončili, vraťte se k němu nejprve.</p>
+
+      <h2>Cílový stav: Povýšení na řadič domény</h2>
+      <p>Server SRV1-DC bude mít nainstalovanou roli <strong>Active Directory Domain Services (AD DS)</strong> a bude povýšen na řadič nového lesa a domény <code>prijmeni.cyberschool.internal</code>.</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Parametr</th>
+              <th>Hodnota na SRV1-DC</th>
+              <th>Poznámka</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Role serveru</strong></td>
+              <td>Active Directory Domain Services (AD DS), DNS Server</td>
+              <td>Instaluje se včetně RSAT nástrojů pro správu</td>
+            </tr>
+            <tr>
+              <td><strong>Název domény (FQDN)</strong></td>
+              <td><code>prijmeni.cyberschool.internal</code></td>
+              <td>Vaše příjmení malými písmeny bez diakritiky (např. <code>novak.cyberschool.internal</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>NetBIOS jméno domény</strong></td>
+              <td><code>PRIJMENI</code></td>
+              <td>Odvozuje se automaticky velkými písmeny (např. <code>NOVAK</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>DSRM heslo</strong></td>
+              <td><code>Pa55w.rd</code></td>
+              <td>Heslo pro SafeModeAdministratorPassword (režim obnovení adresářových služeb)</td>
+            </tr>
+            <tr>
+              <td><strong>FSMO role</strong></td>
+              <td>Všech 5 rolí na <code>SRV1-DC</code></td>
+              <td>Schema Master, Domain Naming Master, PDC Emulator, RID Master, Infrastructure Master</td>
+            </tr>
+            <tr>
+              <td><strong>Global Catalog (GC)</strong></td>
+              <td><code>True</code></td>
+              <td>První řadič v doméně je automaticky globálním katalogem</td>
+            </tr>
+            <tr>
+              <td><strong>Přihlášení po restartu</strong></td>
+              <td><code>PRIJMENI\Administrator</code></td>
+              <td>Heslo zůstává standardní <code>Pa55w.rd</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul>
+        <li>Doména <code>prijmeni.cyberschool.internal</code> existuje a SRV1-DC je jejím primárním řadičem (Domain Controller).</li>
+        <li>Server zároveň funguje jako integrovaný DNS server pro tuto doménu (role DNS se konfiguruje automaticky spolu s AD DS).</li>
+        <li>Po dokončení instalace a automatickém restartu se přihlašujete jako <code>PRIJMENI\Administrator</code> (nebo <code>Administrator@prijmeni.cyberschool.internal</code>).</li>
+      </ul>
+
+      <h2>Instalace a povýšení v PowerShellu</h2>
+      <p>Krok 1: Instalace role AD DS s nástroji pro správu:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools</code></pre>
+      </div>
+
+      <p>Krok 2: Povýšení na řadič domény a vytvoření nového lesa (nahraďte <code>&lt;prijmeni&gt;</code> vaším příjmením, např. <code>novak</code>):</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$DomainName = "&lt;prijmeni&gt;.cyberschool.internal"
+$SecurePassword = ConvertTo-SecureString "Pa55w.rd" -AsPlainText -Force
+
+Install-ADDSForest -DomainName $DomainName -SafeModeAdministratorPassword $SecurePassword -InstallDns:$true -Force:$true</code></pre>
+      </div>
+
+      <h2>Ověření nástroji</h2>
+      <p>Na SRV1-DC jsou po restartu plně dostupné administrační nástroje pro správu domény:</p>
+      <ul>
+        <li><strong>Active Directory Users and Computers (ADUC)</strong> – správa uživatelů, skupin a organizačních jednotek.</li>
+        <li><strong>DNS Manager</strong> – správa primární dopředné zóny <code>prijmeni.cyberschool.internal</code>.</li>
+        <li><strong>Active Directory Administrative Center (ADAC)</strong> – moderní grafické rozhraní správy domény.</li>
+        <li><strong>Active Directory Domains and Trusts</strong> – správa důvěryhodností a funkčních úrovní lesa.</li>
+      </ul>
+    </article>
+  </main>
+
+  <script>
+    function copySnippet(btn) {
+      const code = btn.closest('.code-block-wrapper').querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Zkopírováno!';
+        setTimeout(() => { btn.innerText = orig; }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

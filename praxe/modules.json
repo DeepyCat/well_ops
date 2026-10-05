@@ -9,5 +9,16 @@
     "defaultVM": "SRV1-DC",
     "tasksFile": "praxe/01/tasks.js",
     "verifiedFile": "praxe/01/verified.json"
+  },
+  {
+    "id": "02",
+    "code": "M02",
+    "title": "Modul 02: Active Directory Domain Services",
+    "shortTitle": "Modul 02",
+    "folder": "praxe/02",
+    "vms": ["SRV1-DC"],
+    "defaultVM": "SRV1-DC",
+    "tasksFile": "praxe/02/tasks.js",
+    "verifiedFile": "praxe/02/verified.json"
   }
 ]
