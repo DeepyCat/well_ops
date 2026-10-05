@@ -13,6 +13,9 @@ Když víc procesů (vláken) přistupuje ke stejnému prostředku (paměť, sou
 
 ## Kritická sekce
 
+![Kritická sekce a Coffmanovy podmínky uváznutí Deadlock](img/critical-section-mutex.svg)
+
+
 **Kritická sekce (critical section)** je nejmenší část kódu, kde dochází k přístupu ke sdílenému prostředku, ke kterému nesmí přistupovat víc procesů/vláken zároveň. Programy usilující o vstup musí použít **synchronizační primitivum**, které zajistí exkluzivní přístup a konečnou dobu čekání.
 
 ### Tři podmínky řízení přístupu do kritické sekce

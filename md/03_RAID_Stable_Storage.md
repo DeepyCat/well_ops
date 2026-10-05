@@ -10,6 +10,9 @@ Disky jsou čím dál menší a levnější, takže je ekonomicky výhodné při
 
 ## Zlepšení spolehlivosti redundancí
 
+![Úrovně diskových polí RAID](img/raid-levels.svg)
+
+
 Pravděpodobnost poruchy **nějakého** disku z N disků je mnohem vyšší než porucha jednoho konkrétního disku. Příklad: střední doba do poruchy (MTTF) jednoho disku 100 000 hodin → u pole 100 disků klesne na 100 000/100 = 1000 hodin (~42 dní)!
 
 Řešení: **redundance** – uložit navíc informace, ze kterých lze při výpadku disku obnovit ztracená data.

@@ -12,6 +12,9 @@ Proces žádá o V/V systémovým voláním, které určuje: čtení/zápis, adr
 
 ### Algoritmy plánování disku
 
+![Algoritmy plánování pohybu diskové hlavy](img/disk-scheduling.svg)
+
+
 Příklad fronty požadavků na cylindry: **98, 183, 37, 122, 14, 124, 65, 67**, hlava startuje na cylindru **53**.
 
 | Algoritmus | Princip | Výsledek na příkladu |

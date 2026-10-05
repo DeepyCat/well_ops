@@ -6,6 +6,9 @@ aliases: [Správa paměti úvod, Memory Management úvod]
 
 ## Proč?
 
+![Paměťová hierarchie od registrů po cloud](img/memory-hierarchy.svg)
+
+
 **Ideál programátora:** paměť je nekonečně velká, rychlá, levná a persistentní (trvalá).
 
 **Realita:** paměť je hierarchie různých úrovní – [[registr|registry CPU]], malé množství rychlé [[cache]], grafická paměť, gigabajty [[RAM]], gigabajty až terabajty na [[HDD]]/[[SSD]], terabajty v cloudu. Čím rychlejší, tím menší a dražší.

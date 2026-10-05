@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="280" viewBox="0 0 620 280">
+  <rect width="620" height="280" fill="#16181d" rx="10"/>
+  <text x="310" y="28" text-anchor="middle" font-family="Segoe UI,Arial" font-size="15" fill="#fbbf24" font-weight="bold">Algoritmy plánování pohybu hlavy disku (Disk Scheduling)</text>
+
+  <!-- Comparison Bars -->
+  <g transform="translate(40, 55)">
+    <!-- FCFS -->
+    <rect width="540" height="55" rx="6" fill="#1e222b" stroke="#f43f5e" stroke-width="1"/>
+    <text x="15" y="22" font-family="Arial" font-size="11" fill="#f43f5e" font-weight="bold">FCFS (First-Come, First-Served)</text>
+    <text x="15" y="42" font-family="Arial" font-size="9" fill="#cbd5e1">Vyřizuje striktně v pořadí příchodu požadavků.</text>
+    <rect x="360" y="12" width="165" height="30" fill="#4c0519" rx="4"/>
+    <text x="442" y="31" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5" font-weight="bold">Velké přejíždění hlavy (640 cyl.)</text>
+  </g>
+
+  <g transform="translate(40, 120)">
+    <!-- SSTF -->
+    <rect width="540" height="55" rx="6" fill="#1e222b" stroke="#f59e0b" stroke-width="1"/>
+    <text x="15" y="22" font-family="Arial" font-size="11" fill="#f59e0b" font-weight="bold">SSTF (Shortest Seek Time First)</text>
+    <text x="15" y="42" font-family="Arial" font-size="9" fill="#cbd5e1">Vybírá požadavek s nejkratším posunem od aktuální polohy.</text>
+    <rect x="360" y="12" width="165" height="30" fill="#451a03" rx="4"/>
+    <text x="442" y="31" text-anchor="middle" font-family="Arial" font-size="9" fill="#fde68a" font-weight="bold">Rychlé (236 cyl.), hrozí vyhladovění</text>
+  </g>
+
+  <g transform="translate(40, 185)">
+    <!-- SCAN / Elevator -->
+    <rect width="540" height="55" rx="6" fill="#1e222b" stroke="#4ade80" stroke-width="1"/>
+    <text x="15" y="22" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">SCAN (Výtahový algoritmus / Elevator)</text>
+    <text x="15" y="42" font-family="Arial" font-size="9" fill="#cbd5e1">Hlava jede jedním směrem až na konec disku, pak se otočí zpět.</text>
+    <rect x="360" y="12" width="165" height="30" fill="#052e16" rx="4"/>
+    <text x="442" y="31" text-anchor="middle" font-family="Arial" font-size="9" fill="#86efac" font-weight="bold">Férový přístup, bez vyhladovění</text>
+  </g>
+
+  <text x="310" y="265" text-anchor="middle" font-family="Arial" font-size="9" fill="#94a3b8">Varianty: C-SCAN (kruhový SCAN s návratem na začátek) · LOOK / C-LOOK (otočení na posledním požadavku)</text>
+</svg>

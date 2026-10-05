@@ -15,6 +15,9 @@ aliases: [Interprocess Communication, IPC, Meziprocesová komunikace]
 
 ## Dva základní modely IPC
 
+![Modely meziprocesové komunikace IPC](img/ipc-models.svg)
+
+
 | Model | Princip |
 | :-- | :-- |
 | **Sdílená paměť** | oblast paměti sdílená spolupracujícími procesy, komunikace čtením/zápisem dat |

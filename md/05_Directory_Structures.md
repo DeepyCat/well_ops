@@ -10,6 +10,9 @@ Hledání souboru, vytvoření, smazání, výpis obsahu, přejmenování, průc
 
 ## Typy adresářové struktury
 
+![Adresářový strom a vnitřní struktura Unix Inode](img/directory-tree-inode.svg)
+
+
 ### Jednoúrovňový adresář (Single-Level)
 
 Všechny soubory v jednom adresáři. Jednoduché, ale **jména musí být unikátní** pro celý systém – nepraktické u víc uživatelů nebo velkého počtu souborů.
