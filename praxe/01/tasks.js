@@ -88,20 +88,20 @@ window.OPS_MODULE_TASKS["01"] = [
     what: () => {
       return `
         <p>Povyšte server <strong>SRV1-DC</strong> na první řadič domény (Domain Controller) a vytvořte nový kořenový les domény <code>&lt;prijmeni&gt;.cyberschool.internal</code>.</p>
-        <div style="background: rgba(56, 139, 253, 0.1); border: 1px solid rgba(56, 139, 253, 0.35); border-left: 4px solid #1f6feb; border-radius: 6px; padding: 10px 14px; margin: 12px 0; font-size: 0.88rem;">
-          <strong>Důležité:</strong> V proměnné <code>$DomainName</code> nahraďte zástupný text <code>&lt;prijmeni&gt;</code> vaším skutečným příjmením bez diakritiky, malými písmeny (např. <code>novak.cyberschool.internal</code>). DSRM heslo pro obnovení adresáře nastavte na standardní <code>Pa55w.rd</code>.<br>
+        <div style="background: rgba(255, 85, 85, 0.08); border: 1px solid rgba(255, 85, 85, 0.3); border-left: 4px solid #ff5555; border-radius: 6px; padding: 10px 14px; margin: 12px 0; font-size: 0.88rem;">
+          <strong>Důležité:</strong> V proměnné <code>$DomainName</code> nahraďte zástupný text <code>&lt;prijmeni&gt;</code> vaším skutečným příjmením bez diakritiky, malými písmeny (např. <code>pachomov.cyberschool.internal</code>). DSRM heslo pro obnovení adresáře nastavte na standardní <code>Pa55w.rd</code>.<br>
           <em>Po dokončení příkazu se server automaticky restartuje!</em>
         </div>
       `;
     },
     how: () => {
-      return `# 1. Zadejte název domény s vaším příjmením bez diakritiky (např. novak.cyberschool.internal):\n$DomainName = "<prijmeni>.cyberschool.internal"\n$SecurePassword = ConvertTo-SecureString "Pa55w.rd" -AsPlainText -Force\n\n# 2. Spusťte instalaci nového lesa a řadiče domény (po dokončení se server sám restartuje):\nInstall-ADDSForest -DomainName $DomainName -SafeModeAdministratorPassword $SecurePassword -InstallDns:$true -Force:$true`;
+      return `# 1. Zadejte název domény s vaším příjmením bez diakritiky (např. pachomov.cyberschool.internal):\n$DomainName = "<prijmeni>.cyberschool.internal"\n$SecurePassword = ConvertTo-SecureString "Pa55w.rd" -AsPlainText -Force\n\n# 2. Spusťte instalaci nového lesa a řadiče domény (po dokončení se server sám restartuje):\nInstall-ADDSForest -DomainName $DomainName -SafeModeAdministratorPassword $SecurePassword -InstallDns:$true -Force:$true`;
     },
     verify: () => {
       return `# Spusťte po restartu serveru a novém přihlášení:\nGet-ADDomain | Select-Object Name, Forest, DomainMode`;
     },
     expected: () => {
-      return `Name       Forest                          DomainMode\n----       ------                          ----------\n<prijmeni> <prijmeni>.cyberschool.internal Windows2016Forest`;
+      return `Name     Forest                         DomainMode\n----     ------                         ----------\npachomov pachomov.cyberschool.internal Windows2025Domain`;
     }
   },
   {
