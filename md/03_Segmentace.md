@@ -3,7 +3,7 @@ aliases: [Segmentation, Segmentace paměti]
 ---
 
 # Segmentace
-![Segmentace paměti — tabulka segmentů a fyzická paměť](../img/segmentace.svg)
+![Segmentace paměti — tabulka segmentů a fyzická paměť](img/segmentace.svg)
 
 
 Logický adresní prostor procesu je **kolekce segmentů** – každý má jméno a délku. Adresa se skládá ze **dvou složek**: čísla segmentu a offsetu (posunutí uvnitř segmentu). V praxi se segmenty číslují místo pojmenování: `<segment-number, offset>`.

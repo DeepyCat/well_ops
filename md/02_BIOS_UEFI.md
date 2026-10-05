@@ -21,7 +21,7 @@ Tyto tři vrstvy zaručují komunikaci mezi aplikací a OS napříč různým ha
 AMI BIOS, AWARD BIOS (fúzoval s Phoenixem), Phoenix BIOS.
 
 ## Start počítače a POST
-![Bootovací sekvence BIOS/UEFI](../img/bios-boot.svg)
+![Bootovací sekvence BIOS/UEFI](img/bios-boot.svg)
 
 
 1. **Inicializace** – BIOS projde sloty (PCI, PCIe, patice procesorů/pamětí), přečte z jejich ROM informace a vytvoří API. Data si uloží do CMOS (tzv. ESCD), aby to nemusel dělat při každém startu.
