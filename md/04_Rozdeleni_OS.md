@@ -41,6 +41,8 @@ Paměť je rozdělena na samostatné části (uzly), ke každému uzlu je samost
 - **Serverové OS** – nainstalovány na řídicích počítačích sítě, obsahují síťové služby ([[DNS]], [[DHCP]], DBMS, WEB, APP…), prostředky pro správu databáze uživatelů a klientů. Neslouží pro práci běžných uživatelů. Linux Server, Windows Server.
 
 ## Realtime OS
+![Typy jádra OS — Monolithic vs Microkernel](../img/kernel-types.svg)
+
 
 Operační systémy pracující téměř v reálném čase, se zaručenou maximální dobou reakce (v nejhorším případě) na zpracování požadavku. Používají se, kde jsou vysoké požadavky na interaktivitu – řízení letadel, laboratoří, elektráren, automobilový průmysl.
 

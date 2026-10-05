@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="300" viewBox="0 0 620 300">
+  <rect width="620" height="300" fill="#1a1a1a" rx="10"/>
+  <text x="310" y="28" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Typy jádra OS</text>
+  <!-- MONOLITHIC left -->
+  <text x="145" y="55" text-anchor="middle" font-family="Arial" font-size="12" fill="#f87171" font-weight="bold">Monolitické jádro</text>
+  <!-- User space -->
+  <rect x="30" y="68" width="230" height="30" rx="4" fill="#2a1a1a" stroke="#888" stroke-width="1"/>
+  <text x="145" y="88" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">Aplikace (User Space)</text>
+  <!-- syscall arrow -->
+  <line x1="145" y1="98" x2="145" y2="112" stroke="#f87171" stroke-width="2" marker-end="url(#arr1)"/>
+  <defs><marker id="arr1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f87171"/></marker></defs>
+  <!-- Ring 0 big box monolithic -->
+  <rect x="30" y="112" width="230" height="130" rx="4" fill="#2a1111" stroke="#f87171" stroke-width="2"/>
+  <text x="145" y="130" text-anchor="middle" font-family="Arial" font-size="10" fill="#f87171" font-weight="bold">Ring 0 — Kernel</text>
+  <rect x="40" y="136" width="100" height="22" rx="3" fill="#3a1111" stroke="#f87171" stroke-width="1"/>
+  <text x="90" y="151" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">Scheduler</text>
+  <rect x="150" y="136" width="100" height="22" rx="3" fill="#3a1111" stroke="#f87171" stroke-width="1"/>
+  <text x="200" y="151" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">Správce paměti</text>
+  <rect x="40" y="166" width="100" height="22" rx="3" fill="#3a1111" stroke="#f87171" stroke-width="1"/>
+  <text x="90" y="181" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">Souborový systém</text>
+  <rect x="150" y="166" width="100" height="22" rx="3" fill="#3a1111" stroke="#f87171" stroke-width="1"/>
+  <text x="200" y="181" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">Ovladače (Drivers)</text>
+  <rect x="40" y="196" width="210" height="22" rx="3" fill="#3a1111" stroke="#f87171" stroke-width="1"/>
+  <text x="145" y="211" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">IPC · Síťový stack · Vše ostatní</text>
+  <text x="145" y="258" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">Hardware</text>
+  <text x="145" y="280" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">⚡ Rychlé, ale pád = pád celého systému</text>
+  <!-- Divider -->
+  <line x1="310" y1="45" x2="310" y2="285" stroke="#333" stroke-width="2" stroke-dasharray="6,4"/>
+  <!-- MICROKERNEL right -->
+  <text x="465" y="55" text-anchor="middle" font-family="Arial" font-size="12" fill="#4db8ff" font-weight="bold">Mikrokernel</text>
+  <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#4db8ff"/></marker></defs>
+  <!-- User space -->
+  <rect x="330" y="68" width="265" height="90" rx="4" fill="#1a2030" stroke="#4db8ff" stroke-width="1.5"/>
+  <text x="355" y="84" font-family="Arial" font-size="10" fill="#7dd3fc">User Space (Ring 3):</text>
+  <rect x="338" y="90" width="75" height="20" rx="3" fill="#1e3040" stroke="#3b82f6" stroke-width="1"/>
+  <text x="376" y="104" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">File Server</text>
+  <rect x="422" y="90" width="75" height="20" rx="3" fill="#1e3040" stroke="#3b82f6" stroke-width="1"/>
+  <text x="460" y="104" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">Device Driver</text>
+  <rect x="506" y="90" width="80" height="20" rx="3" fill="#1e3040" stroke="#3b82f6" stroke-width="1"/>
+  <text x="546" y="104" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">Aplikace</text>
+  <text x="338" y="148" font-family="Arial" font-size="9" fill="#555">IPC (zprávy)</text>
+  <line x1="460" y1="158" x2="460" y2="172" stroke="#4db8ff" stroke-width="1.5" marker-end="url(#arr2)"/>
+  <!-- Micro kernel small box -->
+  <rect x="330" y="172" width="265" height="60" rx="4" fill="#1a2a3a" stroke="#4db8ff" stroke-width="2"/>
+  <text x="465" y="190" text-anchor="middle" font-family="Arial" font-size="10" fill="#4db8ff" font-weight="bold">Ring 0 — Mikrokernel (minimální)</text>
+  <text x="465" y="208" text-anchor="middle" font-family="Arial" font-size="9" fill="#7dd3fc">Scheduler · IPC · Základní správa paměti</text>
+  <text x="465" y="258" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">Hardware</text>
+  <text x="465" y="280" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">🛡 Stabilnější, pád driveru ≠ pád systému</text>
+</svg>

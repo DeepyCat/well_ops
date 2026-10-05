@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="240" viewBox="0 0 540 240">
+  <rect width="540" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="270" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Segmentace paměti</text>
+  <defs><marker id="aSeg" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#fb923c"/></marker></defs>
+  <!-- Logical address -->
+  <rect x="20" y="55" width="140" height="40" rx="5" fill="#2a1a10" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="90" y="70" text-anchor="middle" font-family="monospace" font-size="10" fill="#fed7aa">Logická adresa</text>
+  <rect x="25" y="76" width="55" height="16" rx="2" fill="#3a2010"/>
+  <text x="52" y="88" text-anchor="middle" font-family="monospace" font-size="9" fill="#fb923c">s (segment)</text>
+  <rect x="83" y="76" width="74" height="16" rx="2" fill="#2a1808"/>
+  <text x="120" y="88" text-anchor="middle" font-family="monospace" font-size="9" fill="#fbbf24">d (offset)</text>
+  <!-- Arrow down to segment table -->
+  <line x1="52" y1="95" x2="52" y2="135" stroke="#fb923c" stroke-width="1.5" marker-end="url(#aSeg)"/>
+  <!-- Segment table -->
+  <rect x="20" y="135" width="155" height="85" rx="5" fill="#1e1510" stroke="#c2410c" stroke-width="1.5"/>
+  <text x="97" y="153" text-anchor="middle" font-family="Arial" font-size="10" fill="#fb923c" font-weight="bold">Tabulka segmentů</text>
+  <text x="30" y="168" font-family="monospace" font-size="9" fill="#fed7aa">Seg 0: báze=1400, limit=1000</text>
+  <text x="30" y="183" font-family="monospace" font-size="9" fill="#fed7aa">Seg 1: báze=6300, limit=400</text>
+  <text x="30" y="198" font-family="monospace" font-size="9" fill="#fed7aa">Seg 2: báze=4300, limit=400</text>
+  <text x="30" y="213" font-family="monospace" font-size="9" fill="#555">báze + d = fyzická adresa</text>
+  <!-- Arrow right to physical mem -->
+  <line x1="175" y1="177" x2="225" y2="177" stroke="#fb923c" stroke-width="1.5" marker-end="url(#aSeg)"/>
+  <!-- Physical memory -->
+  <rect x="225" y="55" width="100" height="170" rx="5" fill="#1a1a1a" stroke="#555" stroke-width="1"/>
+  <text x="275" y="72" text-anchor="middle" font-family="Arial" font-size="10" fill="#888" font-weight="bold">Fyzická paměť</text>
+  <rect x="229" y="78" width="92" height="28" rx="3" fill="#2a1a10" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="275" y="97" text-anchor="middle" font-family="Arial" font-size="9" fill="#fb923c">Seg 0: kód</text>
+  <rect x="229" y="110" width="92" height="20" rx="3" fill="#1a1a1a" stroke="#333"/>
+  <text x="275" y="124" text-anchor="middle" font-family="Arial" font-size="8" fill="#444">volno</text>
+  <rect x="229" y="135" width="92" height="20" rx="3" fill="#2a1a10" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="275" y="149" text-anchor="middle" font-family="Arial" font-size="9" fill="#fbbf24">Seg 2: data</text>
+  <rect x="229" y="160" width="92" height="18" rx="3" fill="#1a1a1a" stroke="#333"/>
+  <text x="275" y="173" text-anchor="middle" font-family="Arial" font-size="8" fill="#444">volno</text>
+  <rect x="229" y="183" width="92" height="20" rx="3" fill="#2a1a10" stroke="#fb923c" stroke-width="1.5"/>
+  <text x="275" y="197" text-anchor="middle" font-family="Arial" font-size="9" fill="#fbbf24">Seg 1: zásobník</text>
+  <!-- Comparison -->
+  <rect x="345" y="55" width="180" height="170" rx="8" fill="#1a1a1a" stroke="#333"/>
+  <text x="435" y="74" text-anchor="middle" font-family="Arial" font-size="10" fill="#888" font-weight="bold">Segmentace vs Stránkování</text>
+  <text x="355" y="93" font-family="Arial" font-size="9" fill="#fb923c" font-weight="bold">Segmentace</text>
+  <text x="355" y="108" font-family="Arial" font-size="8" fill="#888">✓ Odpovídá logice programu</text>
+  <text x="355" y="121" font-family="Arial" font-size="8" fill="#888">✓ Bez interní fragmentace</text>
+  <text x="355" y="134" font-family="Arial" font-size="8" fill="#888">✗ Externí fragmentace</text>
+  <text x="355" y="147" font-family="Arial" font-size="8" fill="#888">✗ Nutná kompakce</text>
+  <line x1="355" y1="158" x2="515" y2="158" stroke="#333" stroke-width="1"/>
+  <text x="355" y="172" font-family="Arial" font-size="9" fill="#a78bfa" font-weight="bold">Stránkování</text>
+  <text x="355" y="187" font-family="Arial" font-size="8" fill="#888">✓ Bez ext. fragmentace</text>
+  <text x="355" y="200" font-family="Arial" font-size="8" fill="#888">✓ Snadná správa</text>
+  <text x="355" y="213" font-family="Arial" font-size="8" fill="#888">✗ Interní fragmentace</text>
+</svg>

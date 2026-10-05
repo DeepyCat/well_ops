@@ -7,6 +7,8 @@ aliases: [Paging, Stránkování paměti]
 **[[stránkování|Stránkování]]** umožňuje nesouvislý adresní prostor procesu, stejně jako [[segmentace]] – ale na rozdíl od ní se nepotýká s externí fragmentací ani potřebou kompakce. Používá se ve většině dnešních OS – od mainframů po smartphony.
 
 ## Základní princip
+![Stránkování — překlad logické adresy na fyzickou](../img/paging.svg)
+
 
 - Fyzická paměť je rozdělena na bloky pevné velikosti – **rámce (frames)**
 - Logická paměť je rozdělena na bloky **stejné velikosti** – **stránky (pages)**
