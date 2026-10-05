@@ -317,6 +317,46 @@
             background: #16181d;
         }
 
+        /* Stylování interaktivních wiki-odkazů mezi tématy */
+        .wiki-link {
+            color: #60a5fa;
+            background: rgba(96, 165, 250, 0.12);
+            padding: 1px 7px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px dashed rgba(96, 165, 250, 0.6);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: inline-block;
+            margin: 0 1px;
+        }
+
+        .wiki-link:hover {
+            color: #ffffff;
+            background: rgba(37, 99, 235, 0.45);
+            border-bottom-style: solid;
+            border-color: #93c5fd;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+        }
+
+        .wiki-link::after {
+            content: " ↗";
+            font-size: 0.75em;
+            opacity: 0.7;
+        }
+
+        .content-box a:not(.wiki-link) {
+            color: #38bdf8;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .content-box a:not(.wiki-link):hover {
+            color: #7dd3fc;
+        }
+
         .nav-group {
             margin-bottom: 20px;
         }
@@ -435,12 +475,229 @@
     <script>
         let currentFilePath = '';
 
+        // Kompletní mapa wikilinků a klíčových pojmů na odpovídající .md soubory
+        const WIKI_MAP = {
+            // Přímé soubory
+            "01_mass_storage_structure": "md/01_Mass_Storage_Structure.md",
+            "01_process_concept": "md/01_Process_Concept.md",
+            "01_sprava_pameti_uvod": "md/01_Sprava_pameti_uvod.md",
+            "01_sprava_periferii_a_preruseni": "md/01_Sprava_periferii_a_preruseni.md",
+            "01_struktura_operacnich_systemu": "md/01_STRUKTURA_OPERAČNÍCH_SYSTÉMŮ (1).md",
+            "01_struktura_os": "md/01_STRUKTURA_OPERAČNÍCH_SYSTÉMŮ (1).md",
+            "01_vypocetni_system": "md/01_Vypocetni_system.md",
+            "02_bios_uefi": "md/02_BIOS_UEFI.md",
+            "02_co_je_to_operacni_system": "md/02_Co_je_to_operacni_system.md",
+            "02_disk_scheduling_management": "md/02_Disk_Scheduling_Management.md",
+            "02_hlavni_pamet": "md/02_Hlavni_pamet.md",
+            "02_process_scheduling": "md/02_Process_Scheduling.md",
+            "03_device_drivers": "md/03_Device_Drivers.md",
+            "03_funkce_os": "md/03_Funkce_OS.md",
+            "03_operations_on_processes": "md/03_Operations_on_Processes.md",
+            "03_raid_stable_storage": "md/03_RAID_Stable_Storage.md",
+            "03_segmentace": "md/03_Segmentace.md",
+            "04_file_concept_access": "md/04_File_Concept_Access.md",
+            "04_ipc": "md/04_IPC.md",
+            "04_rozdeleni_os": "md/04_Rozdeleni_OS.md",
+            "04_strankovani": "md/04_Strankovani.md",
+            "04_systemova_volani": "md/04_Systemova_volani.md",
+            "05_directory_structures": "md/05_Directory_Structures.md",
+            "05_historie_os": "md/05_Historie_OS.md",
+            "05_process_synchronisation": "md/05_Process_Synchronisation.md",
+            "05_souborove_systemy": "md/05_Souborove_systemy.md",
+            "05_virtualni_pamet": "md/05_Virtualni_pamet.md",
+            "06_cpu_scheduling": "md/06_CPU_Scheduling.md",
+            "06_file_system_implementation": "md/06_File_System_Implementation.md",
+            "06_zakladni_datove_struktury": "md/06_Zakladni_datove_struktury.md",
+            "07_multitasking_multithreading": "md/07_Multitasking_Multithreading.md",
+
+            // Klíčové pojmy (česky i anglicky)
+            "cpu": "md/01_Vypocetni_system.md",
+            "procesor": "md/01_Vypocetni_system.md",
+            "registr": "md/01_Vypocetni_system.md",
+            "registry": "md/01_Vypocetni_system.md",
+            "ciselne_soustavy": "md/01_Vypocetni_system.md",
+            "číselné soustavy": "md/01_Vypocetni_system.md",
+            "bootstrap": "md/01_Vypocetni_system.md",
+            "firmware": "md/01_Vypocetni_system.md",
+            "eeprom": "md/01_Vypocetni_system.md",
+            "rom": "md/01_Vypocetni_system.md",
+            "bios": "md/02_BIOS_UEFI.md",
+            "post": "md/02_BIOS_UEFI.md",
+            "operacni system": "md/02_Co_je_to_operacni_system.md",
+            "operační systém": "md/02_Co_je_to_operacni_system.md",
+            "kernel": "md/02_Co_je_to_operacni_system.md",
+            "jadro": "md/02_Co_je_to_operacni_system.md",
+            "jádro": "md/02_Co_je_to_operacni_system.md",
+            "gui": "md/03_Funkce_OS.md",
+            "cli": "md/03_Funkce_OS.md",
+            "api": "md/03_Funkce_OS.md",
+            "smp": "md/04_Rozdeleni_OS.md",
+            "asmp": "md/04_Rozdeleni_OS.md",
+            "numa": "md/04_Rozdeleni_OS.md",
+            "dns": "md/04_Rozdeleni_OS.md",
+            "dhcp": "md/04_Rozdeleni_OS.md",
+            "preruseni": "md/01_Sprava_periferii_a_preruseni.md",
+            "přerušení": "md/01_Sprava_periferii_a_preruseni.md",
+            "dma": "md/01_Sprava_periferii_a_preruseni.md",
+            "radic": "md/01_Sprava_periferii_a_preruseni.md",
+            "řadič": "md/01_Sprava_periferii_a_preruseni.md",
+            "port": "md/01_Sprava_periferii_a_preruseni.md",
+            "mmu": "md/01_Sprava_pameti_uvod.md",
+            "ram": "md/02_Hlavni_pamet.md",
+            "hlavni pamet": "md/02_Hlavni_pamet.md",
+            "hlavní paměť": "md/02_Hlavni_pamet.md",
+            "segmentace": "md/03_Segmentace.md",
+            "strankovani": "md/04_Strankovani.md",
+            "stránkování": "md/04_Strankovani.md",
+            "virtualni pamet": "md/05_Virtualni_pamet.md",
+            "virtuální paměť": "md/05_Virtualni_pamet.md",
+            "swapping": "md/05_Virtualni_pamet.md",
+            "hdd": "md/01_Mass_Storage_Structure.md",
+            "ssd": "md/01_Mass_Storage_Structure.md",
+            "rpm": "md/01_Mass_Storage_Structure.md",
+            "slc": "md/01_Mass_Storage_Structure.md",
+            "mlc": "md/01_Mass_Storage_Structure.md",
+            "disk scheduling": "md/02_Disk_Scheduling_Management.md",
+            "starvation": "md/02_Disk_Scheduling_Management.md",
+            "vyhladoveni": "md/02_Disk_Scheduling_Management.md",
+            "raid": "md/03_RAID_Stable_Storage.md",
+            "proces": "md/01_Process_Concept.md",
+            "procesy": "md/01_Process_Concept.md",
+            "pcb": "md/01_Process_Concept.md",
+            "zasobnik": "md/01_Process_Concept.md",
+            "zásobník": "md/01_Process_Concept.md",
+            "heap": "md/01_Process_Concept.md",
+            "prepnuti kontextu": "md/01_Process_Concept.md",
+            "přepnutí kontextu": "md/01_Process_Concept.md",
+            "planovani procesu": "md/02_Process_Scheduling.md",
+            "plánování procesů": "md/02_Process_Scheduling.md",
+            "fronta": "md/02_Process_Scheduling.md",
+            "pid": "md/03_Operations_on_Processes.md",
+            "ipc": "md/04_IPC.md",
+            "socket": "md/04_IPC.md",
+            "proces synchronizace": "md/05_Process_Synchronisation.md",
+            "synchronizace procesu": "md/05_Process_Synchronisation.md",
+            "synchronizace procesů": "md/05_Process_Synchronisation.md",
+            "kriticka sekce": "md/05_Process_Synchronisation.md",
+            "kritická sekce": "md/05_Process_Synchronisation.md",
+            "mutex": "md/05_Process_Synchronisation.md",
+            "semafor": "md/05_Process_Synchronisation.md",
+            "uvaznuti": "md/05_Process_Synchronisation.md",
+            "uváznutí": "md/05_Process_Synchronisation.md",
+            "deadlock": "md/05_Process_Synchronisation.md",
+            "cpu scheduling": "md/06_CPU_Scheduling.md",
+            "sjf": "md/06_CPU_Scheduling.md",
+            "fcfs": "md/06_CPU_Scheduling.md",
+            "round robin": "md/06_CPU_Scheduling.md",
+            "vlakno": "md/07_Multitasking_Multithreading.md",
+            "vlákno": "md/07_Multitasking_Multithreading.md",
+            "vlakna": "md/07_Multitasking_Multithreading.md",
+            "vlákna": "md/07_Multitasking_Multithreading.md",
+            "multitasking": "md/07_Multitasking_Multithreading.md",
+            "multithreading": "md/07_Multitasking_Multithreading.md",
+            "fcb": "md/04_File_Concept_Access.md",
+            "koncept souboru": "md/04_File_Concept_Access.md",
+            "adresarove struktury": "md/05_Directory_Structures.md",
+            "adresářové struktury": "md/05_Directory_Structures.md",
+            "zurnalovani": "md/05_Souborove_systemy.md",
+            "žurnálování": "md/05_Souborove_systemy.md",
+            "nfs": "md/05_Souborove_systemy.md",
+            "ext4": "md/05_Souborove_systemy.md",
+            "i-node": "md/06_File_System_Implementation.md",
+            "inode": "md/06_File_System_Implementation.md",
+            "systemove volani": "md/04_Systemova_volani.md",
+            "systémové volání": "md/04_Systemova_volani.md",
+            "posix": "md/04_Systemova_volani.md",
+            "spojovy seznam": "md/06_Zakladni_datove_struktury.md",
+            "spojový seznam": "md/06_Zakladni_datove_struktury.md",
+            "pole": "md/06_Zakladni_datove_struktury.md",
+            "hasovaci tabulka": "md/06_Zakladni_datove_struktury.md",
+            "hašovací tabulka": "md/06_Zakladni_datove_struktury.md",
+            "bst": "md/06_Zakladni_datove_struktury.md"
+        };
+
+        // Zpracování Obsidian wikilinků před předáním do marked.js
+        function processMarkdownWikilinks(rawMd) {
+            if (!rawMd) return '';
+
+            // 1. Odstranění chybějících vložených obrázků ![[...]]
+            let clean = rawMd.replace(/!\[\[([^\]]+)\]\]/g, '');
+
+            // 2. Převod [[Target|Label]] na interaktivní wiki odkaz
+            clean = clean.replace(/(?<!\!)\[\[([^\]|]+)\|([^\]]+)\]\]/g, function(match, target, label) {
+                return `<a href="javascript:void(0)" class="wiki-link" data-wiki="${target.trim()}" title="Přejít na téma: ${target.trim()}">${label.trim()}</a>`;
+            });
+
+            // 3. Převod [[Target]] na interaktivní wiki odkaz
+            clean = clean.replace(/(?<!\!)\[\[([^\]]+)\]\]/g, function(match, target) {
+                return `<a href="javascript:void(0)" class="wiki-link" data-wiki="${target.trim()}" title="Přejít na téma: ${target.trim()}">${target.trim()}</a>`;
+            });
+
+            return clean;
+        }
+
+        // Navigace na cílové téma z wikilinku nebo interního odkazu
+        function navigateToWikiTarget(target) {
+            if (!target) return;
+            let norm = target.toLowerCase().trim().replace(/\.md$/, '').replace(/^md\//, '');
+            let mappedFile = WIKI_MAP[norm];
+
+            // Pokud není přímo v mapě, zkusíme najít tlačítko v sidebaru odpovídající názvu
+            if (!mappedFile) {
+                let buttons = Array.from(document.querySelectorAll('sidebar button'));
+                let foundBtn = buttons.find(b => {
+                    let onclick = b.getAttribute('onclick') || '';
+                    return onclick.toLowerCase().includes(norm);
+                });
+                if (foundBtn) {
+                    foundBtn.click();
+                    return;
+                }
+            }
+
+            if (mappedFile) {
+                let foundBtn = Array.from(document.querySelectorAll('sidebar button')).find(b => {
+                    let onclick = b.getAttribute('onclick') || '';
+                    return onclick.includes(mappedFile.split('/').pop());
+                });
+                loadMarkdown(mappedFile, foundBtn);
+                if (foundBtn) {
+                    foundBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+                let mainElem = document.querySelector('main');
+                if (mainElem) mainElem.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                // Pokud téma nemá vlastní soubor, zkusíme jej vyhledat v postranním panelu
+                let searchInput = document.getElementById('mdSearchInput');
+                if (searchInput) {
+                    searchInput.value = target;
+                    filterMarkdownDocs();
+                    searchInput.focus();
+                }
+            }
+        }
+
         function loadMarkdown(filePath, btnElement) {
             currentFilePath = filePath;
 
+            // Aktualizace URL hash pro přímé sdílení a historii prohlížeče
+            let fileName = filePath.split('/').pop();
+            if (window.location.hash !== '#' + fileName) {
+                history.pushState(null, '', '#' + fileName);
+            }
+
             // Označení aktivního tlačítka v menu
             document.querySelectorAll('sidebar button').forEach(b => b.classList.remove('active'));
-            if(btnElement) btnElement.classList.add('active');
+            if (btnElement) {
+                btnElement.classList.add('active');
+            } else {
+                // Pokus najít tlačítko podle souboru
+                let matchBtn = Array.from(document.querySelectorAll('sidebar button')).find(b => {
+                    let onclick = b.getAttribute('onclick') || '';
+                    return onclick.includes(fileName);
+                });
+                if (matchBtn) matchBtn.classList.add('active');
+            }
 
             // Skrytí placeholderu a schování tlačítka během načítání
             document.getElementById('placeholderState').style.display = 'none';
@@ -453,16 +710,22 @@
                     return response.text();
                 })
                 .then(markdown => {
+                    // Předzpracování wikilinků a formátování
+                    let processed = processMarkdownWikilinks(markdown);
+
                     // Vykreslení markdownu pomocí knihovny Marked
-                    document.getElementById('markdownContent').innerHTML = marked.parse(markdown);
+                    document.getElementById('markdownContent').innerHTML = marked.parse(processed);
                     
                     // Nastavení a zobrazení tlačítka pro stažení až na konci obsahu
                     let downloadBtn = document.getElementById('downloadBtn');
-                    let fileName = filePath.split('/').pop();
                     downloadBtn.href = filePath;
                     downloadBtn.download = fileName;
                     downloadBtn.innerText = `📥 Stáhnout ${fileName}`;
                     document.getElementById('downloadContainer').style.display = 'block';
+
+                    // Posun na začátek stránky
+                    let mainElem = document.querySelector('main');
+                    if (mainElem) mainElem.scrollTop = 0;
                 })
                 .catch(err => {
                     document.getElementById('markdownContent').innerHTML = `
@@ -473,6 +736,37 @@
                     `;
                 });
         }
+
+        // Globální odchytávání kliknutí na odkazy uvnitř markdown obsahu
+        document.getElementById('markdownContent').addEventListener('click', function(e) {
+            let link = e.target.closest('a');
+            if (!link) return;
+
+            // Klik na wiki odkaz
+            let wikiTarget = link.getAttribute('data-wiki');
+            if (wikiTarget) {
+                e.preventDefault();
+                navigateToWikiTarget(wikiTarget);
+                return;
+            }
+
+            let href = link.getAttribute('href');
+            // Externí webové odkazy otevírat v novém okně
+            if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                return;
+            }
+
+            // Odkazy na jiné .md soubory načítat dynamicky
+            if (href && (href.endsWith('.md') || href.includes('.md#'))) {
+                e.preventDefault();
+                let cleanFile = href.split('#')[0].replace(/^(\.\.\/|\.\/)/, '');
+                if (!cleanFile.startsWith('md/')) cleanFile = 'md/' + cleanFile;
+                navigateToWikiTarget(cleanFile);
+                return;
+            }
+        });
 
         // Funkce pro živé vyhledávání / filtrování tlačítek podle názvu souboru
         function filterMarkdownDocs() {
@@ -499,6 +793,22 @@
                 group.style.display = hasVisibleItems ? "" : "none";
             });
         }
+
+        // Obsluha URL hashe při načtení a změně historie prohlížeče
+        function checkUrlHash() {
+            let hash = window.location.hash.replace(/^#/, '');
+            if (hash) {
+                let filePath = hash.startsWith('md/') ? hash : 'md/' + hash;
+                let foundBtn = Array.from(document.querySelectorAll('sidebar button')).find(b => {
+                    let onclick = b.getAttribute('onclick') || '';
+                    return onclick.includes(hash.split('/').pop());
+                });
+                loadMarkdown(filePath, foundBtn);
+            }
+        }
+
+        window.addEventListener('load', checkUrlHash);
+        window.addEventListener('popstate', checkUrlHash);
     </script>
 </body>
 </html>
