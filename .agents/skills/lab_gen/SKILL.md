@@ -16,9 +16,9 @@ Podrobná specifikace se nachází v hlavním souboru projektu: [lab_gen.md](../
 ### 1. Složka cvičení `praxe/XX/`
 Vytvořit složku `praxe/XX/` (např. `praxe/02/`):
 - `__zadani.md` a `_zadani.md` – textové zadání cvičení.
-- `__zadani.html` a `_zadani.html` – stylizovaná HTML verze v GitHub dark-theme s kopírovacími tlačítky a SVG ikonami (žádné emoji!).
+- `__zadani.html` a `_zadani.html` – stylizovaná HTML verze sjednocená s OPS motivem (`#1a1a1a`, červená tlačítka `--accent: #ff5555`), kopírovacími tlačítky a SVG ikonami (žádné emoji!).
 - `_vysledek.md`, `__reseni.md` a `_reseni.md` – kontrolní seznam vzorového řešení bod po bodu.
-- `__reseni.html`, `_reseni.html` a `_vysledek.html` – stylizovaná HTML verze řešení.
+- `__reseni.html`, `_reseni.html` a `_vysledek.html` – stylizovaná HTML verze řešení v jednotném OPS motivu s červenými tlačítky.
 
 ### 2. Konfigurace ověření `praxe/XX/verified.json`
 Vytvořit soubor `praxe/XX/verified.json`, kde jsou pro nově vytvořený modul ve výchozím stavu všechny stroje nastaveny na `false` (dokud je uživatel v reálném labu fyzicky neotestuje):

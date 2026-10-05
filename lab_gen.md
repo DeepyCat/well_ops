@@ -26,9 +26,9 @@ Při zpracování nového modulu (např. `02`) AI **VŽDY** provede následujíc
 ### Krok 1: Vytvoření složky `praxe/XX/` a souborů zadání
 Vytvořte složku `praxe/XX/` (např. `praxe/02/`) a v ní:
 1. `__zadani.md` a jeho identické zrcadlo `_zadani.md` (Markdown zadání s kontextem, tabulkami parametrů a cílovým stavem).
-2. `__zadani.html` a `_zadani.html` (plnohodnotná, stylová HTML stránka v tmavém GitHub motivu s breadcrumbs, tlačítky pro kopírování kódů a SVG ikonami bez emoji).
+2. `__zadani.html` a `_zadani.html` (plnohodnotná, stylová HTML stránka sladěná s jednotným OPS tmavým tématem `#1a1a1a`, červenými tlačítky `--accent: #ff5555`, breadcrumbs, tlačítky pro kopírování kódů a SVG ikonami bez emoji).
 3. `_vysledek.md` a jeho identická zrcadla `__reseni.md` a `_reseni.md` (kontrolní seznam bod po bodu: jak se pozná, že je úkol splněný, s přesnými PowerShell testy a očekávanými výstupy).
-4. `__reseni.html`, `_reseni.html` a `_vysledek.html` (plnohodnotná HTML stránka vzorového řešení).
+4. `__reseni.html`, `_reseni.html` a `_vysledek.html` (plnohodnotná HTML stránka vzorového řešení v jednotném OPS tématu s červenými tlačítky).
 
 ### Krok 2: Vytvoření konfiguračního souboru `verified.json`
 Vytvořte `praxe/XX/verified.json`. **Ve výchozím stavu nastavte pro nově vytvořený modul všechny stroje na `false`** (protože ještě nebyly v reálném labu fyzicky otestovány):
