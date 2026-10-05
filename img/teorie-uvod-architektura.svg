@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="220" viewBox="0 0 800 220">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#1a2030"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="220" fill="url(#g1)"/>
+  <!-- Title -->
+  <text x="400" y="28" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="15" fill="#4db8ff" font-weight="bold" letter-spacing="2">ARCHITEKTURA OPERAČNÍHO SYSTÉMU</text>
+  <!-- Layers -->
+  <!-- User layer -->
+  <rect x="80" y="48" width="640" height="36" rx="5" fill="#1e2a3a" stroke="#4db8ff" stroke-width="1.5"/>
+  <text x="400" y="72" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#4db8ff">👤  UŽIVATEL  (User Space)</text>
+  <!-- Apps layer -->
+  <rect x="80" y="94" width="640" height="36" rx="5" fill="#1a2a20" stroke="#34d399" stroke-width="1.5"/>
+  <text x="400" y="118" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#34d399">📦  APLIKACE  (bash, GUI, Word, Firefox…)</text>
+  <!-- OS/Kernel layer -->
+  <rect x="80" y="140" width="640" height="36" rx="5" fill="#2a1a1a" stroke="#ff5555" stroke-width="1.5"/>
+  <text x="400" y="164" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#ff5555">⚙️  OS JÁDRO  (Scheduler, Memory Mgr, IPC, Drivers)</text>
+  <!-- Hardware layer -->
+  <rect x="80" y="186" width="640" height="28" rx="5" fill="#222" stroke="#888" stroke-width="1.5"/>
+  <text x="400" y="205" text-anchor="middle" font-family="Segoe UI,Arial" font-size="13" fill="#aaa">🖥️  HARDWARE  (CPU · RAM · Disk · I/O)</text>
+  <!-- Arrows left -->
+  <line x1="60" y1="62" x2="60" y2="200" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+  <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#444"/></marker></defs>
+  <text x="10" y="135" font-family="Arial" font-size="11" fill="#555" transform="rotate(-90,10,135)">Abstrakce</text>
+</svg>
