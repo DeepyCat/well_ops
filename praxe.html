@@ -77,10 +77,11 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: #161b22;
-      border: 1px solid #30363d;
+      background: linear-gradient(135deg, #241414 0%, #1f1212 100%);
+      border: 1px solid rgba(255, 85, 85, 0.45);
       border-radius: 6px;
       padding: 4px 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .module-selector-label {
@@ -89,15 +90,15 @@
       gap: 6px;
       font-size: 0.74rem;
       font-weight: 700;
-      color: #58a6ff;
+      color: var(--accent);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
 
     .module-select {
-      background: #0d1117;
-      color: #e6edf3;
-      border: 1px solid #30363d;
+      background: #160e0e;
+      color: #ffcccc;
+      border: 1px solid rgba(255, 85, 85, 0.5);
       border-radius: 4px;
       padding: 5px 10px;
       font-size: 0.85rem;
@@ -109,8 +110,14 @@
     }
 
     .module-select:hover, .module-select:focus {
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+      border-color: var(--accent-hover);
+      color: #ffffff;
+      box-shadow: 0 0 0 2px rgba(255, 85, 85, 0.3), 0 0 10px rgba(255, 85, 85, 0.25);
+    }
+
+    .module-select option {
+      background-color: #1a1111;
+      color: #ffffff;
     }
 
     header h1 {
