@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="404 - KERNEL PANIC: Adresa nenalezena v tabulce stránek.">
+    <link rel="icon" type="image/x-icon" href="img/bird.png">
+    <title>404: KERNEL PANIC | OPS</title>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --term-bg: #11141a;
+            --accent-red: #ff3344;
+            --accent-red-glow: rgba(255, 51, 68, 0.45);
+            --accent-cyan: #00f0ff;
+            --accent-cyan-glow: rgba(0, 240, 255, 0.35);
+            --accent-green: #00ff66;
+            --accent-green-glow: rgba(0, 255, 102, 0.35);
+            --accent-amber: #ffaa00;
+            --text-color: #d1d5db;
+            --text-dim: #6b7280;
+            --border-color: rgba(255, 255, 255, 0.12);
+            --font-mono: 'Consolas', 'Fira Code', 'Courier New', monospace;
+            --font-ui: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-ui);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            position: relative;
+            user-select: none;
+        }
+
+        /* Scanlines & CRT Overlay */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 4px, 6px 100%;
+            opacity: 0.85;
+        }
+
+        .crt-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.85), inset 0 0 40px rgba(255, 51, 68, 0.08);
+        }
+
+        /* Top Bar */
+        .status-header {
+            width: 100%;
+            max-width: 1000px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            z-index: 10;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-red);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent-red);
+            box-shadow: 0 0 10px var(--accent-red);
+            animation: pulse-red 1.2s infinite alternate;
+        }
+
+        @keyframes pulse-red {
+            0% { opacity: 0.4; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1.15); }
+        }
+
+        .audio-toggle-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .audio-toggle-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: 0 0 12px var(--accent-cyan-glow);
+        }
+
+        .audio-toggle-btn.active {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            box-shadow: 0 0 12px var(--accent-green-glow);
+        }
+
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Glitch Title Section */
+        .glitch-wrapper {
+            text-align: center;
+            margin: 10px 0 20px;
+            position: relative;
+        }
+
+        .glitch-404 {
+            font-family: var(--font-mono);
+            font-size: clamp(4.5rem, 12vw, 8.5rem);
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: #ffffff;
+            position: relative;
+            display: inline-block;
+            text-shadow: 
+                0 0 20px var(--accent-red-glow),
+                0 0 40px rgba(255, 51, 68, 0.2);
+        }
+
+        .glitch-404::before,
+        .glitch-404::after {
+            content: "404";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .glitch-404::before {
+            left: 3px;
+            text-shadow: -2px 0 var(--accent-cyan);
+            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        }
+
+        .glitch-404::after {
+            left: -3px;
+            text-shadow: -2px 0 var(--accent-red);
+            animation: glitch-anim-2 3.2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 70% 0); transform: skew(0.3deg); }
+            20% { clip-path: inset(60% 0 10% 0); transform: skew(-0.5deg); }
+            40% { clip-path: inset(10% 0 80% 0); transform: skew(0.8deg); }
+            60% { clip-path: inset(80% 0 5% 0); transform: skew(-0.2deg); }
+            80% { clip-path: inset(30% 0 40% 0); transform: skew(0.5deg); }
+            100% { clip-path: inset(50% 0 30% 0); transform: skew(-0.3deg); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(10% 0 85% 0); transform: skew(-0.6deg); }
+            20% { clip-path: inset(70% 0 15% 0); transform: skew(0.4deg); }
+            40% { clip-path: inset(30% 0 50% 0); transform: skew(-0.8deg); }
+            60% { clip-path: inset(15% 0 75% 0); transform: skew(0.2deg); }
+            80% { clip-path: inset(55% 0 25% 0); transform: skew(-0.4deg); }
+            100% { clip-path: inset(40% 0 45% 0); transform: skew(0.6deg); }
+        }
+
+        .panic-subtitle {
+            font-family: var(--font-mono);
+            color: var(--accent-red);
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: -10px;
+            text-shadow: 0 0 10px var(--accent-red-glow);
+        }
+
+        .panic-detail {
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        /* Navigation Buttons */
+        .nav-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin: 20px 0 28px;
+            width: 100%;
+        }
+
+        .action-btn {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        .action-btn-primary {
+            background: linear-gradient(135deg, rgba(255, 51, 68, 0.2) 0%, rgba(180, 20, 35, 0.4) 100%);
+            border: 1px solid var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(255, 51, 68, 0.25);
+        }
+
+        .action-btn-primary:hover {
+            background: linear-gradient(135deg, rgba(255, 51, 68, 0.45) 0%, rgba(220, 30, 50, 0.7) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(255, 51, 68, 0.45);
+            color: #ffffff;
+        }
+
+        .action-btn-secondary {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .action-btn-secondary:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--accent-cyan-glow);
+        }
+
+        /* Interactive Arcade Area */
+        .arcade-section {
+            width: 100%;
+            background: var(--term-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .terminal-header {
+            background: #181b22;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .term-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .term-dot.red { background: #ff5f56; }
+        .term-dot.yellow { background: #ffbd2e; }
+        .term-dot.green { background: #27c93f; }
+
+        .terminal-title {
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .terminal-title span.active-mode {
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .game-controls-hint {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+        }
+
+        /* Game Arena Canvas Container */
+        .game-arena {
+            position: relative;
+            width: 100%;
+            min-height: 380px;
+            background: #090a0d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        canvas#gameCanvas {
+            display: block;
+            width: 100%;
+            height: 380px;
+            cursor: crosshair;
+        }
+
+        /* CLI Terminal Mode Container */
+        .cli-terminal-container {
+            display: none;
+            width: 100%;
+            height: 380px;
+            padding: 16px;
+            background: #090a0d;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: #d1d5db;
+            text-align: left;
+            user-select: text;
+        }
+
+        .cli-terminal-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .cli-terminal-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .cli-output {
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+
+        .cli-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cli-prompt {
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        .cli-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            caret-color: var(--accent-cyan);
+        }
+
+        /* Canvas UI Overlay */
+        .canvas-overlay-ui {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            right: 14px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            z-index: 5;
+        }
+
+        .ui-score-box {
+            background: rgba(0, 0, 0, 0.65);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-cyan);
+        }
+
+        .ui-health-box {
+            background: rgba(0, 0, 0, 0.65);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-red);
+        }
+
+        /* Bottom Status & Refresh Note */
+        .footer-note {
+            margin-top: 24px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .footer-note kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .nav-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            canvas#gameCanvas,
+            .cli-terminal-container {
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="crt-overlay"></div>
+    <div class="crt-glow"></div>
+
+    <!-- Top Status Header -->
+    <header class="status-header">
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            <span>CRITICAL FAULT: 0x00000194</span>
+        </div>
+        <button id="audioToggle" class="audio-toggle-btn" title="Zapnout/Vypnout 8-bit syntetizované audio">
+            <span id="audioIcon">🔇</span>
+            <span id="audioLabel">AUDIO: MUTED</span>
+        </button>
+    </header>
+
+    <main class="container">
+        <!-- 404 Glitch & Panic Dump -->
+        <div class="glitch-wrapper">
+            <h1 class="glitch-404">404</h1>
+            <div class="panic-subtitle">KERNEL PANIC: PROCESS_TERMINATED</div>
+            <div class="panic-detail">
+                Faulting IP: <code>0x00000404</code> &bull; Signal: <code>SIGSEGV</code> &bull; Page fault in non-paged area: <code>URL_NOT_FOUND</code>
+            </div>
+        </div>
+
+        <!-- Safe Navigation Options -->
+        <nav class="nav-actions">
+            <a href="index.html" class="action-btn action-btn-primary">
+                <span>⚡</span> REBOOT TO SAFE MODE (Domů)
+            </a>
+            <a href="teorie.html" class="action-btn action-btn-secondary">
+                <span>📚</span> Knihovna Teorie (30 témat)
+            </a>
+            <a href="praxe.html" class="action-btn action-btn-secondary">
+                <span>🛠️</span> Praktická Cvičení (Moduly)
+            </a>
+        </nav>
+
+        <!-- Interactive Arcade Arena / Terminal -->
+        <section class="arcade-section">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <span class="term-dot red"></span>
+                    <span class="term-dot yellow"></span>
+                    <span class="term-dot green"></span>
+                </div>
+                <div class="terminal-title">
+                    SIMULATOR: <span id="gameModeTitle" class="active-mode">INITIALIZING...</span>
+                </div>
+                <div id="gameInstructions" class="game-controls-hint">
+                    Načítání...
+                </div>
+            </div>
+
+            <div class="game-arena">
+                <!-- Canvas UI overlay -->
+                <div id="canvasUiOverlay" class="canvas-overlay-ui" style="display: none;">
+                    <div id="uiScore" class="ui-score-box">SCORE: 0</div>
+                    <div id="uiHealth" class="ui-health-box">CPU/RAM: 100%</div>
+                </div>
+
+                <!-- Canvas for 2D Games -->
+                <canvas id="gameCanvas" width="950" height="380"></canvas>
+
+                <!-- Interactive CLI Terminal for Game 3 -->
+                <div id="cliTerminal" class="cli-terminal-container">
+                    <div id="cliHistory" class="cli-output"></div>
+                    <div class="cli-input-row">
+                        <span class="cli-prompt">root@well_ops:~$</span>
+                        <input type="text" id="cliInputField" class="cli-input" autocomplete="off" spellcheck="false" autofocus>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-note">
+            <div>💡 Při každém načtení stránky se náhodně vybere 1 ze 3 miniher. Zkus stisknout <kbd>F5</kbd> pro jinou!</div>
+            <div style="opacity: 0.7;">Hra 1: Process Hunter &bull; Hra 2: Deadlock Runner &bull; Hra 3: Interactive CLI Terminal</div>
+        </div>
+    </main>
+
+    <script>
+        /* =========================================================================
+           1. WEB AUDIO API - 8-BIT PROCEDURAL SOUND GENERATOR (ZERO ASSETS)
+           ========================================================================= */
+        const SoundFX = {
+            ctx: null,
+            enabled: false,
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            toggle() {
+                this.init();
+                this.enabled = !this.enabled;
+                return this.enabled;
+            },
+            playLaser() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.exponentialRampToValueAtTime(110, now + 0.15);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            },
+            playHit() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            },
+            playJump() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(580, now + 0.14);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.14);
+            },
+            playScore() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                osc.frequency.setValueAtTime(783.99, now + 0.16);
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.26);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.26);
+            },
+            playError() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.setValueAtTime(80, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            },
+            playBeep() {
+                if (!this.enabled || !this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                const now = this.ctx.currentTime;
+                osc.frequency.setValueAtTime(950, now);
+                gain.gain.setValueAtTime(0.06, now);
+                gain.gain.exponentialRampToValueAtTime(0.005, now + 0.05);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        };
+
+        // Audio toggle button event
+        const audioBtn = document.getElementById('audioToggle');
+        const audioIcon = document.getElementById('audioIcon');
+        const audioLabel = document.getElementById('audioLabel');
+        audioBtn.addEventListener('click', () => {
+            const isLive = SoundFX.toggle();
+            if (isLive) {
+                audioBtn.classList.add('active');
+                audioIcon.textContent = '🔊';
+                audioLabel.textContent = 'AUDIO: LIVE';
+                SoundFX.playBeep();
+            } else {
+                audioBtn.classList.remove('active');
+                audioIcon.textContent = '🔇';
+                audioLabel.textContent = 'AUDIO: MUTED';
+            }
+        });
+
+        /* =========================================================================
+           2. GAME SELECTOR & ROUTER (RANDOM SELECTION ON PAGE LOAD)
+           ========================================================================= */
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const overlayUi = document.getElementById('canvasUiOverlay');
+        const scoreUi = document.getElementById('uiScore');
+        const healthUi = document.getElementById('uiHealth');
+        const titleUi = document.getElementById('gameModeTitle');
+        const hintUi = document.getElementById('gameInstructions');
+        const cliContainer = document.getElementById('cliTerminal');
+
+        // Resize internal canvas to physical dimensions
+        function fitCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width || 950;
+            canvas.height = rect.height || 380;
+        }
+        window.addEventListener('resize', fitCanvas);
+        fitCanvas();
+
+        let activeAnimationId = null;
+
+        // Choose randomly between 1, 2, 3
+        const gameChoices = ['hunter', 'runner', 'terminal'];
+        const selectedGame = gameChoices[Math.floor(Math.random() * gameChoices.length)];
+
+        /* =========================================================================
+           3. GAME 1: PROCESS HUNTER (ARCADE DEFENDER)
+           ========================================================================= */
+        function initProcessHunter() {
+            titleUi.textContent = 'PROCESS HUNTER (Memory Defender)';
+            hintUi.innerHTML = 'Ovládání: <b>Pohyb myší/dotyk</b> = míření &bull; <b>Klik / Mezerník</b> = SIGKILL';
+            overlayUi.style.display = 'flex';
+            canvas.style.display = 'block';
+            cliContainer.style.display = 'none';
+
+            let score = 0;
+            let memory = 100;
+            let gameOver = false;
+            let mouseX = canvas.width / 2;
+            let mouseY = canvas.height - 40;
+
+            const bullets = [];
+            const enemies = [];
+            const powerups = [];
+            let lastSpawn = 0;
+
+            function spawnEnemy() {
+                const pids = ['PID:404', 'ZOMBIE', 'SEGFAULT', 'LEAK:0x9A', 'DEADLOCK', 'PANIC'];
+                enemies.push({
+                    x: 30 + Math.random() * (canvas.width - 60),
+                    y: -20,
+                    text: pids[Math.floor(Math.random() * pids.length)],
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: 1.2 + Math.random() * 1.5,
+                    radius: 24,
+                    hp: 1,
+                    isBoss: Math.random() < 0.15
+                });
+            }
+
+            function spawnRamPack() {
+                powerups.push({
+                    x: 30 + Math.random() * (canvas.width - 60),
+                    y: -20,
+                    vy: 1.0,
+                    radius: 16
+                });
+            }
+
+            function shoot() {
+                if (gameOver) {
+                    // Restart
+                    score = 0;
+                    memory = 100;
+                    enemies.length = 0;
+                    bullets.length = 0;
+                    powerups.length = 0;
+                    gameOver = false;
+                    scoreUi.textContent = 'SCORE: 0';
+                    healthUi.textContent = 'CPU/RAM: 100%';
+                    healthUi.style.color = 'var(--accent-red)';
+                    return;
+                }
+                bullets.push({
+                    x: mouseX,
+                    y: mouseY,
+                    vy: -8
+                });
+                SoundFX.playLaser();
+            }
+
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+
+            canvas.addEventListener('click', shoot);
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    shoot();
+                }
+            });
+
+            // Touch support
+            canvas.addEventListener('touchmove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                if (e.touches[0]) {
+                    mouseX = e.touches[0].clientX - rect.left;
+                    mouseY = e.touches[0].clientY - rect.top;
+                }
+            }, { passive: true });
+            canvas.addEventListener('touchstart', (e) => {
+                shoot();
+            }, { passive: true });
+
+            function loop(timestamp) {
+                ctx.fillStyle = '#090a0d';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Grid background effect
+                ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x < canvas.width; x += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+                for (let y = 0; y < canvas.height; y += 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+
+                if (!gameOver) {
+                    // Spawn logic
+                    if (timestamp - lastSpawn > 800) {
+                        spawnEnemy();
+                        if (Math.random() < 0.25) spawnRamPack();
+                        lastSpawn = timestamp;
+                    }
+
+                    // Update bullets
+                    for (let i = bullets.length - 1; i >= 0; i--) {
+                        const b = bullets[i];
+                        b.y += b.vy;
+                        ctx.fillStyle = '#00f0ff';
+                        ctx.shadowColor = '#00f0ff';
+                        ctx.shadowBlur = 8;
+                        ctx.fillRect(b.x - 2, b.y - 8, 4, 12);
+                        ctx.shadowBlur = 0;
+
+                        if (b.y < -10) bullets.splice(i, 1);
+                    }
+
+                    // Update powerups (RAM)
+                    for (let i = powerups.length - 1; i >= 0; i--) {
+                        const p = powerups[i];
+                        p.y += p.vy;
+
+                        ctx.fillStyle = 'rgba(0, 255, 102, 0.2)';
+                        ctx.strokeStyle = '#00ff66';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#00ff66';
+                        ctx.font = '10px Consolas, monospace';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('+RAM', p.x, p.y);
+
+                        // Check collision with player cursor
+                        const dx = p.x - mouseX;
+                        const dy = p.y - mouseY;
+                        if (Math.hypot(dx, dy) < p.radius + 15) {
+                            memory = Math.min(100, memory + 15);
+                            score += 50;
+                            healthUi.textContent = `CPU/RAM: ${Math.round(memory)}%`;
+                            scoreUi.textContent = `SCORE: ${score}`;
+                            SoundFX.playScore();
+                            powerups.splice(i, 1);
+                            continue;
+                        }
+
+                        if (p.y > canvas.height + 20) powerups.splice(i, 1);
+                    }
+
+                    // Update enemies
+                    for (let i = enemies.length - 1; i >= 0; i--) {
+                        const en = enemies[i];
+                        en.x += en.vx;
+                        en.y += en.vy;
+
+                        // Wall bounce
+                        if (en.x < 30 || en.x > canvas.width - 30) en.vx *= -1;
+
+                        // Draw Enemy Node
+                        ctx.fillStyle = en.isBoss ? 'rgba(255, 51, 68, 0.35)' : 'rgba(255, 51, 68, 0.15)';
+                        ctx.strokeStyle = '#ff3344';
+                        ctx.lineWidth = en.isBoss ? 2 : 1;
+                        ctx.beginPath();
+                        ctx.arc(en.x, en.y, en.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 11px Consolas, monospace';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(en.text, en.x, en.y);
+
+                        // Bullet hits enemy
+                        for (let j = bullets.length - 1; j >= 0; j--) {
+                            const b = bullets[j];
+                            if (Math.hypot(en.x - b.x, en.y - b.y) < en.radius + 4) {
+                                bullets.splice(j, 1);
+                                en.hp--;
+                                if (en.hp <= 0) {
+                                    score += en.isBoss ? 200 : 100;
+                                    scoreUi.textContent = `SCORE: ${score}`;
+                                    SoundFX.playHit();
+                                    enemies.splice(i, 1);
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Enemy reached bottom: Memory Leak!
+                        if (en.y > canvas.height + 15) {
+                            memory -= en.isBoss ? 25 : 12;
+                            SoundFX.playError();
+                            if (memory <= 0) {
+                                memory = 0;
+                                gameOver = true;
+                            }
+                            healthUi.textContent = `CPU/RAM: ${Math.round(memory)}%`;
+                            enemies.splice(i, 1);
+                        }
+                    }
+
+                    // Draw Player Cursor (CPU Core Cannon)
+                    ctx.save();
+                    ctx.translate(mouseX, mouseY);
+                    ctx.strokeStyle = '#00f0ff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 16, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Crosshair lines
+                    ctx.beginPath();
+                    ctx.moveTo(-24, 0); ctx.lineTo(-8, 0);
+                    ctx.moveTo(8, 0); ctx.lineTo(24, 0);
+                    ctx.moveTo(0, -24); ctx.lineTo(0, -8);
+                    ctx.moveTo(0, 8); ctx.lineTo(0, 24);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#00f0ff';
+                    ctx.font = '9px Consolas, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('CPU', 0, 4);
+                    ctx.restore();
+
+                } else {
+                    // Game Over Screen
+                    ctx.fillStyle = 'rgba(10, 0, 5, 0.85)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.fillStyle = '#ff3344';
+                    ctx.font = 'bold 28px Consolas, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('OUT OF MEMORY: KERNEL PANIC', canvas.width / 2, canvas.height / 2 - 20);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '16px Consolas, monospace';
+                    ctx.fillText(`KONEČNÉ SKÓRE: ${score} PIDs KILLED`, canvas.width / 2, canvas.height / 2 + 15);
+
+                    ctx.fillStyle = '#00f0ff';
+                    ctx.font = '14px Consolas, monospace';
+                    ctx.fillText('[ KLIKNI PRO NOVÝ POKUS ]', canvas.width / 2, canvas.height / 2 + 55);
+                }
+
+                activeAnimationId = requestAnimationFrame(loop);
+            }
+            activeAnimationId = requestAnimationFrame(loop);
+        }
+
+        /* =========================================================================
+           4. GAME 2: DEADLOCK RUNNER (OBSTACLE DODGING RUNNER)
+           ========================================================================= */
+        function initDeadlockRunner() {
+            titleUi.textContent = 'DEADLOCK RUNNER (Pipeline Avoidance)';
+            hintUi.innerHTML = 'Ovládání: <b>Mezerník / Šipka Nahoru / Klik</b> = Skok procesoru přes Mutexy';
+            overlayUi.style.display = 'flex';
+            canvas.style.display = 'block';
+            cliContainer.style.display = 'none';
+
+            let score = 0;
+            let distance = 0;
+            let gameOver = false;
+
+            const groundY = canvas.height - 50;
+            const player = {
+                x: 120,
+                y: groundY - 30,
+                w: 36,
+                h: 30,
+                vy: 0,
+                jumpPower: -10.5,
+                gravity: 0.45,
+                isGrounded: true
+            };
+
+            const obstacles = [];
+            let nextObstacleDist = 80;
+
+            function jump() {
+                if (gameOver) {
+                    // Restart
+                    score = 0;
+                    distance = 0;
+                    obstacles.length = 0;
+                    player.y = groundY - 30;
+                    player.vy = 0;
+                    player.isGrounded = true;
+                    gameOver = false;
+                    scoreUi.textContent = 'SCORE: 0';
+                    healthUi.textContent = 'STATUS: RUNNING';
+                    healthUi.style.color = 'var(--accent-green)';
+                    return;
+                }
+                if (player.isGrounded) {
+                    player.vy = player.jumpPower;
+                    player.isGrounded = false;
+                    SoundFX.playJump();
+                }
+            }
+
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' || e.code === 'ArrowUp') {
+                    e.preventDefault();
+                    jump();
+                }
+            });
+            canvas.addEventListener('click', jump);
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                jump();
+            }, { passive: false });
+
+            healthUi.textContent = 'STATUS: RUNNING';
+            healthUi.style.color = 'var(--accent-green)';
+
+            function loop() {
+                ctx.fillStyle = '#090a0d';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Pipeline Floor
+                ctx.strokeStyle = '#00f0ff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, groundY);
+                ctx.lineTo(canvas.width, groundY);
+                ctx.stroke();
+
+                // Floor tick marks (scrolling effect)
+                ctx.strokeStyle = 'rgba(0, 240, 255, 0.2)';
+                const tickOffset = (distance * 6) % 30;
+                for (let x = -tickOffset; x < canvas.width; x += 30) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, groundY);
+                    ctx.lineTo(x - 15, groundY + 20);
+                    ctx.stroke();
+                }
+
+                if (!gameOver) {
+                    distance += 1;
+                    score = Math.floor(distance * 1.5);
+                    scoreUi.textContent = `CYCLES: ${score}`;
+
+                    // Player physics
+                    player.vy += player.gravity;
+                    player.y += player.vy;
+                    if (player.y >= groundY - player.h) {
+                        player.y = groundY - player.h;
+                        player.vy = 0;
+                        player.isGrounded = true;
+                    }
+
+                    // Obstacle Spawning
+                    nextObstacleDist--;
+                    if (nextObstacleDist <= 0) {
+                        const obstacleTypes = [
+                            { name: 'MUTEX_LOCK', w: 26, h: 42, color: '#ff3344' },
+                            { name: 'DEADLOCK', w: 34, h: 54, color: '#ffaa00' },
+                            { name: 'PAGE_FAULT', w: 24, h: 36, color: '#ff3344' }
+                        ];
+                        const chosen = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+                        obstacles.push({
+                            x: canvas.width + 20,
+                            y: groundY - chosen.h,
+                            w: chosen.w,
+                            h: chosen.h,
+                            name: chosen.name,
+                            color: chosen.color
+                        });
+                        nextObstacleDist = 65 + Math.floor(Math.random() * 55);
+                    }
+
+                    // Move & Draw Obstacles
+                    for (let i = obstacles.length - 1; i >= 0; i--) {
+                        const ob = obstacles[i];
+                        ob.x -= 5.5;
+
+                        // Draw Obstacle (Mutex Barrier)
+                        ctx.fillStyle = ob.color + '33';
+                        ctx.strokeStyle = ob.color;
+                        ctx.lineWidth = 2;
+                        ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+                        ctx.strokeRect(ob.x, ob.y, ob.w, ob.h);
+
+                        // Icon / Label
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = '8px Consolas, monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('🔒', ob.x + ob.w / 2, ob.y + 14);
+                        ctx.fillText(ob.name.split('_')[0], ob.x + ob.w / 2, ob.y + ob.h - 6);
+
+                        // Collision Check
+                        if (
+                            player.x + player.w - 6 > ob.x &&
+                            player.x + 6 < ob.x + ob.w &&
+                            player.y + player.h > ob.y
+                        ) {
+                            gameOver = true;
+                            SoundFX.playError();
+                            healthUi.textContent = 'DEADLOCK!';
+                            healthUi.style.color = 'var(--accent-red)';
+                        }
+
+                        if (ob.x < -60) obstacles.splice(i, 1);
+                    }
+
+                    // Draw Player (Thread Packet)
+                    ctx.save();
+                    ctx.translate(player.x, player.y);
+                    ctx.fillStyle = 'rgba(0, 255, 102, 0.2)';
+                    ctx.strokeStyle = '#00ff66';
+                    ctx.lineWidth = 2;
+                    ctx.fillRect(0, 0, player.w, player.h);
+                    ctx.strokeRect(0, 0, player.w, player.h);
+
+                    ctx.fillStyle = '#00ff66';
+                    ctx.font = 'bold 10px Consolas, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('THREAD', player.w / 2, player.h / 2 + 3);
+
+                    // Jet flame if jumping
+                    if (!player.isGrounded) {
+                        ctx.fillStyle = '#ffaa00';
+                        ctx.fillRect(6, player.h, player.w - 12, 6);
+                    }
+                    ctx.restore();
+
+                } else {
+                    // Game Over Screen
+                    ctx.fillStyle = 'rgba(10, 0, 5, 0.85)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    ctx.fillStyle = '#ff3344';
+                    ctx.font = 'bold 28px Consolas, monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('DEADLOCK ENCOUNTERED!', canvas.width / 2, canvas.height / 2 - 20);
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = '16px Consolas, monospace';
+                    ctx.fillText(`UJETÁ VZDÁLENOST: ${score} CPU CYKLŮ`, canvas.width / 2, canvas.height / 2 + 15);
+
+                    ctx.fillStyle = '#00f0ff';
+                    ctx.font = '14px Consolas, monospace';
+                    ctx.fillText('[ STISKNI MEZERNÍK / KLIKNI PRO NOVÝ RUN ]', canvas.width / 2, canvas.height / 2 + 55);
+                }
+
+                activeAnimationId = requestAnimationFrame(loop);
+            }
+            activeAnimationId = requestAnimationFrame(loop);
+        }
+
+        /* =========================================================================
+           5. GAME 3: INTERACTIVE GLITCH CLI TERMINAL
+           ========================================================================= */
+        function initInteractiveTerminal() {
+            titleUi.textContent = 'KERNEL DEBUG CLI TERMINAL';
+            hintUi.innerHTML = 'Napiš <b>help</b> pro zobrazení dostupných příkazů nebo vyřeš havárii pomocí <b>kill -9 404</b>';
+            overlayUi.style.display = 'none';
+            canvas.style.display = 'none';
+            cliContainer.style.display = 'block';
+
+            const cliHistory = document.getElementById('cliHistory');
+            const cliInput = document.getElementById('cliInputField');
+
+            const welcomeMsg = 
+`[WELL_OPS KERNEL BOOT LOADER v4.04]
+[!] SYSTEM HALTED: Page fault occurred at physical frame 0x404
+[!] Signal received: SIGSEGV (Segmentation Fault)
+[!] 1 rogue zombie process detected blocking system bus.
+
+Zadejte 'help' pro seznam příkazů záchranné konzole.`;
+            cliHistory.textContent = welcomeMsg + '\n\n';
+
+            const commands = {
+                help: () => `Dostupné příkazy:
+  help           - Zobrazí tuto nápovědu
+  status         - Vypíše stav jádra a paměťových stránek
+  top / ps       - Seznam běžících procesů v systému
+  kill -9 404    - Nuceně ukončí poškozený proces a obnoví systém!
+  fix / recover  - Pokus o automatickou obnovu stránkovače
+  reboot         - Okamžitý restart do úvodního rozcestníku
+  teorie         - Přechod do Knihovny Teorie (30 kapitol)
+  praxe          - Přechod do Praktických Cvičení
+  matrix         - Spustí Matrix kód
+  cat hint.txt   - Zobrazí tajnou nápovědu
+  clear          - Vyčistí obrazovku terminálu`,
+
+                status: () => `--- KERNEL STATUS ---
+VRAM: OK
+RAM: 16384 MB (32% alokováno)
+MMU: FAULT - Stránka pro hledanou URL neexistuje v tabulce stránek!
+Process 404: STUCK v nekonečné smyčce
+Doporučení: Použijte 'kill -9 404' k odblokování sběrnice.`,
+
+                ps: () => `  PID TTY          TIME CMD
+    1 ?        00:00:02 init
+   42 ?        00:00:00 systemd-journal
+  137 ?        00:00:01 mmu_daemon
+  404 ?        00:13:37 [404_PAGE_NOT_FOUND] <defunct/zombie>
+  512 pts/0    00:00:00 bash`,
+
+                top: () => `Tasks: 5 total, 1 zombie, 1 running
+%Cpu(s): 98.4% sys,  1.6% idle
+KiB Mem : 16384000 total, 11452300 free, 4931700 used
+  PID USER      PR  NI    VIRT    RES  %CPU %MEM     TIME+ COMMAND
+  404 root      20   0  404000  40400  98.4  2.4  13:37.04 defunct_404`,
+
+                'cat hint.txt': () => `[TAJNÝ LOG ADMINISTRÁTORA]:
+Stránka, kterou hledáš, byla patrně přesunuta nebo smazána.
+Zkus napsat 'kill -9 404' pro simulaci opravy jádra!`,
+
+                matrix: () => `01001111 01010000 01010011 00100000 01010011 01011001 01010011 01010100 01000101 01001101
+THE MATRIX HAS YOU... SPOUSTIM SYSTÉM REBOOT SEKVENCI...`,
+
+                'kill -9 404': () => {
+                    SoundFX.playScore();
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2200);
+                    return `>>> ZASLÁN SIGNÁL SIGKILL NA PID 404...
+>>> PROCES USMRTSEN!
+>>> PAMĚŤ UVOLNĚNA. SYSTÉM JE STABILNÍ.
+>>> RESTARTUJI DO SAFE MODE ZA 2 SEKUNDY...`;
+                },
+
+                fix: () => {
+                    SoundFX.playScore();
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2200);
+                    return `>>> OBNOVOVÁNÍ TABULKY STRÁNEK MMU...
+>>> SYSTÉM OBNOVEN! PŘESMĚROVÁVÁM DO BEZPEČNÉHO REŽIMU...`;
+                },
+
+                reboot: () => {
+                    SoundFX.playBeep();
+                    window.location.href = 'index.html';
+                    return `Restartuji do safe mode...`;
+                },
+
+                teorie: () => {
+                    window.location.href = 'teorie.html';
+                    return `Otevírám teorii...`;
+                },
+
+                praxe: () => {
+                    window.location.href = 'praxe.html';
+                    return `Otevírám praxi...`;
+                },
+
+                clear: () => {
+                    cliHistory.textContent = '';
+                    return '';
+                }
+            };
+
+            cliInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const rawVal = cliInput.value.trim();
+                    const cmd = rawVal.toLowerCase();
+                    cliInput.value = '';
+
+                    SoundFX.playBeep();
+
+                    if (!cmd) return;
+
+                    let response = '';
+                    if (commands[cmd]) {
+                        response = commands[cmd]();
+                    } else if (commands[rawVal]) {
+                        response = commands[rawVal]();
+                    } else {
+                        SoundFX.playError();
+                        response = `bash: command not found: ${rawVal}. Zadej 'help' pro seznam příkazů.`;
+                    }
+
+                    if (cmd !== 'clear') {
+                        cliHistory.textContent += `root@well_ops:~$ ${rawVal}\n${response}\n\n`;
+                    }
+                    cliContainer.scrollTop = cliContainer.scrollHeight;
+                }
+            });
+
+            // Focus input on clicking anywhere in terminal container
+            cliContainer.addEventListener('click', () => {
+                cliInput.focus();
+            });
+        }
+
+        /* =========================================================================
+           6. INITIALIZE RANDOMLY CHOSEN GAME
+           ========================================================================= */
+        console.log(`[404 Engine] Selected Random Game Mode: ${selectedGame}`);
+
+        if (selectedGame === 'hunter') {
+            initProcessHunter();
+        } else if (selectedGame === 'runner') {
+            initDeadlockRunner();
+        } else if (selectedGame === 'terminal') {
+            initInteractiveTerminal();
+        }
+    </script>
+</body>
+</html>
