@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OPS - Games</title>
+    <link rel="stylesheet" href="style.cs">
+    <link rel="icon" type="image/x-icon" href="img/bird.png">
+    
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+</head>
+
+<style>
+    body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+    .landing-page {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    scroll-snap-align: start;
+}
+
+.choice-btn {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: white;
+    font-size: 2rem;
+    transition: flex 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.choice-btn::after {
+    content: attr(data-text);
+    font-size: 2.2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.35);
+    padding: 15px 30px;
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: transform 0.3s ease, background 0.3s ease;
+    text-align: center;
+}
+
+.choice-btn:hover {
+    flex: 1.4;
+    filter: brightness(1.25);
+    z-index: 10;
+}
+
+.choice-btn:hover::after {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.choice-btn:nth-child(1) { clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%); z-index: 4; }
+.choice-btn:nth-child(2) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 3; }
+.choice-btn:nth-child(3) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 2; }
+.choice-btn:nth-child(4) { clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%); margin-left: -3%; z-index: 1; }
+
+.choice-btn.rezero { background-image: url('gd/assets/juchelka.png'); background-position: 80% 50%; }
+.choice-btn.mushoku { background-image: url(''); background-position: 80% 50%; }
+.choice-btn.konosuba { background-image: url('img/konosuba-bg.jpg'); background-position: 80% 50%; }
+.choice-btn.yuri { background-image: url('img/yuri-bg.jpg'); background-position: 50% 50%; }
+</style>
+
+<body class="scroll-body">
+
+   <!--
+    <div class="scroll-nav">
+        <button onclick="scrollToSection(0)" title="Top Section">▲</button>
+        <button onclick="scrollToSection(1)" title="Bottom Section">▼</button>
+    </div>
+    -->
+    
+    <section class="landing-page" id="sec-0">
+        <a href="gd/index.html" class="choice-btn rezero" data-text="Juchelka dash"></a>
+        <a href="stratagem/index.html" class="choice-btn mushoku" data-text="Juchelka Hero"></a>
+        <a href="mc/index.html" class="choice-btn konosuba" data-text="JuchelkaCraft"></a>
+        <a href="statistika.html" class="choice-btn yuri" data-text="Statistiky"></a>
+    </section>
+
+    <!--
+    <section class="landing-page" id="sec-1">
+        <a href="helldivers.html" class="choice-btn helldivers" data-text="Helldivers"></a>
+        <a href="umamusume.html" class="choice-btn umamusume" data-text="Uma Musume"></a>
+        <a href="f1.html" class="choice-btn f1" data-text="Formula 1"></a>
+        <a href="custom.html" class="choice-btn custom" data-text="Reklama <3"></a>
+    </section>
+    -->
+    <script>
+        function scrollToSection(index) {
+            const sections = document.querySelectorAll('.landing-page');
+            if (sections[index]) {
+                sections[index].scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+</html>
