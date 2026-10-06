@@ -4,6 +4,8 @@ aliases: [Main Memory, Hlavní paměť, Souvislé přidělování paměti]
 
 # Hlavní paměť
 
+![Ochrana paměti — Base a Limit registry, překlad logické adresy](img/main-memory.svg)
+
 ## Základní hardware
 
 [[RAM|Hlavní paměť]] a [[registr|registry]] jsou jediné úložiště, ke kterému má [[CPU]] přímý přístup – instrukce mohou pracovat jen s adresami v paměti, ne s adresami na disku. Data, která CPU potřebuje, tam musí být nejdřív přenesena.

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="220" viewBox="0 0 500 220">
+  <rect width="500" height="220" fill="#1a1a1a" rx="10"/>
+  <text x="250" y="24" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Vrstvy výpočetního systému</text>
+
+  <!-- Uživatelé -->
+  <rect x="40" y="40" width="420" height="34" rx="6" fill="#2a2a2a" stroke="#888888" stroke-width="2"/>
+  <text x="250" y="62" text-anchor="middle" font-family="Arial" font-size="13" fill="#bbbbbb" font-weight="bold">👤 Uživatelé</text>
+
+  <!-- Arrow -->
+  <line x1="250" y1="74" x2="250" y2="84" stroke="#555" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Aplikační programy -->
+  <rect x="40" y="84" width="420" height="34" rx="6" fill="#1e1a10" stroke="#f97316" stroke-width="2"/>
+  <text x="250" y="106" text-anchor="middle" font-family="Arial" font-size="13" fill="#f97316" font-weight="bold">📦 Aplikační programy</text>
+
+  <!-- Arrow -->
+  <line x1="250" y1="118" x2="250" y2="128" stroke="#555" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Operační systém -->
+  <rect x="40" y="128" width="420" height="34" rx="6" fill="#101828" stroke="#3b82f6" stroke-width="2"/>
+  <text x="250" y="150" text-anchor="middle" font-family="Arial" font-size="13" fill="#3b82f6" font-weight="bold">⚙ Operační systém</text>
+
+  <!-- Arrow -->
+  <line x1="250" y1="162" x2="250" y2="172" stroke="#555" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Hardware -->
+  <rect x="40" y="172" width="420" height="34" rx="6" fill="#0c1525" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="250" y="186" text-anchor="middle" font-family="Arial" font-size="11" fill="#93c5fd" font-weight="bold">🔧 Hardware</text>
+  <text x="250" y="200" text-anchor="middle" font-family="Arial" font-size="9" fill="#60a5fa">CPU · RAM · I/O periferie</text>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="3" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 z" fill="#555"/>
+    </marker>
+  </defs>
+</svg>

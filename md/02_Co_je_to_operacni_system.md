@@ -4,6 +4,8 @@ aliases: [Co je to operační systém]
 
 # Co je to operační systém
 
+![Vrstvy výpočetního systému — Hardware, OS, Aplikace, Uživatelé](img/os-concept.svg)
+
 ## Základní pojmy
 
 - **Výpočetní systém** – stroj na zpracování dat, provádějící samočinně předem zadané operace. Například počítač.

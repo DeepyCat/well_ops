@@ -4,6 +4,8 @@ aliases: [Funkce operačního systému]
 
 # Funkce OS
 
+![Přehled funkcí operačního systému](img/os-functions.svg)
+
 ## Správa procesů
 
 - Evidence spuštěných [[proces|procesů]]

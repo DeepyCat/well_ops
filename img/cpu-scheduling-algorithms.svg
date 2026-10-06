@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="280" viewBox="0 0 620 280">
+  <rect width="620" height="280" fill="#1a1a1a" rx="10"/>
+  <text x="310" y="24" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Algoritmy plánování CPU — Ganttův diagram</text>
+
+  <!-- Legend -->
+  <rect x="14" y="34" width="12" height="10" rx="1" fill="#ef4444"/>
+  <text x="30" y="43" font-family="Arial" font-size="9" fill="#e0e0e0">P1 (24 ms)</text>
+  <rect x="90" y="34" width="12" height="10" rx="1" fill="#3b82f6"/>
+  <text x="106" y="43" font-family="Arial" font-size="9" fill="#e0e0e0">P2 (3 ms)</text>
+  <rect x="164" y="34" width="12" height="10" rx="1" fill="#22c55e"/>
+  <text x="180" y="43" font-family="Arial" font-size="9" fill="#e0e0e0">P3 (3 ms)</text>
+
+  <!-- Time axis label -->
+  <text x="560" y="43" font-family="Arial" font-size="9" fill="#555">čas (ms)</text>
+
+  <!-- ROW 1: FCFS -->
+  <text x="14" y="65" font-family="Arial" font-size="10" fill="#e0e0e0" font-weight="bold">FCFS</text>
+  <!-- P1: 0-24 → width proportional, scale: 1ms = 7px, start at x=70 -->
+  <!-- P1 24ms: 168px, P2 3ms: 21px, P3 3ms: 21px total=30ms=210px -->
+  <rect x="70" y="52" width="168" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="154" y="67" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">P1 — 24 ms</text>
+  <rect x="238" y="52" width="21" height="22" rx="2" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.2"/>
+  <text x="248" y="67" text-anchor="middle" font-family="Arial" font-size="7" fill="#93c5fd">P2</text>
+  <rect x="259" y="52" width="21" height="22" rx="2" fill="#14532d" stroke="#22c55e" stroke-width="1.2"/>
+  <text x="269" y="67" text-anchor="middle" font-family="Arial" font-size="7" fill="#86efac">P3</text>
+  <!-- tick marks -->
+  <line x1="70" y1="74" x2="70" y2="80" stroke="#555" stroke-width="1"/>
+  <text x="70" y="89" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">0</text>
+  <line x1="238" y1="74" x2="238" y2="80" stroke="#555" stroke-width="1"/>
+  <text x="238" y="89" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">24</text>
+  <line x1="259" y1="74" x2="259" y2="80" stroke="#555" stroke-width="1"/>
+  <text x="259" y="89" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">27</text>
+  <line x1="280" y1="74" x2="280" y2="80" stroke="#555" stroke-width="1"/>
+  <text x="280" y="89" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">30</text>
+  <text x="340" y="65" font-family="Arial" font-size="9" fill="#f97316">→ prům. čekání: 17 ms</text>
+  <text x="340" y="78" font-family="Arial" font-size="8" fill="#555">efekt konvoje: krátké procesy čekají za P1</text>
+
+  <!-- ROW 2: SJF -->
+  <text x="14" y="116" font-family="Arial" font-size="10" fill="#e0e0e0" font-weight="bold">SJF</text>
+  <rect x="70" y="103" width="21" height="22" rx="2" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.2"/>
+  <text x="80" y="118" text-anchor="middle" font-family="Arial" font-size="7" fill="#93c5fd">P2</text>
+  <rect x="91" y="103" width="21" height="22" rx="2" fill="#14532d" stroke="#22c55e" stroke-width="1.2"/>
+  <text x="101" y="118" text-anchor="middle" font-family="Arial" font-size="7" fill="#86efac">P3</text>
+  <rect x="112" y="103" width="168" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="196" y="118" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">P1 — 24 ms</text>
+  <!-- ticks -->
+  <line x1="70" y1="125" x2="70" y2="131" stroke="#555" stroke-width="1"/>
+  <text x="70" y="140" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">0</text>
+  <line x1="91" y1="125" x2="91" y2="131" stroke="#555" stroke-width="1"/>
+  <text x="91" y="140" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">3</text>
+  <line x1="112" y1="125" x2="112" y2="131" stroke="#555" stroke-width="1"/>
+  <text x="112" y="140" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">6</text>
+  <line x1="280" y1="125" x2="280" y2="131" stroke="#555" stroke-width="1"/>
+  <text x="280" y="140" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">30</text>
+  <text x="340" y="116" font-family="Arial" font-size="9" fill="#22c55e">→ prům. čekání: 3 ms ✓ optimální</text>
+  <text x="340" y="129" font-family="Arial" font-size="8" fill="#555">nejkratší job jde první</text>
+
+  <!-- ROW 3: RR q=4 -->
+  <text x="14" y="166" font-family="Arial" font-size="10" fill="#e0e0e0" font-weight="bold">RR q=4</text>
+  <!-- P1:4, P2:3, P3:3, P1:4, P1:4, P1:4, P1:4 = 4+3+3+4+4+4+4=26... scale: 4ms=21px, 3ms=16px -->
+  <!-- x=70 start, segments: P1(4)=21px, P2(3)=16px, P3(3)=16px, P1(4)=21, P1(4)=21, P1(4)=21, P1(4)=21 total=137px -->
+  <rect x="70" y="153" width="21" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="80" y="168" text-anchor="middle" font-family="Arial" font-size="7" fill="#fca5a5">P1</text>
+  <rect x="91" y="153" width="16" height="22" rx="2" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.2"/>
+  <text x="99" y="168" text-anchor="middle" font-family="Arial" font-size="7" fill="#93c5fd">P2</text>
+  <rect x="107" y="153" width="16" height="22" rx="2" fill="#14532d" stroke="#22c55e" stroke-width="1.2"/>
+  <text x="115" y="168" text-anchor="middle" font-family="Arial" font-size="7" fill="#86efac">P3</text>
+  <rect x="123" y="153" width="21" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="133" y="168" text-anchor="middle" font-family="Arial" font-size="7" fill="#fca5a5">P1</text>
+  <rect x="144" y="153" width="21" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="154" y="168" text-anchor="middle" font-family="Arial" font-size="7" fill="#fca5a5">P1</text>
+  <rect x="165" y="153" width="21" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="175" y="168" text-anchor="middle" font-family="Arial" font-size="7" fill="#fca5a5">P1</text>
+  <rect x="186" y="153" width="21" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="196" y="168" text-anchor="middle" font-family="Arial" font-size="7" fill="#fca5a5">P1</text>
+  <!-- ticks -->
+  <line x1="70" y1="175" x2="70" y2="181" stroke="#555" stroke-width="1"/>
+  <text x="70" y="190" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">0</text>
+  <line x1="207" y1="175" x2="207" y2="181" stroke="#555" stroke-width="1"/>
+  <text x="207" y="190" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">30</text>
+  <text x="340" y="166" font-family="Arial" font-size="9" fill="#f97316">→ prům. čekání: ~5,67 ms</text>
+  <text x="340" y="179" font-family="Arial" font-size="8" fill="#555">preemptivní, pro interaktivní systémy</text>
+
+  <!-- ROW 4: Priority -->
+  <text x="14" y="216" font-family="Arial" font-size="10" fill="#e0e0e0" font-weight="bold">Priority</text>
+  <!-- P3 prio=1 (3ms=21px), P1 prio=2 (24ms=168px), P2 prio=3 (3ms=21px) -->
+  <rect x="70" y="203" width="21" height="22" rx="2" fill="#14532d" stroke="#22c55e" stroke-width="1.2"/>
+  <text x="80" y="218" text-anchor="middle" font-family="Arial" font-size="7" fill="#86efac">P3 p=1</text>
+  <rect x="91" y="203" width="168" height="22" rx="2" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="175" y="218" text-anchor="middle" font-family="Arial" font-size="9" fill="#fca5a5">P1 — priorita=2</text>
+  <rect x="259" y="203" width="21" height="22" rx="2" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.2"/>
+  <text x="269" y="218" text-anchor="middle" font-family="Arial" font-size="7" fill="#93c5fd">P2 p=3</text>
+  <!-- ticks -->
+  <line x1="70" y1="225" x2="70" y2="231" stroke="#555" stroke-width="1"/>
+  <text x="70" y="240" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">0</text>
+  <line x1="280" y1="225" x2="280" y2="231" stroke="#555" stroke-width="1"/>
+  <text x="280" y="240" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">30</text>
+  <text x="340" y="214" font-family="Arial" font-size="9" fill="#f97316">→ nízká priorita = riziko hladovění</text>
+  <text x="340" y="227" font-family="Arial" font-size="8" fill="#555">řešení: aging (postupné zvyšování priority)</text>
+
+  <!-- horizontal separator lines between rows -->
+  <line x1="14" y1="96" x2="606" y2="96" stroke="#333" stroke-width="1"/>
+  <line x1="14" y1="147" x2="606" y2="147" stroke="#333" stroke-width="1"/>
+  <line x1="14" y1="198" x2="606" y2="198" stroke="#333" stroke-width="1"/>
+</svg>
