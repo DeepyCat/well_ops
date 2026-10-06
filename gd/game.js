@@ -5950,9 +5950,12 @@ class ps {
     const _0xf42f36 = h;
     if (_0x1872a7.textures.exists("juchelka")) {
       let _juchelka = _0x1872a7.add.image(_0xf42f36, _0x28689a, "juchelka");
-      let baseScale = 54 / Math.max(_juchelka.width, _juchelka.height);
-      _juchelka.setScale(baseScale);
-      _juchelka._baseScale = baseScale;
+      let baseScaleX = 54 / _juchelka.width;
+      let baseScaleY = 54 / _juchelka.height;
+      _juchelka.setScale(baseScaleX, baseScaleY);
+      _juchelka._baseScaleX = baseScaleX;
+      _juchelka._baseScaleY = baseScaleY;
+      _juchelka._baseScale = Math.min(baseScaleX, baseScaleY);
       _juchelka.setDepth(0xa);
       _juchelka.setVisible(true);
       this._playerSpriteLayer = {
