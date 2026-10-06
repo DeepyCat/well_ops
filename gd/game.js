@@ -238,6 +238,7 @@ class PreloadScene extends Phaser.Scene {
       this.load.image(_0x20ed8b, _0x4bca28);
     }
     this.load.image("juchelka", "assets/juchelka.png");
+    this.load.image("juchelka_logo", "assets/juchelka_logo.png");
     this.load.image("sliderBar", 'assets/sliderBar.png');
     this.load.image('square04_001', "assets/square04_001.png");
     this.load.image("GJ_square02", "assets/GJ_square02.png");
@@ -7534,7 +7535,13 @@ class GameScene extends Phaser.Scene {
     this._firstPlay = true;
     this._player.setCubeVisible(false);
     this._player.setShipVisible(false);
-    this._logo = this.add.image(0x0, 0x64, "GJ_WebSheet", "GJ_logo_001.png").setScrollFactor(0x0).setDepth(0x1e);
+    if (this.textures.exists("juchelka_logo")) {
+      this._logo = this.add.image(0x0, 0x64, "juchelka_logo").setScrollFactor(0x0).setDepth(0x1e);
+      const _logoScale = Math.min(850 / this._logo.width, 1.0);
+      this._logo.setScale(_logoScale);
+    } else {
+      this._logo = this.add.image(0x0, 0x64, "GJ_WebSheet", "GJ_logo_001.png").setScrollFactor(0x0).setDepth(0x1e);
+    }
     this._robLogo = this.add.image(0xa0, 0x22b, "GJ_WebSheet", 'RobTopLogoBig_001.png').setScrollFactor(0x0).setDepth(0x1e).setScale(0.9);
     this._copyrightText = this.add.text(0x0, 0x271, "© 2026 RobTop Games · geometrydash.com", {
       fontSize: "14px",
@@ -8205,7 +8212,7 @@ class GameScene extends Phaser.Scene {
     if (this._logo) {
       this.tweens.add({
         targets: this._logo,
-        y: -this._logo.height,
+        y: -(this._logo.displayHeight || this._logo.height),
         duration: 0x12c,
         ease: "Quad.In",
         onComplete: () => {
