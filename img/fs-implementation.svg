@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="280" viewBox="0 0 620 280">
+  <rect width="620" height="280" fill="#1a1a1a" rx="10"/>
+  <text x="310" y="24" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Struktura disku — MBR vs GPT a vnitřní struktura oddílu</text>
+
+  <!-- MBR side -->
+  <text x="152" y="46" text-anchor="middle" font-family="Arial" font-size="12" fill="#f97316" font-weight="bold">MBR</text>
+  <text x="152" y="58" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">max. 4 primární oddíly, limit 2 TiB</text>
+
+  <!-- MBR block -->
+  <rect x="14" y="64" width="276" height="28" rx="4" fill="#2a1400" stroke="#f97316" stroke-width="2"/>
+  <text x="152" y="76" text-anchor="middle" font-family="Arial" font-size="9" fill="#f97316" font-weight="bold">MBR (512 B) — Boot kód</text>
+  <text x="152" y="87" text-anchor="middle" font-family="Arial" font-size="8" fill="#fdba74">Partition Table (max 4 primární oddíly)</text>
+
+  <!-- MBR partitions -->
+  <rect x="14" y="100" width="80" height="36" rx="3" fill="#1e1000" stroke="#f97316" stroke-width="1.2"/>
+  <text x="54" y="115" text-anchor="middle" font-family="Arial" font-size="8" fill="#fdba74" font-weight="bold">Oddíl 1</text>
+  <text x="54" y="128" text-anchor="middle" font-family="Arial" font-size="7" fill="#555">VBR + FS</text>
+
+  <rect x="100" y="100" width="80" height="36" rx="3" fill="#1e1000" stroke="#f97316" stroke-width="1.2"/>
+  <text x="140" y="115" text-anchor="middle" font-family="Arial" font-size="8" fill="#fdba74" font-weight="bold">Oddíl 2</text>
+  <text x="140" y="128" text-anchor="middle" font-family="Arial" font-size="7" fill="#555">VBR + FS</text>
+
+  <rect x="186" y="100" width="104" height="36" rx="3" fill="#1e1000" stroke="#f97316" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="238" y="115" text-anchor="middle" font-family="Arial" font-size="8" fill="#fdba74" font-weight="bold">Extended</text>
+  <text x="238" y="128" text-anchor="middle" font-family="Arial" font-size="7" fill="#555">logické oddíly →</text>
+
+  <!-- GPT side -->
+  <text x="468" y="46" text-anchor="middle" font-family="Arial" font-size="12" fill="#3b82f6" font-weight="bold">GPT</text>
+  <text x="468" y="58" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">max. 128 oddílů, podpora &gt;2 TiB, UEFI</text>
+
+  <!-- GPT blocks -->
+  <rect x="330" y="64" width="276" height="20" rx="3" fill="#0f1a2e" stroke="#555" stroke-width="1.2"/>
+  <text x="468" y="78" text-anchor="middle" font-family="Arial" font-size="8" fill="#555">Protective MBR (zpětná kompatibilita)</text>
+
+  <rect x="330" y="86" width="276" height="20" rx="3" fill="#0f1a2e" stroke="#3b82f6" stroke-width="2"/>
+  <text x="468" y="100" text-anchor="middle" font-family="Arial" font-size="9" fill="#3b82f6" font-weight="bold">GPT Header (GUID, CRC32, záloha)</text>
+
+  <rect x="330" y="108" width="276" height="20" rx="3" fill="#0f1a2e" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="468" y="122" text-anchor="middle" font-family="Arial" font-size="8" fill="#7dd3fc">Partition Table (max 128 záznamů)</text>
+
+  <!-- GPT partition blocks -->
+  <rect x="330" y="130" width="50" height="20" rx="2" fill="#0d1e2e" stroke="#3b82f6" stroke-width="1"/>
+  <text x="355" y="144" text-anchor="middle" font-family="Arial" font-size="7" fill="#93c5fd">Odd. 1</text>
+  <rect x="382" y="130" width="50" height="20" rx="2" fill="#0d1e2e" stroke="#3b82f6" stroke-width="1"/>
+  <text x="407" y="144" text-anchor="middle" font-family="Arial" font-size="7" fill="#93c5fd">Odd. 2</text>
+  <rect x="434" y="130" width="50" height="20" rx="2" fill="#0d1e2e" stroke="#3b82f6" stroke-width="1"/>
+  <text x="459" y="144" text-anchor="middle" font-family="Arial" font-size="7" fill="#93c5fd">Odd. 3</text>
+  <text x="512" y="144" font-family="Arial" font-size="10" fill="#555">···</text>
+
+  <rect x="536" y="130" width="70" height="20" rx="2" fill="#0f1a2e" stroke="#555" stroke-width="1"/>
+  <text x="571" y="144" text-anchor="middle" font-family="Arial" font-size="7" fill="#555">Backup GPT</text>
+
+  <!-- Divider -->
+  <line x1="307" y1="44" x2="307" y2="170" stroke="#333" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Inside partition section (bottom, full width) -->
+  <text x="310" y="178" text-anchor="middle" font-family="Arial" font-size="10" fill="#22c55e" font-weight="bold">Vnitřní struktura oddílu (souborový systém)</text>
+
+  <!-- Partition internal blocks -->
+  <rect x="14" y="186" width="90" height="50" rx="4" fill="#0d1f0d" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="59" y="202" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e" font-weight="bold">Superblock</text>
+  <text x="59" y="215" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">metadata FS</text>
+  <text x="59" y="227" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">velikost, blok</text>
+
+  <rect x="112" y="186" width="90" height="50" rx="4" fill="#0d1f0d" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="157" y="202" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e" font-weight="bold">Free bitmap</text>
+  <text x="157" y="215" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">volné / obsazené</text>
+  <text x="157" y="227" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">bloky (1 bit / blok)</text>
+
+  <rect x="210" y="186" width="90" height="50" rx="4" fill="#0d1f0d" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="255" y="202" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e" font-weight="bold">i-node tabulka</text>
+  <text x="255" y="215" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">FCB každého souboru</text>
+  <text x="255" y="227" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">oprávnění, ukazatele</text>
+
+  <rect x="308" y="186" width="298" height="50" rx="4" fill="#0d1f0d" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="457" y="202" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e" font-weight="bold">Datové bloky</text>
+  <text x="457" y="215" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">skutečný obsah souborů a adresářů</text>
+  <text x="457" y="227" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">typicky 4 KB na blok · přímé / nepřímé bloky</text>
+
+  <!-- Separator above partition internals -->
+  <line x1="14" y1="175" x2="606" y2="175" stroke="#333" stroke-width="1"/>
+</svg>

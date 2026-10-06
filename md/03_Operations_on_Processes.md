@@ -4,6 +4,8 @@ aliases: [Operations on Processes, Operace s procesy]
 
 # Operace s procesy – vytváření a ukončování
 
+![Strom procesů — fork(), exec() a hierarchie PID](img/process-tree.svg)
+
 Procesy v systému mohou běžet souběžně a jsou dynamicky vytvářeny a mazány. Systém musí poskytovat mechanismus pro **vytváření a ukončování procesů**.
 
 ## Strom procesů

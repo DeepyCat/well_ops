@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="240" viewBox="0 0 560 240">
+  <defs>
+    <marker id="da" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3 z" fill="#aaa"/>
+    </marker>
+  </defs>
+  <rect width="560" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="22" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Architektura ovladačů zařízení</text>
+
+  <!-- Column headers -->
+  <text x="148" y="44" text-anchor="middle" font-family="Arial" font-size="12" fill="#22d3ee" font-weight="bold">🪟 Windows</text>
+  <text x="412" y="44" text-anchor="middle" font-family="Arial" font-size="12" fill="#f97316" font-weight="bold">🐧 Linux</text>
+
+  <!-- Divider -->
+  <line x1="280" y1="36" x2="280" y2="220" stroke="#333" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- === WINDOWS COLUMN === -->
+  <!-- Application -->
+  <rect x="68" y="52" width="160" height="32" rx="5" fill="#1e2a2a" stroke="#22d3ee" stroke-width="1.5"/>
+  <text x="148" y="68" text-anchor="middle" font-family="Arial" font-size="10" fill="#22d3ee" font-weight="bold">Aplikace (User mode)</text>
+  <text x="148" y="79" text-anchor="middle" font-family="Arial" font-size="8" fill="#67e8f9">Win32 API</text>
+
+  <!-- Arrow -->
+  <line x1="148" y1="84" x2="148" y2="100" stroke="#aaa" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- WDM/KMDF Driver -->
+  <rect x="68" y="100" width="160" height="34" rx="5" fill="#0d1a2a" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="148" y="115" text-anchor="middle" font-family="Arial" font-size="10" fill="#3b82f6" font-weight="bold">WDM / KMDF Driver</text>
+  <text x="148" y="127" text-anchor="middle" font-family="Arial" font-size="8" fill="#7dd3fc">Kernel-mode ovladač</text>
+
+  <!-- Arrow -->
+  <line x1="148" y1="134" x2="148" y2="150" stroke="#aaa" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- HW Controller -->
+  <rect x="68" y="150" width="160" height="28" rx="5" fill="#1a1a1a" stroke="#888" stroke-width="1.5"/>
+  <text x="148" y="168" text-anchor="middle" font-family="Arial" font-size="10" fill="#aaa" font-weight="bold">Hardware Controller</text>
+
+  <!-- Arrow -->
+  <line x1="148" y1="178" x2="148" y2="192" stroke="#aaa" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- Device -->
+  <rect x="68" y="192" width="160" height="26" rx="5" fill="#111" stroke="#666" stroke-width="1.5"/>
+  <text x="148" y="209" text-anchor="middle" font-family="Arial" font-size="10" fill="#888">📦 Fyzické zařízení</text>
+
+  <!-- === LINUX COLUMN === -->
+  <!-- Application -->
+  <rect x="332" y="52" width="160" height="32" rx="5" fill="#2a1a10" stroke="#f97316" stroke-width="1.5"/>
+  <text x="412" y="68" text-anchor="middle" font-family="Arial" font-size="10" fill="#f97316" font-weight="bold">Aplikace (User mode)</text>
+  <text x="412" y="79" text-anchor="middle" font-family="Arial" font-size="8" fill="#fdba74">POSIX / syscall</text>
+
+  <!-- Arrow -->
+  <line x1="412" y1="84" x2="412" y2="100" stroke="#aaa" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- Kernel Module -->
+  <rect x="332" y="100" width="160" height="34" rx="5" fill="#0d1a2a" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="412" y="115" text-anchor="middle" font-family="Arial" font-size="10" fill="#3b82f6" font-weight="bold">Kernel Module (.ko)</text>
+  <text x="412" y="127" text-anchor="middle" font-family="Arial" font-size="8" fill="#7dd3fc">integrovaný / proprietární</text>
+
+  <!-- Arrow -->
+  <line x1="412" y1="134" x2="412" y2="150" stroke="#aaa" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- HW Controller -->
+  <rect x="332" y="150" width="160" height="28" rx="5" fill="#1a1a1a" stroke="#888" stroke-width="1.5"/>
+  <text x="412" y="168" text-anchor="middle" font-family="Arial" font-size="10" fill="#aaa" font-weight="bold">Hardware Controller</text>
+
+  <!-- Arrow -->
+  <line x1="412" y1="178" x2="412" y2="192" stroke="#aaa" stroke-width="1.5" marker-end="url(#da)"/>
+
+  <!-- Device -->
+  <rect x="332" y="192" width="160" height="26" rx="5" fill="#111" stroke="#666" stroke-width="1.5"/>
+  <text x="412" y="209" text-anchor="middle" font-family="Arial" font-size="10" fill="#888">📦 Fyzické zařízení</text>
+
+  <!-- OS Kernel spanning banner -->
+  <rect x="68" y="95" width="424" height="44" rx="4" fill="none" stroke="#1d4ed8" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="520" y="120" text-anchor="end" font-family="Arial" font-size="8" fill="#1d4ed8">OS Kernel</text>
+</svg>

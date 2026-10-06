@@ -1,5 +1,7 @@
 # Device Drivers (ovladače zařízení)
 
+![Architektura ovladačů zařízení — Windows WDM vs Linux kernel moduly](img/device-drivers.svg)
+
 Aby hardware fungoval, potřebuje operační systém **ovladač** dodaný výrobcem. Windows i Linux to potřebují, ale řeší to jinak.
 
 ## Windows

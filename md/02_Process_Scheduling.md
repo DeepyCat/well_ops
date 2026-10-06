@@ -4,6 +4,8 @@ aliases: [Process Scheduling, Plánování procesů podrobně]
 
 # Plánování procesů (podrobně)
 
+![Plánovací fronty — Job Queue, Ready Queue a typy plánovačů](img/scheduling-queues.svg)
+
 Cíl **multiprogramování** – mít vždy nějaký proces běžící, maximalizovat využití CPU. Cíl **sdílení času (time sharing)** – přepínat procesor mezi procesy tak často, aby s nimi uživatel mohl interaktivně pracovat. **[[plánování procesů|Plánovač procesů]]** vybírá dostupný proces pro spuštění na CPU. Na jednoprocesorovém systému běží vždy nejvýš jeden proces, ostatní čekají.
 
 ## Plánovací fronty
