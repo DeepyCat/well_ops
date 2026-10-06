@@ -248,7 +248,7 @@ class PreloadScene extends Phaser.Scene {
     this.game.registry.set("selectedLevelId", _0x57faeb.id);
     this.game.registry.set("selectedSongKey", _0x57faeb.songKey);
     this.game.registry.set("selectedBgKey", Gn(_0x57faeb.id));
-    document.title = "Geometry Dash - " + _0x57faeb.name;
+    document.title = "Juchelka Dash - " + _0x57faeb.name;
     this.game.registry.set("requestedLevelPath", _0x4d7bd3);
     this.load.text("level_selected", _0x4d7bd3);
     this.load.text("level_1", "assets/1.txt");
@@ -7747,7 +7747,9 @@ class GameScene extends Phaser.Scene {
       _0x426993.setTexture("GJ_WebSheet", _0x23c9e5 ? 'toggleFullscreenOff_001.png' : "toggleFullscreenOn_001.png");
       this._toggleFullscreen();
     });
-    this._pauseContainer.add(this.add.bitmapText(_0x13af33, 0x41, 'bigFont', "Stereo Madness", 0x28).setOrigin(0.5, 0.5));
+    const _pauseTitleMeta = this.game.registry.get("selectedLevelMeta");
+    const _pauseTitle = (_pauseTitleMeta && _pauseTitleMeta.name) ? _pauseTitleMeta.name : "Stereo Madness";
+    this._pauseContainer.add(this.add.bitmapText(_0x13af33, 0x41, 'bigFont', _pauseTitle, 0x28).setOrigin(0.5, 0.5));
     const _0x46bab2 = this._bestPercent || 0x0;
     const _0x38b8d1 = this.add.image(_0x13af33, 0xaa, 'GJ_WebSheet', "GJ_progressBar_001.png").setTint(0x0).setAlpha(0.49019607843137253);
     this._pauseContainer.add(_0x38b8d1);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Geometry Dash | OPS</title>
+  <title>Juchelka Dash | OPS</title>
   <link rel="icon" type="image/x-icon" href="../img/bird.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -153,7 +153,7 @@
       showBootError('Unhandled rejection: ' + reason);
     });
 
-    // Max 10 levelu (1 az 10)
+    // Vsech 22 oficialnich levelu (odemceno)
     var LEVELS = [
       { id: 1, name: 'Stereo Madness', song: 'StereoMadness.mp3' },
       { id: 2, name: 'Back on Track', song: 'BackOnTrack.mp3' },
@@ -164,19 +164,31 @@
       { id: 7, name: 'Jumper', song: 'Jumper.mp3' },
       { id: 8, name: 'Time Machine', song: 'TimeMachine.mp3' },
       { id: 9, name: 'Cycles', song: 'Cycles.mp3' },
-      { id: 10, name: 'xStep', song: 'xStep.mp3' }
+      { id: 10, name: 'xStep', song: 'xStep.mp3' },
+      { id: 11, name: 'Clutterfunk', song: 'Clutterfunk.mp3' },
+      { id: 12, name: 'Theory of Everything', song: 'TheoryOfEverything.mp3' },
+      { id: 13, name: 'Electroman Adventures', song: 'Electroman.mp3' },
+      { id: 14, name: 'Clubstep', song: 'Clubstep.mp3' },
+      { id: 15, name: 'Electrodynamix', song: 'Electrodynamix.mp3' },
+      { id: 16, name: 'Hexagon Force', song: 'HexagonForce.mp3' },
+      { id: 17, name: 'Blast Processing', song: 'BlastProcessing.mp3' },
+      { id: 18, name: 'Theory of Everything 2', song: 'TheoryOfEverything2.mp3' },
+      { id: 19, name: 'Geometrical Dominator', song: 'GeometricalDominator.mp3' },
+      { id: 20, name: 'Deadlocked', song: 'Deadlocked.mp3' },
+      { id: 21, name: 'Fingerdash', song: 'Fingerdash.mp3' },
+      { id: 22, name: 'Dash', song: 'Dash.mp3' }
     ];
 
     function selectedLevelMeta() {
       var params = new URLSearchParams(window.location.search);
       var level = parseInt(params.get('level') || '1', 10);
-      if (!Number.isFinite(level) || level > 10) level = 1;
+      if (!Number.isFinite(level) || level > 22 || level < 1) level = 1;
       return LEVELS.find(function (entry) { return entry.id === level; }) || LEVELS[0];
     }
 
     function updateTitleFromQuery() {
       var meta = selectedLevelMeta();
-      document.title = 'Geometry Dash | ' + meta.name;
+      document.title = 'Juchelka Dash | ' + meta.name;
     }
 
     function mountLevelSelector() {
@@ -184,7 +196,7 @@
       var wrap = document.createElement('section');
       wrap.className = 'level-picker';
       wrap.innerHTML =
-        '<h2><span>🎮</span> Level Selector (1-10)</h2>' +
+        '<h2><span>🎮</span> Juchelka Dash (1-22)</h2>' +
         '<div class="row">' +
           '<select id="gdLevelSelect"></select>' +
           '<button id="gdLevelLoad" type="button">Hrát</button>' +
