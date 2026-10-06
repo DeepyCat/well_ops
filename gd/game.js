@@ -8,8 +8,6 @@ const y = "solid";
 const x = "hazard";
 const _ = "portal_fly";
 const w = "portal_cube";
-const Wn = "portal_wave";
-const MODE_WAVE = "wave";
 const Bn = "portal_gravity_flip";
 const kn = "portal_gravity_normal";
 const Tn = "speed_portal";
@@ -239,6 +237,7 @@ class PreloadScene extends Phaser.Scene {
       const _0x4bca28 = "assets/game_bg_" + String(_0x2a9be3).padStart(0x2, '0') + "_001.png";
       this.load.image(_0x20ed8b, _0x4bca28);
     }
+    this.load.image("juchelka", "assets/juchelka.png");
     this.load.image("sliderBar", 'assets/sliderBar.png');
     this.load.image('square04_001', "assets/square04_001.png");
     this.load.image("GJ_square02", "assets/GJ_square02.png");
@@ -373,7 +372,6 @@ class M {
     this.isJumping = false;
     this.gravityFlipped = false;
     this.isFlying = false;
-    this.isWave = false;
     this.wasBoosted = false;
     this.collideTop = 0x0;
     this.collideBottom = 0x0;
@@ -4019,22 +4017,6 @@ const OBJECT_DEFS = {
     portalParticle: true,
     portalParticleColor: 0x4dff00
   },
-  0x294: {
-    type: OBJ_PORTAL,
-    frame: "portal_04_front_001.png",
-    gridW: 0x1,
-    gridH: 0x3,
-    sub: MODE_WAVE,
-    portalParticle: true,
-    portalParticleColor: 0x00f0ff
-  },
-  0x295: {
-    type: OBJ_PORTAL,
-    frame: "portal_05_front_001.png",
-    gridW: 0x1,
-    gridH: 0x3,
-    sub: MODE_WAVE
-  },
   0xd: {
     type: OBJ_PORTAL,
     frame: "portal_04_front_001.png",
@@ -5432,8 +5414,6 @@ class us {
                 _0x25452a = _;
               } else if ('cube' === _0x24471f.sub) {
                 _0x25452a = w;
-              } else if ('wave' === _0x24471f.sub) {
-                _0x25452a = Wn;
               } else if ("gravity_flip" === _0x24471f.sub) {
                 _0x25452a = Bn;
               } else if ("gravity_normal" === _0x24471f.sub) {
@@ -5968,10 +5948,25 @@ class ps {
     const _0x1872a7 = this._scene;
     const _0x28689a = 0x1cc - this.p.y;
     const _0xf42f36 = h;
-    this._playerGlowLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, "player_01_glow_001.png", 0x9, false);
-    this._playerSpriteLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, 'player_01_001.png', 0xa, true);
-    this._playerOverlayLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, "player_01_2_001.png", 0x8, true);
-    this._playerExtraLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, "player_01_extra_001.png", 0xc, true);
+    if (_0x1872a7.textures.exists("juchelka")) {
+      let _juchelka = _0x1872a7.add.image(_0xf42f36, _0x28689a, "juchelka");
+      let baseScale = 54 / Math.max(_juchelka.width, _juchelka.height);
+      _juchelka.setScale(baseScale);
+      _juchelka._baseScale = baseScale;
+      _juchelka.setDepth(0xa);
+      _juchelka.setVisible(true);
+      this._playerSpriteLayer = {
+        sprite: _juchelka
+      };
+      this._playerGlowLayer = null;
+      this._playerOverlayLayer = null;
+      this._playerExtraLayer = null;
+    } else {
+      this._playerGlowLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, "player_01_glow_001.png", 0x9, false);
+      this._playerSpriteLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, 'player_01_001.png', 0xa, true);
+      this._playerOverlayLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, "player_01_2_001.png", 0x8, true);
+      this._playerExtraLayer = ds(_0x1872a7, _0xf42f36, _0x28689a, "player_01_extra_001.png", 0xc, true);
+    }
     if (this._playerGlowLayer) {
       this._playerGlowLayer.sprite.setTint(0xffff);
       this._playerGlowLayer.sprite._glowEnabled = false;
@@ -6020,22 +6015,11 @@ class ps {
     if (this._shipOverlayLayer) {
       this._shipOverlayLayer.sprite.setTint(0xffff);
     }
-    let _wavePoly = _0x1872a7.add.polygon(_0xf42f36, _0x28689a, [
-      { x: 22, y: 0 },
-      { x: -16, y: -15 },
-      { x: -6, y: 0 },
-      { x: -16, y: 15 }
-    ], 0x00f0ff);
-    _wavePoly.setStrokeStyle(2, 0xffffff);
-    _wavePoly.setDepth(0xb).setVisible(false);
-    this._waveSpriteLayer = { sprite: _wavePoly };
     this.playerSprite = this._playerSpriteLayer.sprite;
     this.shipSprite = this._shipSpriteLayer.sprite;
-    this.waveSprite = _wavePoly;
     this._playerLayers = [this._playerSpriteLayer, this._playerGlowLayer, this._playerOverlayLayer, this._playerExtraLayer];
     this._shipLayers = [this._shipSpriteLayer, this._shipGlowLayer, this._shipOverlayLayer, this._shipExtraLayer];
-    this._waveLayers = [this._waveSpriteLayer];
-    this._allLayers = [...this._playerLayers, ...this._shipLayers, ...this._waveLayers];
+    this._allLayers = [...this._playerLayers, ...this._shipLayers];
   }
   ['_initParticles'](_0x538533) {
     this._particleEmitter = _0x538533.add.particles(0x0, 0x0, "GJ_WebSheet", {
@@ -6281,67 +6265,7 @@ class ps {
       this._playerExtraLayer.sprite.setVisible(_0x411813);
     }
   }
-  ["setWaveVisible"](_0x1c5620) {
-    if (this._waveSpriteLayer && this._waveSpriteLayer.sprite) {
-      this._waveSpriteLayer.sprite.setVisible(_0x1c5620);
-    }
-  }
-  ["enterWaveMode"](_0xeb37c6 = null) {
-    if (this.p.isWave) return;
-    this.exitShipMode();
-    this.p.isWave = true;
-    this.p.isFlying = false;
-    this.p.onGround = false;
-    this.p.canJump = false;
-    this.p.isJumping = false;
-    this.stopRotation();
-    this._rotation = (this.p.upKeyDown ? -Math.PI / 4 : Math.PI / 4) * this.flipMod();
-    this._particleEmitter.stop();
-    this._particleActive = false;
-    this._flyParticleEmitter.stop();
-    this._flyParticleActive = false;
-    this._streak.reset();
-    this._streak.start();
-    this.setShipVisible(false);
-    this.setCubeVisible(false);
-    this.setWaveVisible(true);
-    let _0x17d728 = this.p.y;
-    if (_0xeb37c6) {
-      _0x17d728 = undefined !== _0xeb37c6.portalY ? _0xeb37c6.portalY : _0xeb37c6.y;
-    }
-    this._gameLayer.setFlyMode(true, _0x17d728);
-  }
-  ["exitWaveMode"]() {
-    if (this.p.isWave) {
-      this.p.isWave = false;
-      this.p.onGround = false;
-      this.p.canJump = false;
-      this.p.isJumping = false;
-      this.stopRotation();
-      this._rotation = 0x0;
-      this._streak.stop();
-      this._streak.reset();
-      this.setWaveVisible(false);
-      this.setCubeVisible(true);
-      this._gameLayer.setFlyMode(false, 0x0);
-    }
-  }
-  ["_updateWaveJump"](_0x130c46) {
-    const speed = 11.540004 * (this._scene._speedMul || 1.0);
-    const flip = this.flipMod();
-    if (this.p.upKeyDown) {
-      this.p.yVelocity = speed * flip;
-      this.p.onGround = false;
-    } else {
-      this.p.yVelocity = -speed * flip;
-    }
-  }
-  ["updateWaveRotation"](_0x217ad3) {
-    const flip = this.flipMod();
-    this._rotation = (this.p.upKeyDown ? -Math.PI / 4 : Math.PI / 4) * flip;
-  }
   ["setShipVisible"](_0x1c5620) {
-    if (_0x1c5620) this.setWaveVisible(false);
     this._shipSpriteLayer.sprite.setVisible(_0x1c5620);
     if (this._shipGlowLayer) {
       this._shipGlowLayer.sprite.setVisible(_0x1c5620 && this._shipGlowLayer.sprite._glowEnabled);
@@ -6364,23 +6288,7 @@ class ps {
     this._lastCameraY = _0x3f0607;
     this._aboveContainer.x = -_0x30c325;
     this._aboveContainer.y = _0x3f0607;
-    if (this.p.isWave) {
-      if (this._waveSpriteLayer && this._waveSpriteLayer.sprite) {
-        this._waveSpriteLayer.sprite.x = _0x7f0705;
-        this._waveSpriteLayer.sprite.y = _0x1a433c;
-        this._waveSpriteLayer.sprite.rotation = _0x2907d3;
-        this._waveSpriteLayer.sprite.setVisible(true);
-      }
-      for (const _0x5dc75c of this._shipLayers) if (_0x5dc75c) {
-        _0x5dc75c.sprite.setVisible(false);
-      }
-      for (const _0x536f40 of this._playerLayers) if (_0x536f40) {
-        _0x536f40.sprite.setVisible(false);
-      }
-    } else if (this.p.isFlying) {
-      if (this._waveSpriteLayer && this._waveSpriteLayer.sprite) {
-        this._waveSpriteLayer.sprite.setVisible(false);
-      }
+    if (this.p.isFlying) {
       const _0x285611 = Math.cos(_0x2907d3);
       const _0x501bf9 = Math.sin(_0x2907d3);
       const _0x1b1d28 = -0xa * _0x501bf9;
@@ -6428,7 +6336,11 @@ class ps {
     this._streak.start();
     this.setShipVisible(true);
     for (const _0xc1f7c3 of this._playerLayers) if (_0xc1f7c3) {
-      _0xc1f7c3.sprite.setScale(0.55);
+      if (_0xc1f7c3.sprite._baseScale) {
+        _0xc1f7c3.sprite.setScale(_0xc1f7c3.sprite._baseScale * 0.55);
+      } else {
+        _0xc1f7c3.sprite.setScale(0.55);
+      }
     }
     let _0x17d728 = this.p.y;
     if (_0xeb37c6) {
@@ -6458,7 +6370,11 @@ class ps {
       this.setShipVisible(false);
       this.setCubeVisible(true);
       for (const _0xe1b715 of this._playerLayers) if (_0xe1b715) {
-        _0xe1b715.sprite.setScale(0x1);
+        if (_0xe1b715.sprite._baseScale) {
+          _0xe1b715.sprite.setScale(_0xe1b715.sprite._baseScale);
+        } else {
+          _0xe1b715.sprite.setScale(0x1);
+        }
       }
       this._gameLayer.setFlyMode(false, 0x0);
     }
@@ -6918,9 +6834,7 @@ class ps {
     return this.p.gravityFlipped ? this.p.yVelocity > 3.832796 : this.p.yVelocity < 3.832796;
   }
   ['updateJump'](_0x3d1c6f) {
-    if (this.p.isWave) {
-      this._updateWaveJump(_0x3d1c6f);
-    } else if (this.p.isFlying) {
+    if (this.p.isFlying) {
       this._updateFlyJump(_0x3d1c6f);
     } else {
       if (this.p.upKeyDown && this.p.canJump) {
@@ -7021,12 +6935,6 @@ class ps {
           this._applySpeedPortal(_0x1b13b8.speedSub);
           continue;
         }
-        if (_0x1b13b8.type === Wn && !_0x1b13b8.activated) {
-          _0x1b13b8.activated = true;
-          this._playPortalShine(_0x1b13b8);
-          this.enterWaveMode(_0x1b13b8);
-          continue;
-        }
         if (_0x1b13b8.type !== _) {
           if (_0x1b13b8.type !== w) {
             if (_0x1b13b8.type === x) {
@@ -7106,11 +7014,6 @@ class ps {
       }
     }
     let _0x3020c8 = this._gameLayer.getFloorY();
-    if (this.p.isWave) {
-      let _cCeil = this._gameLayer.getCeilingY();
-      if (this.p.y <= _0x3020c8 + 0x14) return void this.killPlayer();
-      if (null !== _cCeil && this.p.y >= _cCeil - 0x14) return void this.killPlayer();
-    }
     if (!_0x30410f) {
       if (!this.p.gravityFlipped && this.p.y <= _0x3020c8 + 0x1e) {
         this.p.y = _0x3020c8 + 0x1e;
@@ -7267,7 +7170,11 @@ class ps {
       _0x5a0fa9.sprite.setAlpha(0x1);
     }
     for (const _0x1e656c of this._playerLayers) if (_0x1e656c) {
-      _0x1e656c.sprite.setScale(0x1);
+      if (_0x1e656c.sprite._baseScale) {
+        _0x1e656c.sprite.setScale(_0x1e656c.sprite._baseScale);
+      } else {
+        _0x1e656c.sprite.setScale(0x1);
+      }
     }
     this._particleEmitter.stop();
     this._particleActive = false;
@@ -7768,53 +7675,6 @@ class GameScene extends Phaser.Scene {
     this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H).on("down", () => {
       this._fpsText.setVisible(!this._fpsText.visible);
     });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE).on("down", () => {
-      if (this._player) {
-        this._player.exitWaveMode();
-        this._player.exitShipMode();
-        if (window.onGDModeChanged) window.onGDModeChanged('cube');
-      }
-    });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO).on("down", () => {
-      if (this._player) {
-        this._player.exitWaveMode();
-        this._player.enterShipMode();
-        if (window.onGDModeChanged) window.onGDModeChanged('ship');
-      }
-    });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE).on("down", () => {
-      if (this._player) {
-        this._player.exitShipMode();
-        this._player.enterWaveMode();
-        if (window.onGDModeChanged) window.onGDModeChanged('wave');
-      }
-    });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).on("down", () => {
-      if (this._player) {
-        if (this._state.isWave) {
-          this._player.exitWaveMode();
-          if (window.onGDModeChanged) window.onGDModeChanged('cube');
-        } else {
-          this._player.exitShipMode();
-          this._player.enterWaveMode();
-          if (window.onGDModeChanged) window.onGDModeChanged('wave');
-        }
-      }
-    });
-    window.setGDGameMode = (mode) => {
-      if (!this._player) return;
-      if (mode === 'cube') {
-        this._player.exitWaveMode();
-        this._player.exitShipMode();
-      } else if (mode === 'ship') {
-        this._player.exitWaveMode();
-        this._player.enterShipMode();
-      } else if (mode === 'wave') {
-        this._player.exitShipMode();
-        this._player.enterWaveMode();
-      }
-      if (window.onGDModeChanged) window.onGDModeChanged(mode);
-    };
   }
   ["toggleGlitter"](_0x34c21a) {
     if (_0x34c21a) {
@@ -8377,7 +8237,7 @@ class GameScene extends Phaser.Scene {
     if (!(this._slideIn || this._state.isDead)) {
       this._state.upKeyDown = true;
       this._state.upKeyPressed = true;
-      if (!this._state.isFlying && !this._state.isWave && this._state.canJump) {
+      if (!this._state.isFlying && this._state.canJump) {
         this._player.updateJump(0x0);
         this._totalJumps++;
       }
@@ -8743,7 +8603,7 @@ class GameScene extends Phaser.Scene {
       this._state.y += this._state.yVelocity * _0x5caeb1;
       this._player.checkCollisions(this._playerWorldX - h);
       this._playerWorldX += _0x426602 * 11.540004 * 0.9 * this._speedMul;
-      if (!this._state.isFlying && !this._state.isWave) {
+      if (!this._state.isFlying) {
         if (this._state.onGround) {
           this._player.updateGroundRotation(_0x5caeb1);
         } else if (this._player.rotateActionActive) {
@@ -8816,9 +8676,7 @@ class GameScene extends Phaser.Scene {
     this._updateBackground();
     this._level.stepGroundAnimation(_0xaf2ffd / 0x3e8);
     this._level.updateGroundTiles(this._cameraY);
-    if (this._state.isWave) {
-      this._player.updateWaveRotation(_0x30fa5d);
-    } else if (this._state.isFlying) {
+    if (this._state.isFlying) {
       this._player.updateShipRotation(_0x30fa5d);
     }
     const _0x259e68 = this._playerWorldX - this._cameraX;
