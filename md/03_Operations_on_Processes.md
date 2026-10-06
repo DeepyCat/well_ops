@@ -35,6 +35,8 @@ Když proces vytvoří potomka, potomek potřebuje zdroje (čas CPU, paměť, so
 1. Potomek je **kopií** rodiče (stejný program i data)
 2. Do potomka se nahraje **nový program**
 
+![Mechanismus tvorby procesů fork, exec, wait, exit](img/fork-exec-model.svg)
+
 ## Vytváření procesů v Linuxu/UNIXu
 
 - **`fork()`** – systémové volání vytvoří nový proces jako **kopii adresního prostoru** rodiče. Oba procesy (rodič i dítě) pokračují od instrukce hned za `fork()` – liší se jen návratovou hodnotou: dítě dostane **0**, rodič dostane **PID dítěte** (kladné číslo)

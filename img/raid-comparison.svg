@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="240" viewBox="0 0 560 240">
+  <rect width="560" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Srovnání diskových polí RAID (Rychlost, Kapacita, Odolnost)</text>
+  <rect x="25" y="48" width="115" height="165" rx="6" fill="#1c2538" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="82" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#60a5fa" font-weight="bold">RAID 0</text>
+  <text x="82" y="86" text-anchor="middle" font-family="Arial" font-size="8" fill="#94a3b8">Striping (prokládání)</text>
+  <text x="82" y="110" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Min. disků: 2</text>
+  <text x="82" y="128" text-anchor="middle" font-family="Arial" font-size="9" fill="#38bdf8">Kapacita: N × D</text>
+  <text x="82" y="146" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Čtení: Velmi rychlé</text>
+  <text x="82" y="164" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Zápis: Velmi rychlý</text>
+  <text x="82" y="190" text-anchor="middle" font-family="Arial" font-size="9" fill="#ef4444" font-weight="bold">Redundance: ŽÁDNÁ</text>
+  <text x="82" y="202" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#f87171">Pád 1 disku = ztráta všeho</text>
+  <rect x="155" y="48" width="115" height="165" rx="6" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="212" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#4ade80" font-weight="bold">RAID 1</text>
+  <text x="212" y="86" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">Mirroring (zrcadlení)</text>
+  <text x="212" y="110" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Min. disků: 2</text>
+  <text x="212" y="128" text-anchor="middle" font-family="Arial" font-size="9" fill="#f59e0b">Kapacita: 50 % (1 × D)</text>
+  <text x="212" y="146" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Čtení: Rychlé (2×)</text>
+  <text x="212" y="164" text-anchor="middle" font-family="Arial" font-size="9" fill="#aaa">Zápis: Stejný</text>
+  <text x="212" y="190" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e" font-weight="bold">Výpadek 1 disku OK</text>
+  <text x="212" y="202" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">Vysoká bezpečnost dat</text>
+  <rect x="285" y="48" width="125" height="165" rx="6" fill="#2e2412" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="347" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#fde68a" font-weight="bold">RAID 5</text>
+  <text x="347" y="86" text-anchor="middle" font-family="Arial" font-size="8" fill="#fed7aa">Distrib. parita (XOR)</text>
+  <text x="347" y="110" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Min. disků: 3</text>
+  <text x="347" y="128" text-anchor="middle" font-family="Arial" font-size="9" fill="#38bdf8">Kapacita: (N-1) × D</text>
+  <text x="347" y="146" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Čtení: Velmi rychlé</text>
+  <text x="347" y="164" text-anchor="middle" font-family="Arial" font-size="9" fill="#f59e0b">Zápis: Pomalý (XOR)</text>
+  <text x="347" y="190" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e" font-weight="bold">Výpadek 1 disku OK</text>
+  <text x="347" y="202" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#fde68a">Optimální poměr cena/výkon</text>
+  <rect x="425" y="48" width="110" height="165" rx="6" fill="#281830" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="480" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#c084fc" font-weight="bold">RAID 10 (1+0)</text>
+  <text x="480" y="86" text-anchor="middle" font-family="Arial" font-size="8" fill="#d8b4fe">Zrcadlení + Striping</text>
+  <text x="480" y="110" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Min. disků: 4</text>
+  <text x="480" y="128" text-anchor="middle" font-family="Arial" font-size="9" fill="#f59e0b">Kapacita: 50 %</text>
+  <text x="480" y="146" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Čtení: Extrémní</text>
+  <text x="480" y="164" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Zápis: Velmi rychlý</text>
+  <text x="480" y="190" text-anchor="middle" font-family="Arial" font-size="9" fill="#22c55e" font-weight="bold">Výpadek až 2 disků</text>
+  <text x="480" y="202" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#c084fc">Podnikové databáze</text>
+</svg>

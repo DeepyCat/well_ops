@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Segmentová tabulka: Limit, Báze a kontrola chráněného přístupu</text>
+  <rect x="30" y="50" width="130" height="60" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="95" y="72" text-anchor="middle" font-family="Arial" font-size="11" fill="#60a5fa" font-weight="bold">Logická adresa</text>
+  <rect x="40" y="80" width="50" height="22" fill="#2563eb"/><text x="65" y="95" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff">s (číslo)</text>
+  <rect x="95" y="80" width="55" height="22" fill="#1d4ed8"/><text x="122" y="95" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff">d (offset)</text>
+  <rect x="180" y="50" width="170" height="125" rx="5" fill="#2a1e12" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="265" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#fbbf24" font-weight="bold">Tabulka segmentů (ST)</text>
+  <text x="200" y="88" font-family="Arial" font-size="8.5" fill="#94a3b8">Segment</text><text x="250" y="88" font-family="Arial" font-size="8.5" fill="#fde68a">Limit</text><text x="305" y="88" font-family="Arial" font-size="8.5" fill="#4ade80">Báze</text>
+  <line x1="190" y1="93" x2="340" y2="93" stroke="#64748b" stroke-width="1"/>
+  <text x="205" y="108" font-family="Arial" font-size="8.5" fill="#fff">0 (Kód)</text><text x="250" y="108" font-family="Arial" font-size="8.5" fill="#fde68a">1 000</text><text x="305" y="108" font-family="Arial" font-size="8.5" fill="#4ade80">14 000</text>
+  <text x="205" y="126" font-family="Arial" font-size="8.5" fill="#fff">1 (Data)</text><text x="250" y="126" font-family="Arial" font-size="8.5" fill="#fde68a">400</text><text x="305" y="126" font-family="Arial" font-size="8.5" fill="#4ade80">6 300</text>
+  <text x="205" y="144" font-family="Arial" font-size="8.5" fill="#fff">2 (Zásobník)</text><text x="250" y="144" font-family="Arial" font-size="8.5" fill="#fde68a">400</text><text x="305" y="144" font-family="Arial" font-size="8.5" fill="#4ade80">4 300</text>
+  <text x="205" y="162" font-family="Arial" font-size="8.5" fill="#fff">3 (Halda)</text><text x="250" y="162" font-family="Arial" font-size="8.5" fill="#fde68a">1 100</text><text x="305" y="162" font-family="Arial" font-size="8.5" fill="#4ade80">3 200</text>
+  <rect x="375" y="60" width="75" height="40" rx="4" fill="#1e293b" stroke="#cbd5e1"/>
+  <text x="412" y="78" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff">Je d &lt; Limit?</text>
+  <text x="412" y="92" text-anchor="middle" font-family="Arial" font-size="8" fill="#ef4444">NE → Past/Trap</text>
+  <rect x="470" y="50" width="70" height="155" rx="5" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="505" y="70" text-anchor="middle" font-family="Arial" font-size="10" fill="#4ade80" font-weight="bold">RAM</text>
+  <rect x="475" y="80" width="60" height="28" fill="#15803d"/><text x="505" y="98" text-anchor="middle" font-family="Arial" font-size="8" fill="#fff">Báze + d</text>
+  <rect x="475" y="120" width="60" height="20" fill="#14532d"/><text x="505" y="134" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">Segment 0</text>
+  <text x="280" y="215" text-anchor="middle" font-family="Arial" font-size="9" fill="#666">Segmentace logicky dělí program podle pohledu programátora na různorodé délky bloků</text>
+</svg>

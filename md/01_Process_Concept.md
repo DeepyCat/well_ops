@@ -44,6 +44,8 @@ Proces během svého běhu mění stav:
 
 Názvy stavů se liší systém od systému, ale samotné stavy se vyskytují všude (některé OS je dělí ještě jemněji). **V daném okamžiku může na jednom procesoru běžet jen jeden proces** – ale procesů ve stavu Ready nebo Waiting může být víc najednou.
 
+![Struktura Process Control Block (PCB)](img/pcb-structure.svg)
+
 ## Process Control Block (PCB)
 
 Každý proces reprezentuje v operačním systému **PCB** (Process Control Block, taky Task Control Block) – datová struktura se všemi informacemi o daném procesu:

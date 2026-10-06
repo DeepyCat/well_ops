@@ -4,6 +4,8 @@
 
 Aby hardware fungoval, potřebuje operační systém **ovladač** dodaný výrobcem. Windows i Linux to potřebují, ale řeší to jinak.
 
+![Architektura ovladačů Windows KMDF a UMDF](img/windows-driver-model.svg)
+
 ## Windows
 
 Při instalaci Windows je potřeba nainstalovat ovladače od výrobce hardwaru – čipsetu základní desky, grafické karty, Wi-Fi karty atd.

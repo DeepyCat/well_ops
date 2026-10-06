@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="240" viewBox="0 0 560 240">
+  <rect width="560" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Struktura a technologie SSD (Solid-State Drive)</text>
+  <rect x="30" y="48" width="140" height="155" rx="6" fill="#1a2233" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="100" y="72" text-anchor="middle" font-family="Arial" font-size="12" fill="#60a5fa" font-weight="bold">SSD Řadič</text>
+  <rect x="42" y="88" width="116" height="22" rx="3" fill="#142848"/>
+  <text x="100" y="103" text-anchor="middle" font-family="Arial" font-size="9" fill="#93c5fd">FTL (Flash Trans. Layer)</text>
+  <rect x="42" y="116" width="116" height="22" rx="3" fill="#142848"/>
+  <text x="100" y="131" text-anchor="middle" font-family="Arial" font-size="9" fill="#93c5fd">Wear Leveling</text>
+  <rect x="42" y="144" width="116" height="22" rx="3" fill="#142848"/>
+  <text x="100" y="159" text-anchor="middle" font-family="Arial" font-size="9" fill="#93c5fd">DRAM Cache Buffer</text>
+  <rect x="42" y="172" width="116" height="20" rx="3" fill="#142848"/>
+  <text x="100" y="186" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#93c5fd">ECC Error Correction</text>
+  <line x1="170" y1="125" x2="200" y2="125" stroke="#60a5fa" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="200" y="48" width="330" height="155" rx="6" fill="#1e2520" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="365" y="72" text-anchor="middle" font-family="Arial" font-size="12" fill="#4ade80" font-weight="bold">NAND Flash Paměťové buňky</text>
+  <rect x="215" y="88" width="70" height="50" rx="4" fill="#163520" stroke="#16a34a"/>
+  <text x="250" y="108" text-anchor="middle" font-family="Arial" font-size="10" fill="#86efac" font-weight="bold">SLC</text>
+  <text x="250" y="126" text-anchor="middle" font-family="Arial" font-size="8" fill="#aaa">1 bit/buňka</text>
+  <rect x="295" y="88" width="70" height="50" rx="4" fill="#163520" stroke="#16a34a"/>
+  <text x="330" y="108" text-anchor="middle" font-family="Arial" font-size="10" fill="#86efac" font-weight="bold">MLC</text>
+  <text x="330" y="126" text-anchor="middle" font-family="Arial" font-size="8" fill="#aaa">2 bity/buňka</text>
+  <rect x="375" y="88" width="70" height="50" rx="4" fill="#163520" stroke="#16a34a"/>
+  <text x="410" y="108" text-anchor="middle" font-family="Arial" font-size="10" fill="#86efac" font-weight="bold">TLC</text>
+  <text x="410" y="126" text-anchor="middle" font-family="Arial" font-size="8" fill="#aaa">3 bity/buňka</text>
+  <rect x="455" y="88" width="65" height="50" rx="4" fill="#163520" stroke="#16a34a"/>
+  <text x="487" y="108" text-anchor="middle" font-family="Arial" font-size="10" fill="#86efac" font-weight="bold">QLC</text>
+  <text x="487" y="126" text-anchor="middle" font-family="Arial" font-size="8" fill="#aaa">4 bity/buňka</text>
+  <rect x="215" y="148" width="305" height="44" rx="4" fill="#142018"/>
+  <text x="367" y="166" text-anchor="middle" font-family="Arial" font-size="9" fill="#86efac">Čtení/Zápis po STRÁNKÁCH (4–16 KB) • Mazání po BLOCÍCH (128–512 stránek)</text>
+  <text x="367" y="182" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#888">Trim příkaz: OS informuje SSD o smazaných blocích pro Garbage Collection</text>
+  <text x="280" y="224" text-anchor="middle" font-family="Arial" font-size="9" fill="#666">SSD nemá pohyblivé mechanické části • Rychlý náhodný přístup • Omezený počet přepisů P/E cyklů</text>
+</svg>

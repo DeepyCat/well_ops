@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Evoluční strom UNIXu a jeho moderní následovníci</text>
+  <rect x="205" y="45" width="150" height="35" rx="4" fill="#312e81" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="280" y="67" text-anchor="middle" font-family="Arial" font-size="11" fill="#c7d2fe" font-weight="bold">UNIX (1969 Bell Labs)</text>
+  <line x1="240" y1="80" x2="100" y2="110" stroke="#a5b4fc" stroke-width="1.5"/>
+  <line x1="320" y1="80" x2="280" y2="110" stroke="#a5b4fc" stroke-width="1.5"/>
+  <line x1="280" y1="80" x2="450" y2="110" stroke="#a5b4fc" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <rect x="30" y="110" width="140" height="35" rx="4" fill="#1e3a8a" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="100" y="132" text-anchor="middle" font-family="Arial" font-size="10" fill="#bfdbfe" font-weight="bold">BSD (Berkeley, 1977)</text>
+  <rect x="210" y="110" width="140" height="35" rx="4" fill="#3730a3" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="280" y="132" text-anchor="middle" font-family="Arial" font-size="10" fill="#c7d2fe" font-weight="bold">System V (AT&amp;T, 1983)</text>
+  <rect x="390" y="110" width="140" height="35" rx="4" fill="#14532d" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="460" y="132" text-anchor="middle" font-family="Arial" font-size="10" fill="#bbf7d0" font-weight="bold">Linux (Torvalds, 1991)</text>
+  <line x1="100" y1="145" x2="100" y2="170" stroke="#3b82f6" stroke-width="1.5"/>
+  <rect x="30" y="170" width="140" height="35" rx="4" fill="#172554" stroke="#60a5fa"/>
+  <text x="100" y="192" text-anchor="middle" font-family="Arial" font-size="9" fill="#93c5fd">macOS / iOS (Darwin)</text>
+  <line x1="280" y1="145" x2="280" y2="170" stroke="#6366f1" stroke-width="1.5"/>
+  <rect x="210" y="170" width="140" height="35" rx="4" fill="#1e1b4b" stroke="#818cf8"/>
+  <text x="280" y="192" text-anchor="middle" font-family="Arial" font-size="9" fill="#a5b4fc">Solaris / AIX / HP-UX</text>
+  <line x1="460" y1="145" x2="460" y2="170" stroke="#22c55e" stroke-width="1.5"/>
+  <rect x="390" y="170" width="140" height="35" rx="4" fill="#052e16" stroke="#4ade80"/>
+  <text x="460" y="192" text-anchor="middle" font-family="Arial" font-size="9" fill="#86efac">Android / Ubuntu / RHEL</text>
+  <text x="280" y="218" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">UNIX sjednotil POSIX standard: Vše v systému je soubor • Filozofie malých jednoúčelových nástrojů</text>
+</svg>

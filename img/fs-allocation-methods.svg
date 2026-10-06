@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Metody alokace diskového prostoru pro soubory</text>
+  <rect x="25" y="48" width="160" height="155" rx="6" fill="#1e2538" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="105" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#60a5fa" font-weight="bold">Souvislá (Contiguous)</text>
+  <rect x="35" y="85" width="140" height="35" fill="#0f172a"/><text x="105" y="106" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#93c5fd">[Blok 0][Blok 1][Blok 2]</text>
+  <text x="105" y="135" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Velmi rychlé čtení</text>
+  <text x="105" y="150" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#ef4444">- Externí fragmentace disku</text>
+  <text x="105" y="165" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#ef4444">- Obtížný růst souboru</text>
+  <text x="105" y="188" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Využití: Optické disky (ISO 9660)</text>
+  <rect x="198" y="48" width="164" height="155" rx="6" fill="#241e12" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="280" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#fbbf24" font-weight="bold">Zřetězená (Linked / FAT)</text>
+  <rect x="208" y="85" width="144" height="35" fill="#1c1917"/><text x="280" y="106" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fde68a">[B 16 →] [B 42 →] [B 7 → ∅]</text>
+  <text x="280" y="135" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Žádná externí fragmentace</text>
+  <text x="280" y="150" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#ef4444">- Pomalý náhodný přístup</text>
+  <text x="280" y="165" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#ef4444">- Ztráta pointeru = ztráta dat</text>
+  <text x="280" y="188" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Využití: MS-DOS FAT tabulka</text>
+  <rect x="375" y="48" width="160" height="155" rx="6" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="455" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">Indexová (Indexed / Inode)</text>
+  <rect x="385" y="85" width="140" height="35" fill="#052e16"/><text x="455" y="101" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">Index Blok (Pole ukazatelů)</text><text x="455" y="114" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#bbf7d0">→ B12, → B54, → B90</text>
+  <text x="455" y="135" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Rychlý přímý přístup</text>
+  <text x="455" y="150" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Soubor roste dynamicky</text>
+  <text x="455" y="165" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#aaa">- Režie na index blok</text>
+  <text x="455" y="188" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Využití: ext4, NTFS, UFS</text>
+  <text x="280" y="218" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">Indexová alokace s víceúrovňovým indexem je standardem všech moderních souborových systémů</text>
+</svg>

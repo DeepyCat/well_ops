@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="240" viewBox="0 0 560 240">
+  <rect width="560" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Vnitřní struktura Unixového i-uzlu (Inode Architecture)</text>
+  <rect x="30" y="48" width="160" height="170" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="110" y="68" text-anchor="middle" font-family="Arial" font-size="11" fill="#60a5fa" font-weight="bold">Inode (Metadata)</text>
+  <rect x="40" y="76" width="140" height="16" fill="#0f172a"/><text x="110" y="88" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">Režim / Oprávnění (Mode)</text>
+  <rect x="40" y="94" width="140" height="16" fill="#0f172a"/><text x="110" y="106" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">Vlastník (UID / GID)</text>
+  <rect x="40" y="112" width="140" height="16" fill="#0f172a"/><text x="110" y="124" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">Velikost souboru v bajtech</text>
+  <rect x="40" y="130" width="140" height="16" fill="#0f172a"/><text x="110" y="142" text-anchor="middle" font-family="Arial" font-size="8" fill="#93c5fd">Počet odkazů (Link Count)</text>
+  <rect x="40" y="148" width="140" height="18" fill="#15803d" stroke="#22c55e"/><text x="110" y="161" text-anchor="middle" font-family="Arial" font-size="8" fill="#fff">12 Přímých ukazatelů</text>
+  <rect x="40" y="168" width="140" height="18" fill="#b45309" stroke="#f59e0b"/><text x="110" y="181" text-anchor="middle" font-family="Arial" font-size="8" fill="#fff">1 Jednoduše nepřímý</text>
+  <rect x="40" y="188" width="140" height="18" fill="#6b21a8" stroke="#a855f7"/><text x="110" y="201" text-anchor="middle" font-family="Arial" font-size="8" fill="#fff">1 Dvojitě nepřímý ukazatel</text>
+  <line x1="180" y1="157" x2="240" y2="110" stroke="#22c55e" stroke-width="1.5"/>
+  <rect x="240" y="95" width="120" height="35" rx="3" fill="#142e1e" stroke="#22c55e"/>
+  <text x="300" y="116" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Datové bloky (0–11)</text>
+  <line x1="180" y1="177" x2="240" y2="160" stroke="#f59e0b" stroke-width="1.5"/>
+  <rect x="240" y="145" width="120" height="35" rx="3" fill="#2e2412" stroke="#f59e0b"/>
+  <text x="300" y="166" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fbbf24">Index blok (Ukazatele)</text>
+  <line x1="360" y1="162" x2="400" y2="162" stroke="#f59e0b" stroke-width="1.5"/>
+  <rect x="400" y="145" width="130" height="35" rx="3" fill="#142e1e" stroke="#22c55e"/>
+  <text x="465" y="166" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80">Další datové bloky</text>
+  <text x="360" y="215" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">Díky nepřímým ukazatelům podporuje Inode jak malé soubory (rychlý přímý přístup), tak obří soubory v terabajtech</text>
+</svg>

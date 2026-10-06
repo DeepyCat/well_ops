@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="240" viewBox="0 0 560 240">
+  <rect width="560" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Hardwarová asociativní paměť TLB (Translation Lookaside Buffer)</text>
+  <rect x="25" y="55" width="100" height="55" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="75" y="78" text-anchor="middle" font-family="Arial" font-size="10" fill="#60a5fa" font-weight="bold">Logická adresa</text>
+  <text x="55" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#93c5fd">p (stránka)</text>
+  <text x="95" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#cbd5e1">d (offset)</text>
+  <rect x="165" y="45" width="150" height="110" rx="6" fill="#2e1b12" stroke="#f97316" stroke-width="1.5"/>
+  <text x="240" y="66" text-anchor="middle" font-family="Arial" font-size="11" fill="#fdba74" font-weight="bold">TLB (Rychlá cache)</text>
+  <text x="200" y="84" font-family="Arial" font-size="8" fill="#cbd5e1">Stránka p</text><text x="255" y="84" font-family="Arial" font-size="8" fill="#86efac">Rámec f</text>
+  <rect x="175" y="90" width="130" height="16" fill="#431407"/><text x="200" y="102" font-family="Arial" font-size="8" fill="#fed7aa">0x1A</text><text x="265" y="102" font-family="Arial" font-size="8" fill="#86efac">0x04</text>
+  <rect x="175" y="110" width="130" height="16" fill="#431407"/><text x="200" y="122" font-family="Arial" font-size="8" fill="#fed7aa">0x2B</text><text x="265" y="122" font-family="Arial" font-size="8" fill="#86efac">0x09</text>
+  <line x1="125" y1="85" x2="165" y2="85" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="315" y1="75" x2="430" y2="75" stroke="#22c55e" stroke-width="2"/>
+  <text x="365" y="70" text-anchor="middle" font-family="Arial" font-size="8" fill="#4ade80">TLB Hit (99 %)</text>
+  <rect x="165" y="168" width="150" height="45" rx="4" fill="#1e293b" stroke="#ef4444"/>
+  <text x="240" y="186" text-anchor="middle" font-family="Arial" font-size="9" fill="#f87171">TLB Miss → Hledej v RAM</text>
+  <text x="240" y="200" text-anchor="middle" font-family="Arial" font-size="8" fill="#94a3b8">v plné tabulce stránek</text>
+  <line x1="240" y1="155" x2="240" y2="168" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <rect x="430" y="50" width="105" height="155" rx="5" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="482" y="72" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">Fyzická RAM</text>
+  <rect x="440" y="85" width="85" height="35" fill="#166534" rx="3"/><text x="482" y="106" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff">Fyz. rámec f + offset d</text>
+  <text x="280" y="228" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">Díky TLB probíhá překlad virtuální adresy v 1 hodinovém cyklu bez nutnosti dvojího čtení RAM</text>
+</svg>

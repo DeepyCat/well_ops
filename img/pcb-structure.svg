@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="250" viewBox="0 0 560 250">
+  <rect width="560" height="250" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Struktura Process Control Block (PCB)</text>
+  <rect x="30" y="46" width="230" height="185" rx="6" fill="#221828" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="145" y="68" text-anchor="middle" font-family="Arial" font-size="12" fill="#c084fc" font-weight="bold">Process Control Block (PCB)</text>
+  <rect x="42" y="78" width="206" height="20" rx="3" fill="#301c40"/><text x="145" y="92" text-anchor="middle" font-family="Arial" font-size="9" fill="#e9d5ff">PID (Process ID) &amp; Stav procesu</text>
+  <rect x="42" y="102" width="206" height="20" rx="3" fill="#301c40"/><text x="145" y="116" text-anchor="middle" font-family="Arial" font-size="9" fill="#e9d5ff">Program Counter (PC) ukazatel</text>
+  <rect x="42" y="126" width="206" height="20" rx="3" fill="#301c40"/><text x="145" y="140" text-anchor="middle" font-family="Arial" font-size="9" fill="#e9d5ff">CPU Registry (AX, BX, SP, PSW...)</text>
+  <rect x="42" y="150" width="206" height="20" rx="3" fill="#301c40"/><text x="145" y="164" text-anchor="middle" font-family="Arial" font-size="9" fill="#e9d5ff">Plánovací informace (priorita, fronty)</text>
+  <rect x="42" y="174" width="206" height="20" rx="3" fill="#301c40"/><text x="145" y="188" text-anchor="middle" font-family="Arial" font-size="9" fill="#e9d5ff">Správa paměti (báze, limit, tab. stránek)</text>
+  <rect x="42" y="198" width="206" height="20" rx="3" fill="#301c40"/><text x="145" y="212" text-anchor="middle" font-family="Arial" font-size="9" fill="#e9d5ff">Účetní data &amp; I/O stav (otevřené soubory)</text>
+  <rect x="290" y="46" width="240" height="185" rx="6" fill="#182230" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="410" y="68" text-anchor="middle" font-family="Arial" font-size="12" fill="#60a5fa" font-weight="bold">Paměťový prostor procesu</text>
+  <rect x="305" y="78" width="210" height="26" rx="3" fill="#dc2626"/><text x="410" y="95" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Zásobník (Stack) ↓</text>
+  <rect x="305" y="108" width="210" height="24" rx="3" fill="#1e293b" stroke="#475569" stroke-dasharray="3,3"/><text x="410" y="124" text-anchor="middle" font-family="Arial" font-size="9" fill="#94a3b8">Volný prostor (růst proti sobě)</text>
+  <rect x="305" y="136" width="210" height="26" rx="3" fill="#ea580c"/><text x="410" y="153" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Halda (Heap) ↑</text>
+  <rect x="305" y="166" width="210" height="26" rx="3" fill="#16a34a"/><text x="410" y="183" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Data (BSS + Inicializovaná data)</text>
+  <rect x="305" y="196" width="210" height="26" rx="3" fill="#2563eb"/><text x="410" y="213" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Text (Kód programu - Read-Only)</text>
+</svg>

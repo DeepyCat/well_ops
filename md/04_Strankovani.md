@@ -34,6 +34,8 @@ Stránka 4 B, fyzická paměť 32 B (8 rámců), tedy n=2, m=4.
 - Logická adresa 3 = stránka 0, offset 3 → 5×4 + 3 = **23**
 - Logická adresa 4 = stránka 1, offset 0 → stránka 1 je v rámci 6 → 6×4 + 0 = **24**
 
+![Hardwarová asociativní paměť TLB](img/tlb-hardware.svg)
+
 ## Hardwarová podpora – tabulka stránek
 
 Každá adresa z CPU se rozdělí na **číslo stránky (p)** a **offset (d)**. Číslo stránky je index do **tabulky stránek (page table)**, která obsahuje bázovou adresu odpovídajícího rámce ve fyzické paměti. Tahle báze se sečte s offsetem → fyzická adresa.

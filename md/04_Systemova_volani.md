@@ -39,6 +39,8 @@ API funkce **za scénou volají skutečná systémová volání** – např. Win
 - Skutečná systémová volání bývají detailnější a hůř se s nimi pracuje než s API
 - Přesto mezi funkcí API a odpovídajícím systémovým voláním v jádru často existuje silná spojitost
 
+![Obsluha systémového volání přerušením](img/system-call-interrupt.svg)
+
 ## Rozhraní systémových volání (System Call Interface)
 
 Runtime podpora (knihovny přibalené ke kompilátoru) poskytuje **rozhraní systémových volání** – propojuje volání funkce z API se skutečnými voláními v jádru OS.

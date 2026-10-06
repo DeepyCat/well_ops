@@ -23,6 +23,8 @@ aliases: [Správa paměti úvod, Memory Management úvod]
   - sdílení paměti mezi vlákny (bezpečně)
   - sdílení paměti mezi procesy (aniž by se musela vypnout ochrana)
 
+![Převod logické adresy pomocí MMU](img/mmu-translation.svg)
+
 ## Jak? – Memory Management Unit (MMU)
 
 Hlavní úkoly správce paměti:

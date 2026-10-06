@@ -4,9 +4,13 @@ aliases: [File Concept, Koncept souboru, File Access Methods]
 
 # Koncept souboru a přístupové metody
 
+![Metody přístupu k souborům — sekvenční, přímý a indexový přístup](img/file-access-methods.svg)
+
 ## Co je to soubor
 
 **Soubor** je pojmenovaná kolekce souvisejících informací zaznamenaná na sekundárním úložišti – nejmenší jednotka logického úložiště z pohledu uživatele. OS abstrahuje fyzické vlastnosti úložných zařízení do jednotné logické jednotky (soubor). Vnitřní strukturu a obsah definuje tvůrce souboru.
+
+![Atributy a operace se soubory](img/file-attributes-operations.svg)
 
 ## Atributy souboru
 

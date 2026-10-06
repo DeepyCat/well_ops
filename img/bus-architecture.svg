@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Třívrstvá systémová sběrnice výpočetního systému</text>
+  <rect x="30" y="50" width="100" height="55" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="80" y="82" text-anchor="middle" font-family="Arial" font-size="12" fill="#60a5fa" font-weight="bold">CPU</text>
+  <rect x="230" y="50" width="100" height="55" rx="5" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="280" y="82" text-anchor="middle" font-family="Arial" font-size="12" fill="#4ade80" font-weight="bold">RAM</text>
+  <rect x="430" y="50" width="100" height="55" rx="5" fill="#261c16" stroke="#f97316" stroke-width="1.5"/>
+  <text x="480" y="82" text-anchor="middle" font-family="Arial" font-size="12" fill="#fb923c" font-weight="bold">I/O Řadiče</text>
+  <rect x="30" y="125" width="500" height="18" rx="3" fill="#1d4ed8" stroke="#3b82f6"/>
+  <text x="45" y="138" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">Řídící sběrnice (Control Bus) — Read/Write, Interrupt, Clock signály</text>
+  <rect x="30" y="150" width="500" height="18" rx="3" fill="#15803d" stroke="#22c55e"/>
+  <text x="45" y="163" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">Adresová sběrnice (Address Bus) — jednosměrná, určuje fyzickou adresu buňky</text>
+  <rect x="30" y="175" width="500" height="18" rx="3" fill="#c2410c" stroke="#f97316"/>
+  <text x="45" y="188" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">Datová sběrnice (Data Bus) — obousměrná, přenáší skutečná data a instrukce</text>
+  <line x1="80" y1="105" x2="80" y2="125" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="280" y1="105" x2="280" y2="125" stroke="#22c55e" stroke-width="2"/>
+  <line x1="480" y1="105" x2="480" y2="125" stroke="#f97316" stroke-width="2"/>
+  <text x="280" y="215" text-anchor="middle" font-family="Arial" font-size="9" fill="#666">Šířka adresové sběrnice (např. 32/64 bitů) limituje maximální adresovatelnou paměť RAM (4 GB vs 16 EB)</text>
+</svg>

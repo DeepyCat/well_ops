@@ -33,6 +33,8 @@ Hlava létá na extrémně tenkém vzduchovém polštáři (mikrony) – riziko 
 - **Host controller** – řadič na straně počítače
 - **Disk controller** – vestavěný v každé jednotce, má vlastní [[cache]]. Přenos dat mezi cache a povrchem disku probíhá jinou rychlostí než mezi cache a host controllerem (elektronická rychlost)
 
+![Technologie a architektura SSD](img/ssd-architecture.svg)
+
 ## SSD (Solid-State Disk)
 
 Nevolatilní paměť používaná jako náhrada mechanického disku – od DRAM se zálohovací baterií po flash paměti (**[[SLC]]**, **[[MLC]]**).

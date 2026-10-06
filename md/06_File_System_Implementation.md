@@ -4,6 +4,8 @@ aliases: [File-System Implementation, Implementace souborového systému, MBR, G
 
 # Implementace souborového systému
 
+![Struktura disku — MBR vs GPT a vnitřní struktura oddílu](img/fs-implementation.svg)
+
 ## Struktura souborového systému (vrstvy)
 
 1. **I/O control** – ovladače zařízení a obsluha přerušení, překládá "přines blok 123" na hardwarové instrukce řadiče
@@ -15,6 +17,8 @@ Vrstvení minimalizuje duplicitu kódu, ale přidává režii.
 ### Běžné souborové systémy
 
 **UFS** (UNIX, na bázi Berkeley FFS), **FAT/FAT32/NTFS** (Windows), **ext3/ext4** (Linux, nejběžnější z 40+ podporovaných), **ISO 9660** (CD-ROM), **FUSE** (souborový systém v uživatelském, ne jaderném režimu), Google File System.
+
+![Vnitřní struktura Unixového Inode](img/inode-structure-detail.svg)
 
 ## FCB (File Control Block)
 

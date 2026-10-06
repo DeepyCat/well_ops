@@ -4,6 +4,8 @@ aliases: [CPU Scheduling, Plánování CPU]
 
 # Plánování CPU
 
+![Algoritmy plánování CPU — FCFS, SJF, Round Robin a Priority Scheduling](img/cpu-scheduling-algorithms.svg)
+
 Plánování CPU je základ multiprogramovaných systémů – přepínáním procesoru mezi procesy dělá OS počítač produktivnější.
 
 ## Základní koncept
@@ -44,6 +46,8 @@ Modul, který předá kontrolu CPU procesu vybranému schedulerem:
 - skok na správné místo v programu (obnovení běhu)
 
 Musí být **co nejrychlejší**, protože se volá při každém přepnutí procesu. Doba, za kterou dispatcher zastaví jeden proces a spustí druhý, se nazývá **dispatch latency**.
+
+![Kritéria a metriky plánování CPU](img/scheduling-criteria.svg)
 
 ## Kritéria plánování
 

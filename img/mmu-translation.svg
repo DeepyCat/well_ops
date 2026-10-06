@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="220" viewBox="0 0 560 220">
+  <rect width="560" height="220" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">MMU: Překlad logické (virtuální) adresy na fyzickou</text>
+  <rect x="25" y="55" width="100" height="70" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="75" y="85" text-anchor="middle" font-family="Arial" font-size="12" fill="#60a5fa" font-weight="bold">CPU</text>
+  <text x="75" y="105" text-anchor="middle" font-family="Arial" font-size="9" fill="#94a3b8">Generuje log. adr.</text>
+  <line x1="125" y1="90" x2="175" y2="90" stroke="#60a5fa" stroke-width="2"/>
+  <text x="150" y="82" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#93c5fd">Logická adr. 346</text>
+  <rect x="175" y="45" width="210" height="120" rx="8" fill="#1e2238" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="280" y="68" text-anchor="middle" font-family="Arial" font-size="12" fill="#a78bfa" font-weight="bold">MMU (Memory Management Unit)</text>
+  <rect x="195" y="80" width="170" height="35" rx="4" fill="#2e1065" stroke="#a78bfa"/>
+  <text x="280" y="102" text-anchor="middle" font-family="Arial" font-size="10" fill="#c4b5fd">Relokační registr: 14 000</text>
+  <circle cx="280" cy="135" r="14" fill="#4c1d95" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="280" y="140" text-anchor="middle" font-family="Arial" font-size="16" fill="#fff" font-weight="bold">+</text>
+  <line x1="385" y1="110" x2="435" y2="110" stroke="#22c55e" stroke-width="2"/>
+  <text x="410" y="102" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#86efac">Fyzická adr. 14 346</text>
+  <rect x="435" y="50" width="100" height="140" rx="6" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="485" y="75" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">Fyzická RAM</text>
+  <rect x="445" y="95" width="80" height="30" rx="3" fill="#166534" stroke="#4ade80"/>
+  <text x="485" y="114" text-anchor="middle" font-family="Arial" font-size="9" fill="#dcfce7">Adresa: 14 346</text>
+  <text x="485" y="150" text-anchor="middle" font-family="Arial" font-size="8" fill="#666">OS prostor</text>
+  <text x="485" y="175" text-anchor="middle" font-family="Arial" font-size="8" fill="#666">Uživatelská RAM</text>
+  <text x="280" y="195" text-anchor="middle" font-family="Arial" font-size="9" fill="#888">Program pracuje pouze s logickou adresou (0 až MAX) • MMU ji v reálném čase přičítá k bázi</text>
+</svg>

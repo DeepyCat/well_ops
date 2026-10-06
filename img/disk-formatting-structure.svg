@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Správa a formátování disku (Low-level vs Logické formátování)</text>
+  <rect x="30" y="48" width="500" height="55" rx="5" fill="#1a2430" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="45" y="68" font-family="Arial" font-size="11" fill="#60a5fa" font-weight="bold">1. Fyzické formátování (Low-level formatting ve výrobě)</text>
+  <text x="45" y="88" font-family="Arial" font-size="9" fill="#94a3b8">Rozdělení ploten na stopy a sektory (typicky 512 B nebo 4096 B Advanced Format)</text>
+  <text x="450" y="88" font-family="Arial" font-size="9" fill="#38bdf8">Hlavička + Data + ECC</text>
+  <rect x="30" y="110" width="240" height="55" rx="5" fill="#2a1e16" stroke="#f97316" stroke-width="1.5"/>
+  <text x="45" y="130" font-family="Arial" font-size="11" fill="#fb923c" font-weight="bold">2. Rozdělení na oddíly (Partitioning)</text>
+  <text x="45" y="148" font-family="Arial" font-size="8.5" fill="#fdba74">Disk se logicky rozdělí (C:, D:, /dev/sda1)</text>
+  <text x="45" y="159" font-family="Arial" font-size="8.5" fill="#fdba74">MBR nebo GPT tabulka oddílů</text>
+  <rect x="290" y="110" width="240" height="55" rx="5" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="305" y="130" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">3. Logické formátování (Vytvoření FS)</text>
+  <text x="305" y="148" font-family="Arial" font-size="8.5" fill="#86efac">Vytvoření datových struktur souborového systému</text>
+  <text x="305" y="159" font-family="Arial" font-size="8.5" fill="#86efac">Superblok, Inode tabulka, volné bloky</text>
+  <rect x="30" y="172" width="500" height="42" rx="5" fill="#221628" stroke="#c084fc" stroke-width="1"/>
+  <text x="45" y="188" font-family="Arial" font-size="9.5" fill="#e9d5ff" font-weight="bold">Chybné bloky (Bad Blocks) &amp; Sektor Sparing</text>
+  <text x="45" y="204" font-family="Arial" font-size="8.5" fill="#d8b4fe">Řadič disku udržuje seznam vadných sektorů a automaticky je přemapovává na náhradní záložní stopy</text>
+</svg>

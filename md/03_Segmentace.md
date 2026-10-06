@@ -20,6 +20,8 @@ C kompilátor typicky vytváří samostatné segmenty pro:
 
 Knihovny linkované při kompilaci mohou dostat vlastní segmenty – loader jim pak přidělí čísla segmentů.
 
+![Detaily segmentové tabulky a ochrana paměti](img/segmentation-table-details.svg)
+
 ## Segmentation hardware – segmentová tabulka
 
 Fyzická paměť je pořád jednorozměrná posloupnost bajtů, takže dvourozměrnou adresu `<segment, offset>` je nutné převést na jednorozměrnou fyzickou adresu. To zajišťuje **segmentová tabulka**:

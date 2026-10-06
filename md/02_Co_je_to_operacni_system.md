@@ -20,6 +20,8 @@ aliases: [Co je to operační systém]
 - **Vnější paměť** – stálé uložení dat a programů, které zrovna nejsou zpracovávány: pevné disky, flash disky, BD, magnetické pásky, cloudová uložiště.
 - **Vstupně-výstupní systém (V/V, I/O)** – souhrn zařízení pro komunikaci výpočetního systému s okolím (monitor, klávesnice, tiskárna…).
 
+![Režimy procesoru — User Mode vs Kernel Mode](img/os-kernel-user-mode.svg)
+
 ## Logické prostředky výpočetního systému
 
 - **Uživatel** – kdokoli, kdo zadává zakázku výpočetnímu systému

@@ -41,6 +41,8 @@ Příklad, proč na tom záleží (analogie se semaforem na trati):
 
 Kdyby byla celá sekvence "zkontroluj → nastav → vpusť" **atomická** (neděliteľná), ke kolizi by nedošlo – proto se podobné operace chrání [[semafor|semafory]] nebo [[mutex]]em.
 
+![Modely vláken Many-to-One vs One-to-One](img/thread-lifecycle.svg)
+
 ## Multithreading
 
 - **[[vlákno|Vlákno]]** – nejmenší jednotka vykonávání v rámci procesu

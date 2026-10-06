@@ -32,6 +32,8 @@ Používá se stejný **bit valid/invalid** jako u [[stránkování]] – ale s 
 
 Záznam v tabulce stránek pro stránku na disku obsahuje buď jen "invalid", nebo přímo adresu stránky na disku.
 
+![Algoritmy náhrady stránek FIFO, OPT a LRU](img/page-replacement-algorithms.svg)
+
 ## Page Fault (výpadek stránky)
 
 Když proces přistoupí na stránku označenou jako invalid (a přitom platnou, jen zrovna na disku), nastane **page fault** – hardware to při překladu adresy zjistí a vyvolá trap do OS.

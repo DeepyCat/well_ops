@@ -43,6 +43,8 @@ Mnoho systémů (včetně PC) používá **oba přístupy zároveň** – I/O in
 - **Programmed I/O (PIO)** – CPU samo sleduje stavové bity a "krmí" řadič po jednotlivých bajtech – plýtvá drahým výkonem CPU u velkých přenosů
 - **[[DMA]]** – hostitel zapíše do paměti DMA příkazový blok (zdroj, cíl, počet bajtů) a předá jeho adresu DMA řadiči; ten pak sám ovládá paměťovou sběrnici bez zásahu CPU
 
+![DMA přenos a obsluha přerušení](img/dma-controller.svg)
+
 ## Správa přerušení
 ![Přerušení — Interrupt flow a DMA](img/interrupt.svg)
 

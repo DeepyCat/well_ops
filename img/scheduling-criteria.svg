@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Metriky a kritéria plánování CPU</text>
+  <rect x="30" y="48" width="150" height="70" rx="5" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="105" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">CPU Využití (Utilization)</text>
+  <text x="105" y="88" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#bbf7d0">% času, kdy CPU počítá</text>
+  <text x="105" y="104" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#86efac" font-weight="bold">Cíl: MAXIMALIZOVAT (40–90%)</text>
+  <rect x="205" y="48" width="150" height="70" rx="5" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="280" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">Propustnost (Throughput)</text>
+  <text x="280" y="88" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#bbf7d0">Počet úloh za jednotku času</text>
+  <text x="280" y="104" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#86efac" font-weight="bold">Cíl: MAXIMALIZOVAT</text>
+  <rect x="380" y="48" width="150" height="70" rx="5" fill="#3b1219" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="455" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#f87171" font-weight="bold">Turnaround Time</text>
+  <text x="455" y="88" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca">Čas od zadání do skončení</text>
+  <text x="455" y="104" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fca5a5" font-weight="bold">Cíl: MINIMALIZOVAT</text>
+  <rect x="115" y="128" width="150" height="70" rx="5" fill="#3b1219" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="190" y="150" text-anchor="middle" font-family="Arial" font-size="11" fill="#f87171" font-weight="bold">Doba čekání (Waiting Time)</text>
+  <text x="190" y="168" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca">Čas strávený ve frontě Ready</text>
+  <text x="190" y="184" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fca5a5" font-weight="bold">Cíl: MINIMALIZOVAT</text>
+  <rect x="295" y="128" width="150" height="70" rx="5" fill="#3b1219" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="370" y="150" text-anchor="middle" font-family="Arial" font-size="11" fill="#f87171" font-weight="bold">Doba odezvy (Response Time)</text>
+  <text x="370" y="168" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca">Čas do první reakce systému</text>
+  <text x="370" y="184" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fca5a5" font-weight="bold">Cíl: MINIMALIZOVAT (Interaktivní)</text>
+  <text x="280" y="218" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">Algoritmy hledají kompromis: Např. Round Robin minimalizuje Response Time, ale zvyšuje Turnaround Time</text>
+</svg>
