@@ -239,6 +239,7 @@ class PreloadScene extends Phaser.Scene {
     }
     this.load.image("juchelka", "assets/juchelka.png");
     this.load.image("juchelka_logo", "assets/juchelka_logo.png");
+    this.load.image("crack_me", "assets/crack_me.png");
     this.load.image("sliderBar", 'assets/sliderBar.png');
     this.load.image('square04_001', "assets/square04_001.png");
     this.load.image("GJ_square02", "assets/GJ_square02.png");
@@ -7548,7 +7549,13 @@ class GameScene extends Phaser.Scene {
       color: "#ffffff",
       fontFamily: "Arial"
     }).setOrigin(0x1, 0x1).setScrollFactor(0x0).setDepth(0x1e).setAlpha(0.3);
-    this._tryMeImg = this.add.image(0x0, 182.5, "GJ_WebSheet", "tryMe_001.png").setScrollFactor(0x0).setDepth(0x1e);
+    if (this.textures.exists("crack_me")) {
+      this._tryMeImg = this.add.image(0x0, 182.5, "crack_me").setScrollFactor(0x0).setDepth(0x1e);
+      const _tryMeScale = Math.min(260 / this._tryMeImg.width, 1.0);
+      this._tryMeImg.setScale(_tryMeScale);
+    } else {
+      this._tryMeImg = this.add.image(0x0, 182.5, "GJ_WebSheet", "tryMe_001.png").setScrollFactor(0x0).setDepth(0x1e);
+    }
     this._downloadBtns = [];
     const _0x4fc67f = [{
       key: 'downloadSteam_001',
@@ -8187,7 +8194,7 @@ class GameScene extends Phaser.Scene {
     if (this._tryMeImg) {
       this.tweens.add({
         targets: this._tryMeImg,
-        y: -this._tryMeImg.height,
+        y: -(this._tryMeImg.displayHeight || this._tryMeImg.height),
         duration: 0x12c,
         ease: "Quad.In",
         onComplete: () => {
