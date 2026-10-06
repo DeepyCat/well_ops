@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Geometry Dash | OPS</title>
+  <link rel="icon" type="image/x-icon" href="../img/bird.png">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      overflow: hidden; 
+      background-color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    canvas { display: block; margin: 0 auto; }
+
+    /* Top Left Navigation */
+    .top-bar-ops {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 9998;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .ops-back-btn {
+      text-decoration: none;
+      background: linear-gradient(135deg, rgba(255, 51, 68, 0.3) 0%, rgba(180, 20, 35, 0.5) 100%);
+      border: 1px solid #ff3344;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font: 700 12px/1.2 Consolas, monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 15px rgba(255, 51, 68, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .ops-back-btn:hover {
+      background: linear-gradient(135deg, rgba(255, 51, 68, 0.6) 0%, rgba(220, 30, 50, 0.8) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 51, 68, 0.5);
+    }
+
+    /* Mode Switcher Bar */
+    .mode-bar {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9998;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, rgba(14, 20, 30, 0.92), rgba(8, 12, 20, 0.92));
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 240, 255, 0.15);
+    }
+
+    .mode-bar-header {
+      font: 700 11px/1 Consolas, monospace;
+      color: #00f0ff;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mode-buttons-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .mode-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e0e0e0;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font: 700 12px/1.2 Consolas, monospace;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mode-btn:hover {
+      background: rgba(0, 240, 255, 0.2);
+      border-color: #00f0ff;
+      color: #00f0ff;
+    }
+
+    .mode-btn.active {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.35), rgba(0, 150, 255, 0.5));
+      border-color: #00f0ff;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+    }
+
+    .mode-btn.wave-btn.active {
+      background: linear-gradient(135deg, rgba(0, 255, 102, 0.35), rgba(0, 240, 255, 0.5));
+      border-color: #00ff66;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(0, 255, 102, 0.45);
+    }
+
+    .mode-hint {
+      font: 11px/1 Consolas, monospace;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .mode-hint b {
+      color: #00ff66;
+    }
+
+    /* Level Selector on Top Right */
+    .level-picker {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 9998;
+      min-width: 300px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, rgba(18, 36, 56, 0.9), rgba(8, 14, 26, 0.9));
+      color: #e7f8ff;
+      font: 12px/1.4 Consolas, monospace;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+    }
+    .level-picker h2 {
+      font: 700 12px/1.2 Consolas, monospace;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+      color: #9de8ff;
+    }
+    .level-picker .row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .level-picker select,
+    .level-picker button {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.35);
+      color: #e7f8ff;
+      padding: 6px 8px;
+      font: 12px/1.2 Consolas, monospace;
+    }
+    .level-picker select {
+      flex: 1;
+      min-width: 0;
+    }
+    .level-picker button {
+      cursor: pointer;
+      background: linear-gradient(180deg, #26b6d4, #1b7995);
+      color: #f4feff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .level-picker .song {
+      margin-top: 6px;
+      color: #8fe0ff;
+      opacity: 0.9;
+    }
+    @media (max-width: 700px) {
+      .level-picker {
+        left: 10px;
+        right: 10px;
+        top: 60px;
+        min-width: 0;
+      }
+      .mode-bar {
+        bottom: 8px;
+        padding: 6px 10px;
+        width: 95%;
+      }
+      .mode-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+    }
+  </style>
+  <script defer src="./vendor.js"></script>
+  <script defer src="./game.js"></script>
+  <script>
+    function showBootError(message) {
+      var panel = document.createElement('pre');
+      panel.textContent = message;
+      panel.style.position = 'fixed';
+      panel.style.left = '12px';
+      panel.style.right = '12px';
+      panel.style.top = '12px';
+      panel.style.zIndex = '99999';
+      panel.style.padding = '10px 12px';
+      panel.style.background = 'rgba(0,0,0,0.85)';
+      panel.style.color = '#ff7878';
+      panel.style.border = '1px solid #ff4d4f';
+      panel.style.borderRadius = '8px';
+      panel.style.font = '12px/1.4 Consolas, monospace';
+      panel.style.whiteSpace = 'pre-wrap';
+      document.body.appendChild(panel);
+    }
+
+    window.addEventListener('error', function (event) {
+      showBootError('Runtime error: ' + (event.message || 'unknown'));
+    });
+
+    window.addEventListener('unhandledrejection', function (event) {
+      var reason = event && event.reason ? String(event.reason) : 'unknown';
+      showBootError('Unhandled rejection: ' + reason);
+    });
+
+    var LEVELS = [
+      { id: 1, name: 'Stereo Madness', song: 'StereoMadness.mp3' },
+      { id: 2, name: 'Back on Track', song: 'BackOnTrack.mp3' },
+      { id: 3, name: 'Polargeist', song: 'Polargeist.mp3' },
+      { id: 4, name: 'Dry Out', song: 'DryOut.mp3' },
+      { id: 5, name: 'Base After Base', song: 'BaseAfterBase.mp3' },
+      { id: 6, name: "Can't Let Go", song: 'CantLetGo.mp3' },
+      { id: 7, name: 'Jumper', song: 'Jumper.mp3' },
+      { id: 8, name: 'Time Machine', song: 'TimeMachine.mp3' },
+      { id: 9, name: 'Cycles', song: 'Cycles.mp3' },
+      { id: 10, name: 'xStep', song: 'xStep.mp3' },
+      { id: 11, name: 'Clutterfunk', song: 'Clutterfunk.mp3' },
+      { id: 12, name: 'Theory of Everything', song: 'TheoryOfEverything.mp3' },
+      { id: 13, name: 'Electroman Adventures', song: 'Electroman.mp3' },
+      { id: 14, name: 'Clubstep', song: 'Clubstep.mp3' },
+      { id: 15, name: 'Electrodynamix', song: 'Electrodynamix.mp3' },
+      { id: 16, name: 'Hexagon Force', song: 'HexagonForce.mp3' },
+      { id: 17, name: 'Blast Processing', song: 'BlastProcessing.mp3' },
+      { id: 18, name: 'Theory of Everything 2', song: 'TheoryOfEverything2.mp3' },
+      { id: 19, name: 'Geometrical Dominator', song: 'GeometricalDominator.mp3' },
+      { id: 20, name: 'Deadlocked', song: 'Deadlocked.mp3' },
+      { id: 21, name: 'Fingerdash', song: 'Fingerdash.mp3' },
+      { id: 22, name: 'Dash', song: 'Dash.mp3' }
+    ];
+
+    function selectedLevelMeta() {
+      var params = new URLSearchParams(window.location.search);
+      var level = parseInt(params.get('level') || '1', 10);
+      if (!Number.isFinite(level)) level = 1;
+      return LEVELS.find(function (entry) { return entry.id === level; }) || LEVELS[0];
+    }
+
+    function updateTitleFromQuery() {
+      var meta = selectedLevelMeta();
+      document.title = 'Geometry Dash (Cube, Ship, Wave) - ' + meta.name;
+    }
+
+    function mountLevelSelector() {
+      var meta = selectedLevelMeta();
+      var wrap = document.createElement('section');
+      wrap.className = 'level-picker';
+      wrap.innerHTML =
+        '<h2>Level Selector</h2>' +
+        '<div class="row">' +
+          '<select id="gdLevelSelect"></select>' +
+          '<button id="gdLevelLoad" type="button">Load</button>' +
+        '</div>' +
+        '<div class="song" id="gdSongInfo"></div>';
+      document.body.appendChild(wrap);
+
+      var select = document.getElementById('gdLevelSelect');
+      var songInfo = document.getElementById('gdSongInfo');
+      LEVELS.forEach(function (entry) {
+        var option = document.createElement('option');
+        option.value = String(entry.id);
+        option.textContent = entry.id + '. ' + entry.name;
+        if (entry.id === meta.id) option.selected = true;
+        select.appendChild(option);
+      });
+
+      function refreshSongInfo() {
+        var id = parseInt(select.value, 10);
+        var current = LEVELS.find(function (entry) { return entry.id === id; }) || LEVELS[0];
+        songInfo.textContent = 'Song: ' + current.song;
+      }
+      refreshSongInfo();
+      select.addEventListener('change', refreshSongInfo);
+
+      document.getElementById('gdLevelLoad').addEventListener('click', function () {
+        var params = new URLSearchParams(window.location.search);
+        params.set('level', select.value);
+        window.location.search = params.toString();
+      });
+    }
+
+    // Mount Gamemode Switcher
+    function mountModeSwitcher() {
+      var bar = document.createElement('div');
+      bar.className = 'mode-bar';
+      bar.innerHTML = 
+        '<div class="mode-bar-header">🎮 Změna Módu Hráče (Klávesy 1, 2, 3 nebo W)</div>' +
+        '<div class="mode-buttons-row">' +
+          '<button id="btnCube" class="mode-btn active" title="Klávesa [1]">⬛ CUBE [1]</button>' +
+          '<button id="btnShip" class="mode-btn" title="Klávesa [2]">🚀 SHIP [2]</button>' +
+          '<button id="btnWave" class="mode-btn wave-btn" title="Klávesa [3] nebo [W]">▲ WAVE (Šipka 45°) [3]</button>' +
+        '</div>' +
+        '<div class="mode-hint" id="modeHintText">' +
+          'Wave mód: <b>Drž mezerník / klik</b> = let nahoru 45° | <b>Pusť</b> = let dolů 45°' +
+        '</div>';
+      document.body.appendChild(bar);
+
+      var btnCube = document.getElementById('btnCube');
+      var btnShip = document.getElementById('btnShip');
+      var btnWave = document.getElementById('btnWave');
+
+      function updateActiveBtn(mode) {
+        btnCube.classList.remove('active');
+        btnShip.classList.remove('active');
+        btnWave.classList.remove('active');
+        if (mode === 'cube') btnCube.classList.add('active');
+        if (mode === 'ship') btnShip.classList.add('active');
+        if (mode === 'wave') btnWave.classList.add('active');
+      }
+
+      btnCube.addEventListener('click', function() {
+        if (window.setGDGameMode) window.setGDGameMode('cube');
+        updateActiveBtn('cube');
+      });
+      btnShip.addEventListener('click', function() {
+        if (window.setGDGameMode) window.setGDGameMode('ship');
+        updateActiveBtn('ship');
+      });
+      btnWave.addEventListener('click', function() {
+        if (window.setGDGameMode) window.setGDGameMode('wave');
+        updateActiveBtn('wave');
+      });
+
+      window.onGDModeChanged = function(mode) {
+        updateActiveBtn(mode);
+      };
+    }
+
+    updateTitleFromQuery();
+
+    window.addEventListener('load', function () {
+      mountLevelSelector();
+      mountModeSwitcher();
+      setTimeout(function () {
+        var hasCanvas = !!document.querySelector('canvas');
+        if (!hasCanvas) {
+          var hasPhaser = typeof window.Phaser !== 'undefined';
+          showBootError('Boot watchdog: no canvas created. Phaser loaded: ' + hasPhaser);
+        }
+      }, 1200);
+    });
+
+    // Keep resize behavior aligned with the original runner.
+    new ResizeObserver(() => {
+      window.dispatchEvent(new Event('resize'));
+    }).observe(document.documentElement);
+  </script>
+</head>
+<body>
+  <div class="top-bar-ops">
+    <a href="../index.html" class="ops-back-btn">
+      <span>⬅</span> Zpět na OPS Portál
+    </a>
+  </div>
+</body>
+</html>
