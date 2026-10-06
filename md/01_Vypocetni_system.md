@@ -25,6 +25,8 @@ Speciální (vyhrazené) registry:
 - **Ukazatel zásobníku (Stack Pointer, SP)** – ukazuje na vrchol zásobníku (paměti pracující na principu LIFO – poslední dovnitř, první ven).
 - **Stavový registr (Processor Status, PS)** – uchovává informace o momentálním stavu procesoru, včetně režimu činnosti (režim jádra / uživatelský režim).
 
+![Architektura sběrnice výpočetního systému](img/bus-architecture.svg)
+
 ## Sběrnice (BUS)
 ![Výpočetní systém — CPU, RAM, I/O a Sběrnice](img/cpu-arch.svg)
 

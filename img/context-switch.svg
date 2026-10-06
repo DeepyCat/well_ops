@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="240" viewBox="0 0 560 240">
+  <rect width="560" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Časový průběh přepnutí kontextu (Context Switch)</text>
+  <rect x="30" y="46" width="120" height="30" rx="4" fill="#166534"/><text x="90" y="65" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Proces P1 běží</text>
+  <line x1="90" y1="76" x2="90" y2="195" stroke="#4ade80" stroke-width="2" stroke-dasharray="3,3"/>
+  <rect x="410" y="46" width="120" height="30" rx="4" fill="#1e3a8a"/><text x="470" y="65" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Proces P2 čeká</text>
+  <line x1="470" y1="76" x2="470" y2="195" stroke="#60a5fa" stroke-width="2" stroke-dasharray="3,3"/>
+  <line x1="90" y1="90" x2="230" y2="100" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="160" y="90" text-anchor="middle" font-family="Arial" font-size="8" fill="#f87171">Přerušení / Timer</text>
+  <rect x="210" y="95" width="140" height="30" rx="4" fill="#3f1214" stroke="#ef4444" stroke-width="1"/>
+  <text x="280" y="109" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fca5a5">Ulož stav do PCB1</text>
+  <text x="280" y="120" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Režie jádra OS</text>
+  <rect x="220" y="130" width="120" height="20" rx="3" fill="#222" stroke="#555"/>
+  <text x="280" y="144" text-anchor="middle" font-family="Arial" font-size="8" fill="#aaa">Plánovač vybere P2</text>
+  <rect x="210" y="155" width="140" height="30" rx="4" fill="#152840" stroke="#3b82f6" stroke-width="1"/>
+  <text x="280" y="169" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#93c5fd">Obnov stav z PCB2</text>
+  <text x="280" y="180" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Nahrání registrů</text>
+  <line x1="350" y1="185" x2="470" y2="195" stroke="#3b82f6" stroke-width="1.5"/>
+  <rect x="410" y="195" width="120" height="30" rx="4" fill="#2563eb"/><text x="470" y="214" text-anchor="middle" font-family="Arial" font-size="10" fill="#fff" font-weight="bold">Proces P2 běží</text>
+  <rect x="30" y="195" width="120" height="30" rx="4" fill="#1e293b"/><text x="90" y="214" text-anchor="middle" font-family="Arial" font-size="10" fill="#64748b">P1 čeká v Ready</text>
+  <text x="280" y="232" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#777">Během přepnutí kontextu CPU nevykonává žádnou užitečnou práci uživatele (čistá režie systému)</text>
+</svg>

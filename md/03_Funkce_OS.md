@@ -52,6 +52,8 @@ aliases: [Funkce operačního systému]
 - Přihlašování/odhlašování
 - Logování činnosti uživatelů
 
+![Podsystémy a architektura rozhraní OS](img/os-subsystems.svg)
+
 ## Uživatelské rozhraní
 
 Sada programů pro komunikaci s uživatelem:

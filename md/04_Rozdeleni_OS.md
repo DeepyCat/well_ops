@@ -4,6 +4,8 @@ aliases: [Rozdělení operačních systémů]
 
 # Rozdělení OS
 
+![Architektury SMP vs NUMA](img/smp-numa-architecture.svg)
+
 ## Podle počtu ovládaných procesorů
 
 ### Jednoprocesorové

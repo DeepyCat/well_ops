@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Algoritmy náhrady stránek (Page Replacement Algorithms)</text>
+  <rect x="25" y="48" width="160" height="155" rx="6" fill="#1e2538" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="105" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#60a5fa" font-weight="bold">FIFO (First-In, First-Out)</text>
+  <rect x="35" y="85" width="140" height="35" fill="#0f172a"/><text x="105" y="106" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#93c5fd">Vyhodí nejstarší stránku</text>
+  <text x="105" y="135" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Jednoduchá implementace</text>
+  <text x="105" y="150" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#ef4444">- Může vyhodit důležitou</text>
+  <text x="105" y="168" text-anchor="middle" font-family="Arial" font-size="8" fill="#f87171" font-weight="bold">Béládyho anomálie!</text>
+  <text x="105" y="182" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#cbd5e1">(Víc rámců = víc chyb)</text>
+  <rect x="198" y="48" width="164" height="155" rx="6" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="280" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">OPT (Optimální algoritmus)</text>
+  <rect x="208" y="85" width="144" height="35" fill="#052e16"/><text x="280" y="106" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#86efac">Vyhodí stránku použitou nejdále</text>
+  <text x="280" y="135" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Nejnižší počet výpadků</text>
+  <text x="280" y="155" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#ef4444">- Nelze v praxi implementovat</text>
+  <text x="280" y="175" text-anchor="middle" font-family="Arial" font-size="8" fill="#cbd5e1">Vyžaduje znalost budoucnosti</text>
+  <text x="280" y="190" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Slouží jen jako teoretický etalon</text>
+  <rect x="375" y="48" width="160" height="155" rx="6" fill="#221628" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="455" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#c084fc" font-weight="bold">LRU (Least Recently Used)</text>
+  <rect x="385" y="85" width="140" height="35" fill="#2e1065"/><text x="455" y="106" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#d8b4fe">Vyhodí nejdéle nepoužitou</text>
+  <text x="455" y="135" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Výborný poměr výkonu</text>
+  <text x="455" y="150" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#4ade80">+ Nemá Béládyho anomálii</text>
+  <text x="455" y="172" text-anchor="middle" font-family="Arial" font-size="8" fill="#cbd5e1">Aproximace v praxi:</text>
+  <text x="455" y="186" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#d8b4fe">Clock algoritmus (Druhá šance)</text>
+  <text x="280" y="218" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">Když nastane Page Fault a RAM je plná, OS musí nahradit obětní stránku (Victim Page)</text>
+</svg>

@@ -4,6 +4,8 @@ aliases: [Základní datové struktury, Datové struktury]
 
 # Základní datové struktury
 
+![Přehled datových struktur — pole, spojový seznam, zásobník a hašovací tabulka](img/data-structures.svg)
+
 Operační systém si potřebuje pamatovat spoustu informací (seznam běžících procesů, ovladače, volné/alokované bloky paměti). S různými druhy informací je potřeba zacházet různě – proto existuje víc typů **datových struktur**, jednotlivé údaje v nich se nazývají **prvky**.
 
 ## [[pole|Pole]]
@@ -56,6 +58,8 @@ Když hašovací funkce namapuje víc různých klíčů na stejný slot, jde o 
 - **Otevřené adresování** – při kolizi se hledá další volné místo předem daným způsobem (posun o 1, druhá hašovací funkce…). Kapacita je omezená velikostí pole.
 
 Nejhorší případ (hašovací funkce vrací pořád stejný haš) degraduje tabulku na lineární seznam.
+
+![Binární vyhledávací strom BST](img/binary-search-tree.svg)
 
 ## [[BST|Binární vyhledávací strom]] (BST)
 

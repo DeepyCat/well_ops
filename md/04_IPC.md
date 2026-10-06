@@ -87,6 +87,8 @@ Když jsou **obě** operace blokující, jde o tzv. **rendezvous** – producer�
 - **Omezená kapacita** – fronta délky n, odesílatel čeká, jen když je fronta plná
 - **Neomezená kapacita** – odesílatel nikdy nečeká
 
+![Klient–server komunikace přes síťové sockety](img/socket-communication.svg)
+
 ## Client–server komunikace
 
 ### Socket

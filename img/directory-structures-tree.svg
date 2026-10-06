@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Struktury adresářů: Jednoúrovňový, Dvouúrovňový a Stromový</text>
+  <rect x="25" y="48" width="155" height="155" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="102" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#60a5fa" font-weight="bold">Jednoúrovňový</text>
+  <text x="102" y="86" text-anchor="middle" font-family="Arial" font-size="8" fill="#94a3b8">Single-level (Vše v jednom)</text>
+  <rect x="35" y="98" width="135" height="22" fill="#0f172a"/><text x="102" y="112" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#cbd5e1">[soubor A] [soubor B] [soubor C]</text>
+  <text x="102" y="150" text-anchor="middle" font-family="Arial" font-size="8" fill="#ef4444">Kolize jmen souborů!</text>
+  <text x="102" y="166" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Nemožnost seskupování</text>
+  <rect x="200" y="48" width="155" height="155" rx="6" fill="#221628" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="277" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#c084fc" font-weight="bold">Dvouúrovňový</text>
+  <text x="277" y="86" text-anchor="middle" font-family="Arial" font-size="8" fill="#d8b4fe">Master Dir + Uživatel (UFD)</text>
+  <rect x="210" y="98" width="135" height="20" fill="#2e1065"/><text x="277" y="112" text-anchor="middle" font-family="Arial" font-size="8" fill="#fff">Master File Directory</text>
+  <text x="240" y="135" text-anchor="middle" font-family="Arial" font-size="8" fill="#a78bfa">User 1</text><text x="315" y="135" text-anchor="middle" font-family="Arial" font-size="8" fill="#a78bfa">User 2</text>
+  <text x="277" y="166" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">Izolace uživatelů</text>
+  <text x="277" y="182" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#aaa">Ale nelze tvořit podsložky</text>
+  <rect x="375" y="48" width="160" height="155" rx="6" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="455" y="70" text-anchor="middle" font-family="Arial" font-size="11" fill="#4ade80" font-weight="bold">Stromový (Hierarchický)</text>
+  <text x="455" y="86" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">Tree-structured (UNIX / Win)</text>
+  <rect x="430" y="98" width="50" height="20" rx="2" fill="#166534"/><text x="455" y="112" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">/ root</text>
+  <text x="410" y="140" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">/bin</text><text x="455" y="140" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">/home</text><text x="500" y="140" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">/etc</text>
+  <text x="455" y="168" text-anchor="middle" font-family="Arial" font-size="8" fill="#bbf7d0">Absolutní &amp; Relativní cesta</text>
+  <text x="455" y="185" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">Podpora hardlinků i symlinků</text>
+  <text x="280" y="218" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">Moderní OS používají stromovou strukturu s podporou cyklických odkazů (Acyclic Graph / DAG)</text>
+</svg>

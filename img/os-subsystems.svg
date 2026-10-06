@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="240" viewBox="0 0 560 240">
+  <rect width="560" height="240" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Podsystémy a architektura rozhraní OS (UI vs API)</text>
+  <rect x="30" y="46" width="240" height="80" rx="6" fill="#14251e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="150" y="68" text-anchor="middle" font-family="Arial" font-size="12" fill="#4ade80" font-weight="bold">Uživatelské rozhraní (UI)</text>
+  <rect x="42" y="78" width="100" height="36" rx="3" fill="#164e24"/><text x="92" y="95" text-anchor="middle" font-family="Arial" font-size="9" fill="#bbf7d0" font-weight="bold">CLI</text><text x="92" y="107" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">Bash, CMD, PS</text>
+  <rect x="158" y="78" width="100" height="36" rx="3" fill="#164e24"/><text x="208" y="95" text-anchor="middle" font-family="Arial" font-size="9" fill="#bbf7d0" font-weight="bold">GUI</text><text x="208" y="107" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#86efac">Desktop, Okna, Myš</text>
+  <rect x="290" y="46" width="240" height="80" rx="6" fill="#172554" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="410" y="68" text-anchor="middle" font-family="Arial" font-size="12" fill="#60a5fa" font-weight="bold">Aplikační rozhraní (API)</text>
+  <rect x="302" y="78" width="105" height="36" rx="3" fill="#1e3a8a"/><text x="354" y="95" text-anchor="middle" font-family="Arial" font-size="9" fill="#dbeafe" font-weight="bold">POSIX / libc</text><text x="354" y="107" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#93c5fd">Linux, UNIX</text>
+  <rect x="415" y="78" width="105" height="36" rx="3" fill="#1e3a8a"/><text x="467" y="95" text-anchor="middle" font-family="Arial" font-size="9" fill="#dbeafe" font-weight="bold">Win32 / Win64</text><text x="467" y="107" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#93c5fd">Windows API</text>
+  <line x1="150" y1="126" x2="280" y2="142" stroke="#4ade80" stroke-width="1.5"/>
+  <line x1="410" y1="126" x2="280" y2="142" stroke="#60a5fa" stroke-width="1.5"/>
+  <rect x="30" y="142" width="500" height="82" rx="6" fill="#301518" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="280" y="162" text-anchor="middle" font-family="Arial" font-size="11" fill="#f87171" font-weight="bold">Jádro operačního systému (Správa zdrojů)</text>
+  <rect x="45" y="172" width="90" height="42" rx="3" fill="#451216"/><text x="90" y="190" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca" font-weight="bold">Procesy</text><text x="90" y="204" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#fca5a5">Plánování CPU</text>
+  <rect x="143" y="172" width="90" height="42" rx="3" fill="#451216"/><text x="188" y="190" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca" font-weight="bold">Paměť</text><text x="188" y="204" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#fca5a5">Virtuální paměť</text>
+  <rect x="241" y="172" width="80" height="42" rx="3" fill="#451216"/><text x="281" y="190" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca" font-weight="bold">Soubory</text><text x="281" y="204" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#fca5a5">VFS, práva</text>
+  <rect x="329" y="172" width="90" height="42" rx="3" fill="#451216"/><text x="374" y="190" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca" font-weight="bold">Periferie</text><text x="374" y="204" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#fca5a5">Ovladače, I/O</text>
+  <rect x="427" y="172" width="90" height="42" rx="3" fill="#451216"/><text x="472" y="190" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#fecaca" font-weight="bold">Bezpečnost</text><text x="472" y="204" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#fca5a5">Uživatelé, ACL</text>
+</svg>

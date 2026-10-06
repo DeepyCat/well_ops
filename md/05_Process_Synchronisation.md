@@ -26,6 +26,8 @@ Když víc procesů (vláken) přistupuje ke stejnému prostředku (paměť, sou
 
 Procesy čekající na vstup mohou používat **aktivní čekání** – neustále se pokoušet o vstup.
 
+![Synchronizační primitiva — Mutex vs Semafor](img/semaphore-mutex.svg)
+
 ## Synchronizační primitiva
 
 ### Zámek a instrukce TSL (Test and Set Lock)

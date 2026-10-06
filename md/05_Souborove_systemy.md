@@ -4,6 +4,8 @@ aliases: [Souborové systémy, File systems]
 
 # Souborové systémy
 
+![Přehled souborových systémů a vrstva VFS](img/file-systems.svg)
+
 ## Proč souborové systémy existují
 
 Řeší ukládání a přístup k souborům na úložišti (HDD, USB disk, SSD, CD/DVD/BD, diskové pole) – konkrétně:
@@ -52,6 +54,8 @@ aliases: [Souborové systémy, File systems]
 - **SMB** (Server Message Block) – síťové sdílení souborů, hlavně Windows
 - **NFS** (Network File System) – síťové sdílení, typicky mezi UNIXovými/Linuxovými systémy
 - **CODA** – experimentální distribuovaný souborový systém s podporou odpojeného (offline) režimu
+
+![Metody alokace diskového prostoru](img/fs-allocation-methods.svg)
 
 ## Funkcionalita souborových systémů
 

@@ -4,6 +4,8 @@ aliases: [Historie operačních systémů]
 
 # Historie OS
 
+![Časová osa vývoje operačních systémů](img/os-history-timeline.svg)
+
 ## Průkopníci bez systému
 
 Nejstarší elektromechanické počítače neměly žádný operační systém. Programy se spouštěly pomocí děrných štítků, parametry nastavovala skupina operátorů přepínači – proces byl fyzicky i duševně náročný a neefektivní. Postupně vznikaly první jednoduché systémy (obsluha V/V, dávkový režim).
@@ -11,6 +13,8 @@ Nejstarší elektromechanické počítače neměly žádný operační systém. 
 ## 1960 – IBM OS/360
 
 Začátkem 60. let vyvinula IBM revoluční systém **OS/360** – první systém, který mohl běžet na různých strojích (dřív měl každý typ počítače vlastní systém napevno spojený s hardwarem). Vývoj byl komplikovaný, ale řada IBM 360 byla díky jednotnému systému komerčně velmi úspěšná – počítače této řady řídily i první let člověka na Měsíc.
+
+![Evoluce a větve rodiny UNIX](img/unix-evolution.svg)
 
 ## UNIX
 

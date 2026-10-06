@@ -8,6 +8,8 @@ aliases: [Directory Structure, Adresářová struktura, File Sharing, File Syste
 
 Hledání souboru, vytvoření, smazání, výpis obsahu, přejmenování, průchod celou strukturou (např. pro zálohu).
 
+![Jednoúrovňové, dvouúrovňové a stromové adresáře](img/directory-structures-tree.svg)
+
 ## Typy adresářové struktury
 
 ![Adresářový strom a vnitřní struktura Unix Inode](img/directory-tree-inode.svg)

@@ -32,6 +32,8 @@ Výpočet: MTTF jednoho disku 100 000 h, střední doba opravy (MTTR) 10 h → s
 
 Cíl: zvýšit propustnost malých přístupů (load balancing) a zkrátit odezvu velkých přístupů.
 
+![Srovnání úrovní diskových polí RAID](img/raid-comparison.svg)
+
 ## Úrovně RAID (podrobně)
 
 | Úroveň | Princip | Poznámka |

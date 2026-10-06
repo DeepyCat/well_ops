@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Synchronizační primitiva: Mutex (Zámek) vs Semafor (Počítadlo)</text>
+  <rect x="30" y="48" width="240" height="155" rx="6" fill="#2e1518" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="150" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#f87171" font-weight="bold">Mutex (Binární zámek)</text>
+  <rect x="45" y="82" width="210" height="36" rx="4" fill="#451216"/><text x="150" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#fecaca">Hodnoty: 0 (Zamčeno) nebo 1 (Volno)</text><text x="150" y="110" text-anchor="middle" font-family="Arial" font-size="8" fill="#fca5a5">Vlastnictví: Odemkne jen ten, kdo zamknul</text>
+  <text x="150" y="136" text-anchor="middle" font-family="Arial" font-size="9" fill="#cbd5e1">acquire() / lock()</text>
+  <rect x="75" y="144" width="150" height="22" fill="#1a1a1a" stroke="#ef4444"/><text x="150" y="159" text-anchor="middle" font-family="Arial" font-size="9" fill="#ef4444" font-weight="bold">Kritická sekce (1 proces)</text>
+  <text x="150" y="182" text-anchor="middle" font-family="Arial" font-size="9" fill="#cbd5e1">release() / unlock()</text>
+  <text x="150" y="196" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Chrání 1 sdílený zdroj</text>
+  <rect x="290" y="48" width="240" height="155" rx="6" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="410" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#4ade80" font-weight="bold">Semafor (Počítadlo S)</text>
+  <rect x="305" y="82" width="210" height="36" rx="4" fill="#052e16"/><text x="410" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#bbf7d0">Hodnota S: Počet volných instancí zdrojů</text><text x="410" y="110" text-anchor="middle" font-family="Arial" font-size="8" fill="#86efac">Nemá vlastníka (signalizovat může i jiný proces)</text>
+  <text x="410" y="136" text-anchor="middle" font-family="Arial" font-size="9" fill="#cbd5e1">wait(S) nebo P(S): S = S - 1</text>
+  <rect x="335" y="144" width="150" height="22" fill="#1a1a1a" stroke="#22c55e"/><text x="410" y="159" text-anchor="middle" font-family="Arial" font-size="9" fill="#4ade80" font-weight="bold">Až N procesů současně</text>
+  <text x="410" y="182" text-anchor="middle" font-family="Arial" font-size="9" fill="#cbd5e1">signal(S) nebo V(S): S = S + 1</text>
+  <text x="410" y="196" text-anchor="middle" font-family="Arial" font-size="7.5" fill="#94a3b8">Chrání fond N identických zdrojů</text>
+  <text x="280" y="218" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">Operace nad semaforem musí probíhat atomicky (nedělitelně bez možnosti přerušení)</text>
+</svg>

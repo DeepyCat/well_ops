@@ -8,6 +8,8 @@ Základní deska spojuje všechny díly počítače (procesor, disky, sběrnice,
 
 BIOS je v podstatě sada ovladačů základních komponent systému a funguje jako **"překladač"** mezi hardwarem a operačním systémem – vůči OS se tváří "stále stejně" bez ohledu na připojený hardware. Např. OS vidí disk jako úložiště dat, ale nemusí znát jeho konkrétní parametry (počet hlav, sektorů…).
 
+![Tři vrstvy BIOSu](img/bios-layers.svg)
+
 ## Tři vrstvy BIOSu
 
 1. **Flash ROM** – vlastní program BIOS a jeho data (info o možných komponentách desky), lze přepsat programem flash

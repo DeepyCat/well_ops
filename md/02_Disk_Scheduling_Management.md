@@ -31,6 +31,8 @@ SSTF je v podstatě obdoba [[06_CPU_Scheduling|SJF]] plánování CPU – i tady
 
 [[SSD]] nemá pohyblivou hlavu, takže tyto algoritmy z velké části **neplatí**. Používá se prosté FCFS (např. Linux Noop scheduler), případně jen se slučováním sousedních požadavků na zápis (čtení má u SSD rovnoměrnou dobu, zápis ne).
 
+![Správa a formátování disku](img/disk-formatting-structure.svg)
+
 ## Správa disku (Disk Management)
 
 ### Formátování disku

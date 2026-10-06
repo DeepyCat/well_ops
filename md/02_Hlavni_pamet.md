@@ -76,6 +76,8 @@ MMU sečte logickou adresu s relokačním registrem → fyzická adresa. Při p�
 
 Simulace ukazují, že first fit a best fit jsou rychlejší a efektivnější než worst fit.
 
+![Externí a interní fragmentace paměti](img/memory-fragmentation.svg)
+
 ## Fragmentace
 
 - **Externí fragmentace** – celkem je dost volné paměti, ale je **roztříštěná** na malé nesouvislé díry, žádná není dost velká pro nový požadavek. Platí tzv. **pravidlo 50 %** – při N alokovaných blocích se dalších ~0,5 N ztratí fragmentací (až třetina paměti nevyužitelná)

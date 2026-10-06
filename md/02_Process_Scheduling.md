@@ -54,6 +54,8 @@ Volitelná mezivrstva, používaná hlavně u systémů se sdílením času. Do�
 
 Long-term scheduler by měl vybírat **dobrou směs** obou typů – samé I/O-bound procesy = prázdná ready queue, samé CPU-bound = nevyužitá V/V zařízení. Nejlepší výkon má systém s vyváženou kombinací.
 
+![Časový průběh přepnutí kontextu](img/context-switch.svg)
+
 ## Přepnutí kontextu (Context Switch)
 
 [[přerušení|Přerušení]] donutí OS přepnout CPU z aktuálního úkolu na rutinu jádra. Při tom se musí uložit aktuální kontext běžícího procesu (do jeho [[PCB]]), aby šel později obnovit – kontext zahrnuje hodnoty [[registr|CPU registrů]], stav procesu a info o správě paměti.

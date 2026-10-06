@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="230" viewBox="0 0 560 230">
+  <rect width="560" height="230" fill="#1a1a1a" rx="10"/>
+  <text x="280" y="26" text-anchor="middle" font-family="Segoe UI,Arial" font-size="14" fill="#e0e0e0" font-weight="bold">Atributy souboru a základní operace se soubory</text>
+  <rect x="30" y="48" width="240" height="155" rx="6" fill="#172554" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="150" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#93c5fd" font-weight="bold">Atributy souboru (Metadata)</text>
+  <rect x="42" y="80" width="216" height="18" rx="3" fill="#1e3a8a"/><text x="52" y="93" font-family="Arial" font-size="8.5" fill="#dbeafe">• Jméno: Čitelné pro člověka (např. test.txt)</text>
+  <rect x="42" y="102" width="216" height="18" rx="3" fill="#1e3a8a"/><text x="52" y="115" font-family="Arial" font-size="8.5" fill="#dbeafe">• Identifikátor: Unikátní číselné ID (inode číslo)</text>
+  <rect x="42" y="124" width="216" height="18" rx="3" fill="#1e3a8a"/><text x="52" y="137" font-family="Arial" font-size="8.5" fill="#dbeafe">• Velikost: Aktuální bajty &amp; alokované bloky</text>
+  <rect x="42" y="146" width="216" height="18" rx="3" fill="#1e3a8a"/><text x="52" y="159" font-family="Arial" font-size="8.5" fill="#dbeafe">• Ochrana / Práva: rwx pro Owner/Group/Other</text>
+  <rect x="42" y="168" width="216" height="18" rx="3" fill="#1e3a8a"/><text x="52" y="181" font-family="Arial" font-size="8.5" fill="#dbeafe">• Časová razítka: mtime (úprava), atime (čtení)</text>
+  <rect x="290" y="48" width="240" height="155" rx="6" fill="#142e1e" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="410" y="70" text-anchor="middle" font-family="Arial" font-size="12" fill="#86efac" font-weight="bold">Základní operace (OS API)</text>
+  <rect x="302" y="80" width="100" height="30" rx="3" fill="#166534"/><text x="352" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">create()</text>
+  <rect x="418" y="80" width="100" height="30" rx="3" fill="#166534"/><text x="468" y="98" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">open() / close()</text>
+  <rect x="302" y="116" width="100" height="30" rx="3" fill="#15803d"/><text x="352" y="134" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">read()</text>
+  <rect x="418" y="116" width="100" height="30" rx="3" fill="#15803d"/><text x="468" y="134" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">write()</text>
+  <rect x="302" y="152" width="100" height="30" rx="3" fill="#16a34a"/><text x="352" y="170" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">lseek()</text>
+  <rect x="418" y="152" width="100" height="30" rx="3" fill="#991b1b"/><text x="468" y="170" text-anchor="middle" font-family="Arial" font-size="9" fill="#fff" font-weight="bold">unlink() / delete</text>
+  <text x="280" y="218" text-anchor="middle" font-family="Arial" font-size="8.5" fill="#666">OS spravuje tabulku otevřených souborů na úrovni systému i na úrovni každého běžícího procesu</text>
+</svg>
