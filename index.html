@@ -136,31 +136,54 @@
             color: #fff;
         }
 
-        #gd-game-btn {
+        .games-bar {
             position: fixed;
-            bottom: 5px;
-            left: 5px;
+            bottom: 8px;
+            left: 8px;
             z-index: 9999;
-            background: rgba(0, 0, 0, 0.45);
-            color: #00f0ff;
-            padding: 4px 10px;
-            border-radius: 4px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .game-btn {
+            background: rgba(0, 0, 0, 0.55);
+            padding: 5px 12px;
+            border-radius: 6px;
             font-size: 12px;
             font-weight: 700;
             font-family: 'Consolas', monospace;
             text-decoration: none;
-            border: 1px solid rgba(0, 240, 255, 0.35);
-            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+            transition: all 0.25s ease;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
-        #gd-game-btn:hover {
+        .game-btn.gd {
+            color: #00f0ff;
+            border: 1px solid rgba(0, 240, 255, 0.35);
+        }
+
+        .game-btn.gd:hover {
             background: rgba(0, 240, 255, 0.25);
             color: #fff;
             border-color: #00f0ff;
             box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .game-btn.stratagem {
+            color: #FFE900;
+            border: 1px solid rgba(255, 233, 0, 0.35);
+        }
+
+        .game-btn.stratagem:hover {
+            background: rgba(255, 233, 0, 0.25);
+            color: #fff;
+            border-color: #FFE900;
+            box-shadow: 0 0 12px rgba(255, 233, 0, 0.5);
             transform: translateY(-2px);
         }
 
@@ -186,8 +209,11 @@
     </style>
 </head>
 <body class="custom-layout">
-    <!-- Tlačítko na Geometry Dash -->
-    <a href="gd/index.html" id="gd-game-btn" title="Geometry Dash (Cube, Ship, Wave)">🎮 Geometry Dash</a>
+    <!-- Panel her v levém dolním rohu -->
+    <div class="games-bar">
+        <a href="gd/index.html" class="game-btn gd" title="Geometry Dash">🎮 Geometry Dash</a>
+        <a href="stratagem/index.html" class="game-btn stratagem" title="Stratagem Hero Online (Helldivers 2)">⚡ Stratagem Hero</a>
+    </div>
 
     <!-- Čisté přepínací tlačítko -->
     <button id="mode-toggle-btn" title="Přepnout režim">♦</button>
