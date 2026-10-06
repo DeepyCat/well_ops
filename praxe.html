@@ -96,17 +96,21 @@
     }
 
     .module-select {
-      background: #160e0e;
+      background: #160e0e url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ff5555' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+      background-size: 11px 11px;
       color: #ffcccc;
       border: 1px solid rgba(255, 85, 85, 0.5);
       border-radius: 4px;
-      padding: 5px 10px;
+      padding: 5px 28px 5px 10px;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       outline: none;
       transition: all 0.2s ease;
       font-family: inherit;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
     }
 
     .module-select:hover, .module-select:focus {
@@ -450,10 +454,72 @@
     .detail-nav-footer {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
       margin-top: 10px;
       padding-top: 14px;
       border-top: 1px solid var(--border-color);
+    }
+
+    .detail-footer-module-select {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #221515 0%, #1a1010 100%);
+      border: 1px solid rgba(255, 85, 85, 0.4);
+      border-radius: 20px;
+      padding: 3px 6px 3px 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    .detail-footer-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      user-select: none;
+    }
+
+    .detail-module-pills {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .detail-module-pill {
+      background: #252020;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cfcfcf;
+      padding: 4px 11px;
+      border-radius: 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: inherit;
+      user-select: none;
+      outline: none;
+    }
+
+    .detail-module-pill:hover {
+      background: #382222;
+      border-color: var(--accent);
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(255, 85, 85, 0.3);
+    }
+
+    .detail-module-pill.active {
+      background: linear-gradient(135deg, rgba(255, 85, 85, 0.35) 0%, rgba(255, 85, 85, 0.2) 100%);
+      border-color: var(--accent);
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(255, 85, 85, 0.45);
     }
 
     .nav-step-btn {
@@ -481,6 +547,155 @@
       opacity: 0.3;
       cursor: not-allowed;
       border-color: var(--border-color);
+    }
+
+    /* Globální patička stránky */
+    .site-footer {
+      width: 100%;
+      background: linear-gradient(180deg, #1d1717 0%, #140f0f 100%);
+      border-top: 2px solid rgba(255, 85, 85, 0.25);
+      padding: 12px 25px;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+      flex-shrink: 0;
+      z-index: 90;
+    }
+
+    .footer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .footer-module-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .footer-module-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      user-select: none;
+    }
+
+    .footer-module-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .footer-module-pill {
+      background: #1c1313;
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: #e5e5e5;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      outline: none;
+      user-select: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .footer-module-pill:hover {
+      background: #301a1a;
+      border-color: var(--accent-hover);
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(255, 85, 85, 0.35);
+    }
+
+    .footer-module-pill.active {
+      background: linear-gradient(135deg, rgba(255, 85, 85, 0.32) 0%, rgba(255, 85, 85, 0.18) 100%);
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(255, 85, 85, 0.45);
+      font-weight: 700;
+    }
+
+    .footer-module-pill .pill-badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 85, 85, 0.2);
+      color: var(--accent-hover);
+      border: 1px solid rgba(255, 85, 85, 0.4);
+      letter-spacing: 0.4px;
+    }
+
+    .footer-module-pill.active .pill-badge {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent-hover);
+    }
+
+    .footer-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .footer-link-btn {
+      background-color: #242424;
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: #f0f6fc;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .footer-link-btn:hover {
+      background-color: #382222;
+      color: #ffffff;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(255, 85, 85, 0.3);
+    }
+
+    .footer-link-btn .external-icon {
+      color: var(--accent);
+      transition: color 0.2s ease;
+      margin-left: 2px;
+    }
+
+    .footer-link-btn:hover .external-icon {
+      color: var(--accent-hover);
+    }
+
+    .footer-meta {
+      font-size: 0.76rem;
+      color: #888;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .task-label {
@@ -1133,7 +1348,7 @@
 
     @media screen and (max-width: 900px) {
       .main-content {
-        padding: 14px 14px 40px 14px;
+        padding: 14px 14px 25px 14px;
       }
       .top-controls {
         flex-direction: column;
@@ -1155,7 +1370,23 @@
         max-height: 200px;
       }
       .detail-pane {
-        padding: 18px 18px 30px 18px;
+        padding: 18px 18px 25px 18px;
+      }
+      .detail-nav-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .detail-footer-module-select {
+        justify-content: center;
+        order: -1;
+      }
+      .footer-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .footer-actions {
+        width: 100%;
+        justify-content: flex-start;
       }
       .header-actions {
         flex-direction: row;
@@ -1648,6 +1879,35 @@
     </div>
   </div>
 
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-module-section">
+        <span class="footer-module-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          <span>Zadání:</span>
+        </span>
+        <div class="footer-module-pills" id="footer-module-pills">
+          <!-- Dynamicky renderováno z window.OPS_MODULES (Modul 00, Modul 01...) -->
+        </div>
+      </div>
+      <div class="footer-actions">
+        <a href="praxe/00/__zadani.html" target="_blank" rel="noopener noreferrer" class="footer-link-btn" id="footer-link-zadani" title="Otevřít zformátované zadání (_zadani.md) v nové záložce">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <span>_zadani.md</span>
+          <svg class="external-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+        <a href="praxe/00/__reseni.html" target="_blank" rel="noopener noreferrer" class="footer-link-btn" id="footer-link-reseni" title="Otevřít zformátované řešení (__reseni.md) v nové záložce">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          <span>__reseni.md</span>
+          <svg class="external-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </a>
+        <div class="footer-meta">
+          <span>• OPS Praktická cvičení</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script>
     let currentModuleId = "00";
     let currentModuleConfig = null;
@@ -1682,6 +1942,38 @@
           ${m.title}
         </option>
       `).join('');
+    }
+
+    function renderFooterModules() {
+      const container = document.getElementById("footer-module-pills");
+      if (!container) return;
+      const modules = window.OPS_MODULES || [];
+      container.innerHTML = modules.map(m => {
+        const isActive = m.id === currentModuleId;
+        const shortTitle = m.shortTitle || ('Modul ' + m.id);
+        const fullTitle = m.title || shortTitle;
+        const titleWithoutPrefix = m.title ? m.title.replace(/^Modul \d+:\s*/, '') : '';
+        return `
+          <button type="button" class="footer-module-pill ${isActive ? 'active' : ''}" onclick="switchModule('${m.id}')" title="${escapeHtml(fullTitle)}">
+            <span class="pill-badge">${escapeHtml(m.code || ('M' + m.id))}</span>
+            <span class="pill-title">${escapeHtml(shortTitle)}</span>
+            ${titleWithoutPrefix ? `<span class="pill-desc" style="font-size:0.75rem; color:#aaa; font-weight:normal; margin-left:2px;">• ${escapeHtml(titleWithoutPrefix)}</span>` : ''}
+          </button>
+        `;
+      }).join('');
+
+      const zadaniBtn = document.getElementById("footer-link-zadani");
+      const reseniBtn = document.getElementById("footer-link-reseni");
+      const folder = (currentModuleConfig && currentModuleConfig.folder) || `praxe/${currentModuleId}`;
+      const title = (currentModuleConfig && (currentModuleConfig.shortTitle || currentModuleConfig.title)) || `Modul ${currentModuleId}`;
+      if (zadaniBtn) {
+        zadaniBtn.href = `${folder}/__zadani.html`;
+        zadaniBtn.title = `Otevřít zformátované zadání (__zadani.md) pro ${title} v nové záložce`;
+      }
+      if (reseniBtn) {
+        reseniBtn.href = `${folder}/__reseni.html`;
+        reseniBtn.title = `Otevřít zformátované řešení (__reseni.md) pro ${title} v nové záložce`;
+      }
     }
 
     function switchModule(modId) {
@@ -2109,6 +2401,21 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             Předchozí úkol
           </button>
+
+          <div class="detail-footer-module-select">
+            <span class="detail-footer-label">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              <span>Zadání:</span>
+            </span>
+            <div class="detail-module-pills">
+              ${(window.OPS_MODULES || []).map(m => `
+                <button type="button" class="detail-module-pill ${m.id === currentModuleId ? 'active' : ''}" onclick="switchModule('${m.id}')" title="${escapeHtml(m.title)}">
+                  ${escapeHtml(m.shortTitle || ('Modul ' + m.id))}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
           <button class="nav-step-btn" ${nextTask ? `onclick="selectTask('${nextTask.id}')"` : "disabled"}>
             Další úkol
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -2143,6 +2450,7 @@
       // Aktualizovat select a horní odkazy
       initModuleSelect();
       updateDocLinks();
+      renderFooterModules();
 
       // Zkontrolovat platnost vybraného stroje
       const availableVMs = config.vms || ["SRV1-DC", "SRV2-FS", "PC1-WIN"];
