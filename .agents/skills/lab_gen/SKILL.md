@@ -16,9 +16,9 @@ Podrobná specifikace se nachází v hlavním souboru projektu: [lab_gen.md](../
 ### 1. Složka cvičení `praxe/XX/`
 Vytvořit složku `praxe/XX/` (např. `praxe/02/`):
 - `__zadani.md` a `_zadani.md` – textové zadání cvičení.
-- `__zadani.html` a `_zadani.html` – stylizovaná HTML verze sjednocená s OPS motivem (`#1a1a1a`, červená tlačítka `--accent: #ff5555`), kopírovacími tlačítky a SVG ikonami (žádné emoji!).
+- `__zadani.html` a `_zadani.html` – stylizovaná HTML verze sjednocená s OPS motivem (`#1a1a1a`, červená tlačítka `--accent: #ff5555`), kopírovacími tlačítky, SVG ikonami (žádné emoji!) a povinným faviconem (`<link rel="icon" type="image/x-icon" href="../../img/bird.png">`).
 - `_vysledek.md`, `__reseni.md` a `_reseni.md` – kontrolní seznam vzorového řešení bod po bodu.
-- `__reseni.html`, `_reseni.html` a `_vysledek.html` – stylizovaná HTML verze řešení v jednotném OPS motivu s červenými tlačítky.
+- `__reseni.html`, `_reseni.html` a `_vysledek.html` – stylizovaná HTML verze řešení v jednotném OPS motivu s červenými tlačítky a povinným faviconem (`<link rel="icon" type="image/x-icon" href="../../img/bird.png">`).
 
 ### 2. Konfigurace ověření `praxe/XX/verified.json`
 Vytvořit soubor `praxe/XX/verified.json`, kde jsou pro nově vytvořený modul ve výchozím stavu všechny stroje nastaveny na `false` (dokud je uživatel v reálném labu fyzicky neotestuje):
@@ -89,6 +89,12 @@ Do tagu `<head>` v `praxe.html` doplnit:
    - Všechny IP adresyvažte na proměnnou `wsX` (`192.168.${x}.0/24`, brána `192.168.${x}.1`, servery `.10`/`.20`, klienti `.100–.200`).
 6. **NIC VAROVNÝ BANNER:**
    - U síťových úkolů vždy zobrazte `.nic-warning-banner` připomínající zapnutí NIC 2 v CyLabu a pravidlo *„na NIC 1 (NAT) nešahat“*.
+7. **POVINNÝ FAVICON NA VŠECH STRÁNKÁCH (`img/bird.png`):**
+   - Všechny HTML stránky v projektu musí mít v tagu `<head>` nastavenou favicon na `img/bird.png`.
+   - V kořenových stránkách (`index.html`, `teorie.html`, `praxe.html`):
+     `<link rel="icon" type="image/x-icon" href="img/bird.png">`
+   - V HTML stránkách v podsložkách modulů (`praxe/XX/*.html`):
+     `<link rel="icon" type="image/x-icon" href="../../img/bird.png">`
 
 ---
 
