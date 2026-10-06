@@ -7768,28 +7768,28 @@ class GameScene extends Phaser.Scene {
     this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H).on("down", () => {
       this._fpsText.setVisible(!this._fpsText.visible);
     });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE).on(down, () => {
+    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ONE).on("down", () => {
       if (this._player) {
         this._player.exitWaveMode();
         this._player.exitShipMode();
         if (window.onGDModeChanged) window.onGDModeChanged('cube');
       }
     });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO).on(down, () => {
+    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO).on("down", () => {
       if (this._player) {
         this._player.exitWaveMode();
         this._player.enterShipMode();
         if (window.onGDModeChanged) window.onGDModeChanged('ship');
       }
     });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE).on(down, () => {
+    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE).on("down", () => {
       if (this._player) {
         this._player.exitShipMode();
         this._player.enterWaveMode();
         if (window.onGDModeChanged) window.onGDModeChanged('wave');
       }
     });
-    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).on(down, () => {
+    this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W).on("down", () => {
       if (this._player) {
         if (this._state.isWave) {
           this._player.exitWaveMode();
