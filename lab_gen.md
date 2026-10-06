@@ -26,9 +26,9 @@ Při zpracování nového modulu (např. `02`) AI **VŽDY** provede následujíc
 ### Krok 1: Vytvoření složky `praxe/XX/` a souborů zadání
 Vytvořte složku `praxe/XX/` (např. `praxe/02/`) a v ní:
 1. `__zadani.md` a jeho identické zrcadlo `_zadani.md` (Markdown zadání s kontextem, tabulkami parametrů a cílovým stavem).
-2. `__zadani.html` a `_zadani.html` (plnohodnotná, stylová HTML stránka sladěná s jednotným OPS tmavým tématem `#1a1a1a`, červenými tlačítky `--accent: #ff5555`, breadcrumbs, tlačítky pro kopírování kódů a SVG ikonami bez emoji).
+2. `__zadani.html` a `_zadani.html` (plnohodnotná, stylová HTML stránka sladěná s jednotným OPS tmavým tématem `#1a1a1a`, červenými tlačítky `--accent: #ff5555`, breadcrumbs, tlačítky pro kopírování kódů, SVG ikonami bez emoji a povinným faviconem `<link rel="icon" type="image/x-icon" href="../../img/bird.png">`).
 3. `_vysledek.md` a jeho identická zrcadla `__reseni.md` a `_reseni.md` (kontrolní seznam bod po bodu: jak se pozná, že je úkol splněný, s přesnými PowerShell testy a očekávanými výstupy).
-4. `__reseni.html`, `_reseni.html` a `_vysledek.html` (plnohodnotná HTML stránka vzorového řešení v jednotném OPS tématu s červenými tlačítky).
+4. `__reseni.html`, `_reseni.html` a `_vysledek.html` (plnohodnotná HTML stránka vzorového řešení v jednotném OPS tématu s červenými tlačítky a povinným faviconem `<link rel="icon" type="image/x-icon" href="../../img/bird.png">`).
 
 ### Krok 2: Vytvoření konfiguračního souboru `verified.json`
 Vytvořte `praxe/XX/verified.json`. **Ve výchozím stavu nastavte pro nově vytvořený modul všechny stroje na `false`** (protože ještě nebyly v reálném labu fyzicky otestovány):
@@ -170,6 +170,17 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 - **NIC 2 (Ethernet1 / Interní síť):** SEM PATŘÍ IP! Musí být zapnutý v CyLabu.
 - **NIC 3 (Ethernet2 / Třídní síť):** Třída.
 
+### 7. POVINNÝ FAVICON NA VŠECH STRÁNKÁCH (`img/bird.png`)
+- **VŠECHNY stránky portálu** musí mít v hlavičce `<head>` definovanou ikonu webu (favicon) odkazující na `img/bird.png`:
+  - Kořenové soubory (`index.html`, `praxe.html`, `teorie.html`):
+    ```html
+    <link rel="icon" type="image/x-icon" href="img/bird.png">
+    ```
+  - Modulové podstránky v `praxe/XX/` (`__zadani.html`, `_zadani.html`, `__reseni.html`, `_reseni.html`, `_vysledek.html`):
+    ```html
+    <link rel="icon" type="image/x-icon" href="../../img/bird.png">
+    ```
+
 ---
 
 ## 🔍 Ověřovací checklist pro AI před odevzdáním práce
@@ -182,4 +193,5 @@ Než označíte úkol za dokončený, zkontrolujte v terminálu:
 5. V `praxe.html` nedošlo k syntaktické chybě v JS.
 6. Žádný příkaz neobsahuje `Ethernet*`.
 7. Žádné heslo ani klíč nejsou v rozporu se zadáním (klíče z Teams, heslo `Pa55w.rd`).
-8. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
+8. Všechny HTML stránky obsahují v `<head>` favicon odkazující na `bird.png` (`img/bird.png` resp. `../../img/bird.png`).
+9. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
