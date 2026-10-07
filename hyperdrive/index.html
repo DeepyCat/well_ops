@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Race with Kokeš | OPS</title>
+  <link rel="icon" type="image/x-icon" href="../img/bird.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #090d16;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #e5e7eb;
+    }
+
+    /* Top Navigation Bar */
+    .top-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 52px;
+      z-index: 100;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.45) 100%);
+      border: 1px solid #ef4444;
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font: 700 12px/1.2 Consolas, monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.5) 0%, rgba(220, 38, 38, 0.75) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45);
+    }
+
+    .game-title {
+      font: 700 15px/1.2 Consolas, monospace;
+      color: #fbbf24;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .controls-hint {
+      font: 12px/1.2 Consolas, monospace;
+      color: #9ca3af;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .controls-hint kbd {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #f3f4f6;
+      font-weight: bold;
+    }
+
+    .fullscreen-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f3f4f6;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font: 700 12px/1.2 Consolas, monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .fullscreen-btn:hover {
+      background: rgba(255, 255, 255, 0.18);
+      border-color: #fbbf24;
+      color: #fbbf24;
+    }
+
+    /* Game Frame Container */
+    .game-container {
+      position: absolute;
+      top: 52px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    iframe#gameFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background-color: #000;
+    }
+
+    @media (max-width: 800px) {
+      .controls-hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="top-bar">
+    <div class="nav-left">
+      <a href="../games.html" class="back-btn">
+        <span>⬅</span> Zpět na hry
+      </a>
+      <div class="game-title">
+        <span>🏎️</span> Race with Kokeš
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="controls-hint">
+        <kbd>WASD</kbd> / <kbd>Šipky</kbd> Řízení &bull; <kbd>Mezerník</kbd> Ruční brzda &bull; <kbd>C</kbd> Kamera
+      </div>
+      <button id="fsBtn" class="fullscreen-btn" title="Přepnout na celou obrazovku">
+        <span>⛶</span> Fullscreen
+      </button>
+    </div>
+  </header>
+
+  <main class="game-container" id="gameWrapper">
+    <iframe
+      id="gameFrame"
+      src="https://html-classic.itch.zone/html/4204857/index.html?v=1782549138"
+      allow="autoplay; fullscreen *; gamepad; accelerometer; gyroscope; xr-spatial-tracking"
+      allowfullscreen="true"
+      scrolling="no">
+    </iframe>
+  </main>
+
+  <script>
+    const fsBtn = document.getElementById('fsBtn');
+    const gameWrapper = document.getElementById('gameWrapper');
+
+    fsBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        if (gameWrapper.requestFullscreen) {
+          gameWrapper.requestFullscreen();
+        } else if (gameWrapper.webkitRequestFullscreen) {
+          gameWrapper.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement) {
+        fsBtn.innerHTML = '<span>🗗</span> Exit FS';
+      } else {
+        fsBtn.innerHTML = '<span>⛶</span> Fullscreen';
+      }
+    });
+  </script>
+</body>
+</html>
