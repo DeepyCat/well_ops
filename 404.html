@@ -524,6 +524,9 @@
             <a href="mc/index.html" class="action-btn action-btn-secondary" style="border-color: #22c55e; color: #22c55e;">
                 <span>⛏️</span> Minecraft
             </a>
+            <a href="subway/index.html" class="action-btn action-btn-secondary" style="border-color: #f59e0b; color: #f59e0b;">
+                <span>🛹</span> Subway Surfers
+            </a>
         </nav>
 
         <!-- Interactive Arcade Arena / Terminal -->
@@ -1229,7 +1232,7 @@ Zadejte 'help' pro seznam příkazů záchranné konzole.`;
   teorie         - Přechod do Knihovny Teorie (30 kapitol)
   praxe          - Přechod do Praktických Cvičení
   matrix         - Spustí Matrix kód
-  cat hint.txt   - Zobrazí tajnou nápovědu
+  subway         - Spustí Subway Surfers
   clear          - Vyčistí obrazovku terminálu`,
 
                 status: () => `--- KERNEL STATUS ---
@@ -1333,6 +1336,16 @@ THE MATRIX HAS YOU... SPOUSTIM SYSTÉM REBOOT SEKVENCI...`,
                 eaglercraft: () => {
                     window.location.href = 'mc/index.html';
                     return `Spouštím Minecraft (Eaglercraft 1.12.2 / 1.8.8)...`;
+                },
+
+                subway: () => {
+                    window.location.href = 'subway/index.html';
+                    return `Spouštím Subway Surfers...`;
+                },
+
+                subwaysurfers: () => {
+                    window.location.href = 'subway/index.html';
+                    return `Spouštím Subway Surfers...`;
                 },
 
                 clear: () => {

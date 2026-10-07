@@ -1,139 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <title>OPS - Games</title>
-    <link rel="stylesheet" href="style.cs">
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="img/bird.png">
-    
-    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
 </head>
 
 <style>
     body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    min-height: 100vh;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        background-color: #0f172a;
+    }
+
+    .home-portal-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.85);
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 10px 20px;
+        border-radius: 30px;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .home-portal-btn:hover {
+        background: rgba(220, 38, 38, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+    }
+
     .landing-page {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-    scroll-snap-align: start;
-}
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+        scroll-snap-align: start;
+    }
 
-.choice-btn {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-decoration: none;
-    color: white;
-    font-size: 2rem;
-    transition: flex 0.4s ease, filter 0.4s ease, transform 0.4s ease;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
+    .choice-btn {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        color: white;
+        font-size: 2rem;
+        transition: flex 0.4s ease, filter 0.4s ease, transform 0.4s ease;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
 
-.choice-btn::after {
-    content: attr(data-text);
-    font-size: 2.2rem;
-    font-weight: bold;
-    letter-spacing: 1px;
-    color: white;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-    background: rgba(0, 0, 0, 0.35);
-    padding: 15px 30px;
-    border-radius: 50px;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    transition: transform 0.3s ease, background 0.3s ease;
-    text-align: center;
-}
+    .choice-btn::after {
+        content: attr(data-text);
+        font-size: 2.1rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: white;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        background: rgba(0, 0, 0, 0.45);
+        padding: 15px 28px;
+        border-radius: 50px;
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: transform 0.3s ease, background 0.3s ease;
+        text-align: center;
+        max-width: 85%;
+        word-break: break-word;
+    }
 
-.choice-btn:hover {
-    flex: 1.4;
-    filter: brightness(1.25);
-    z-index: 10;
-}
+    .choice-btn:hover {
+        flex: 1.45;
+        filter: brightness(1.25);
+        z-index: 10;
+    }
 
-.choice-btn:hover::after {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.6);
-}
+    .choice-btn:hover::after {
+        transform: scale(1.08);
+        background: rgba(0, 0, 0, 0.7);
+    }
 
-.choice-btn:nth-child(1) { clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%); z-index: 4; }
-.choice-btn:nth-child(2) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 3; }
-.choice-btn:nth-child(3) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 2; }
-.choice-btn:nth-child(4) { clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%); margin-left: -3%; z-index: 1; }
+    .choice-btn:nth-child(1) { clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%); z-index: 5; }
+    .choice-btn:nth-child(2) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 4; }
+    .choice-btn:nth-child(3) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 3; }
+    .choice-btn:nth-child(4) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 2; }
+    .choice-btn:nth-child(5) { clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%); margin-left: -3%; z-index: 1; }
 
-.choice-btn.rezero { background-image: url(''); background-position: 80% 50%; }
-.choice-btn.mushoku { background-image: url(''); background-position: 80% 50%; }
-.choice-btn.konosuba { background-image: url('mc/juchelka_craft.png'); background-position: 80% 50%; }
-.choice-btn.yuri { background-image: url('img/yuri-bg.jpg'); background-position: 50% 50%; }
-<!--
-    .choice-btn.helldivers { 
-    background-image: url('img/helldivers-bg.jpg'); 
-    background-position: 25% 50%; 
-    background-size: cover; 
-}
-
-.choice-btn.umamusume { 
-    background-image: url('img/umamusume-bg.jpg'); 
-    background-position: 15% 50%; 
-    background-size: cover; 
-}
-
-.choice-btn.f1 { 
-    background-image: url('img/f1-bg.jpg'); 
-    background-position: 40% 50%; 
-    background-size: cover; 
-}
-
-.choice-btn.custom { 
-    background-image: url('img/all1-b.jpg'); 
-    background-position: 50% 50%; 
-    background-size: cover; 
-}
-
-    -->
+    .choice-btn.gd { background-image: url('gd/assets/game_bg_01_001.png'); background-position: center; }
+    .choice-btn.hero { background-image: url('img/praxe-bg.jpg'); background-position: center; }
+    .choice-btn.craft { background-image: url('mc/juchelka_craft.png'); background-position: 80% 50%; }
+    .choice-btn.subway { background-image: url('subway/subway_bg.jpg'); background-position: center; }
+    .choice-btn.stat { background-image: url('img/teorie-bg.jpg'); background-position: 50% 50%; }
 </style>
 
 <body class="scroll-body">
+    <a href="index.html" class="home-portal-btn">⬅ Zpět na OPS Portál</a>
 
-   <!--
-    <div class="scroll-nav">
-        <button onclick="scrollToSection(0)" title="Top Section">▲</button>
-        <button onclick="scrollToSection(1)" title="Bottom Section">▼</button>
-    </div>
-    -->
-    
     <section class="landing-page" id="sec-0">
-        <a href="gd/index.html" class="choice-btn rezero" data-text="Juchelka dash"></a>
-        <a href="stratagem/index.html" class="choice-btn mushoku" data-text="Juchelka Hero"></a>
-        <a href="mc/index.html" class="choice-btn konosuba" data-text="JuchelkaCraft"></a>
-        <a href="statistika.html" class="choice-btn yuri" data-text="Statistiky"></a>
+        <a href="gd/index.html" class="choice-btn gd" data-text="Juchelka dash"></a>
+        <a href="stratagem/index.html" class="choice-btn hero" data-text="Juchelka Hero"></a>
+        <a href="mc/index.html" class="choice-btn craft" data-text="JuchelkaCraft"></a>
+        <a href="subway/index.html" class="choice-btn subway" data-text="Subway Surfers"></a>
+        <a href="statistika.html" class="choice-btn stat" data-text="Statistiky"></a>
     </section>
 
-    <!--
-    <section class="landing-page" id="sec-1">
-        <a href="helldivers.html" class="choice-btn helldivers" data-text="Helldivers"></a>
-        <a href="umamusume.html" class="choice-btn umamusume" data-text="Uma Musume"></a>
-        <a href="f1.html" class="choice-btn f1" data-text="Formula 1"></a>
-        <a href="custom.html" class="choice-btn custom" data-text="Reklama <3"></a>
-    </section>
-    -->
     <script>
         function scrollToSection(index) {
             const sections = document.querySelectorAll('.landing-page');
