@@ -1771,11 +1771,10 @@ var UnityLoader = UnityLoader || {
         },
         handler: function(e, t) {
             var r = t ? this.demangle(e, t) : e.message;
-                if (window.parent && typeof window.parent.showUnitywebNoSupport === "function") {
-                    window.parent.showUnitywebNoSupport();
-                } else {
-                    console.error("Unity Error: " + r);
-                }
+            if (window.parent && typeof window.parent.showUnitywebNoSupport === "function") {
+                window.parent.showUnitywebNoSupport();
+            } else {
+                console.error("Unity Error: " + r);
             }
         },
         popup: function(e, t, r) {

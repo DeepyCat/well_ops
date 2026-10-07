@@ -31,7 +31,7 @@
         loader: "unity",
         maxRatio: 16 / 9,
         minRatio: 9 / 16,
-        thumbnail: "https://i.poki.com/q80,w100,h100,g29251,Default.jpg",
+        thumbnail: "kokes_blue.jpg",
         numScreenshots: 4,
         commentChangeTime: 5e3,
         spinnerRemoveDelay: 1e3,
@@ -232,8 +232,7 @@
         l = i("slideshow-top"),
         d = document.createElement("img");
     d.id = "thumbnail", d.alt = r.a.title, d.title = r.a.title;
-    var u = r.a.thumbnail;
-    u.startsWith("https://img.poki.com/") && (u = "https://img.poki.com/cdn-cgi/image/quality=78,width=40,height=40,fit=cover,g=0.5x0.5,f=auto/".concat(u.substr(21))), d.src = u;
+    u && u.startsWith("https://img.poki.com/") && (u = "kokes_blue.jpg"), d.src = u || "kokes_blue.jpg";
     var h = i("slideshow-top-container"),
         f = i("game-title");
     f.innerText = r.a.title;
