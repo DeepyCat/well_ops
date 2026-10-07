@@ -6229,11 +6229,13 @@ class ps {
       this._particleActive = false;
     }
     {
+      const _flipMod = this.p.gravityFlipped ? -1 : 1;
       const _0xe76a85 = Math.cos(this._rotation);
       const _0x26ec65 = Math.sin(this._rotation);
       const _0x216018 = -0x18;
-      const _0x75c380 = _0x119eb7 + _0x216018 * _0xe76a85 - 0x12 * _0x26ec65;
-      const _0x2b31d7 = _0x519d38 + _0x216018 * _0x26ec65 + 0x12 * _0xe76a85;
+      const _jetDy = 0x12 * _flipMod;
+      const _0x75c380 = _0x119eb7 + _0x216018 * _0xe76a85 - _jetDy * _0x26ec65;
+      const _0x2b31d7 = _0x519d38 + _0x216018 * _0x26ec65 + _jetDy * _0xe76a85;
       const _0x5d66f4 = 0x2 * (0x2 * Math.random() - 0x1) * 0x2;
       this._flyParticleEmitter.particleX = _0x75c380;
       this._flyParticleEmitter.particleY = _0x2b31d7 + _0x5d66f4;
@@ -6258,9 +6260,11 @@ class ps {
       this._flyParticle2Emitter.stop();
       this._flyParticle2Active = false;
     }
+    const _dragOnCeil = this.p.gravityFlipped && this.p.onCeiling;
+    const _dragOnFloor = !this.p.gravityFlipped && this.p.onGround && !this.p.onCeiling;
+    const _0x2ac9d0 = this.p.isFlying && (_dragOnFloor || _dragOnCeil);
     this._shipDragEmitter.x = h;
-    this._shipDragEmitter.particleY = 0x1cc - this.p.y + _0x52b718 + 0x1e;
-    const _0x2ac9d0 = this.p.isFlying && this.p.onGround && !this.p.onCeiling;
+    this._shipDragEmitter.particleY = 0x1cc - this.p.y + _0x52b718 + (_dragOnCeil ? -0x1e : 0x1e);
     if (_0x2ac9d0 && !this._shipDragActive) {
       this._shipDragEmitter.start();
       this._shipDragActive = true;
@@ -6305,22 +6309,24 @@ class ps {
     this._aboveContainer.x = -_0x30c325;
     this._aboveContainer.y = _0x3f0607;
     if (this.p.isFlying) {
+      const _flipMod = this.p.gravityFlipped ? -1 : 1;
       const _0x285611 = Math.cos(_0x2907d3);
       const _0x501bf9 = Math.sin(_0x2907d3);
-      const _0x1b1d28 = -0xa * _0x501bf9;
-      const _0x185f91 = 0xa * _0x285611;
-      const _0x562424 = 0xa * _0x501bf9;
-      const _0x3011c9 = -0xa * _0x285611;
+      const _0x1b1d28 = -0xa * _0x501bf9 * _flipMod;
+      const _0x185f91 = 0xa * _0x285611 * _flipMod;
+      const _0x562424 = 0xa * _0x501bf9 * _flipMod;
+      const _0x3011c9 = -0xa * _0x285611 * _flipMod;
       for (const _0x5dc75c of this._shipLayers) if (_0x5dc75c) {
         _0x5dc75c.sprite.x = _0x7f0705 + _0x1b1d28;
         _0x5dc75c.sprite.y = _0x1a433c + _0x185f91;
         _0x5dc75c.sprite.rotation = _0x2907d3;
+        _0x5dc75c.sprite.setFlipY(this.p.gravityFlipped);
       }
       for (const _0x536f40 of this._playerLayers) if (_0x536f40) {
         _0x536f40.sprite.x = _0x7f0705 + _0x562424;
         _0x536f40.sprite.y = _0x1a433c + _0x3011c9;
         _0x536f40.sprite.rotation = _0x2907d3;
-        _0x536f40.sprite.setFlipY(false);
+        _0x536f40.sprite.setFlipY(this.p.gravityFlipped);
       }
     } else {
       for (const _0x2c61a1 of this._allLayers) if (_0x2c61a1) {
@@ -7202,6 +7208,7 @@ class ps {
     this.setShipVisible(false);
     for (const _0x5a0fa9 of this._allLayers) if (_0x5a0fa9) {
       _0x5a0fa9.sprite.setAlpha(0x1);
+      _0x5a0fa9.sprite.setFlipY(false);
     }
     for (const _0x1e656c of this._playerLayers) if (_0x1e656c) {
       if (_0x1e656c.sprite._baseScale) {
