@@ -4645,10 +4645,20 @@ const OBJECT_DEFS = {
     gridH: 0x0
   },
   0x8e: {
-    type: OBJ_DECO,
-    frame: "secretCoin_01_001.png",
+    type: OBJ_PAD,
+    frame: "gravbump_01_001.png",
     gridW: 0x1,
-    gridH: 0x1
+    gridH: 0x1,
+    flipGravity: true,
+    padBoost: 20
+  },
+  0x3fe: {
+    type: OBJ_RING,
+    frame: "gravring_01_001.png",
+    gridW: 0x1,
+    gridH: 0x1,
+    flipGravity: true,
+    ringBoost: 17.5
   },
   0x531: {
     type: OBJ_DECO,
@@ -4657,7 +4667,7 @@ const OBJECT_DEFS = {
     gridH: 0x1
   }
 };
-const DEFAULT_OBJECT_IDS = [0x1, 0x2, 0x3, 0x4, 0x6, 0x7, 0x53, 0x8, 0x27, 0x67, 0x188, 0x23, 0x24, 0x28, 0x8c, 0x8d, 0x3e, 0x41, 0x42, 0x44, 0xc3, 0xc4];
+const DEFAULT_OBJECT_IDS = [0x1, 0x2, 0x3, 0x4, 0x6, 0x7, 0x53, 0x8, 0x27, 0x67, 0x188, 0x23, 0x43, 0x24, 0x28, 0x8c, 0x8e, 0x8d, 0x3fe, 0x3e, 0x41, 0x42, 0x44, 0xc3, 0xc4];
 for (let As of DEFAULT_OBJECT_IDS) if (OBJECT_DEFS[As]) {
   OBJECT_DEFS[As].glow = true;
 }
@@ -5435,10 +5445,11 @@ class us {
               this._addCollisionToSection(_0x3a9d85);
               this._registerGroupCollider(_0x3a9d85, _0x5920d7);
             } else if (_0x24471f.type === OBJ_PAD) {
-              let _0x173f32 = new O(OBJ_PAD, _0x173c58, _0x7ab528, 0x30, 0x18);
+              let _0x173f32 = new O(OBJ_PAD, _0x173c58, _0x7ab528, 0x30, 0x30);
               _0x173f32.id = _0x1b937f.id;
               _0x173f32.boost = _0x24471f.padBoost;
               _0x173f32.flipGravity = !!_0x24471f.flipGravity;
+              _0x173f32.isUpsideDown = !!(_0x1b937f.flipY || Math.abs(Math.abs(_0x1b937f.rot || 0) - 180) < 45);
               this.objects.push(_0x173f32);
               this._addCollisionToSection(_0x173f32);
               this._registerGroupCollider(_0x173f32, _0x5920d7);
@@ -6711,13 +6722,16 @@ class ps {
     if (0x8c === _0x4a2eb0) {
       return 42;
     }
+    if (0x8e === _0x4a2eb0) {
+      return 20;
+    }
     return 34;
   }
   ["_getRingBoost"](_0x2ea630, _0x46f586) {
     if (Number.isFinite(_0x46f586)) {
       return _0x46f586;
     }
-    if (0x54 === _0x2ea630) {
+    if (0x54 === _0x2ea630 || 0x3fe === _0x2ea630) {
       return 17.5;
     }
     if (0x8d === _0x2ea630) {
@@ -6947,19 +6961,34 @@ class ps {
             }
             if (_0x1b13b8.type === OBJ_PAD && !_0x1b13b8.activated && !this.p.isFlying) {
               _0x1b13b8.activated = true;
+              const _padBoost = this._getPadBoost(_0x1b13b8.id, _0x1b13b8.boost);
+              const _isCeiling = _0x1b13b8.isUpsideDown || (this.p.gravityFlipped && _0x1b13b8.isUpsideDown !== false);
+              const _boostDir = _isCeiling ? -1 : 1;
+              this.p.yVelocity = _padBoost * _boostDir;
+              this.p.onGround = false;
+              this.p.canJump = false;
+              this.p.isJumping = true;
+              this.p.y += _boostDir * 5;
+              this.runRotateAction();
               if (_0x1b13b8.flipGravity) {
                 this._applyGravityPortal(!this.p.gravityFlipped);
               }
-              this._applyVerticalBoost(this._getPadBoost(_0x1b13b8.id, _0x1b13b8.boost));
               return;
             }
             if (_0x1b13b8.type === OBJ_RING && !_0x1b13b8.activated && !this.p.isFlying && this.p.upKeyPressed) {
               _0x1b13b8.activated = true;
               this.p.upKeyPressed = false;
+              const _ringBoost = this._getRingBoost(_0x1b13b8.id, _0x1b13b8.boost);
+              const _boostDir = this.p.gravityFlipped ? -1 : 1;
+              this.p.yVelocity = _ringBoost * _boostDir;
+              this.p.onGround = false;
+              this.p.canJump = false;
+              this.p.isJumping = true;
+              this.p.y += _boostDir * 3;
+              this.runRotateAction();
               if (_0x1b13b8.flipGravity) {
                 this._applyGravityPortal(!this.p.gravityFlipped);
               }
-              this._applyVerticalBoost(this._getRingBoost(_0x1b13b8.id, _0x1b13b8.boost));
               return;
             }
             if (_0x1b13b8.type === y) {
