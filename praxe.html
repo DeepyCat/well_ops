@@ -1718,6 +1718,164 @@
     .ws-card-highlight {
       animation: wsCardHighlight 1s ease-in-out 3;
     }
+
+    /* Fanfára animace pro zaškrtnutý checkbox a úkol */
+    @keyframes taskFanfareCheck {
+      0% {
+        transform: scale(0.8);
+      }
+      45% {
+        transform: scale(1.4);
+        box-shadow: 0 0 20px 4px rgba(255, 85, 85, 0.95), 0 0 35px 8px rgba(255, 215, 0, 0.6);
+      }
+      75% {
+        transform: scale(0.95);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .fanfare-burst {
+      animation: taskFanfareCheck 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+    }
+
+    @keyframes rowFanfareGlow {
+      0% {
+        background-color: transparent;
+      }
+      35% {
+        background-color: rgba(255, 85, 85, 0.22);
+        box-shadow: inset 0 0 15px rgba(255, 85, 85, 0.35);
+      }
+      100% {
+        background-color: transparent;
+      }
+    }
+
+    .row-fanfare {
+      animation: rowFanfareGlow 0.9s ease-out forwards;
+    }
+
+    /* Modul Complete Modal (Gratulace s GIFem a konfetami) */
+    .module-complete-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+      animation: fadeInModal 0.3s ease forwards;
+    }
+
+    .module-complete-card {
+      background: #1b1b1b;
+      border: 2px solid #22c55e;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 12px 50px rgba(0, 0, 0, 0.85), 0 0 45px rgba(34, 197, 94, 0.4);
+      animation: slideUpModal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-complete-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.45);
+      color: #4ade80;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+
+    .module-complete-title {
+      font-size: 1.65rem;
+      font-weight: 900;
+      color: #f0fdf4;
+      margin: 0 0 8px 0;
+      line-height: 1.25;
+      text-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    }
+
+    .module-complete-sub {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+    }
+
+    .module-complete-gif-wrap {
+      width: 100%;
+      max-height: 250px;
+      min-height: 160px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 22px;
+      background: #111;
+      border: 1px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .module-complete-gif-wrap img {
+      width: 100%;
+      height: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .module-complete-btn {
+      background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+      border: 1px solid #4ade80;
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 12px 28px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 18px rgba(34, 197, 94, 0.45);
+      width: 100%;
+    }
+
+    .module-complete-btn:hover {
+      background: linear-gradient(135deg, #166534 0%, #16a34a 100%);
+      box-shadow: 0 6px 26px rgba(34, 197, 94, 0.7);
+      transform: translateY(-2px);
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 10001;
+    }
   </style>
 </head>
 <body>
@@ -1801,6 +1959,27 @@
       <div class="ws-notice-footnote">Číslo pracoviště můžeš kdykoliv později upravit v pravé horní části obrazovky.</div>
     </div>
   </div>
+
+  <!-- Celebratory Module Complete Modal -->
+  <div id="module-complete-modal" class="module-complete-overlay" style="display: none;">
+    <div class="module-complete-card">
+      <div class="module-complete-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        100% Hotovo
+      </div>
+      <h2 class="module-complete-title" id="module-complete-title">Gratulujeme! 🎉</h2>
+      <p class="module-complete-sub" id="module-complete-sub">Dokončil jsi všechny úkoly v tomto modulu! Skvělá práce, mistře.</p>
+      <div class="module-complete-gif-wrap">
+        <img id="module-complete-gif" src="img/celebration/proud-of-you1.gif" alt="I'm proud of you!">
+      </div>
+      <button type="button" class="module-complete-btn" onclick="closeModuleCompleteModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span>Paráda, pokračovat!</span>
+      </button>
+    </div>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
 
   <header>
     <div class="header-left">
@@ -2040,9 +2219,6 @@
       const key = getStorageKey(vm, taskId);
       const val = localStorage.getItem(key);
       if (val !== null) return val === "1";
-      if (currentModuleId === "00" || currentModuleId === "01") {
-        return localStorage.getItem(`vm_task_${vm}_${taskId}`) === "1" || localStorage.getItem(`lab_${vm}_${taskId}`) === "1";
-      }
       return false;
     }
 
@@ -2053,28 +2229,183 @@
       } else {
         localStorage.removeItem(key);
       }
-      if (currentModuleId === "00" || currentModuleId === "01") {
-        if (done) {
-          localStorage.setItem(`vm_task_${vm}_${taskId}`, "1");
-        } else {
-          localStorage.removeItem(`vm_task_${vm}_${taskId}`);
-        }
-      }
     }
 
     function autoCheckVerifiedTasks() {
+      // Záměrně prázdné: Každý uživatel / student začíná s čistými, nezaškrtnutými úkoly.
+      // Stav 'Ověřeno OK' indikuje pouze otestovanost návodu na daném VM v labu, nikoli že má student hotovo.
+    }
+
+    // ----------------------------------------------------
+    // Konfety & Animace Oslavy
+    // ----------------------------------------------------
+    const celebrationGifs = [
+      "img/celebration/proud-of-you1.gif",
+      "img/celebration/proud-of-you2.gif",
+      "img/celebration/proud-of-you3.gif",
+      "img/celebration/proud-of-you4.gif",
+      "img/celebration/proud-of-you5.gif"
+    ];
+
+    let confettiParticles = [];
+    let confettiAnimationId = null;
+
+    function initConfettiCanvas() {
+      const canvas = document.getElementById("confetti-canvas");
+      if (!canvas) return null;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      return canvas;
+    }
+
+    window.addEventListener("resize", () => {
+      const canvas = document.getElementById("confetti-canvas");
+      if (canvas && confettiParticles.length > 0) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    });
+
+    function spawnConfettiBurst(x, y, count = 35) {
+      const colors = ["#ff5555", "#ff79c6", "#bd93f9", "#50fa7b", "#ffb86c", "#f1fa8c", "#8be9fd", "#ffffff"];
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 7 + 3;
+        confettiParticles.push({
+          x: x,
+          y: y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 2.5,
+          size: Math.random() * 7 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotationSpeed: (Math.random() - 0.5) * 12,
+          gravity: 0.22,
+          opacity: 1,
+          decay: Math.random() * 0.015 + 0.012
+        });
+      }
+      if (!confettiAnimationId) {
+        animateConfetti();
+      }
+    }
+
+    function spawnFullscreenConfetti(durationMs = 4000) {
+      const colors = ["#ff5555", "#ff79c6", "#bd93f9", "#50fa7b", "#ffb86c", "#f1fa8c", "#8be9fd", "#22c55e", "#ffd700"];
+      const startTime = Date.now();
+      
+      const interval = setInterval(() => {
+        if (Date.now() - startTime > durationMs) {
+          clearInterval(interval);
+          return;
+        }
+        for (let i = 0; i < 22; i++) {
+          confettiParticles.push({
+            x: Math.random() * window.innerWidth,
+            y: -10,
+            vx: (Math.random() - 0.5) * 5,
+            vy: Math.random() * 5 + 3,
+            size: Math.random() * 8 + 5,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            rotationSpeed: (Math.random() - 0.5) * 10,
+            gravity: 0.12,
+            opacity: 1,
+            decay: Math.random() * 0.007 + 0.005
+          });
+        }
+        if (!confettiAnimationId) {
+          animateConfetti();
+        }
+      }, 100);
+    }
+
+    function animateConfetti() {
+      const canvas = initConfettiCanvas();
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = confettiParticles.length - 1; i >= 0; i--) {
+          const p = confettiParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravity;
+          p.vx *= 0.985;
+          p.rotation += p.rotationSpeed;
+          p.opacity -= p.decay;
+
+          if (p.opacity <= 0 || p.y > canvas.height + 20) {
+            confettiParticles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, p.opacity);
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.7);
+          ctx.restore();
+        }
+
+        if (confettiParticles.length > 0) {
+          confettiAnimationId = requestAnimationFrame(loop);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          confettiAnimationId = null;
+        }
+      }
+
+      confettiAnimationId = requestAnimationFrame(loop);
+    }
+
+    function isModuleFullyCompleted() {
       const vms = (currentModuleConfig && currentModuleConfig.vms) || ["SRV1-DC", "SRV2-FS", "PC1-WIN"];
+      let allDone = true;
+      let hasTasks = false;
+
       vms.forEach(vm => {
-        if (currentVerifiedConfig[vm] === true) {
-          const initKey = `ops_verified_autodone_${currentModuleId}_${vm}_v2`;
-          if (!localStorage.getItem(initKey)) {
-            taskDefinitions
-              .filter(t => t.forVMs.includes(vm))
-              .forEach(t => setTaskDone(vm, t.id, true));
-            localStorage.setItem(initKey, "1");
+        const vmTasks = taskDefinitions.filter(t => t.forVMs.includes(vm));
+        if (vmTasks.length > 0) {
+          hasTasks = true;
+          const done = vmTasks.filter(t => isTaskDone(vm, t.id)).length;
+          if (done < vmTasks.length) {
+            allDone = false;
           }
         }
       });
+
+      return hasTasks && allDone;
+    }
+
+    function triggerModuleCelebrationModal() {
+      const modal = document.getElementById("module-complete-modal");
+      if (!modal) return;
+
+      const randomGif = celebrationGifs[Math.floor(Math.random() * celebrationGifs.length)];
+      const gifImg = document.getElementById("module-complete-gif");
+      if (gifImg) {
+        gifImg.src = randomGif;
+      }
+
+      const titleEl = document.getElementById("module-complete-title");
+      if (titleEl) {
+        const title = (currentModuleConfig && (currentModuleConfig.shortTitle || currentModuleConfig.title)) || `Modul ${currentModuleId}`;
+        titleEl.textContent = `Gratulujeme! ${title} dokončen! 🎉`;
+      }
+
+      modal.style.display = "flex";
+      spawnFullscreenConfetti(4500);
+    }
+
+    function closeModuleCompleteModal() {
+      const modal = document.getElementById("module-complete-modal");
+      if (modal) {
+        modal.style.display = "none";
+      }
     }
 
     function changeWorkstation(val) {
@@ -2129,6 +2460,48 @@
     function toggleTask(taskId, checked, ev) {
       if (ev) ev.stopPropagation();
       setTaskDone(currentVM, taskId, checked);
+
+      if (checked) {
+        // Získat souřadnice pro lokální konfety a fanfáru
+        let clickX = window.innerWidth / 2;
+        let clickY = window.innerHeight / 2;
+        let targetCheckbox = null;
+
+        if (ev) {
+          if (ev.clientX && ev.clientY) {
+            clickX = ev.clientX;
+            clickY = ev.clientY;
+          }
+          if (ev.target) {
+            targetCheckbox = ev.target;
+          }
+        }
+
+        // Fanfára animace pro checkbox
+        if (targetCheckbox) {
+          targetCheckbox.classList.remove("fanfare-burst");
+          void targetCheckbox.offsetWidth;
+          targetCheckbox.classList.add("fanfare-burst");
+
+          const itemRow = targetCheckbox.closest(".task-item") || targetCheckbox.closest(".detail-title");
+          if (itemRow) {
+            itemRow.classList.remove("row-fanfare");
+            void itemRow.offsetWidth;
+            itemRow.classList.add("row-fanfare");
+          }
+        }
+
+        // Lokální konfety u checkboxu
+        spawnConfettiBurst(clickX, clickY, 32);
+
+        // Zkontrolovat, zda byl dokončen celý modul
+        if (isModuleFullyCompleted()) {
+          setTimeout(() => {
+            triggerModuleCelebrationModal();
+          }, 450);
+        }
+      }
+
       render();
     }
 
@@ -2306,7 +2679,7 @@
             <span>${currentTask.title}</span>
           </div>
           <label class="status-toggle ${isDone ? 'is-done' : ''}">
-            <input type="checkbox" class="custom-checkbox" ${isDone ? "checked" : ""} onchange="toggleTask('${currentTask.id}', this.checked)">
+            <input type="checkbox" class="custom-checkbox" ${isDone ? "checked" : ""} onchange="toggleTask('${currentTask.id}', this.checked, event)">
             <span>${isDone ? 'Hotovo' : 'Označit jako hotové'}</span>
           </label>
         </div>
