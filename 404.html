@@ -525,7 +525,7 @@
                 <span>⛏️</span> Minecraft
             </a>
             <a href="subway/index.html" class="action-btn action-btn-secondary" style="border-color: #f59e0b; color: #f59e0b;">
-                <span>🛹</span> Subway Surfers
+                <span>🏃‍♂️</span> Run From Kokeš
             </a>
         </nav>
 
@@ -1232,7 +1232,7 @@ Zadejte 'help' pro seznam příkazů záchranné konzole.`;
   teorie         - Přechod do Knihovny Teorie (30 kapitol)
   praxe          - Přechod do Praktických Cvičení
   matrix         - Spustí Matrix kód
-  subway         - Spustí Subway Surfers
+  kokes / subway - Spustí hru Run From Kokeš
   clear          - Vyčistí obrazovku terminálu`,
 
                 status: () => `--- KERNEL STATUS ---
@@ -1340,12 +1340,22 @@ THE MATRIX HAS YOU... SPOUSTIM SYSTÉM REBOOT SEKVENCI...`,
 
                 subway: () => {
                     window.location.href = 'subway/index.html';
-                    return `Spouštím Subway Surfers...`;
+                    return `Spouštím Run From Kokeš...`;
                 },
 
                 subwaysurfers: () => {
                     window.location.href = 'subway/index.html';
-                    return `Spouštím Subway Surfers...`;
+                    return `Spouštím Run From Kokeš...`;
+                },
+
+                kokes: () => {
+                    window.location.href = 'subway/index.html';
+                    return `Spouštím Run From Kokeš...`;
+                },
+
+                runfromkokes: () => {
+                    window.location.href = 'subway/index.html';
+                    return `Spouštím Run From Kokeš...`;
                 },
 
                 clear: () => {
