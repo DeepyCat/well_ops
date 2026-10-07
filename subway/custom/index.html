@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Juchelka Surfers (Moddovatelná WebGL verze) - OPS Portál</title>
+  <title>Run From Kokeš (Moddovatelná verze) - OPS Portál</title>
   <link rel="icon" type="image/x-icon" href="../../img/bird.png">
   <link rel="stylesheet" href="style.css" type="text/css">
 </head>
@@ -19,6 +19,7 @@
         <span>👤 Skin:</span>
         <select id="skinSelector" onchange="changeSkin(this.value)">
           <option value="assets/juchelka.png">Juchelka (Default)</option>
+          <option value="assets/kokes_blue.jpg">Kokeš</option>
           <option value="assets/player.png">Jake (Originál)</option>
         </select>
       </div>
@@ -29,7 +30,7 @@
 
   <div id="ModalBox" class="modal">
     <div class="modal-content">
-      <h2 class='game_title' id="modal_title">Juchelka Surfers</h2>
+      <h2 class='game_title' id="modal_title">Run From Kokeš</h2>
       <p class="game_score" id="modal_score" style="display:none;"></p>
       <button class="start-btn" id="start_action_btn">Hrát</button>
       <div class="controls-hint">
@@ -69,7 +70,7 @@
 
   function start() {
     modal.style.display = "flex";
-    titleEl.textContent = "Juchelka Surfers";
+    titleEl.textContent = "Run From Kokeš";
     scoreEl.style.display = "none";
     actionBtn.textContent = "Spustit hru";
   }
