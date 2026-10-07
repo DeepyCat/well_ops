@@ -1011,6 +1011,9 @@
             let score = 0;
             let distance = 0;
             let gameOver = false;
+            const baseSpeed = 5.0;
+            let currentSpeed = baseSpeed;
+            let floorScroll = 0;
 
             const groundY = canvas.height - 50;
             const player = {
@@ -1025,14 +1028,17 @@
             };
 
             const obstacles = [];
-            let nextObstacleDist = 80;
+            let nextObstacleDist = 70;
 
             function jump() {
                 if (gameOver) {
                     // Restart
                     score = 0;
                     distance = 0;
+                    currentSpeed = baseSpeed;
+                    floorScroll = 0;
                     obstacles.length = 0;
+                    nextObstacleDist = 70;
                     player.y = groundY - 30;
                     player.vy = 0;
                     player.isGrounded = true;
@@ -1078,7 +1084,7 @@
 
                 // Floor tick marks (scrolling effect)
                 ctx.strokeStyle = 'rgba(0, 240, 255, 0.2)';
-                const tickOffset = (distance * 6) % 30;
+                const tickOffset = floorScroll % 30;
                 for (let x = -tickOffset; x < canvas.width; x += 30) {
                     ctx.beginPath();
                     ctx.moveTo(x, groundY);
@@ -1089,7 +1095,10 @@
                 if (!gameOver) {
                     distance += 1;
                     score = Math.floor(distance * 1.5);
-                    scoreUi.textContent = `CYCLES: ${score}`;
+                    // Pomalé zrychlování: ze základu 5.0 postupně až k ~13.0
+                    currentSpeed = baseSpeed + Math.min(distance * 0.003, 8.0);
+                    floorScroll += currentSpeed;
+                    scoreUi.textContent = `CYCLES: ${score} | RYCHLOST: ${currentSpeed.toFixed(1)}x`;
 
                     // Player physics
                     player.vy += player.gravity;
@@ -1117,13 +1126,16 @@
                             name: chosen.name,
                             color: chosen.color
                         });
-                        nextObstacleDist = 65 + Math.floor(Math.random() * 55);
+                        // Bezpečný a férový odstup překážek škálovaný podle aktuální rychlosti
+                        const minPixelGap = 320 + chosen.w;
+                        const randomPixelGap = Math.random() * 260;
+                        nextObstacleDist = Math.max(26, Math.floor((minPixelGap + randomPixelGap) / currentSpeed));
                     }
 
                     // Move & Draw Obstacles
                     for (let i = obstacles.length - 1; i >= 0; i--) {
                         const ob = obstacles[i];
-                        ob.x -= 5.5;
+                        ob.x -= currentSpeed;
 
                         // Draw Obstacle (Mutex Barrier)
                         ctx.fillStyle = ob.color + '33';
@@ -1187,7 +1199,7 @@
 
                     ctx.fillStyle = '#ffffff';
                     ctx.font = '16px Consolas, monospace';
-                    ctx.fillText(`UJETÁ VZDÁLENOST: ${score} CPU CYKLŮ`, canvas.width / 2, canvas.height / 2 + 15);
+                    ctx.fillText(`UJETÁ VZDÁLENOST: ${score} CPU CYKLŮ (${currentSpeed.toFixed(1)}x RYCHLOST)`, canvas.width / 2, canvas.height / 2 + 15);
 
                     ctx.fillStyle = '#00f0ff';
                     ctx.font = '14px Consolas, monospace';
