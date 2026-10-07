@@ -1,16 +1,95 @@
 <!DOCTYPE HTML>
 
 <head>
-    <title> Stratagem Hero Online</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico?">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?">
+    <title> Juchelka Hero</title>
+   <link rel="icon" type="image/x-icon" href="img/bird.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Oxanium">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Verdana">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Geneva">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Tahoma">
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="./styles/game-config-popup.css">
+ 
     <style>
+        .game-config-popup-container {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 0;
+    background-color: rgba(0,0,0,0.7);
+        }
+
+        .game-config-popup-container.active {
+            display: flex;
+            position: fixed;
+            width: unset;
+            bottom: 0;
+            right: 0;
+        }
+
+        .game-config-popup {
+            display: block;
+            background-color: #d9d9d9;
+            border-radius: 10px;
+            border: 1px solid white;
+            padding: 3rem;
+        }
+
+        .game-config-popup__title {
+            text-align: center;
+            font-family: Oxanium, Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 0.9rem;
+        }
+
+        .game-config-popup__key-bindings {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            grid-template-areas: 
+            '. keyup .'
+            'keyleft keydown keyright';
+        }
+
+
+        .key-bind-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .key-bind-container input {
+            width: 4rem;
+            text-align: center;
+            font-family: Oxanium, Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        .key-bind-container--up   {
+            grid-area: keyup;
+        }
+        .key-bind-container--left {
+            grid-area: keyleft;
+        }
+        .key-bind-container--down {
+            grid-area: keydown;
+        }
+        .key-bind-container--right{
+            grid-area: keyright;
+        }
+
+
+        .game-config-popup__action-buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 0.625rem;
+            margin-top: 1.5rem;
+        }
         body {
             margin: 0;
             padding: 0;
@@ -18,7 +97,7 @@
         }
 
         a {
-            color: #FFE900;
+            color: #ff0000;
         }
 
         button {
@@ -27,7 +106,7 @@
         }
 
         #root {
-            background-color: #0f101c;
+            background-color: #000000;
             min-height: 100vh;
             padding: 8px;
             box-sizing: border-box;
@@ -59,7 +138,7 @@
         }
 
         .title {
-            color: #FFE900;
+            color: #ff0000;
             font-family: Oxanium, Verdana, Geneva, Tahoma, sans-serif;
             width: 50%;
             margin: auto;
@@ -127,7 +206,7 @@
 
         #time-remaining-bar {
             height: 20px;
-            background-color: #FFE900;
+            background-color: #ff0000;
             margin: auto;
         }
 
@@ -136,8 +215,8 @@
         }
 
         .mobile-button {
-            background-color: #3b3600;
-            color: #645c00;
+            background-color: #3b0000;
+            color: #640000;
             font-family: Oxanium, Verdana, Geneva, Tahoma, sans-serif;
             font-size: 5em;
             padding: 0px 20px;
@@ -158,7 +237,7 @@
         }
 
         .game-over-popup {
-            background: linear-gradient(145deg, rgba(92, 84, 0, 1) 0%, rgba(15, 16, 28, 1) 40%, rgba(15, 16, 28, 1) 61%, rgba(92, 84, 0, 1) 100%);
+            background: linear-gradient(145deg, rgba(92, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 1) 61%, rgba(92, 0, 0, 1) 100%);
             z-index: 10;
             padding-block: 20px;
             padding-inline: 10px;
@@ -166,11 +245,11 @@
             margin-inline: auto;
             margin-top: 20px;
             border-radius: 40px 0 40px 0;
-            box-shadow: 9px 9px 23px 4px rgba(0,0,0,0.75);;
+            box-shadow: 9px 9px 23px 4px rgba(0,0,0,0.75);
         }
 
         #completed-strategems-readout {
-            color: #FFE900;
+            color: #ff0000;
             font-family: Oxanium, Verdana, Geneva, Tahoma, sans-serif;
             text-align: left;
             width: max-content;
@@ -181,8 +260,8 @@
         #share-button,
         #share-button-spamless,
         #refresh-button {
-            background-color: #ad9f00;
-            color: #FFE900;
+            background-color: #ad0000;
+            color: #ff0000;
             text-align: center;
             text-decoration: none;
             display: block;
@@ -223,13 +302,13 @@
 
 <body>
     <div style="position: fixed; top: 14px; left: 14px; z-index: 9999;">
-        <a href="../index.html" style="text-decoration: none; background: rgba(0, 0, 0, 0.7); border: 1px solid #FFE900; color: #FFE900; padding: 8px 14px; border-radius: 6px; font-family: Oxanium, sans-serif; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+        <a href="../index.html" style="text-decoration: none; background: rgba(0, 0, 0, 0.7); border: 1px solid #ff0000; color: #ff0000; padding: 8px 14px; border-radius: 6px; font-family: Oxanium, sans-serif; font-size: 14px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
             ⬅ Zpět na OPS Portál
         </a>
     </div>
     <div id="root">
         <div class="logo-container">
-            <img class="logo" src="./data/Images/Helldivers_2_logo.webp">
+            <img class="logo" src="./data/Images/juchelka.png">
         </div>
 
         <h1 class="title">
@@ -238,7 +317,7 @@
 
         <div class="interactable-center-container" id="interactable-center-container">
             <h2 class="stratagem-name" id="stratagem-name">
-                HI :) You shouldn't see this
+               
             </h2>
 
             <table class="stratagems-table" id="stratagems-table">
@@ -279,13 +358,13 @@
             <h1 class="title" id="score-readout">SCORE: ##</h1>
             <p id="completed-strategems-readout"></p>
             <div>
-                
+               
                 <button onclick="copyShare()" id="share-button">
                     Share your score!
                 </button>
 
                 <br>
-                
+               
                 <button onclick="copyShare(true)" id="share-button-spamless">
                     Spam Filter Compatible Share
                 </button>
@@ -343,21 +422,7 @@
         <div class="info">
             <div class="info__config-actions-container">
                 <button role="button" data-action-type="game-config--open" class="button">change keybinds</button>
-            </div>
-            <p class="larger-info">
-                Check out Helldivers 2 on <a href="https://store.steampowered.com/app/553850/HELLDIVERS_2/" target="_blank">Steam</a> and <a href="https://www.playstation.com/en-us/games/helldivers-2/" target="_blank">Playstation</a>!<br>
-            </p>
-            Made with 💖 by <a href="https://github.com/CombustibleToast" target="_blank">CombustibleToast</a><br> 
-            Additional contributions by 
-            <a href="https://github.com/CombustibleToast/StratagemHeroOnline/pulls?q=is%3Apr+author%3ASavageCore" target="_blank">SavageCore</a>, 
-            <a href="https://github.com/CombustibleToast/StratagemHeroOnline/pulls?q=is%3Apr+author%3Arrliu" target="_blank">rrliu</a>, 
-            <a href="https://github.com/CombustibleToast/StratagemHeroOnline/pulls?q=is%3Apr+author%3AAlexander-ilyin3" target="_blank">Alexander-ilyin3</a>, 
-            <a href="https://github.com/CombustibleToast/StratagemHeroOnline/pulls?q=is%3Apr+author%3AHAYD323" target="_blank">HAYD323</a>, 
-            and <a href="https://github.com/nvigneux/Helldivers-2-Stratagems-icons-svg" target="_blank">nvigneux</a> for the images. Thank you! <br>
-            Play the original Helldivers 1 version <a href="Old/index.html">here</a>.<br>
-            View the source code <a href="https://github.com/CombustibleToast/StratagemHeroOnline" target="_blank">on Github</a> or report an issue <a href="https://github.com/CombustibleToast/StratagemHeroOnline/issues" target="_blank">here</a><br>
-            Not affiliated with Helldivers, Arrowhead Studios, or Playstation Studios. Please don't sue me :)<br>
-        </div>
+           
     </div>
 </body>
 
