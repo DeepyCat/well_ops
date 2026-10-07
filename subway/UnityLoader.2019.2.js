@@ -1771,12 +1771,19 @@ var UnityLoader = UnityLoader || {
         },
         handler: function(e, t) {
             var r = t ? this.demangle(e, t) : e.message;
-            if (!(t && t.errorhandler && t.errorhandler(r, e.filename, e.lineno) || (console.log("Invoking error handler due to\n" + r), "function" == typeof dump && dump("Invoking error handler due to\n" + r), -1 != r.indexOf("UnknownError") || -1 != r.indexOf("Program terminated with exit(0)") || this.didShowErrorMessage))) {
-                parent.showUnitywebNoSupport();
+                if (window.parent && typeof window.parent.showUnitywebNoSupport === "function") {
+                    window.parent.showUnitywebNoSupport();
+                } else {
+                    console.error("Unity Error: " + r);
+                }
             }
         },
         popup: function(e, t, r) {
-            parent.showUnitywebNoSupport();
+            if (window.parent && typeof window.parent.showUnitywebNoSupport === "function") {
+                window.parent.showUnitywebNoSupport();
+            } else {
+                console.warn("Unity Popup: " + (e || r));
+            }
         }
     },
     Job: {
@@ -2098,7 +2105,7 @@ var UnityLoader = UnityLoader || {
     processWasmFrameworkJob: function(e, t) {
         var r = UnityLoader.Job.result(e, "downloadWasmFramework");
         UnityLoader.loadCode(e, r, function(r, n) {
-            e.mainScriptUrlOrBlob = n, e.isModularized && (UnityLoader[r] = my4399UnityModule), UnityLoader[r](e), t.complete()
+            e.mainScriptUrlOrBlob = n, e.isModularized && (UnityLoader[r] = (typeof UnityModule !== "undefined" ? UnityModule : (typeof my4399UnityModule !== "undefined" ? my4399UnityModule : (window.UnityModule || UnityLoader[r])))), UnityLoader[r](e), t.complete()
         }, {
             Module: e,
             url: e.wasmFrameworkUrl,
@@ -2118,7 +2125,7 @@ var UnityLoader = UnityLoader || {
     processAsmFrameworkJob: function(e, t) {
         var r = UnityLoader.Job.result(e, "downloadAsmFramework");
         UnityLoader.loadCode(e, r, function(r, n) {
-            e.isModularized && (e.mainScriptUrlOrBlob = n, UnityLoader[r] = my4399UnityModule), UnityLoader[r](e), t.complete()
+            e.isModularized && (e.mainScriptUrlOrBlob = n, UnityLoader[r] = (typeof UnityModule !== "undefined" ? UnityModule : (typeof my4399UnityModule !== "undefined" ? my4399UnityModule : (window.UnityModule || UnityLoader[r])))), UnityLoader[r](e), t.complete()
         }, {
             Module: e,
             url: e.asmFrameworkUrl,
