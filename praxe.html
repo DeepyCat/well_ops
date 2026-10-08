@@ -2165,35 +2165,6 @@
     </div>
   </div>
 
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-module-section">
-        <span class="footer-module-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-          <span>Zadání:</span>
-        </span>
-        <div class="footer-module-pills" id="footer-module-pills">
-          <!-- Dynamicky renderováno z window.OPS_MODULES (Modul 00, Modul 01...) -->
-        </div>
-      </div>
-      <div class="footer-actions">
-        <a href="praxe/00/__zadani.html" target="_blank" rel="noopener noreferrer" class="footer-link-btn" id="footer-link-zadani" title="Otevřít zformátované zadání (_zadani.md) v nové záložce">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-          <span>_zadani.md</span>
-          <svg class="external-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-        </a>
-        <a href="praxe/00/__reseni.html" target="_blank" rel="noopener noreferrer" class="footer-link-btn" id="footer-link-reseni" title="Otevřít zformátované řešení (__reseni.md) v nové záložce">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-          <span>__reseni.md</span>
-          <svg class="external-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-        </a>
-        <div class="footer-meta">
-          <span>• OPS Praktická cvičení</span>
-        </div>
-      </div>
-    </div>
-  </footer>
-
   <script>
     let currentModuleId = "00";
     let currentModuleConfig = null;
@@ -2918,20 +2889,6 @@
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
             Předchozí úkol
           </button>
-
-          <div class="detail-footer-module-select">
-            <span class="detail-footer-label">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-              <span>Zadání:</span>
-            </span>
-            <div class="detail-module-pills">
-              ${(window.OPS_MODULES || []).map(m => `
-                <button type="button" class="detail-module-pill ${m.id === currentModuleId ? 'active' : ''}" onclick="switchModule('${m.id}')" title="${escapeHtml(m.title)}">
-                  ${escapeHtml(m.shortTitle || ('Modul ' + m.id))}
-                </button>
-              `).join('')}
-            </div>
-          </div>
 
           <button class="nav-step-btn" ${nextTask ? `onclick="selectTask('${nextTask.id}')"` : "disabled"}>
             Další úkol
