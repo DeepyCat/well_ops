@@ -273,6 +273,61 @@
       color: var(--accent-hover);
     }
 
+    /* Checkbox uvnitř tlačítka serveru pro dokončení celého VM */
+    .vm-check-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 2px;
+      padding: 2px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .vm-check-toggle:hover {
+      transform: scale(1.15);
+    }
+
+    .vm-check-input {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 17px;
+      height: 17px;
+      border: 1.5px solid #666;
+      border-radius: 4px;
+      background-color: #1a1a1a;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      outline: none;
+      margin: 0;
+    }
+
+    .vm-check-input:hover {
+      border-color: #22c55e;
+      background-color: #222;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.45);
+    }
+
+    .vm-check-input:checked {
+      background-color: #22c55e;
+      border-color: #22c55e;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2.5-2.5a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+      background-size: 13px 13px;
+      background-position: center;
+      background-repeat: no-repeat;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+    }
+
+    .vm-check-input:active {
+      transform: scale(0.9);
+    }
+
     .vm-verified-tag {
       font-size: 0.68rem;
       padding: 2px 7px;
@@ -2057,10 +2112,6 @@
         <span>__reseni.md</span>
         <svg class="external-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
       </a>
-      <button class="complete-vm-btn" id="btn-complete-vm" onclick="completeCurrentVM(event)" title="Označit všechny úkoly na aktuálním VM jako hotové">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span id="complete-vm-btn-text">Dokončit celé VM</span>
-      </button>
       <button class="reset-btn" onclick="resetCurrentVM()">Resetovat stav VM</button>
       <a href="index.html" class="back-btn">Chcu zpět</a>
     </div>
@@ -2561,31 +2612,34 @@
       render();
     }
 
-    function completeCurrentVM(ev) {
+    function toggleVMAllTasks(vm, checked, ev) {
       if (ev) ev.stopPropagation();
-      const vmTasks = taskDefinitions.filter(t => t.forVMs.includes(currentVM));
+      const vmTasks = taskDefinitions.filter(t => t.forVMs.includes(vm));
       if (vmTasks.length === 0) return;
 
-      // Označit všechny úkoly daného stroje jako hotové
-      vmTasks.forEach(t => setTaskDone(currentVM, t.id, true));
+      vmTasks.forEach(t => setTaskDone(vm, t.id, checked));
 
-      // Spustit oslavné konfety a fanfáru z tlačítka
-      let clickX = window.innerWidth / 2;
-      let clickY = 100;
-      if (ev && ev.clientX && ev.clientY) {
-        clickX = ev.clientX;
-        clickY = ev.clientY;
-      }
-      spawnConfettiBurst(clickX, clickY, 50);
+      if (checked) {
+        let clickX = window.innerWidth / 2;
+        let clickY = 100;
+        if (ev && ev.clientX && ev.clientY) {
+          clickX = ev.clientX;
+          clickY = ev.clientY;
+        }
+        spawnConfettiBurst(clickX, clickY, 45);
 
-      // Zkontrolovat celkové dokončení modulu
-      if (isModuleFullyCompleted()) {
-        setTimeout(() => {
-          triggerModuleCelebrationModal();
-        }, 450);
+        if (isModuleFullyCompleted()) {
+          setTimeout(() => {
+            triggerModuleCelebrationModal();
+          }, 450);
+        }
       }
 
       render();
+    }
+
+    function completeCurrentVM(ev) {
+      toggleVMAllTasks(currentVM, true, ev);
     }
 
     function selectTask(taskId) {
@@ -2670,9 +2724,16 @@
       container.innerHTML = vms.map(vm => {
         const isVerified = currentVerifiedConfig[vm] === true;
         const isActive = currentVM === vm;
+        const tasks = taskDefinitions.filter(t => t.forVMs.includes(vm));
+        const done = tasks.filter(t => isTaskDone(vm, t.id)).length;
+        const allDone = tasks.length > 0 && done === tasks.length;
         return `
           <button class="vm-btn ${isActive ? 'active' : ''}" id="btn-${vm}" onclick="switchVM('${vm}')">
-            ${vm} <span class="vm-badge" id="badge-${vm}">0/0</span>
+            <span>${vm}</span>
+            <label class="vm-check-toggle" title="${allDone ? `Označit všechny úkoly na ${vm} jako nehotové` : `Označit všechny úkoly na ${vm} jako hotové`}" onclick="event.stopPropagation()">
+              <input type="checkbox" class="vm-check-input" ${allDone ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleVMAllTasks('${vm}', this.checked, event)">
+            </label>
+            <span class="vm-badge" id="badge-${vm}">${done}/${tasks.length}</span>
             ${isVerified ? `
               <span class="vm-verified-tag" title="Všechny příkazy a konfigurace na ${vm} byly v praxi otestovány a ověřeny jako 100% funkční!">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -2700,11 +2761,6 @@
       renderVMTabs();
       updateBadges();
       updateWorkstationUI();
-
-      const completeBtnText = document.getElementById("complete-vm-btn-text");
-      if (completeBtnText) {
-        completeBtnText.textContent = `Dokončit ${currentVM}`;
-      }
 
       const relevantTasks = taskDefinitions.filter(t => t.forVMs.includes(currentVM));
       const listEl = document.getElementById("task-list");
