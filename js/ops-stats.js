@@ -284,7 +284,7 @@
         },
 
         // Načtení globálního žebříčku ze Supabase
-        fetchLeaderboard: async function(orderBy = "stratagem_highscore", limit = 10) {
+        fetchLeaderboard: async function(orderBy = "total_play_time", limit = 10) {
             if (!isSupabaseConfigured()) return [];
             try {
                 const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at&order=${encodeURIComponent(orderBy)}.desc&limit=${limit}`;

@@ -538,7 +538,7 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
                 <div class="highlight-content">
-                    <h3>Celkový promrhaný čas</h3>
+                    <h3>Celkový čas</h3>
                     <div id="statTotalTime" class="highlight-val">0m</div>
                 </div>
             </div>
@@ -597,14 +597,14 @@
 
             <div class="leaderboard-card">
                 <div class="lb-filter-row">
-                    <button type="button" class="lb-filter-btn active" id="lbFilterHero" onclick="loadLeaderboard('stratagem_highscore', this)">
+                    <button type="button" class="lb-filter-btn active" id="lbFilterTime" onclick="loadLeaderboard('total_play_time', this)">
+                        Celkový herní čas
+                    </button>
+                    <button type="button" class="lb-filter-btn" id="lbFilterHero" onclick="loadLeaderboard('stratagem_highscore', this)">
                         Juchelka Hero (Skóre)
                     </button>
                     <button type="button" class="lb-filter-btn" id="lbFilterGd" onclick="loadLeaderboard('gd_completed_levels', this)">
                         Juchelka Dash (Levely)
-                    </button>
-                    <button type="button" class="lb-filter-btn" id="lbFilterTime" onclick="loadLeaderboard('total_play_time', this)">
-                        Celkový herní čas
                     </button>
                 </div>
 
@@ -852,7 +852,7 @@
             document.getElementById('tabBtnLeaderboard').classList.toggle('active', tabId === 'leaderboard');
 
             if (tabId === 'leaderboard') {
-                loadLeaderboard('stratagem_highscore');
+                loadLeaderboard('total_play_time', document.getElementById('lbFilterTime'));
             }
         }
 
@@ -930,7 +930,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             renderStats();
-            loadLeaderboard('stratagem_highscore');
+            loadLeaderboard('total_play_time', document.getElementById('lbFilterTime'));
         });
     </script>
 </body>
