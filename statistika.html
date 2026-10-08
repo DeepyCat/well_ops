@@ -518,10 +518,10 @@
     <!-- Top bar -->
     <header class="ops-topbar">
         <a href="games.html" class="back-btn">
-            <span>⬅</span> Rozcestník her
+            <span>&larr;</span> Rozcestník her
         </a>
         <button type="button" id="opsUserBadge" class="user-badge-btn" onclick="OPS_STATS.promptUsernameModal()">
-            👤 <span id="topUsernameDisplay" class="user-name">...</span> <span style="opacity:0.6;font-size:11px;">✎</span>
+            <span id="topUsernameDisplay" class="user-name">...</span> <span style="opacity:0.6;font-size:11px;">[upravit]</span>
         </button>
     </header>
 
@@ -534,7 +534,9 @@
         <!-- Hero Highlights -->
         <div class="highlights-grid">
             <div class="highlight-card">
-                <div class="highlight-icon">⏱️</div>
+                <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
                 <div class="highlight-content">
                     <h3>Celkový promrhaný čas</h3>
                     <div id="statTotalTime" class="highlight-val">0m</div>
@@ -542,7 +544,9 @@
             </div>
 
             <div class="highlight-card">
-                <div class="highlight-icon">⭐</div>
+                <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
                 <div class="highlight-content">
                     <h3>Juchelka Gamer Level</h3>
                     <div id="statGamerLevel" class="highlight-val">LVL 1</div>
@@ -550,7 +554,9 @@
             </div>
 
             <div class="highlight-card">
-                <div class="highlight-icon">🎯</div>
+                <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+                </div>
                 <div class="highlight-content">
                     <h3>Stratagem Rekord</h3>
                     <div id="statHeroScore" class="highlight-val">0</div>
@@ -558,7 +564,9 @@
             </div>
 
             <div class="highlight-card">
-                <div class="highlight-icon">🚀</div>
+                <div class="highlight-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
                 <div class="highlight-content">
                     <h3>GD Dokončeno Levelů</h3>
                     <div id="statGdCompleted" class="highlight-val">0 / 22</div>
@@ -568,16 +576,62 @@
 
         <!-- Navigation Tabs -->
         <div class="tab-bar">
-            <button type="button" class="tab-btn active" id="tabBtnMyStats" onclick="switchTab('myStats')">
-                <span>📊</span> Moje statistiky
+            <button type="button" class="tab-btn active" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')">
+                Globální žebříček
             </button>
-            <button type="button" class="tab-btn" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')">
-                <span>🏆</span> Globální žebříček
+            <button type="button" class="tab-btn" id="tabBtnMyStats" onclick="switchTab('myStats')">
+                Moje statistiky
             </button>
         </div>
 
-        <!-- TAB 1: MOJE STATISTIKY -->
-        <div id="tabMyStats">
+        <!-- TAB 1: GLOBÁLNÍ ŽEBŘÍČEK (VÝCHOZÍ) -->
+        <div id="tabLeaderboard">
+            <div id="cloudNotice" class="cloud-notice-box" style="display:none;">
+                <div class="cloud-notice-title">
+                    Synchronizace do cloudu
+                </div>
+                <p style="color:#94a3b8;font-size:0.9rem;">
+                    Pro zobrazení online žebříčku stačí v <code style="color:#38bdf8;">js/ops-stats.js</code> vyplnit adresu a klíč projektu Supabase. Vaše lokální výsledky jsou již zaznamenávány!
+                </p>
+            </div>
+
+            <div class="leaderboard-card">
+                <div class="lb-filter-row">
+                    <button type="button" class="lb-filter-btn active" id="lbFilterHero" onclick="loadLeaderboard('stratagem_highscore', this)">
+                        Juchelka Hero (Skóre)
+                    </button>
+                    <button type="button" class="lb-filter-btn" id="lbFilterGd" onclick="loadLeaderboard('gd_completed_levels', this)">
+                        Juchelka Dash (Levely)
+                    </button>
+                    <button type="button" class="lb-filter-btn" id="lbFilterTime" onclick="loadLeaderboard('total_play_time', this)">
+                        Celkový herní čas
+                    </button>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="lb-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">Pořadí</th>
+                                <th>Hráč</th>
+                                <th id="lbMetricColHeader" style="text-align:right;">Hodnota</th>
+                                <th style="text-align:right;width:140px;">Naposledy aktivní</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lbTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align:center;padding:30px;color:#94a3b8;">
+                                    Načítám data žebříčku...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: MOJE STATISTIKY -->
+        <div id="tabMyStats" style="display: none;">
             <div class="games-grid">
                 <!-- Juchelka Dash -->
                 <div class="game-card">
@@ -692,62 +746,16 @@
             </div>
         </div>
 
-        <!-- TAB 2: GLOBÁLNÍ ŽEBŘÍČEK -->
-        <div id="tabLeaderboard" style="display: none;">
-            <div id="cloudNotice" class="cloud-notice-box" style="display:none;">
-                <div class="cloud-notice-title">
-                    <span>☁️</span> Synchornizace do oblak 
-                </div>
-                <p style="color:#94a3b8;font-size:0.9rem;">
-                    Pro zobrazení online žebříčku stačí v <code style="color:#38bdf8;">js/ops-stats.js</code> vyplnit adresu a klíč projektu Supabase. Vaše lokální výsledky jsou již zaznamenávány!
-                </p>
-            </div>
-
-            <div class="leaderboard-card">
-                <div class="lb-filter-row">
-                    <button type="button" class="lb-filter-btn active" id="lbFilterHero" onclick="loadLeaderboard('stratagem_highscore', this)">
-                        🎯 Juchelka Hero (Skóre)
-                    </button>
-                    <button type="button" class="lb-filter-btn" id="lbFilterGd" onclick="loadLeaderboard('gd_completed_levels', this)">
-                        🚀 Juchelka Dash (Levely)
-                    </button>
-                    <button type="button" class="lb-filter-btn" id="lbFilterTime" onclick="loadLeaderboard('total_play_time', this)">
-                        ⏱️ Celkový herní čas
-                    </button>
-                </div>
-
-                <div style="overflow-x:auto;">
-                    <table class="lb-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 70px;">Pořadí</th>
-                                <th>Hráč</th>
-                                <th id="lbMetricColHeader" style="text-align:right;">Hodnota</th>
-                                <th style="text-align:right;width:140px;">Naposledy aktivní</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lbTableBody">
-                            <tr>
-                                <td colspan="4" style="text-align:center;padding:30px;color:#94a3b8;">
-                                    Načítám data žebříčku...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
         <!-- Spodní akce -->
         <div class="bottom-actions">
             <button type="button" class="action-btn" onclick="OPS_STATS.promptUsernameModal()">
-                <span>👤</span> Změnit přezdívku / Přihlásit se
+                Změnit přezdívku / Přihlásit se
             </button>
             <button type="button" class="action-btn" onclick="OPS_STATS.exportStatsJSON()">
-                <span>💾</span> Exportovat statistiky (JSON)
+                Exportovat statistiky (JSON)
             </button>
             <button type="button" class="action-btn danger" onclick="OPS_STATS.resetLocalStats()">
-                <span>🗑️</span> Resetovat lokální statistiky
+                Resetovat lokální statistiky
             </button>
         </div>
     </div>
@@ -885,7 +893,7 @@
                 tbody.innerHTML = `
                     <tr>
                         <td><span class="rank-medal rank-1">1</span></td>
-                        <td class="lb-player-active">👤 ${myUser || "Ty"} <span style="font-size:11px;opacity:0.6;">(tento počítač)</span></td>
+                        <td class="lb-player-active">${myUser || "Ty"} <span style="font-size:11px;opacity:0.6;">(tento počítač)</span></td>
                         <td style="text-align:right;font-weight:bold;color:#38bdf8;">${column === 'total_play_time' ? myVal : myVal}</td>
                         <td style="text-align:right;color:#94a3b8;font-size:12px;">Právě teď</td>
                     </tr>
@@ -911,7 +919,7 @@
                 tr.innerHTML = `
                     <td>${rank <= 3 ? `<span class="rank-medal ${medalClass}">${rank}</span>` : `<span style="padding-left:8px;color:#94a3b8;">${rank}.</span>`}</td>
                     <td class="${isMe ? 'lb-player-active' : ''}">
-                        ${isMe ? '⭐ ' : ''}${row.username || 'Anonym'} ${isMe ? '<span style="font-size:11px;opacity:0.7;">(ty)</span>' : ''}
+                        ${row.username || 'Anonym'} ${isMe ? '<span style="font-size:11px;opacity:0.7;">(ty)</span>' : ''}
                     </td>
                     <td style="text-align:right;font-weight:bold;color:${rank === 1 ? '#fbbf24' : '#fff'};">${displayVal}</td>
                     <td style="text-align:right;color:#94a3b8;font-size:12px;">${timeAgo}</td>
@@ -922,6 +930,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             renderStats();
+            loadLeaderboard('stratagem_highscore');
         });
     </script>
 </body>
