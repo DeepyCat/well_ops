@@ -39,6 +39,12 @@
             sessions: 0,
             playTime: 0
         },
+        maturita: {
+            highScore: 0,
+            bestDistance: 0,
+            totalGames: 0,
+            playTime: 0
+        },
         runner404: {
             hunterHighScore: 0,
             runnerHighScore: 0,
@@ -76,6 +82,7 @@
                 stratagem: { ...DEFAULT_STATS.stratagem, ...(parsed.stratagem || {}) },
                 hyperdrive: { ...DEFAULT_STATS.hyperdrive, ...(parsed.hyperdrive || {}) },
                 mc: { ...DEFAULT_STATS.mc, ...(parsed.mc || {}) },
+                maturita: { ...DEFAULT_STATS.maturita, ...(parsed.maturita || {}) },
                 runner404: { ...DEFAULT_STATS.runner404, ...(parsed.runner404 || {}) },
                 meta: { ...DEFAULT_STATS.meta, ...(parsed.meta || {}) }
             };
@@ -99,7 +106,7 @@
     // -------------------------------------------------------------------------
     async function syncToCloud() {
         const username = OPS_STATS.getUsername();
-        if (!username || !isSupabaseConfigured()) return;
+        if (!username || !isSupabaseConfigured() || username.startsWith("Host")) return;
 
         const stats = loadLocalStats();
         const payload = {
@@ -132,7 +139,7 @@
     }
 
     async function syncFromCloud(username) {
-        if (!username || !isSupabaseConfigured()) return null;
+        if (!username || !isSupabaseConfigured() || username.startsWith("Host")) return null;
 
         try {
             const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=*`;
@@ -168,6 +175,12 @@
                     mc: {
                         sessions: Math.max(local.mc.sessions, cloudStats.mc?.sessions || 0),
                         playTime: Math.max(local.mc.playTime, cloudStats.mc?.playTime || 0)
+                    },
+                    maturita: {
+                        highScore: Math.max(local.maturita?.highScore || 0, cloudStats.maturita?.highScore || 0),
+                        bestDistance: Math.max(local.maturita?.bestDistance || 0, cloudStats.maturita?.bestDistance || 0),
+                        totalGames: Math.max(local.maturita?.totalGames || 0, cloudStats.maturita?.totalGames || 0),
+                        playTime: Math.max(local.maturita?.playTime || 0, cloudStats.maturita?.playTime || 0)
                     },
                     runner404: {
                         hunterHighScore: Math.max(local.runner404.hunterHighScore, cloudStats.runner404?.hunterHighScore || 0),
@@ -241,6 +254,14 @@
                     if (score >= 100 && !stats.gd.completedLevels.includes(lvl)) {
                         stats.gd.completedLevels.push(lvl);
                     }
+                }
+            } else if (gameId === 'maturita') {
+                stats.maturita.totalGames = (stats.maturita.totalGames || 0) + 1;
+                if (score > (stats.maturita.highScore || 0)) {
+                    stats.maturita.highScore = score;
+                }
+                if (extraData.distance && extraData.distance > (stats.maturita.bestDistance || 0)) {
+                    stats.maturita.bestDistance = extraData.distance;
                 }
             } else if (gameId === 'hunter') {
                 if (score > (stats.runner404.hunterHighScore || 0)) {
@@ -481,12 +502,12 @@
                     Hráčský profil OPS
                 </div>
                 <div class="ops-modal-desc">
-                    Zadej svou herní přezdívku (username). Skóre a statistiky se budou ukládat do žebříčku a při zadání stejného jména na jiném počítači se tvůj postup automaticky načte!
+                    Zadej svou přezdívku pro ukládání do online žebříčku a přenos mezi počítači, nebo pokračuj jako anonymní host.
                 </div>
                 <input type="text" id="opsUsernameInput" class="ops-modal-input" placeholder="Tvoje přezdívka..." maxlength="24" autocomplete="off" />
                 <div class="ops-modal-btn-row">
-                    <button type="button" id="opsModalCancelBtn" class="ops-modal-btn ops-modal-btn-ghost" style="display:none;">Zrušit</button>
-                    <button type="button" id="opsModalSaveBtn" class="ops-modal-btn ops-modal-btn-primary">Uložit profil</button>
+                    <button type="button" id="opsModalGuestBtn" class="ops-modal-btn ops-modal-btn-ghost">Hrát jako host</button>
+                    <button type="button" id="opsModalSaveBtn" class="ops-modal-btn ops-modal-btn-primary">Pokračovat</button>
                 </div>
             </div>
         `;
@@ -494,39 +515,65 @@
 
         const input = document.getElementById("opsUsernameInput");
         const saveBtn = document.getElementById("opsModalSaveBtn");
-        const cancelBtn = document.getElementById("opsModalCancelBtn");
+        const guestBtn = document.getElementById("opsModalGuestBtn");
 
         const submit = async () => {
             const val = input.value.trim();
             if (!val) {
-                input.focus();
+                let current = OPS_STATS.getUsername();
+                let guestName = (current && current.startsWith("Host")) ? current : `Host_${Math.floor(1000 + Math.random() * 9000)}`;
+                saveBtn.disabled = true;
+                await OPS_STATS.setUsername(guestName);
+                saveBtn.disabled = false;
+                backdrop.classList.remove("open");
                 return;
             }
             saveBtn.disabled = true;
             saveBtn.textContent = "Ukládám...";
             await OPS_STATS.setUsername(val);
             saveBtn.disabled = false;
-            saveBtn.textContent = "Uložit profil";
+            backdrop.classList.remove("open");
+        };
+
+        const playAsGuest = async () => {
+            let current = OPS_STATS.getUsername();
+            let guestName = (current && current.startsWith("Host")) ? current : `Host_${Math.floor(1000 + Math.random() * 9000)}`;
+            guestBtn.disabled = true;
+            await OPS_STATS.setUsername(guestName);
+            guestBtn.disabled = false;
             backdrop.classList.remove("open");
         };
 
         saveBtn.addEventListener("click", submit);
+        guestBtn.addEventListener("click", playAsGuest);
         input.addEventListener("keydown", (e) => {
             if (e.key === "Enter") submit();
         });
-        cancelBtn.addEventListener("click", () => {
-            backdrop.classList.remove("open");
+        backdrop.addEventListener("click", (e) => {
+            if (e.target === backdrop) backdrop.classList.remove("open");
         });
     }
 
-    function showUsernameModal(allowCancel = false) {
+    function showUsernameModal(allowCancel = true) {
         createModalDOM();
         const backdrop = document.getElementById("opsStatsModalBackdrop");
         const input = document.getElementById("opsUsernameInput");
-        const cancelBtn = document.getElementById("opsModalCancelBtn");
+        const saveBtn = document.getElementById("opsModalSaveBtn");
 
-        input.value = OPS_STATS.getUsername();
-        cancelBtn.style.display = allowCancel ? "inline-block" : "none";
+        const current = OPS_STATS.getUsername();
+        if (current && !current.startsWith("Host")) {
+            input.value = current;
+            saveBtn.textContent = `Hrát jako ${current}`;
+        } else {
+            input.value = "";
+            saveBtn.textContent = "Pokračovat";
+        }
+
+        input.oninput = () => {
+            const val = input.value.trim();
+            saveBtn.textContent = val ? `Hrát jako ${val}` : "Pokračovat";
+        };
+
         backdrop.classList.add("open");
         setTimeout(() => input.focus(), 100);
     }
@@ -550,19 +597,27 @@
     window.addEventListener("DOMContentLoaded", function() {
         injectUIStyles();
 
-        // Pokud jsme na herních stránkách a přezdívka chybí, zobrazíme dialog
-        const isGameOrHub = window.location.pathname.includes("games.html") || 
-                            window.location.pathname.includes("statistika.html") || 
-                            window.location.pathname.includes("/gd/") || 
-                            window.location.pathname.includes("/stratagem/") || 
-                            window.location.pathname.includes("/hyperdrive/") || 
-                            window.location.pathname.includes("/mc/");
+        const isGamesHub = window.location.pathname.endsWith("games.html") || 
+                           window.location.pathname.includes("games.html") || 
+                           !!document.querySelector(".landing-page");
 
-        if (isGameOrHub) {
-            const user = OPS_STATS.getUsername();
-            if (!user) {
-                // Počkáme chvilku a ukážeme modal
-                setTimeout(() => showUsernameModal(false), 500);
+        if (isGamesHub) {
+            // Na games.html se ptáme pokaždé při každém příchodu na stránku
+            setTimeout(() => showUsernameModal(true), 350);
+        } else {
+            // Na ostatních herních stránkách se ptáme jen pokud přezdívka ještě není nastavena
+            const isGameOrHub = window.location.pathname.includes("statistika.html") || 
+                                window.location.pathname.includes("/gd/") || 
+                                window.location.pathname.includes("/stratagem/") || 
+                                window.location.pathname.includes("/hyperdrive/") || 
+                                window.location.pathname.includes("/mc/") ||
+                                window.location.pathname.includes("/maturita/");
+
+            if (isGameOrHub) {
+                const user = OPS_STATS.getUsername();
+                if (!user) {
+                    setTimeout(() => showUsernameModal(true), 500);
+                }
             }
         }
 
