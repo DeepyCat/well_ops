@@ -374,6 +374,9 @@ class M {
     this.isJumping = false;
     this.gravityFlipped = false;
     this.isFlying = false;
+    this.isBall = false;
+    this.isUfo = false;
+    this.isMini = false;
     this.wasBoosted = false;
     this.collideTop = 0x0;
     this.collideBottom = 0x0;
@@ -4033,42 +4036,49 @@ const OBJECT_DEFS = {
     frame: "portal_05_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: MODE_FLY
+    sub: "mirror"
   },
   0x2e: {
     type: OBJ_PORTAL,
     frame: "portal_06_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: MODE_CUBE
+    sub: "unmirror"
   },
   0x2f: {
     type: OBJ_PORTAL,
     frame: 'portal_07_front_001.png',
     gridW: 0x1,
     gridH: 0x3,
-    sub: MODE_FLY
+    sub: "ball"
+  },
+  0x6f: {
+    type: OBJ_PORTAL,
+    frame: "portal_10_front_001.png",
+    gridW: 0x1,
+    gridH: 0x3,
+    sub: "ufo"
   },
   0xc8: {
     type: OBJ_SPEED,
     frame: "portal_09_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: "slow"
+    sub: "normal"
   },
   0xc9: {
     type: OBJ_SPEED,
     frame: "portal_10_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: "normal"
+    sub: "fast"
   },
   0xca: {
     type: OBJ_SPEED,
     frame: "portal_08_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: "fast"
+    sub: "very_fast"
   },
   0xcb: {
     type: OBJ_SPEED,
@@ -5430,6 +5440,14 @@ class us {
                 _0x25452a = Bn;
               } else if ("gravity_normal" === _0x24471f.sub) {
                 _0x25452a = kn;
+              } else if ("ball" === _0x24471f.sub) {
+                _0x25452a = "portal_ball";
+              } else if ("ufo" === _0x24471f.sub) {
+                _0x25452a = "portal_ufo";
+              } else if ("mini" === _0x24471f.sub) {
+                _0x25452a = "portal_mini";
+              } else if ("big" === _0x24471f.sub) {
+                _0x25452a = "portal_big";
               }
               if (_0x25452a) {
                 let _0x4bd7bc = new O(_0x25452a, _0x173c58, _0x7ab528, 0x5a, _0x2c2226);
@@ -6345,6 +6363,8 @@ class ps {
       return;
     }
     this.p.isFlying = true;
+    this.p.isBall = false;
+    this.p.isUfo = false;
     this._scene.toggleGlitter(true);
     this.p.yVelocity *= 0.5;
     this.p.onGround = false;
@@ -6371,6 +6391,8 @@ class ps {
     this._gameLayer.setFlyMode(true, _0x17d728);
   }
   ['exitShipMode']() {
+    this.p.isBall = false;
+    this.p.isUfo = false;
     if (this.p.isFlying) {
       this.p.isFlying = false;
       this._scene.toggleGlitter(false);
@@ -6399,6 +6421,37 @@ class ps {
         }
       }
       this._gameLayer.setFlyMode(false, 0x0);
+    }
+  }
+  enterBallMode() {
+    this.exitShipMode();
+    this.p.isBall = true;
+    this.p.isUfo = false;
+    this.p.canJump = true;
+  }
+  enterUfoMode() {
+    this.exitShipMode();
+    this.p.isBall = false;
+    this.p.isUfo = true;
+  }
+  enterMiniMode() {
+    this.p.isMini = true;
+    for (const _layer of this._allLayers) {
+      if (_layer && _layer.sprite) {
+        const _baseX = _layer.sprite._baseScaleX || _layer.sprite._baseScale || 1.0;
+        const _baseY = _layer.sprite._baseScaleY || _layer.sprite._baseScale || 1.0;
+        _layer.sprite.setScale(_baseX * 0.6, _baseY * 0.6);
+      }
+    }
+  }
+  enterBigMode() {
+    this.p.isMini = false;
+    for (const _layer of this._allLayers) {
+      if (_layer && _layer.sprite) {
+        const _baseX = _layer.sprite._baseScaleX || _layer.sprite._baseScale || 1.0;
+        const _baseY = _layer.sprite._baseScaleY || _layer.sprite._baseScale || 1.0;
+        _layer.sprite.setScale(_baseX, _baseY);
+      }
     }
   }
   ["hitGround"]() {
@@ -6856,18 +6909,91 @@ class ps {
     }
   }
   ["playerIsFalling"]() {
-    return this.p.gravityFlipped ? this.p.yVelocity > 3.832796 : this.p.yVelocity < 3.832796;
+    return this.p.gravityFlipped ? this.p.yVelocity > -3.832796 : this.p.yVelocity < 3.832796;
+  }
+  _isNearRing() {
+    const _playerX = this._scene._playerWorldX;
+    const _nearby = this._gameLayer.getNearbySectionObjects(_playerX);
+    for (const obj of _nearby) {
+      if (obj.type === OBJ_RING && !obj.activated) {
+        const left = obj.x - obj.w / 2;
+        const right = obj.x + obj.w / 2;
+        const top = obj.y - obj.h / 2;
+        const bottom = obj.y + obj.h / 2;
+        const _pSize = this.p.isMini ? 25 : 35;
+        if (!(_playerX + _pSize <= left || _playerX - _pSize >= right || this.p.y + _pSize <= top || this.p.y - _pSize >= bottom)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  _updateBallJump(_dt) {
+    if ((this.p.upKeyPressed || (this.p.upKeyDown && (this.p.onGround || this.p.onCeiling))) && (this.p.onGround || this.p.onCeiling || this.p.canJump)) {
+      this.p.upKeyPressed = false;
+      this.p.canJump = false;
+      this.p.onGround = false;
+      this.p.onCeiling = false;
+      this.p.gravityFlipped = !this.p.gravityFlipped;
+      const _dir = this.p.gravityFlipped ? 1 : -1;
+      this.p.yVelocity = _dir * (this.p.isMini ? 7.5 : 6);
+      this.p.y += _dir * 4;
+      this.runRotateAction();
+    } else {
+      this.p.yVelocity -= 1.916398 * _dt * this.flipMod();
+      if (this.p.gravityFlipped) {
+        this.p.yVelocity = Math.min(this.p.yVelocity, 30);
+      } else {
+        this.p.yVelocity = Math.max(this.p.yVelocity, -30);
+      }
+      if (this.playerIsFalling()) {
+        const _fallThreshold = this.p.gravityFlipped ? this.p.yVelocity > 4 : this.p.yVelocity < -4;
+        if (_fallThreshold) {
+          this.p.onGround = false;
+        }
+      }
+    }
+  }
+  _updateUfoJump(_dt) {
+    if (this.p.upKeyPressed) {
+      if (!this._isNearRing()) {
+        this.p.upKeyPressed = false;
+        this.p.onGround = false;
+        this.p.onCeiling = false;
+        const _ufoJumpVel = this.p.isMini ? 14.5 : 19;
+        this.p.yVelocity = _ufoJumpVel * this.flipMod();
+        this.p.y += this.flipMod() * 3;
+      }
+    } else {
+      this.p.yVelocity -= 1.916398 * _dt * this.flipMod();
+      if (this.p.gravityFlipped) {
+        this.p.yVelocity = Math.min(this.p.yVelocity, 25);
+      } else {
+        this.p.yVelocity = Math.max(this.p.yVelocity, -25);
+      }
+      if (this.playerIsFalling()) {
+        const _fallThreshold = this.p.gravityFlipped ? this.p.yVelocity > 4 : this.p.yVelocity < -4;
+        if (_fallThreshold) {
+          this.p.onGround = false;
+        }
+      }
+    }
   }
   ['updateJump'](_0x3d1c6f) {
     if (this.p.isFlying) {
       this._updateFlyJump(_0x3d1c6f);
+    } else if (this.p.isBall) {
+      this._updateBallJump(_0x3d1c6f);
+    } else if (this.p.isUfo) {
+      this._updateUfoJump(_0x3d1c6f);
     } else {
       if (this.p.upKeyDown && this.p.canJump) {
         this.p.isJumping = true;
         this.p.onGround = false;
         this.p.canJump = false;
         this.p.upKeyPressed = false;
-        this.p.yVelocity = 22.360064 * this.flipMod();
+        const _cubeJumpVel = (this.p.isMini ? 17.5 : 22.360064) * this.flipMod();
+        this.p.yVelocity = _cubeJumpVel;
         this.runRotateAction();
       } else {
         if (this.p.isJumping) {
@@ -6935,13 +7061,15 @@ class ps {
     this.p.collideBottom = 0x0;
     this.p.onCeiling = false;
     let _0x30410f = false;
+    const _pSize = this.p.isMini ? 18 : 30;
+    const _hazardRad = this.p.isMini ? 5 : 9;
     const _0x198534 = this._gameLayer.getNearbySectionObjects(_0x3c691e);
     for (let _0x1b13b8 of _0x198534) {
       let _0xf3791a = _0x1b13b8.x - _0x1b13b8.w / 0x2;
       let _0x17dbc8 = _0x1b13b8.x + _0x1b13b8.w / 0x2;
       let _0x2d2fa7 = _0x1b13b8.y - _0x1b13b8.h / 0x2;
       let _0x8a8d9a = _0x1b13b8.y + _0x1b13b8.h / 0x2;
-      if (!(_0x3c691e + 0x1e <= _0xf3791a || _0x3c691e - 0x1e >= _0x17dbc8 || _0x8e0d28 + 0x1e <= _0x2d2fa7 || _0x8e0d28 - 0x1e >= _0x8a8d9a)) {
+      if (!(_0x3c691e + _pSize <= _0xf3791a || _0x3c691e - _pSize >= _0x17dbc8 || _0x8e0d28 + _pSize <= _0x2d2fa7 || _0x8e0d28 - _pSize >= _0x8a8d9a)) {
         if (_0x1b13b8.type === Bn && !_0x1b13b8.activated) {
           _0x1b13b8.activated = true;
           this._playPortalShine(_0x1b13b8);
@@ -6960,28 +7088,54 @@ class ps {
           this._applySpeedPortal(_0x1b13b8.speedSub);
           continue;
         }
+        if (_0x1b13b8.type === "portal_ball" && !_0x1b13b8.activated) {
+          _0x1b13b8.activated = true;
+          this._playPortalShine(_0x1b13b8);
+          this.enterBallMode();
+          continue;
+        }
+        if (_0x1b13b8.type === "portal_ufo" && !_0x1b13b8.activated) {
+          _0x1b13b8.activated = true;
+          this._playPortalShine(_0x1b13b8);
+          this.enterUfoMode();
+          continue;
+        }
+        if (_0x1b13b8.type === "portal_mini" && !_0x1b13b8.activated) {
+          _0x1b13b8.activated = true;
+          this._playPortalShine(_0x1b13b8);
+          this.enterMiniMode();
+          continue;
+        }
+        if (_0x1b13b8.type === "portal_big" && !_0x1b13b8.activated) {
+          _0x1b13b8.activated = true;
+          this._playPortalShine(_0x1b13b8);
+          this.enterBigMode();
+          continue;
+        }
         if (_0x1b13b8.type !== _) {
           if (_0x1b13b8.type !== w) {
             if (_0x1b13b8.type === x) {
               return void this.killPlayer();
             }
-            if (_0x1b13b8.type === OBJ_PAD && !_0x1b13b8.activated && !this.p.isFlying) {
+            if (_0x1b13b8.type === OBJ_PAD && !_0x1b13b8.activated) {
               _0x1b13b8.activated = true;
               const _padBoost = this._getPadBoost(_0x1b13b8.id, _0x1b13b8.boost);
-              const _isCeiling = _0x1b13b8.isUpsideDown || (this.p.gravityFlipped && _0x1b13b8.isUpsideDown !== false);
+              const _isCeiling = !!_0x1b13b8.isUpsideDown;
               const _boostDir = _isCeiling ? -1 : 1;
               this.p.yVelocity = _padBoost * _boostDir;
               this.p.onGround = false;
               this.p.canJump = false;
-              this.p.isJumping = true;
+              this.p.isJumping = !this.p.isFlying;
               this.p.y += _boostDir * 5;
-              this.runRotateAction();
+              if (!this.p.isFlying) {
+                this.runRotateAction();
+              }
               if (_0x1b13b8.flipGravity) {
                 this._applyGravityPortal(!this.p.gravityFlipped);
               }
               return;
             }
-            if (_0x1b13b8.type === OBJ_RING && !_0x1b13b8.activated && !this.p.isFlying && this.p.upKeyPressed) {
+            if (_0x1b13b8.type === OBJ_RING && !_0x1b13b8.activated && this.p.upKeyPressed) {
               _0x1b13b8.activated = true;
               this.p.upKeyPressed = false;
               const _ringBoost = this._getRingBoost(_0x1b13b8.id, _0x1b13b8.boost);
@@ -6989,29 +7143,31 @@ class ps {
               this.p.yVelocity = _ringBoost * _boostDir;
               this.p.onGround = false;
               this.p.canJump = false;
-              this.p.isJumping = true;
+              this.p.isJumping = !this.p.isFlying;
               this.p.y += _boostDir * 3;
-              this.runRotateAction();
+              if (!this.p.isFlying) {
+                this.runRotateAction();
+              }
               if (_0x1b13b8.flipGravity) {
                 this._applyGravityPortal(!this.p.gravityFlipped);
               }
               return;
             }
             if (_0x1b13b8.type === y) {
-              let _0x146a97 = _0x8e0d28 - 0x1e + _0x11ee2f;
-              let _0x869e42 = _0x37040a - 0x1e + _0x11ee2f;
-              let _0x3e7199 = _0x8e0d28 + 0x1e - _0x11ee2f;
-              let _0x135a9d = _0x37040a + 0x1e - _0x11ee2f;
-              const _0x3c1654 = _0x3c691e + 0x9 > _0xf3791a && _0x3c691e - 0x9 < _0x17dbc8 && _0x8e0d28 + 0x9 > _0x2d2fa7 && _0x8e0d28 - 0x9 < _0x8a8d9a;
+              let _0x146a97 = _0x8e0d28 - _pSize + _0x11ee2f;
+              let _0x869e42 = _0x37040a - _pSize + _0x11ee2f;
+              let _0x3e7199 = _0x8e0d28 + _pSize - _0x11ee2f;
+              let _0x135a9d = _0x37040a + _pSize - _0x11ee2f;
+              const _0x3c1654 = _0x3c691e + _hazardRad > _0xf3791a && _0x3c691e - _hazardRad < _0x17dbc8 && _0x8e0d28 + _hazardRad > _0x2d2fa7 && _0x8e0d28 - _hazardRad < _0x8a8d9a;
               const _0x4cf6c2 = (this.p.yVelocity <= 0x0 || this.p.onGround) && (_0x146a97 >= _0x8a8d9a || _0x869e42 >= _0x8a8d9a);
               const _0x53244b = (this.p.yVelocity >= 0x0 || this.p.onGround) && (_0x3e7199 <= _0x2d2fa7 || _0x135a9d <= _0x2d2fa7);
               const _0x2841ea = this.p.gravityFlipped ? _0x53244b : _0x4cf6c2;
               if (_0x3c1654 && !_0x2841ea) {
                 return void this.killPlayer();
               }
-              if (_0x3c691e + 0x1e - 0x5 > _0xf3791a && _0x3c691e - 0x1e + 0x5 < _0x17dbc8) {
+              if (_0x3c691e + _pSize - 0x5 > _0xf3791a && _0x3c691e - _pSize + 0x5 < _0x17dbc8) {
                 if (!this.p.gravityFlipped && _0x4cf6c2) {
-                  this.p.y = _0x8a8d9a + 0x1e;
+                  this.p.y = _0x8a8d9a + _pSize;
                   this.hitGround();
                   _0x30410f = true;
                   this.p.collideBottom = _0x8a8d9a;
@@ -7021,14 +7177,14 @@ class ps {
                   continue;
                 }
                 if (this.p.gravityFlipped && _0x53244b) {
-                  this.p.y = _0x2d2fa7 - 0x1e;
+                  this.p.y = _0x2d2fa7 - _pSize;
                   this.hitGround();
                   this.p.onCeiling = true;
                   this.p.collideTop = _0x2d2fa7;
                   continue;
                 }
                 if ((_0x3e7199 <= _0x2d2fa7 || _0x135a9d <= _0x2d2fa7) && (this.p.yVelocity >= 0x0 || this.p.onGround) && this.p.isFlying) {
-                  this.p.y = _0x2d2fa7 - 0x1e;
+                  this.p.y = _0x2d2fa7 - _pSize;
                   this.hitGround();
                   this.p.onCeiling = true;
                   this.p.collideTop = _0x2d2fa7;
@@ -7049,30 +7205,30 @@ class ps {
       }
     }
     if (0x0 !== this.p.collideTop && 0x0 !== this.p.collideBottom) {
-      if (Math.abs(this.p.collideTop - this.p.collideBottom) < 0x30) {
+      if (Math.abs(this.p.collideTop - this.p.collideBottom) < _pSize) {
         return void this.killPlayer();
       }
     }
     let _0x3020c8 = this._gameLayer.getFloorY();
     if (!_0x30410f) {
-      if (!this.p.gravityFlipped && this.p.y <= _0x3020c8 + 0x1e) {
-        this.p.y = _0x3020c8 + 0x1e;
+      if (!this.p.gravityFlipped && this.p.y <= _0x3020c8 + _pSize) {
+        this.p.y = _0x3020c8 + _pSize;
         this.hitGround();
       }
     }
     let _0x496456 = this._gameLayer.getCeilingY();
-    if ((!this.p.gravityFlipped || this.p.isFlying) && null !== _0x496456 && this.p.y >= _0x496456 - 0x1e) {
-      this.p.y = _0x496456 - 0x1e;
+    if ((!this.p.gravityFlipped || this.p.isFlying) && null !== _0x496456 && this.p.y >= _0x496456 - _pSize) {
+      this.p.y = _0x496456 - _pSize;
       this.hitGround();
       this.p.onCeiling = true;
-    } else if (this.p.gravityFlipped && null !== _0x496456 && this.p.y >= _0x496456 - 0x1e) {
-      this.p.y = _0x496456 - 0x1e;
+    } else if (this.p.gravityFlipped && null !== _0x496456 && this.p.y >= _0x496456 - _pSize) {
+      this.p.y = _0x496456 - _pSize;
       this.hitGround();
       this.p.onCeiling = true;
     }
     if (this.p.isFlying) {
-      const _0x354b7c = this.p.y <= _0x3020c8 + 0x1e;
-      const _0xdc296 = null !== _0x496456 && this.p.y >= _0x496456 - 0x1e;
+      const _0x354b7c = this.p.y <= _0x3020c8 + _pSize;
+      const _0xdc296 = null !== _0x496456 && this.p.y >= _0x496456 - _pSize;
       if (!(_0x30410f || _0x354b7c || 0x0 !== this.p.collideTop || _0xdc296)) {
         this.p.onGround = false;
       }
@@ -7204,6 +7360,9 @@ class ps {
     this._rotation = 0x0;
     this._lastCameraX = 0x0;
     this._lastCameraY = 0x0;
+    this.p.isBall = false;
+    this.p.isUfo = false;
+    this.enterBigMode();
     this.setCubeVisible(true);
     this.setShipVisible(false);
     for (const _0x5a0fa9 of this._allLayers) if (_0x5a0fa9) {
@@ -8292,7 +8451,15 @@ class GameScene extends Phaser.Scene {
     if (!(this._slideIn || this._state.isDead)) {
       this._state.upKeyDown = true;
       this._state.upKeyPressed = true;
-      if (!this._state.isFlying && this._state.canJump) {
+      if (this._state.isUfo) {
+        if (!this._player._isNearRing()) {
+          this._player.updateJump(0x0);
+          this._totalJumps++;
+          if (window.OPS_STATS) {
+            window.OPS_STATS.recordScore('gd', 0, { jumps: 1 });
+          }
+        }
+      } else if (!this._state.isFlying && this._state.canJump) {
         this._player.updateJump(0x0);
         this._totalJumps++;
         if (window.OPS_STATS) {
@@ -8670,7 +8837,9 @@ class GameScene extends Phaser.Scene {
       this._player.checkCollisions(this._playerWorldX - h);
       this._playerWorldX += _0x426602 * 11.540004 * 0.9 * this._speedMul;
       if (!this._state.isFlying) {
-        if (this._state.onGround) {
+        if (this._player.p.isBall) {
+          this._player._rotation += 0.08 * this._player.flipMod();
+        } else if (this._state.onGround) {
           this._player.updateGroundRotation(_0x5caeb1);
         } else if (this._player.rotateActionActive) {
           this._player.updateRotateAction(0.004166666666666667);

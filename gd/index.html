@@ -197,7 +197,7 @@
       var wrap = document.createElement('section');
       wrap.className = 'level-picker';
       wrap.innerHTML =
-        '<h2><span>🎮</span> Juchelka Dash (1-22)</h2>' +
+        '<h2>Juchelka Dash (1-22)</h2>' +
         '<div class="row">' +
           '<select id="gdLevelSelect"></select>' +
           '<button id="gdLevelLoad" type="button">Hrát</button>' +
@@ -218,7 +218,7 @@
       function refreshSongInfo() {
         var id = parseInt(select.value, 10);
         var current = LEVELS.find(function (entry) { return entry.id === id; }) || LEVELS[0];
-        songInfo.textContent = '🎵 ' + current.song;
+        songInfo.textContent = 'Skladba: ' + current.song;
       }
       refreshSongInfo();
       select.addEventListener('change', refreshSongInfo);
