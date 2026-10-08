@@ -74,19 +74,19 @@
 
     .choice-btn::after {
         content: attr(data-text);
-        font-size: 2.1rem;
+        font-size: clamp(1.1rem, 1.6vw, 1.8rem);
         font-weight: bold;
         letter-spacing: 1px;
         color: white;
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
         background: rgba(0, 0, 0, 0.45);
-        padding: 15px 28px;
+        padding: 12px 20px;
         border-radius: 50px;
         backdrop-filter: blur(6px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         transition: transform 0.3s ease, background 0.3s ease;
         text-align: center;
-        max-width: 85%;
+        max-width: 88%;
         word-break: break-word;
     }
 
@@ -101,25 +101,28 @@
         background: rgba(0, 0, 0, 0.7);
     }
 
-    .choice-btn:nth-child(1) { clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%); z-index: 5; }
-    .choice-btn:nth-child(2) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 4; }
-    .choice-btn:nth-child(3) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 3; }
-    .choice-btn:nth-child(4) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 2; }
-    .choice-btn:nth-child(5) { clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%); margin-left: -3%; z-index: 1; }
+    .choice-btn:nth-child(1) { clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%); z-index: 6; }
+    .choice-btn:nth-child(2) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 5; }
+    .choice-btn:nth-child(3) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 4; }
+    .choice-btn:nth-child(4) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 3; }
+    .choice-btn:nth-child(5) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 2; }
+    .choice-btn:nth-child(6) { clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%); margin-left: -3%; z-index: 1; }
 
     .choice-btn.gd { background-image: url('gd/assets/juchelkaD.png'); }
     .choice-btn.hero {  background-image: url('stratagem/data/Images/heroJ.png'); }
+    .choice-btn.maturita { background-image: url('barina_run.png'); background-position: center; }
     .choice-btn.craft { background-image: url('mc/juchelka_craft.png'); background-position: 80% 50%; }
     .choice-btn.race { background-image: url('hyperdrive/kokes_race.gif'); background-position: center; }
     .choice-btn.stat { background-image: none; background-color: #1e293b; }
 </style>
 
 <body class="scroll-body">
-    <a href="index.html" class="home-portal-btn">⬅ Zpět na OPS Portál</a>
+    <a href="index.html" class="home-portal-btn">&larr; Zpět na OPS Portál</a>
 
     <section class="landing-page" id="sec-0">
         <a href="gd/index.html" class="choice-btn gd" data-text="Juchelka dash"></a>
         <a href="stratagem/index.html" class="choice-btn hero" data-text="Juchelka Hero"></a>
+        <a href="maturita/index.html" class="choice-btn maturita" data-text="Run From Maturita"></a>
         <a href="mc/index.html" class="choice-btn craft" data-text="JuchelkaCraft"></a>
         <a href="hyperdrive/index.html" class="choice-btn race" data-text="Race with Kokeš"></a>
         <a href="statistika.html" class="choice-btn stat" data-text="Statistiky"></a>
