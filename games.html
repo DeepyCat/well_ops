@@ -123,8 +123,9 @@
         <a href="mc/index.html" class="choice-btn craft" data-text="JuchelkaCraft"></a>
         <a href="hyperdrive/index.html" class="choice-btn race" data-text="Race with Kokeš"></a>
         <a href="statistika.html" class="choice-btn stat" data-text="Statistiky"></a>
-    </section>
+    <div id="opsUserBadge" class="ops-user-badge" onclick="OPS_STATS.promptUsernameModal()"></div>
 
+    <script src="js/ops-stats.js"></script>
     <script>
         function scrollToSection(index) {
             const sections = document.querySelectorAll('.landing-page');

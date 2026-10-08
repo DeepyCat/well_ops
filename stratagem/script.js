@@ -166,6 +166,7 @@ function keypress(keyCode){
     switch(gameState){
         case "initial":
             gameState = "running";
+            window._stratagemGameStartTime = Date.now();
             // Exclusion of `break;` here is intentional. The first keypress of the game should apply to the sequence
         case "running":
             checkGameKeypress(keyCode, sfx);
@@ -324,6 +325,16 @@ function gameOver(){
     // Write score to readout
     let scoreReadout = document.getElementById("score-readout");
     scoreReadout.innerHTML = `SCORE: ${completedStrategemsList.length}`
+
+    // Record stats to OPS_STATS
+    if (window.OPS_STATS) {
+        window.OPS_STATS.recordScore('stratagem', completedStrategemsList.length);
+        if (window._stratagemGameStartTime) {
+            let dur = Math.max(1, Math.floor((Date.now() - window._stratagemGameStartTime) / 1000));
+            window.OPS_STATS.recordPlayTime('stratagem', dur);
+            window._stratagemGameStartTime = null;
+        }
+    }
 
     // Write completed strategems to readout
     let stratagemReadout = document.getElementById("completed-strategems-readout");

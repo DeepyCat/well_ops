@@ -64,6 +64,7 @@
 				transform: translateY(-1px);
 			}
 		</style>
+		<script type="text/javascript" src="../js/ops-stats.js"></script>
 		<script type="text/javascript" src="bootstrap.js"></script>
 		<script type="text/javascript">
 			"use strict";
@@ -100,7 +101,12 @@
 					}
 					
 					main();
-					
+					if (window.OPS_STATS) {
+						window.OPS_STATS.recordSession('mc');
+						setInterval(function() {
+							window.OPS_STATS.recordPlayTime('mc', 10);
+						}, 10000);
+					}
 				}
 			});
 		</script>

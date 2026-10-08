@@ -6,6 +6,7 @@
   <title>Race with Kokeš | OPS</title>
   <link rel="icon" type="image/x-icon" href="../img/bird.png">
   <link rel="stylesheet" href="TemplateData/style.css">
+  <script src="../js/ops-stats.js"></script>
   <style>
     * {
       margin: 0;
@@ -207,6 +208,12 @@
       }).then((unityInstance) => {
         activeInstance = unityInstance;
         loadingBar.style.display = "none";
+        if (window.OPS_STATS) {
+          window.OPS_STATS.recordSession('hyperdrive');
+          setInterval(() => {
+            window.OPS_STATS.recordPlayTime('hyperdrive', 10);
+          }, 10000);
+        }
       }).catch((message) => {
         console.error("Unity load error:", message);
       });
