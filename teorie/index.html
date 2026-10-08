@@ -442,7 +442,7 @@
                 <ul>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/01_Mass_Storage_Structure.md', this)">01_Mass_Storage</button></li>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/02_Disk_Scheduling_Management.md', this)">02_Disk_Scheduling</button></li>
-                    <li><button onclick="loadMarkdown('05_Mass_Storage/03_RAID_Stable_Storage.md', this)">03_RAID_Stable_Storage</button></li>
+                    <li><button onclick="loadMarkdown('05_Mass_Storage/03_RAID_Stable_Storage.md', this)">03_RAID_Stable_Storage.md</button></li>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/04_File_Concept_Access.md', this)">04_File_Concept_Access</button></li>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/05_Directory_Structures.md', this)">05_Directory_Structures</button></li>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/06_File_System_Implementation.md', this)">06_File_System_Implementation</button></li>
@@ -521,9 +521,12 @@
         function processMarkdownContent(rawMd) {
             if (!rawMd) return '';
 
-            // 1. Všechny Obsidian zápisy ![[Obrázek.png]] se automaticky namapují do globální složky img/
-            let clean = rawMd.replace(/!\[\[([^\]]+)\]\]/g, function(match, imgName) {
-                return `<img src="img/${imgName.trim()}" alt="${imgName.trim()}">`;
+            // 1. Zpracování Obsidian vkládání obrázků ![[Nazev.png]] nebo ![[Nazev.png|365]]
+            let clean = rawMd.replace(/!\[\[([^\]]+)\]\]/g, function(match, imgContent) {
+                let parts = imgContent.split('|');
+                let imgName = parts[0].trim();
+                let widthAttr = parts[1] ? `width="${parts[1].trim()}"` : '';
+                return `<img src="img/${imgName}" alt="${imgName}" ${widthAttr}>`;
             });
 
             // 2. Klasické markdownové obrázky ![](...)
