@@ -572,6 +572,7 @@
         </div>
     </main>
 
+    <script src="js/ops-stats.js"></script>
     <script>
         /* =========================================================================
            1. WEB AUDIO API - 8-BIT PROCEDURAL SOUND GENERATOR (ZERO ASSETS)
@@ -945,6 +946,9 @@
                             if (memory <= 0) {
                                 memory = 0;
                                 gameOver = true;
+                                if (window.OPS_STATS) {
+                                    window.OPS_STATS.recordScore('hunter', score);
+                                }
                             }
                             healthUi.textContent = `CPU/RAM: ${Math.round(memory)}%`;
                             enemies.splice(i, 1);
@@ -1158,6 +1162,9 @@
                             player.y + player.h > ob.y
                         ) {
                             gameOver = true;
+                            if (window.OPS_STATS) {
+                                window.OPS_STATS.recordScore('runner', score);
+                            }
                             SoundFX.playError();
                             healthUi.textContent = 'DEADLOCK!';
                             healthUi.style.color = 'var(--accent-red)';

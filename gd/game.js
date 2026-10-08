@@ -8295,6 +8295,9 @@ class GameScene extends Phaser.Scene {
       if (!this._state.isFlying && this._state.canJump) {
         this._player.updateJump(0x0);
         this._totalJumps++;
+        if (window.OPS_STATS) {
+          window.OPS_STATS.recordScore('gd', 0, { jumps: 1 });
+        }
       }
     }
   }
@@ -8635,6 +8638,14 @@ class GameScene extends Phaser.Scene {
           this._hadNewBest = true;
           this._showNewBest();
         }
+        if (window.OPS_STATS) {
+          const _meta = this.game.registry.get("selectedLevelMeta");
+          const lvlId = _meta ? _meta.id : 1;
+          window.OPS_STATS.recordScore('gd', this._lastPercent, {
+            levelId: lvlId,
+            attempts: 1
+          });
+        }
       }
       this._player.updateExplosionPieces(_0xaf2ffd);
       this._deathTimer += _0xaf2ffd;
@@ -8958,6 +8969,14 @@ class GameScene extends Phaser.Scene {
     this._endLayerInternal.add(this.add.image(_0x384f9e - 0x138, _0x3e9c79, 'GJ_WebSheet', "chain_01_001.png").setOrigin(0.5, 0x1));
     this._endLayerInternal.add(this.add.image(_0x384f9e + 0x138, _0x3e9c79, 'GJ_WebSheet', 'chain_01_001.png').setOrigin(0.5, 0x1));
     this._endLayerInternal.add(this.add.image(_0x384f9e, 0xaa, "GJ_WebSheet", "GJ_levelComplete_001.png").setScale(0.8));
+    if (window.OPS_STATS) {
+      const _meta = this.game.registry.get("selectedLevelMeta");
+      const lvlId = _meta ? _meta.id : 1;
+      window.OPS_STATS.recordScore('gd', 100, {
+        levelId: lvlId
+      });
+      window.OPS_STATS.recordPlayTime('gd', Math.floor(this._playTime || 0));
+    }
     let _0xe44f6d = 0xfa;
     const _0x2de55e = this.add.bitmapText(_0x384f9e, _0xe44f6d, 'goldFont', "Attempts: " + this._attempts, 0x28).setOrigin(0.5, 0.5).setScale(0.8);
     this._endLayerInternal.add(_0x2de55e);

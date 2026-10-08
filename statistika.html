@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herní Statistiky & Žebříček | OPS</title>
+    <link rel="icon" type="image/x-icon" href="img/bird.png">
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --card-bg: rgba(18, 24, 38, 0.85);
+            --card-border: rgba(56, 189, 248, 0.2);
+            --accent-cyan: #38bdf8;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --accent-yellow: #fbbf24;
+            --accent-green: #22c55e;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --font-mono: 'Consolas', 'Courier New', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+                linear-gradient(180deg, rgba(10, 14, 23, 0.95), rgba(10, 14, 23, 1));
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        /* Top Navbar */
+        .ops-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(59, 130, 246, 0.25));
+            border: 1px solid var(--accent-cyan);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(59, 130, 246, 0.45));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .user-badge-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            color: #e2e8f0;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .user-badge-btn:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(51, 65, 85, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .user-name {
+            color: var(--accent-cyan);
+            font-weight: 800;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 20px 0;
+        }
+
+        .header-title-box {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .header-title-box h1 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 30%, #38bdf8 70%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header-title-box p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Hero Highlights Grid */
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+
+        .highlight-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+
+        .highlight-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(56, 189, 248, 0.45);
+        }
+
+        .highlight-icon {
+            font-size: 2rem;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .highlight-content h3 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            font-family: var(--font-mono);
+        }
+
+        .highlight-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            font-family: var(--font-mono);
+        }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 28px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: var(--text-muted);
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-cyan);
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .game-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .game-icon-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .game-play-link {
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 5px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .game-play-link:hover {
+            background: rgba(56, 189, 248, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .metric-rows {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .metric-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.95rem;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Level Bars for Geometry Dash */
+        .gd-levels-container {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .gd-levels-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .gd-levels-scroll {
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 6px;
+        }
+
+        .gd-levels-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .gd-levels-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .gd-lvl-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .gd-lvl-name {
+            width: 70px;
+            color: #cbd5e1;
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+
+        .gd-lvl-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .gd-lvl-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .gd-lvl-bar-fill.complete {
+            background: linear-gradient(90deg, #10b981, #22c55e);
+        }
+
+        .gd-lvl-percent {
+            width: 45px;
+            text-align: right;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: var(--accent-cyan);
+            font-size: 12px;
+        }
+
+        /* Leaderboard Table */
+        .leaderboard-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 40px;
+        }
+
+        .lb-filter-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .lb-filter-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lb-filter-btn.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-cyan);
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .lb-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+        }
+
+        .lb-table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .lb-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+        }
+
+        .lb-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .rank-medal {
+            display: inline-flex;
+            width: 26px;
+            height: 26px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 800;
+            font-size: 0.85rem;
+        }
+
+        .rank-1 { background: rgba(251, 191, 36, 0.25); color: #fbbf24; border: 1px solid #fbbf24; }
+        .rank-2 { background: rgba(148, 163, 184, 0.25); color: #e2e8f0; border: 1px solid #94a3b8; }
+        .rank-3 { background: rgba(217, 119, 6, 0.25); color: #f59e0b; border: 1px solid #d97706; }
+
+        .lb-player-active {
+            color: var(--accent-cyan);
+            font-weight: 800;
+        }
+
+        .cloud-notice-box {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px dashed rgba(56, 189, 248, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .cloud-notice-title {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* Action Buttons */
+        .bottom-actions {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top bar -->
+    <header class="ops-topbar">
+        <a href="games.html" class="back-btn">
+            <span>⬅</span> Rozcestník her
+        </a>
+        <button type="button" id="opsUserBadge" class="user-badge-btn" onclick="OPS_STATS.promptUsernameModal()">
+            👤 <span id="topUsernameDisplay" class="user-name">...</span> <span style="opacity:0.6;font-size:11px;">✎</span>
+        </button>
+    </header>
+
+    <div class="container">
+        <div class="header-title-box">
+            <h1>Herní Statistiky &amp; Žebříček</h1>
+            <p>Sleduj svoji prokrastinaci oproti jiným spolužákům!</p>
+        </div>
+
+        <!-- Hero Highlights -->
+        <div class="highlights-grid">
+            <div class="highlight-card">
+                <div class="highlight-icon">⏱️</div>
+                <div class="highlight-content">
+                    <h3>Celkový promrhaný čas</h3>
+                    <div id="statTotalTime" class="highlight-val">0m</div>
+                </div>
+            </div>
+
+            <div class="highlight-card">
+                <div class="highlight-icon">⭐</div>
+                <div class="highlight-content">
+                    <h3>Juchelka Gamer Level</h3>
+                    <div id="statGamerLevel" class="highlight-val">LVL 1</div>
+                </div>
+            </div>
+
+            <div class="highlight-card">
+                <div class="highlight-icon">🎯</div>
+                <div class="highlight-content">
+                    <h3>Stratagem Rekord</h3>
+                    <div id="statHeroScore" class="highlight-val">0</div>
+                </div>
+            </div>
+
+            <div class="highlight-card">
+                <div class="highlight-icon">🚀</div>
+                <div class="highlight-content">
+                    <h3>GD Dokončeno Levelů</h3>
+                    <div id="statGdCompleted" class="highlight-val">0 / 22</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tab-bar">
+            <button type="button" class="tab-btn active" id="tabBtnMyStats" onclick="switchTab('myStats')">
+                <span>📊</span> Moje statistiky
+            </button>
+            <button type="button" class="tab-btn" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')">
+                <span>🏆</span> Globální žebříček
+            </button>
+        </div>
+
+        <!-- TAB 1: MOJE STATISTIKY -->
+        <div id="tabMyStats">
+            <div class="games-grid">
+                <!-- Juchelka Dash -->
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <div class="game-title-group">
+                            <img src="gd/assets/juchelkaD.png" class="game-icon-img" alt="GD">
+                            <div class="game-title">Juchelka Dash</div>
+                        </div>
+                        <a href="gd/index.html" class="game-play-link">Spustit</a>
+                    </div>
+                    <div class="metric-rows">
+                        <div class="metric-row">
+                            <span class="metric-label">Dokončené levely (100%):</span>
+                            <span id="gdCompletedText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Celkem pokusů (Attempts):</span>
+                            <span id="gdAttemptsText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Celkem skoků (Jumps):</span>
+                            <span id="gdJumpsText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Odehraný čas:</span>
+                            <span id="gdTimeText" class="metric-value">0m</span>
+                        </div>
+                    </div>
+
+                    <!-- Level List Preview -->
+                    <div class="gd-levels-container">
+                        <div class="gd-levels-title">
+                            <span>Postup v jednotlivých levelech</span>
+                            <span id="gdAvgPercentText">Průměr: 0%</span>
+                        </div>
+                        <div id="gdLevelsList" class="gd-levels-scroll">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Juchelka Hero -->
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <div class="game-title-group">
+                            <img src="stratagem/data/Images/heroJ.png" class="game-icon-img" alt="Hero">
+                            <div class="game-title">Juchelka Hero</div>
+                        </div>
+                        <a href="stratagem/index.html" class="game-play-link">Spustit</a>
+                    </div>
+                    <div class="metric-rows">
+                        <div class="metric-row">
+                            <span class="metric-label">Nejvyšší skóre (Rekord):</span>
+                            <span id="heroHighScoreText" class="metric-value" style="color:var(--accent-cyan);font-size:1.2rem;">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Celkem odehraných her:</span>
+                            <span id="heroGamesText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Zadáno sekvencí celkem:</span>
+                            <span id="heroSequencesText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Odehraný čas:</span>
+                            <span id="heroTimeText" class="metric-value">0m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Race with Kokeš -->
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <div class="game-title-group">
+                            <img src="hyperdrive/kokes_race.gif" class="game-icon-img" alt="Race">
+                            <div class="game-title">Race with Kokeš</div>
+                        </div>
+                        <a href="hyperdrive/index.html" class="game-play-link">Spustit</a>
+                    </div>
+                    <div class="metric-rows">
+                        <div class="metric-row">
+                            <span class="metric-label">Počet jízd (Sessions):</span>
+                            <span id="raceSessionsText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Čas strávený na trati:</span>
+                            <span id="raceTimeText" class="metric-value">0m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JuchelkaCraft -->
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <div class="game-title-group">
+                            <img src="mc/juchelka_craft.png" class="game-icon-img" alt="Craft">
+                            <div class="game-title">JuchelkaCraft</div>
+                        </div>
+                        <a href="mc/index.html" class="game-play-link">Spustit</a>
+                    </div>
+                    <div class="metric-rows">
+                        <div class="metric-row">
+                            <span class="metric-label">Počet spuštění hry:</span>
+                            <span id="mcSessionsText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Čas strávený ve světě:</span>
+                            <span id="mcTimeText" class="metric-value">0m</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: GLOBÁLNÍ ŽEBŘÍČEK -->
+        <div id="tabLeaderboard" style="display: none;">
+            <div id="cloudNotice" class="cloud-notice-box" style="display:none;">
+                <div class="cloud-notice-title">
+                    <span>☁️</span> Synchornizace do oblak 
+                </div>
+                <p style="color:#94a3b8;font-size:0.9rem;">
+                    Pro zobrazení online žebříčku stačí v <code style="color:#38bdf8;">js/ops-stats.js</code> vyplnit adresu a klíč projektu Supabase. Vaše lokální výsledky jsou již zaznamenávány!
+                </p>
+            </div>
+
+            <div class="leaderboard-card">
+                <div class="lb-filter-row">
+                    <button type="button" class="lb-filter-btn active" id="lbFilterHero" onclick="loadLeaderboard('stratagem_highscore', this)">
+                        🎯 Juchelka Hero (Skóre)
+                    </button>
+                    <button type="button" class="lb-filter-btn" id="lbFilterGd" onclick="loadLeaderboard('gd_completed_levels', this)">
+                        🚀 Juchelka Dash (Levely)
+                    </button>
+                    <button type="button" class="lb-filter-btn" id="lbFilterTime" onclick="loadLeaderboard('total_play_time', this)">
+                        ⏱️ Celkový herní čas
+                    </button>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="lb-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">Pořadí</th>
+                                <th>Hráč</th>
+                                <th id="lbMetricColHeader" style="text-align:right;">Hodnota</th>
+                                <th style="text-align:right;width:140px;">Naposledy aktivní</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lbTableBody">
+                            <tr>
+                                <td colspan="4" style="text-align:center;padding:30px;color:#94a3b8;">
+                                    Načítám data žebříčku...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spodní akce -->
+        <div class="bottom-actions">
+            <button type="button" class="action-btn" onclick="OPS_STATS.promptUsernameModal()">
+                <span>👤</span> Změnit přezdívku / Přihlásit se
+            </button>
+            <button type="button" class="action-btn" onclick="OPS_STATS.exportStatsJSON()">
+                <span>💾</span> Exportovat statistiky (JSON)
+            </button>
+            <button type="button" class="action-btn danger" onclick="OPS_STATS.resetLocalStats()">
+                <span>🗑️</span> Resetovat lokální statistiky
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripty -->
+    <script src="js/ops-stats.js"></script>
+    <script>
+        const GD_LEVEL_NAMES = [
+            "1. Stereo Madness", "2. Back on Track", "3. Polargeist", "4. Dry Out",
+            "5. Base After Base", "6. Cant Let Go", "7. Jumper", "8. Time Machine",
+            "9. Cycles", "10. xStep", "11. Clutterfunk", "12. Theory of Everything",
+            "13. Electroman", "14. Clubstep", "15. Electrodynamix", "16. Hexagon Force",
+            "17. Blast Processing", "18. Theory of Everything 2", "19. Geometrical Dominator",
+            "20. Deadlocked", "21. Fingerdash", "22. Dash"
+        ];
+
+        function formatDuration(sec) {
+            sec = Math.floor(sec || 0);
+            if (sec < 60) return `${sec}s`;
+            const m = Math.floor(sec / 60);
+            const h = Math.floor(m / 60);
+            if (h > 0) return `${h}h ${m % 60}m`;
+            return `${m}m`;
+        }
+
+        function calculateGamerLevel(stats) {
+            const timeXp = Math.floor((stats.meta.totalPlayTime || 0) / 30); // 1 XP každých 30s
+            const heroXp = (stats.stratagem.highScore || 0) * 15;
+            const gdXp = (stats.gd.completedLevels?.length || 0) * 100 + Math.floor((stats.gd.jumps || 0) / 10);
+            const totalXp = timeXp + heroXp + gdXp;
+            const level = Math.max(1, Math.floor(Math.sqrt(totalXp / 10)) + 1);
+            return `LVL ${level}`;
+        }
+
+        function renderStats() {
+            const user = OPS_STATS.getUsername() || "Neznámý hráč";
+            document.getElementById('topUsernameDisplay').textContent = user;
+
+            const stats = OPS_STATS.getStats();
+
+            // Highlights
+            document.getElementById('statTotalTime').textContent = formatDuration(stats.meta.totalPlayTime);
+            document.getElementById('statGamerLevel').textContent = calculateGamerLevel(stats);
+            document.getElementById('statHeroScore').textContent = stats.stratagem.highScore || 0;
+            document.getElementById('statGdCompleted').textContent = `${stats.gd.completedLevels?.length || 0} / 22`;
+
+            // Juchelka Dash
+            document.getElementById('gdCompletedText').textContent = stats.gd.completedLevels?.length || 0;
+            document.getElementById('gdAttemptsText').textContent = stats.gd.attempts || 0;
+            document.getElementById('gdJumpsText').textContent = stats.gd.jumps || 0;
+            document.getElementById('gdTimeText').textContent = formatDuration(stats.gd.playTime);
+
+            // GD Level list
+            const gdList = document.getElementById('gdLevelsList');
+            gdList.innerHTML = '';
+            let sumPercent = 0;
+
+            for (let i = 1; i <= 22; i++) {
+                const lvlKey = String(i);
+                const percent = stats.gd.bestPercent[lvlKey] || 0;
+                sumPercent += percent;
+                const isComplete = percent >= 100;
+
+                const item = document.createElement('div');
+                item.className = 'gd-lvl-item';
+                item.innerHTML = `
+                    <div class="gd-lvl-name" title="${GD_LEVEL_NAMES[i-1]}">${i}. ${GD_LEVEL_NAMES[i-1].split('. ')[1].slice(0, 8)}..</div>
+                    <div class="gd-lvl-bar-bg">
+                        <div class="gd-lvl-bar-fill ${isComplete ? 'complete' : ''}" style="width: ${percent}%;"></div>
+                    </div>
+                    <div class="gd-lvl-percent">${percent}%</div>
+                `;
+                gdList.appendChild(item);
+            }
+            document.getElementById('gdAvgPercentText').textContent = `Průměr: ${Math.round(sumPercent / 22)}%`;
+
+            // Juchelka Hero
+            document.getElementById('heroHighScoreText').textContent = stats.stratagem.highScore || 0;
+            document.getElementById('heroGamesText').textContent = stats.stratagem.totalGames || 0;
+            document.getElementById('heroSequencesText').textContent = stats.stratagem.totalSequences || 0;
+            document.getElementById('heroTimeText').textContent = formatDuration(stats.stratagem.playTime);
+
+            // Race & MC
+            document.getElementById('raceSessionsText').textContent = stats.hyperdrive.sessions || 0;
+            document.getElementById('raceTimeText').textContent = formatDuration(stats.hyperdrive.playTime);
+            document.getElementById('mcSessionsText').textContent = stats.mc.sessions || 0;
+            document.getElementById('mcTimeText').textContent = formatDuration(stats.mc.playTime);
+        }
+
+        function switchTab(tabId) {
+            document.getElementById('tabMyStats').style.display = tabId === 'myStats' ? 'block' : 'none';
+            document.getElementById('tabLeaderboard').style.display = tabId === 'leaderboard' ? 'block' : 'none';
+            document.getElementById('tabBtnMyStats').classList.toggle('active', tabId === 'myStats');
+            document.getElementById('tabBtnLeaderboard').classList.toggle('active', tabId === 'leaderboard');
+
+            if (tabId === 'leaderboard') {
+                loadLeaderboard('stratagem_highscore');
+            }
+        }
+
+        async function loadLeaderboard(column, btnElement) {
+            if (btnElement) {
+                document.querySelectorAll('.lb-filter-btn').forEach(b => b.classList.remove('active'));
+                btnElement.classList.add('active');
+            }
+
+            const headerMap = {
+                'stratagem_highscore': 'Max kódů',
+                'gd_completed_levels': 'Levelů (100%)',
+                'total_play_time': 'Odehraný čas'
+            };
+            document.getElementById('lbMetricColHeader').textContent = headerMap[column] || 'Skóre';
+
+            const tbody = document.getElementById('lbTableBody');
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:#94a3b8;">Načítám data ze žebříčku...</td></tr>`;
+
+            const notice = document.getElementById('cloudNotice');
+            if (!OPS_STATS.config.url || !OPS_STATS.config.anonKey) {
+                notice.style.display = 'block';
+            } else {
+                notice.style.display = 'none';
+            }
+
+            const data = await OPS_STATS.fetchLeaderboard(column, 15);
+            const myUser = OPS_STATS.getUsername();
+
+            if (!data || data.length === 0) {
+                // Lokální ukázkový řádek pro aktuálního hráče
+                const localStats = OPS_STATS.getStats();
+                let myVal = 0;
+                if (column === 'stratagem_highscore') myVal = localStats.stratagem.highScore || 0;
+                else if (column === 'gd_completed_levels') myVal = localStats.gd.completedLevels?.length || 0;
+                else if (column === 'total_play_time') myVal = formatDuration(localStats.meta.totalPlayTime);
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td><span class="rank-medal rank-1">1</span></td>
+                        <td class="lb-player-active">👤 ${myUser || "Ty"} <span style="font-size:11px;opacity:0.6;">(tento počítač)</span></td>
+                        <td style="text-align:right;font-weight:bold;color:#38bdf8;">${column === 'total_play_time' ? myVal : myVal}</td>
+                        <td style="text-align:right;color:#94a3b8;font-size:12px;">Právě teď</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach((row, idx) => {
+                const rank = idx + 1;
+                let medalClass = '';
+                if (rank === 1) medalClass = 'rank-1';
+                else if (rank === 2) medalClass = 'rank-2';
+                else if (rank === 3) medalClass = 'rank-3';
+
+                const isMe = row.username && row.username.toLowerCase() === myUser.toLowerCase();
+                let displayVal = row[column] || 0;
+                if (column === 'total_play_time') displayVal = formatDuration(displayVal);
+
+                const timeAgo = row.updated_at ? new Date(row.updated_at).toLocaleDateString("cs-CZ") : "-";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${rank <= 3 ? `<span class="rank-medal ${medalClass}">${rank}</span>` : `<span style="padding-left:8px;color:#94a3b8;">${rank}.</span>`}</td>
+                    <td class="${isMe ? 'lb-player-active' : ''}">
+                        ${isMe ? '⭐ ' : ''}${row.username || 'Anonym'} ${isMe ? '<span style="font-size:11px;opacity:0.7;">(ty)</span>' : ''}
+                    </td>
+                    <td style="text-align:right;font-weight:bold;color:${rank === 1 ? '#fbbf24' : '#fff'};">${displayVal}</td>
+                    <td style="text-align:right;color:#94a3b8;font-size:12px;">${timeAgo}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderStats();
+        });
+    </script>
+</body>
+</html>
