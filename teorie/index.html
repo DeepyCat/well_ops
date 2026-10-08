@@ -518,21 +518,18 @@
             "01_sprava_periferii_a_preruseni": "06_Sprava_periferii/01_Sprava_periferii_a_preruseni.md"
         };
 
-        function processMarkdownContent(rawMd, activeFolder) {
+        function processMarkdownContent(rawMd) {
             if (!rawMd) return '';
 
-            // 1. Zpracování Obsidian vkládání obrázků ![[Pasted image...]] -> převede na HTML tag img směřující do složky Attachments
+            // 1. Všechny Obsidian zápisy ![[Obrázek.png]] se automaticky namapují do globální složky img/
             let clean = rawMd.replace(/!\[\[([^\]]+)\]\]/g, function(match, imgName) {
-                return `<img src="${activeFolder}/Attachments/${imgName.trim()}" alt="${imgName.trim()}" onerror="this.onerror=null; this.src='img/${imgName.trim()}';">`;
+                return `<img src="img/${imgName.trim()}" alt="${imgName.trim()}">`;
             });
 
-            // 2. Zpracování klasických obrázků ![](Attachments/...) pokud už v markdownu jsou
+            // 2. Klasické markdownové obrázky ![](...)
             clean = clean.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, imgPath) {
-                // Pokud cesta neobsahuje složku a je to jen název souboru, doplníme Attachments
-                if (!imgPath.includes('/') && !imgPath.startsWith('http')) {
-                    imgPath = `${activeFolder}/Attachments/${imgPath}`;
-                }
-                return `<img src="${imgPath}" alt="${alt}">`;
+                let fileName = imgPath.split('/').pop();
+                return `<img src="img/${fileName}" alt="${alt}">`;
             });
 
             // 3. Převod [[Target|Label]] na wiki link
@@ -588,7 +585,6 @@
 
         function loadMarkdown(filePath, btnElement) {
             currentFilePath = filePath;
-            let activeFolder = filePath.substring(0, filePath.lastIndexOf('/'));
 
             let fileName = filePath.split('/').pop();
             if (window.location.hash !== '#' + fileName) {
@@ -616,7 +612,7 @@
                     return response.text();
                 })
                 .then(markdown => {
-                    let processed = processMarkdownContent(markdown, activeFolder);
+                    let processed = processMarkdownContent(markdown);
                     document.getElementById('markdownContent').innerHTML = marked.parse(processed);
                     
                     let downloadBtn = document.getElementById('downloadBtn');
