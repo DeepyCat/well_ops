@@ -442,9 +442,9 @@
                 <ul>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/01_Mass_Storage_Structure.md', this)">01_Mass_Storage</button></li>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/02_Disk_Scheduling_Management.md', this)">02_Disk_Scheduling</button></li>
-                    <li><button onclick="loadMarkdown('05_Mass_Storage/03_RAID_Stable_Storage.md', this)">03_RAID_Stable_Storage.md</button></li>
-                    <li><button onclick="loadMarkdown('05_Mass_Storage/04_File_Concept_Access.md', this)">04_File_Concept_Access.md</button></li>
-                    <li><button onclick="loadMarkdown('05_Mass_Storage/05_Directory_Structures.md', this)">05_Directory_Structures.md</button></li>
+                    <li><button onclick="loadMarkdown('05_Mass_Storage/03_RAID_Stable_Storage.md', this)">03_RAID_Stable_Storage</button></li>
+                    <li><button onclick="loadMarkdown('05_Mass_Storage/04_File_Concept_Access.md', this)">04_File_Concept_Access</button></li>
+                    <li><button onclick="loadMarkdown('05_Mass_Storage/05_Directory_Structures.md', this)">05_Directory_Structures</button></li>
                     <li><button onclick="loadMarkdown('05_Mass_Storage/06_File_System_Implementation.md', this)">06_File_System_Implementation</button></li>
                 </ul>
             </div>
@@ -521,19 +521,27 @@
         function processMarkdownContent(rawMd, activeFolder) {
             if (!rawMd) return '';
 
-            // 1. Zpracování Obsidian vkládání obrázků ![[Pasted image...]] -> nahradíme cestou do složky Attachments nebo img
+            // 1. Zpracování Obsidian vkládání obrázků ![[Pasted image...]] -> převede na HTML tag img směřující do složky Attachments
             let clean = rawMd.replace(/!\[\[([^\]]+)\]\]/g, function(match, imgName) {
-                // Zkusíme najít obrázek buď ve složce Attachments dané složky nebo v globální img složce
-                return `<img src="${activeFolder}/Attachments/${imgName}" alt="${imgName}" onerror="this.src='img/${imgName}'">`;
+                return `<img src="${activeFolder}/Attachments/${imgName.trim()}" alt="${imgName.trim()}" onerror="this.onerror=null; this.src='img/${imgName.trim()}';">`;
             });
 
-            // 2. Převod [[Target|Label]]
-            clean = clean.replace(/(?<!\!)\[\[([^\]\vert{}]+)\Vert{}([^\]]+)\]\]/g, function(match, target, label) {
+            // 2. Zpracování klasických obrázků ![](Attachments/...) pokud už v markdownu jsou
+            clean = clean.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, imgPath) {
+                // Pokud cesta neobsahuje složku a je to jen název souboru, doplníme Attachments
+                if (!imgPath.includes('/') && !imgPath.startsWith('http')) {
+                    imgPath = `${activeFolder}/Attachments/${imgPath}`;
+                }
+                return `<img src="${imgPath}" alt="${alt}">`;
+            });
+
+            // 3. Převod [[Target|Label]] na wiki link
+            clean = clean.replace(/\[\[([^\]\vert{}]+)\Vert{}([^\]]+)\]\]/g, function(match, target, label) {
                 return `<a href="javascript:void(0)" class="wiki-link" data-wiki="${target.trim()}" title="Přejít na téma: ${target.trim()}">${label.trim()}</a>`;
             });
 
-            // 3. Převod [[Target]]
-            clean = clean.replace(/(?<!\!)\[\[([^\]]+)\]\]/g, function(match, target) {
+            // 4. Převod [[Target]] na wiki link
+            clean = clean.replace(/\[\[([^\]]+)\]\]/g, function(match, target) {
                 return `<a href="javascript:void(0)" class="wiki-link" data-wiki="${target.trim()}" title="Přejít na téma: ${target.trim()}">${target.trim()}</a>`;
             });
 
