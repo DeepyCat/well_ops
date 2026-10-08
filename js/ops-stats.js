@@ -478,7 +478,7 @@
         backdrop.innerHTML = `
             <div class="ops-modal-card">
                 <div class="ops-modal-title">
-                    <span>🎮</span> Hráčský profil OPS
+                    Hráčský profil OPS
                 </div>
                 <div class="ops-modal-desc">
                     Zadej svou herní přezdívku (username). Skóre a statistiky se budou ukládat do žebříčku a při zadání stejného jména na jiném počítači se tvůj postup automaticky načte!
@@ -536,10 +536,10 @@
         const username = OPS_STATS.getUsername();
         if (badge) {
             if (username) {
-                badge.innerHTML = `👤 <span class="ops-user-badge-name">${username}</span> <span style="opacity:0.6;font-size:10px;">✎</span>`;
+                badge.innerHTML = `<span class="ops-user-badge-name">${username}</span> <span style="opacity:0.6;font-size:10px;">[změnit]</span>`;
                 badge.title = "Klikněte pro změnu přezdívky nebo přihlášení na jiném PC";
             } else {
-                badge.innerHTML = `👤 <span style="color:#fbbf24;">Zadat přezdívku</span>`;
+                badge.innerHTML = `<span style="color:#fbbf24;">Zadat přezdívku</span>`;
             }
         }
     }
