@@ -228,6 +228,9 @@ class PreloadScene extends Phaser.Scene {
     this.load.atlas("GJ_GameSheet04", "assets/GJ_GameSheet04.png", "assets/GJ_GameSheet04.json");
     this.load.atlas("GJ_GameSheetGlow", "assets/GJ_GameSheetGlow.png", "assets/GJ_GameSheetGlow.json");
     this.load.atlas("GJ_GameSheetEditor", "assets/GJ_GameSheetEditor.png", "assets/GJ_GameSheetEditor.json");
+    this.load.atlas("PixelSheet_01", "assets/PixelSheet_01.png", "assets/PixelSheet_01.json");
+    this.load.atlas("FireSheet_01-hd", "assets/FireSheet_01-hd.png", "assets/FireSheet_01-hd.json");
+    this.load.atlas("GJ_ParticleSheet", "assets/GJ_ParticleSheet.png", "assets/GJ_ParticleSheet.json");
     this.load.image('bigFont', 'assets/bigFont.png');
     this.load.text("bigFontFnt", "assets/bigFont.fnt");
     this.load.image("goldFont", 'assets/goldFont.png');
@@ -386,14 +389,38 @@ class M {
     this.isDead = false;
   }
 }
-const P = ["GJ_WebSheet", "GJ_GameSheet", "GJ_GameSheet02", "GJ_GameSheet03", "GJ_GameSheet04", "GJ_GameSheetGlow", "GJ_GameSheetEditor"];
+const P = ["GJ_WebSheet", "GJ_GameSheet", "GJ_GameSheet02", "GJ_GameSheet03", "GJ_GameSheet04", "GJ_GameSheetGlow", "GJ_GameSheetEditor", "PixelSheet_01", "FireSheet_01-hd", "GJ_ParticleSheet"];
 function R(_0xfe584, _0x2da093) {
+  if (!_0x2da093) {
+    return null;
+  }
   for (let _0x15819b of P) if (_0xfe584.textures.exists(_0x15819b)) {
     if (_0xfe584.textures.get(_0x15819b).has(_0x2da093)) {
       return {
         atlas: _0x15819b,
         frame: _0x2da093
       };
+    }
+  }
+  if (typeof _0x2da093 === "string") {
+    if (_0x2da093.startsWith("d_smallBall_")) {
+      const _fb = _0x2da093.replace("d_smallBall_", "d_ball_");
+      return R(_0xfe584, _fb);
+    }
+    if (_0x2da093.startsWith("spike_")) {
+      return R(_0xfe584, "spike_01_001.png");
+    }
+    if (_0x2da093.startsWith("bump_") || _0x2da093.startsWith("gravbump_")) {
+      return R(_0xfe584, "bump_01_001.png");
+    }
+    if (_0x2da093.startsWith("ring_") || _0x2da093.startsWith("gravring_")) {
+      return R(_0xfe584, "ring_01_001.png");
+    }
+    if (_0x2da093.startsWith("pit_")) {
+      return R(_0xfe584, "pit_01_001.png");
+    }
+    if (_0x2da093.startsWith("block") || _0x2da093.startsWith("square_")) {
+      return R(_0xfe584, "square_01_001.png");
     }
   }
   return null;
@@ -4064,21 +4091,21 @@ const OBJECT_DEFS = {
     frame: "portal_09_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: "normal"
+    sub: "slow"
   },
   0xc9: {
     type: OBJ_SPEED,
     frame: "portal_10_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: "fast"
+    sub: "normal"
   },
   0xca: {
     type: OBJ_SPEED,
     frame: "portal_08_front_001.png",
     gridW: 0x1,
     gridH: 0x3,
-    sub: "very_fast"
+    sub: "fast"
   },
   0xcb: {
     type: OBJ_SPEED,
@@ -4091,19 +4118,23 @@ const OBJECT_DEFS = {
     type: OBJ_PAD,
     frame: "bump_01_001.png",
     gridW: 0x1,
-    gridH: 0x1
+    gridH: 0x1,
+    padBoost: 25.8
   },
   0x43: {
     type: OBJ_PAD,
-    frame: "bump_02_001.png",
+    frame: "gravbump_01_001.png",
     gridW: 0x1,
-    gridH: 0x1
+    gridH: 0x1,
+    flipGravity: true,
+    padBoost: 16
   },
   0x8c: {
     type: OBJ_PAD,
     frame: "bump_03_001.png",
     gridW: 0x1,
-    gridH: 0x1
+    gridH: 0x1,
+    padBoost: 18.2
   },
   0x24: {
     type: OBJ_RING,
@@ -4655,12 +4686,10 @@ const OBJECT_DEFS = {
     gridH: 0x0
   },
   0x8e: {
-    type: OBJ_PAD,
-    frame: "gravbump_01_001.png",
+    type: OBJ_DECO,
+    frame: "secretCoin_01_001.png",
     gridW: 0x1,
-    gridH: 0x1,
-    flipGravity: true,
-    padBoost: 20
+    gridH: 0x1
   },
   0x3fe: {
     type: OBJ_RING,
@@ -4675,9 +4704,16 @@ const OBJECT_DEFS = {
     frame: "secretCoin_2_01_001.png",
     gridW: 0x1,
     gridH: 0x1
+  },
+  0x534: {
+    type: OBJ_PAD,
+    frame: "bump_02_001.png",
+    gridW: 0x1,
+    gridH: 0x1,
+    padBoost: 31.6
   }
 };
-const DEFAULT_OBJECT_IDS = [0x1, 0x2, 0x3, 0x4, 0x6, 0x7, 0x53, 0x8, 0x27, 0x67, 0x188, 0x23, 0x43, 0x24, 0x28, 0x8c, 0x8e, 0x8d, 0x3fe, 0x3e, 0x41, 0x42, 0x44, 0xc3, 0xc4];
+const DEFAULT_OBJECT_IDS = [0x1, 0x2, 0x3, 0x4, 0x6, 0x7, 0x53, 0x8, 0x27, 0x67, 0x188, 0x23, 0x43, 0x24, 0x28, 0x8c, 0x8e, 0x8d, 0x3fe, 0x3e, 0x41, 0x42, 0x44, 0xc3, 0xc4, 0x534];
 for (let As of DEFAULT_OBJECT_IDS) if (OBJECT_DEFS[As]) {
   OBJECT_DEFS[As].glow = true;
 }
@@ -5297,15 +5333,24 @@ class us {
           this._registerGroupVisual(_0x554e0e, _0x5920d7);
         }
         if (_0x24471f && (_0x24471f.type === OBJ_SOLID || _0x24471f.type === OBJ_HAZARD)) {
-          let _0x47077e = _0x4c7589.replace("_001.png", "_2_001.png");
-          let _0xe3eaec = R(_0xd15974, _0x47077e) ? L(_0xd15974, _0x173c58, _0x1b10a0, _0x47077e) : null;
-          if (_0xe3eaec) {
-            this._applyVisualProps(_0xd15974, _0xe3eaec, _0x47077e, _0x1b937f);
-            this._addVisualSprite(_0xe3eaec);
-            _0xe3eaec._eeWorldX = _0x173c58;
-            _0xe3eaec._eeBaseY = _0x1b10a0;
-            this._addToSection(_0xe3eaec);
-            this._registerGroupVisual(_0xe3eaec, _0x5920d7);
+          const _cands = [
+            _0x4c7589.replace("_001.png", "_2_001.png"),
+            _0x4c7589.replace("_001.png", "_color_001.png"),
+            _0x4c7589.replace("_001.png", "_b_001.png")
+          ];
+          for (const _cand of _cands) {
+            if (_cand !== _0x4c7589 && R(_0xd15974, _cand)) {
+              let _0xe3eaec = L(_0xd15974, _0x173c58, _0x1b10a0, _cand);
+              if (_0xe3eaec) {
+                this._applyVisualProps(_0xd15974, _0xe3eaec, _cand, _0x1b937f);
+                this._addVisualSprite(_0xe3eaec);
+                _0xe3eaec._eeWorldX = _0x173c58;
+                _0xe3eaec._eeBaseY = _0x1b10a0;
+                this._addToSection(_0xe3eaec);
+                this._registerGroupVisual(_0xe3eaec, _0x5920d7);
+              }
+              break;
+            }
           }
         }
         if (_0x24471f.children) {
@@ -5463,7 +5508,7 @@ class us {
               this._addCollisionToSection(_0x3a9d85);
               this._registerGroupCollider(_0x3a9d85, _0x5920d7);
             } else if (_0x24471f.type === OBJ_PAD) {
-              let _0x173f32 = new O(OBJ_PAD, _0x173c58, _0x7ab528, 0x30, 0x30);
+              let _0x173f32 = new O(OBJ_PAD, _0x173c58, _0x7ab528, 0x30, 0x18);
               _0x173f32.id = _0x1b937f.id;
               _0x173f32.boost = _0x24471f.padBoost;
               _0x173f32.flipGravity = !!_0x24471f.flipGravity;
@@ -6776,15 +6821,15 @@ class ps {
       return _0x1453f2;
     }
     if (0x43 === _0x4a2eb0) {
-      return 28;
+      return 16;
     }
     if (0x8c === _0x4a2eb0) {
-      return 42;
+      return 18.2;
     }
-    if (0x8e === _0x4a2eb0) {
-      return 20;
+    if (0x534 === _0x4a2eb0) {
+      return 31.6;
     }
-    return 34;
+    return 25.8;
   }
   ["_getRingBoost"](_0x2ea630, _0x46f586) {
     if (Number.isFinite(_0x46f586)) {
