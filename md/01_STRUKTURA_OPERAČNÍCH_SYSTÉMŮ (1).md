@@ -35,6 +35,8 @@ tags: [os]
 
 ![[Pasted image 20261001123532.png|245]]
 
+![Architektura operačního systému — Uživatelský prostor, Aplikace, Jádro a Hardware](img/teorie-uvod-architektura.svg)
+
 - **Privilegovaný režim** = Režim jádra
 - **Uživatelský režim** = Režim aplikací
 
