@@ -4,6 +4,8 @@ aliases: [Správa periferií a přerušení, I/O Hardware, Interrupts]
 
 # Správa periferií a přerušení
 
+![Hardware, periferie, paměť a systémová sběrnice](img/teorie-hardware-pamet.svg)
+
 Dvě hlavní úlohy počítače: **V/V (I/O)** a **výpočet**. Často je hlavní zájem uživatele právě V/V (čtení webu, editace souboru) – výpočet je jen "vedlejší". Kvůli obrovské rozmanitosti periferií (myš, disk, páskový robot) potřebuje OS **I/O subsystém** v jádru, který odděluje zbytek jádra od složitosti řízení konkrétních zařízení.
 
 ## Hardware V/V

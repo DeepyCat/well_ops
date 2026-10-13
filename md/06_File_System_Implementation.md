@@ -73,6 +73,8 @@ Novější standard (součást **UEFI**), nahrazuje MBR – podporuje disky nad 
 
 ## Virtual File System (VFS)
 
+![Vrstvy souborového systému, VFS rozhraní a struktura inode](img/teorie-soubory-rozhrani.svg)
+
 Vrstva umožňující OS podporovat víc typů souborových systémů zároveň (lokální i síťové) přes jednotné rozhraní, objektově orientovaně.
 
 - **1. vrstva** – rozhraní systémových volání (`open, read, write, close`)

@@ -16,6 +16,8 @@ Cíl **multiprogramování** – mít vždy nějaký proces běžící, maximali
 
 ## Fronta ve schématu (queueing diagram)
 
+![Přehled procesů, stavových přechodů a plánování CPU](img/teorie-procesy-planovani.svg)
+
 Nový proces jde nejdřív do **ready queue**, čeká na výběr (dispatch). Po přidělení CPU může nastat:
 
 - proces vyžádá V/V → jde do V/V fronty
