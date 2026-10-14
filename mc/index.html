@@ -63,24 +63,52 @@
 				color: #fff;
 				transform: translateY(-1px);
 			}
+			.ops-backup-btn {
+				background: rgba(15, 23, 42, 0.88);
+				border: 1px solid #38bdf8;
+				color: #38bdf8;
+				padding: 7px 13px;
+				border-radius: 6px;
+				font-size: 12px;
+				font-weight: 700;
+				backdrop-filter: blur(6px);
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+				cursor: pointer;
+				transition: all 0.2s ease;
+				display: inline-flex;
+				align-items: center;
+				font-family: inherit;
+			}
+			.ops-backup-btn:hover {
+				background: rgba(56, 189, 248, 0.2);
+				color: #fff;
+				border-color: #7dd3fc;
+				box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+				transform: translateY(-1px);
+			}
 		</style>
 		<script type="text/javascript" src="../js/ops-stats.js"></script>
 		<script type="text/javascript" src="bootstrap.js"></script>
 		<script type="text/javascript">
 			"use strict";
-			window.addEventListener("load", function() {
+			window.addEventListener("load", async function() {
 				if(window.location.href.indexOf("file:") === 0) {
 					alert("HTTP server nutný: Pro spuštění Minecraftu v prohlížeči je potřeba webový HTTP/HTTPS server (např. python -m http.server nebo live server).");
 				}else {
 					
 					// %%%%%%%%% launch options %%%%%%%%%%%%
+					var currentUser = (window.OPS_STATS && window.OPS_STATS.getUsername()) || "";
+					var safeUser = (window.OPS_STATS && window.OPS_STATS.getSafeUsername(currentUser)) || "Player";
+					var targetDB = "worlds_1_12_" + safeUser;
+					var targetNamespace = "_eaglercraft_1.12_" + safeUser;
 					
 					var relayId = Math.floor(Math.random() * 3);
 					window.eaglercraftXOpts = {
 						demoMode: false,
 						container: "game_frame",
 						assetsURI: "assets.epw",
-						worldsDB: "worlds",
+						worldsDB: targetDB,
+						localStorageNamespace: targetNamespace,
 						servers: [
 							/* example: { addr: "ws://localhost:8081/", name: "Local test server" } */
 						],
@@ -100,12 +128,36 @@
 						if(s) window.eaglercraftXOpts.joinServer = s;
 					}
 					
+					if (window.OPS_STATS) {
+						try {
+							await window.OPS_STATS.prepareMinecraftStorage(targetDB, currentUser);
+						} catch (e) {
+							console.warn("[OPS Minecraft] Příprava úložiště selhala:", e);
+						}
+					}
+					
 					main();
+					
 					if (window.OPS_STATS) {
 						window.OPS_STATS.recordSession('mc');
 						setInterval(function() {
 							window.OPS_STATS.recordPlayTime('mc', 10);
 						}, 10000);
+						
+						// Automatická periodická záloha každých 60 sekund
+						setInterval(function() {
+							window.OPS_STATS.backupMinecraft(currentUser, "auto");
+						}, 60000);
+						
+						window.addEventListener("beforeunload", function() {
+							window.OPS_STATS.backupMinecraft(currentUser, "auto");
+						});
+						
+						document.addEventListener("visibilitychange", function() {
+							if (document.hidden) {
+								window.OPS_STATS.backupMinecraft(currentUser, "auto");
+							}
+						});
 					}
 				}
 			});
@@ -114,11 +166,14 @@
 	<body style="margin:0px;width:100%;height:100%;overflow:hidden;background-color:black;" id="game_frame">
 		<div class="ops-nav-overlay">
 			<a href="../index.html" class="ops-nav-btn">
-				<span>⬅</span> Zpět na OPS Portál
+				<span>&larr;</span> Zpět na OPS Portál
 			</a>
 			<a href="v1_8/index.html" class="ops-version-btn" title="Přepnout na starší verzi 1.8.8">
-				<span>🔄</span> Verze: 1.12.2 (Nejnovější) &bull; Zkusit 1.8.8
+				Verze: 1.12.2 (Nejnovější) &bull; Zkusit 1.8.8
 			</a>
+			<button type="button" class="ops-backup-btn" id="opsMcBackupBtn" onclick="if(window.OPS_STATS)window.OPS_STATS.openMinecraftBackupModal();">
+				[Záloha světů]
+			</button>
 		</div>
 	</body>
 </html>

@@ -12,15 +12,19 @@
 		<meta property="og:description" content="Play minecraft 1.8 in your browser" />
 		<meta property="og:image" content="favicon.png" />
 		<link type="image/png" rel="shortcut icon" href="favicon.png" />
+		<script type="text/javascript" src="../../js/ops-stats.js"></script>
 		<script type="text/javascript" src="classes.js"></script>
 		<script type="text/javascript">
 			"use strict";
-			window.addEventListener("load", () => {
+			window.addEventListener("load", async () => {
 				if(document.location.href.startsWith("file:")) {
 					alert("HTTP please, do not open this file locally, run a local HTTP server and load it via HTTP");
 				}else {
 					
 					// %%%%%%%%% launch options %%%%%%%%%%%%
+					var currentUser = (window.OPS_STATS && window.OPS_STATS.getUsername()) || "";
+					var safeUser = (window.OPS_STATS && window.OPS_STATS.getSafeUsername(currentUser)) || "Player";
+					var targetDB = "worlds_1_8_" + safeUser;
 					
 					const relayId = Math.floor(Math.random() * 3);
 					window.eaglercraftXOpts = {
@@ -28,7 +32,7 @@
 						container: "game_frame",
 						assetsURI: "assets.epk",
 						localesURI: "lang/",
-						worldsDB: "worlds",
+						worldsDB: targetDB,
 						servers: [
                             { serverName: "Asspixel", serverAddress: "wss://web.asspixel.net/CAP/", hideAddress: false },
                             { serverName: "to request a server to add, email me", serverAddress: "vape.master.69@hotmail.com", hideAddress: false }
@@ -47,8 +51,36 @@
 						if(s) window.eaglercraftXOpts.joinServer = s;
 					}
 					
+					if (window.OPS_STATS) {
+						try {
+							await window.OPS_STATS.prepareMinecraftStorage(targetDB, currentUser);
+						} catch (e) {
+							console.warn("[OPS Minecraft 1.8] Příprava úložiště selhala:", e);
+						}
+					}
+					
 					main();
 					
+					if (window.OPS_STATS) {
+						window.OPS_STATS.recordSession('mc');
+						setInterval(function() {
+							window.OPS_STATS.recordPlayTime('mc', 10);
+						}, 10000);
+						
+						setInterval(function() {
+							window.OPS_STATS.backupMinecraft(currentUser, "auto");
+						}, 60000);
+						
+						window.addEventListener("beforeunload", function() {
+							window.OPS_STATS.backupMinecraft(currentUser, "auto");
+						});
+						
+						document.addEventListener("visibilitychange", function() {
+							if (document.hidden) {
+								window.OPS_STATS.backupMinecraft(currentUser, "auto");
+							}
+						});
+					}
 				}
 			});
 		</script>
@@ -108,16 +140,42 @@
 				color: #fff;
 				transform: translateY(-1px);
 			}
+			.ops-backup-btn {
+				background: rgba(15, 23, 42, 0.88);
+				border: 1px solid #38bdf8;
+				color: #38bdf8;
+				padding: 7px 13px;
+				border-radius: 6px;
+				font-size: 12px;
+				font-weight: 700;
+				backdrop-filter: blur(6px);
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+				cursor: pointer;
+				transition: all 0.2s ease;
+				display: inline-flex;
+				align-items: center;
+				font-family: inherit;
+			}
+			.ops-backup-btn:hover {
+				background: rgba(56, 189, 248, 0.2);
+				color: #fff;
+				border-color: #7dd3fc;
+				box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+				transform: translateY(-1px);
+			}
 		</style>
 	</head>
 	<body style="margin:0px;width:100vw;height:100vh;overflow:hidden;" id="game_frame">
 		<div class="ops-nav-overlay">
 			<a href="../../index.html" class="ops-nav-btn">
-				<span>⬅</span> Zpět na OPS Portál
+				<span>&larr;</span> Zpět na OPS Portál
 			</a>
 			<a href="../index.html" class="ops-version-btn" title="Přepnout na nejnovější verzi 1.12.2">
-				<span>⚡</span> Verze: 1.8.8 &bull; Přepnout na nejnovější 1.12.2
+				Verze: 1.8.8 &bull; Přepnout na nejnovější 1.12.2
 			</a>
+			<button type="button" class="ops-backup-btn" id="opsMcBackupBtn" onclick="if(window.OPS_STATS)window.OPS_STATS.openMinecraftBackupModal();">
+				[Záloha světů]
+			</button>
 		</div>
 	</body>
 </html>
