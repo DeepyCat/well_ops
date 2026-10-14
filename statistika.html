@@ -741,6 +741,26 @@
                             <span class="metric-label">Čas strávený ve světě:</span>
                             <span id="mcTimeText" class="metric-value">0m</span>
                         </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Poslední záloha světů:</span>
+                            <span id="mcBackupTimeText" class="metric-value">Zatím neprovedena</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Uložených souborů:</span>
+                            <span id="mcBackupFilesText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Velikost zálohy:</span>
+                            <span id="mcBackupSizeText" class="metric-value">0 KB</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="action-btn" style="padding: 6px 12px; font-size: 11px;" onclick="if(window.OPS_STATS)window.OPS_STATS.openMinecraftBackupModal();">
+                            Správa záloh
+                        </button>
+                        <button type="button" class="action-btn" style="padding: 6px 12px; font-size: 11px; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;" onclick="if(window.OPS_STATS)window.OPS_STATS.exportMinecraftBackup();">
+                            Stáhnout .json
+                        </button>
                     </div>
                 </div>
 
@@ -872,6 +892,35 @@
             document.getElementById('raceTimeText').textContent = formatDuration(stats.hyperdrive?.playTime || 0);
             document.getElementById('mcSessionsText').textContent = stats.mc?.sessions || 0;
             document.getElementById('mcTimeText').textContent = formatDuration(stats.mc?.playTime || 0);
+
+            // Minecraft zálohy
+            const mcBackupTime = stats.mc?.lastBackup ? new Date(stats.mc.lastBackup).toLocaleString("cs-CZ") : "Zatím neprovedena";
+            const mcBackupFiles = stats.mc?.backupFilesCount || 0;
+            const mcBackupBytes = stats.mc?.backupSizeBytes || 0;
+            const mcBackupSizeStr = mcBackupBytes > 1048576 
+                ? (mcBackupBytes / (1024 * 1024)).toFixed(2) + " MB" 
+                : (mcBackupBytes / 1024).toFixed(1) + " KB";
+
+            const mcBackupTimeEl = document.getElementById('mcBackupTimeText');
+            if (mcBackupTimeEl) mcBackupTimeEl.textContent = mcBackupTime;
+            const mcBackupFilesEl = document.getElementById('mcBackupFilesText');
+            if (mcBackupFilesEl) mcBackupFilesEl.textContent = mcBackupFiles;
+            const mcBackupSizeEl = document.getElementById('mcBackupSizeText');
+            if (mcBackupSizeEl) mcBackupSizeEl.textContent = mcBackupSizeStr;
+
+            if (window.OPS_STATS && window.OPS_STATS.getMinecraftBackupMeta) {
+                window.OPS_STATS.getMinecraftBackupMeta().then(meta => {
+                    if (meta && meta.timestamp) {
+                        if (mcBackupTimeEl) mcBackupTimeEl.textContent = new Date(meta.timestamp).toLocaleString("cs-CZ");
+                        if (mcBackupFilesEl) mcBackupFilesEl.textContent = meta.filesCount || 0;
+                        if (mcBackupSizeEl) {
+                            const b = meta.totalBytes || 0;
+                            mcBackupSizeEl.textContent = b > 1048576 ? (b / (1024 * 1024)).toFixed(2) + " MB" : (b / 1024).toFixed(1) + " KB";
+                        }
+                    }
+                });
+            }
+
             document.getElementById('maturitaHighScoreText').textContent = stats.maturita?.highScore || 0;
             document.getElementById('maturitaDistanceText').textContent = `${stats.maturita?.bestDistance || 0}m`;
             document.getElementById('maturitaGamesText').textContent = stats.maturita?.totalGames || 0;
