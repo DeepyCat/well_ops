@@ -1,12 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teorie – Proč trpíme při OPS</title>
-    <meta name="description" content="Teoretická část pro všechny, co už ví, že OPS je čisté utrpení, ale musí to nějak přetrpět.">
+    <meta name="description" content="OPS Markdown reader – studijní materiály, obsah, kartičky a testování.">
     <link rel="icon" type="image/x-icon" href="img/bird.png">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
         :root {
             --bg-main: #1a1a1a;
@@ -17,54 +19,44 @@
             --text-muted: #888;
             --accent: #ff5555;
             --accent-hover: #ff7777;
+            --font-size: 16px;
         }
 
-        /* --- VLASTNÍ SCROLLBAR LADÍCÍ K DESIGNU --- */
         * {
+            box-sizing: border-box;
             scrollbar-width: thin;
             scrollbar-color: #444 var(--bg-main);
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-main);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #444;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-main);
+            background: var(--bg-main);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
         }
 
         header {
             width: 100%;
-            background-color: var(--bg-sidebar);
+            flex-shrink: 0;
+            background: var(--bg-sidebar);
             padding: 15px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 15px;
             border-bottom: 2px solid var(--border-color);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(0,0,0,.5);
             z-index: 10;
         }
 
@@ -75,67 +67,85 @@
             letter-spacing: 1px;
         }
 
-        /* Stylování tlačítka zpět v hlavičce */
-        .back-btn {
-            background-color: #2a2a2a;
+        .back-btn, .tool-btn {
+            background: #2a2a2a;
             border: 1px solid #444;
             color: var(--text-main);
-            padding: 8px 16px;
+            padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: .9rem;
             text-decoration: none;
-            transition: all 0.2s ease;
+            white-space: nowrap;
+            transition: all .2s ease;
         }
-        .back-btn:hover {
-            background-color: #333;
+
+        .back-btn:hover, .tool-btn:hover {
+            background: #333;
             color: #fff;
             border-color: var(--accent);
         }
 
-        /* Layout aplikace (sidebar + main) */
+        .tool-btn:focus-visible,
+        .back-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* ČERVENÝ UKAZATEL ČTENÍ */
+        #readingProgress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: var(--accent);
+            z-index: 2000;
+            box-shadow: 0 0 8px rgba(255,85,85,.65);
+            pointer-events: none;
+        }
+
         .app-layout {
+            position: relative;
             display: flex;
             flex: 1;
+            min-height: 0;
             overflow: hidden;
         }
 
         sidebar {
             width: 320px;
-            background-color: var(--bg-sidebar);
+            min-width: 320px;
+            flex-shrink: 0;
+            background: var(--bg-sidebar);
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
             padding: 20px;
-            box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            gap: 18px;
+            transition: width .25s ease, min-width .25s ease, padding .25s ease;
         }
 
-        /* Stylování vyhledávacího pole */
-        .search-container {
-            margin-bottom: 20px;
-        }
+        .search-container { margin-bottom: 5px; }
 
         #mdSearchInput {
             width: 100%;
             padding: 10px 12px;
-            font-size: 0.9rem;
-            background-color: #1a1a1a;
+            font-size: .9rem;
+            background: #1a1a1a;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             color: var(--text-main);
             outline: none;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
         }
 
-        #mdSearchInput:focus {
-            border-color: var(--accent);
-        }
+        #mdSearchInput:focus { border-color: var(--accent); }
 
+        .nav-group { margin-bottom: 15px; }
 
         .nav-group-title {
-            font-size: 0.85rem;
+            font-size: .82rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--accent);
@@ -143,17 +153,10 @@
             font-weight: bold;
         }
 
-        sidebar ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        sidebar ul { list-style: none; padding: 0; margin: 0; }
+        sidebar li { margin-bottom: 5px; }
 
-        sidebar li {
-            margin-bottom: 5px;
-        }
-
-        sidebar button {
+        sidebar button.file-btn {
             width: 100%;
             text-align: left;
             background: transparent;
@@ -162,33 +165,116 @@
             padding: 8px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: .85rem;
+            transition: all .2s ease;
+            overflow-wrap: anywhere;
         }
 
-        sidebar button:hover {
-            background-color: #2a2a2a;
+        sidebar button.file-btn:hover {
+            background: #2a2a2a;
             color: #fff;
             border-color: #444;
         }
 
-        sidebar button.active {
-            background-color: #332222;
+        sidebar button.file-btn.active {
+            background: #332222;
             color: var(--accent-hover);
             border-color: var(--accent);
             font-weight: bold;
         }
 
+        .sidebar-section {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            background: rgba(0,0,0,.12);
+        }
+
+        .section-heading {
+            font-size: .85rem;
+            color: #fff;
+            font-weight: bold;
+            margin: 0 0 10px;
+        }
+
+        #tocList {
+            padding-left: 0;
+            margin: 0;
+            list-style: none;
+            max-height: 35vh;
+            overflow-y: auto;
+        }
+
+        #tocList li { margin: 3px 0; }
+
+        #tocList button {
+            display: block;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: #bbb;
+            text-align: left;
+            padding: 5px 6px;
+            cursor: pointer;
+            font-size: .82rem;
+            border-radius: 4px;
+            overflow-wrap: anywhere;
+        }
+
+        #tocList button:hover {
+            color: #fff;
+            background: #333;
+        }
+
+        #tocList .toc-h1 { padding-left: 6px; color: #fff; }
+        #tocList .toc-h2 { padding-left: 14px; }
+        #tocList .toc-h3 { padding-left: 25px; font-size: .78rem; }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 115px;
+            left: 320px;
+            transform: none;
+            z-index: 1000;
+            width: 25px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            background: #303030;
+            color: var(--accent-hover);
+            border: 1px solid #555;
+            border-left: none;
+            border-radius: 0 9px 9px 0;
+            cursor: pointer;
+            font-size: 21px;
+            font-weight: bold;
+            box-shadow: 3px 0 12px rgba(0,0,0,.35);
+            transition: left .25s ease, background .2s ease, color .2s ease;
+        }
+
+        .sidebar-toggle:hover { background: var(--accent); color: #fff; }
+
+        .app-layout.sidebar-hidden sidebar {
+            width: 0;
+            min-width: 0;
+            padding: 0;
+            border: 0;
+            overflow: hidden;
+        }
+
+        .app-layout.sidebar-hidden .sidebar-toggle { left: 0; }
+
         main {
             flex: 1;
+            min-width: 0;
             padding: 30px;
             overflow-y: auto;
-            box-sizing: border-box;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            scroll-behavior: smooth;
         }
 
         .content-box {
@@ -197,80 +283,38 @@
             background: var(--bg-box);
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            box-shadow: 0 8px 20px rgba(0,0,0,.6);
             border: 1px solid var(--border-color);
-            height: fit-content;
             min-height: 400px;
+            height: fit-content;
+            overflow-wrap: anywhere;
+            transition: max-width .2s ease, padding .2s ease;
         }
 
-        /* Kontejner a stylování pro tlačítko stažení na konci */
-        .download-container {
-            display: none;
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
+        .app-layout.sidebar-hidden main { padding: 30px 50px; }
+        .app-layout.sidebar-hidden .content-box { max-width: 1400px; }
 
-        .download-btn {
-            background: linear-gradient(135deg, #2a1818 0%, #3a1c1c 100%);
-            border: 1px solid var(--accent);
-            color: #fff;
-            padding: 10px 22px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 2px 8px rgba(255, 85, 85, 0.2);
-        }
-        .download-btn:hover {
-            background: linear-gradient(135deg, #d32f2f 0%, #ff5555 100%);
-            color: #fff;
-            border-color: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(255, 85, 85, 0.45);
-        }
-
-        .placeholder-state {
-            text-align: center;
-            margin-top: 80px;
-        }
-
-        .placeholder-state h2 {
-            color: var(--accent);
-            margin-bottom: 10px;
-        }
-
-        /* --- VYLEPŠENÉ VYKRESLENÍ .MD SOUBORŮ --- */
-        .content-box h1, 
-        .content-box h2, 
-        .content-box h3 {
+        .content-box h1, .content-box h2, .content-box h3,
+        .content-box h4, .content-box h5, .content-box h6 {
             color: #fff;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 8px;
             margin-top: 25px;
             margin-bottom: 15px;
-        }
-        
-        .content-box h1:first-child, 
-        .content-box h2:first-child, 
-        .content-box h3:first-child {
-            margin-top: 0;
+            scroll-margin-top: 20px;
         }
 
+        .content-box h1:first-child, .content-box h2:first-child,
+        .content-box h3:first-child { margin-top: 0; }
+
         .content-box p {
+            font-size: var(--font-size);
             line-height: 1.7;
             color: #d1d1d1;
             margin-bottom: 16px;
         }
 
-        .content-box ul, 
-        .content-box ol {
+        .content-box ul, .content-box ol {
             margin-top: 10px;
             margin-bottom: 16px;
             padding-left: 25px;
@@ -282,16 +326,14 @@
             margin-bottom: 8px;
         }
 
-        .content-box strong {
-            color: #fff;
-        }
+        .content-box strong { color: #fff; }
 
         .content-box code {
             background: #151515;
             padding: 2px 6px;
             border-radius: 4px;
             color: #ff7b72;
-            font-size: 0.9em;
+            font-size: .9em;
         }
 
         .content-box pre {
@@ -303,13 +345,8 @@
             margin-bottom: 16px;
         }
 
-        .content-box pre code {
-            background: none;
-            color: #e6edf3;
-            padding: 0;
-        }
+        .content-box pre code { background: none; color: #e6edf3; padding: 0; }
 
-        /* Obrázky v Markdown obsahu */
         .content-box img {
             max-width: 100%;
             height: auto;
@@ -317,40 +354,52 @@
             margin: 24px auto;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 16px rgba(0,0,0,.4);
             background: #16181d;
         }
 
-        /* Stylování interaktivních wiki-odkazů mezi tématy v červeném stylu */
+        .content-box blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 16px;
+            margin-left: 0;
+            color: #bbb;
+        }
+
+        .content-box table {
+            border-collapse: collapse;
+            display: block;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .content-box th, .content-box td {
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .content-box th { background: #303030; color: #fff; }
+
         .wiki-link {
             color: #ff7777;
-            background: rgba(255, 85, 85, 0.12);
+            background: rgba(255,85,85,.12);
             padding: 1px 7px;
             border-radius: 4px;
             text-decoration: none;
             font-weight: 500;
-            border-bottom: 1px dashed rgba(255, 85, 85, 0.6);
-            transition: all 0.2s ease;
+            border-bottom: 1px dashed rgba(255,85,85,.6);
             cursor: pointer;
             display: inline-block;
             margin: 0 1px;
         }
 
         .wiki-link:hover {
-            color: #ffffff;
-            background: rgba(255, 85, 85, 0.45);
+            color: #fff;
+            background: rgba(255,85,85,.45);
             border-bottom-style: solid;
-            border-color: #ff9999;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 10px rgba(255, 85, 85, 0.4);
         }
 
-        .wiki-link::after {
-            content: " ↗";
-            font-size: 0.75em;
-            opacity: 0.7;
-            color: #ff9999;
-        }
+        .wiki-link::after { content: " ↗"; font-size: .75em; opacity: .7; }
 
         .content-box a:not(.wiki-link) {
             color: var(--accent);
@@ -358,118 +407,333 @@
             text-underline-offset: 3px;
         }
 
-        .content-box a:not(.wiki-link):hover {
+        .content-box a:not(.wiki-link):hover { color: var(--accent-hover); }
+
+        .placeholder-state { text-align: center; margin-top: 80px; }
+        .placeholder-state h2 { color: var(--accent); margin-bottom: 10px; }
+
+        .reader-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .reader-toolbar .tool-btn { padding: 6px 10px; }
+
+        /* TLAČÍTKO PŘEČTENO */
+        #readStatusBtn.read {
+            background: #183322;
+            border-color: #3d8c5a;
+            color: #9be5ad;
+        }
+
+        #readStatusBtn.read:hover {
+            background: #21482f;
+            border-color: #63bd7c;
+        }
+
+        #readStatusBtn:not(.read) {
+            border-color: var(--accent);
+        }
+
+        .reading-mode .content-box {
+            max-width: 1100px;
+            padding: 55px;
+        }
+
+        .reading-mode main { padding-top: 18px; }
+
+        .reading-mode .content-box p {
+            line-height: 1.95;
+        }
+
+        .download-container {
+            display: none;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg,#2a1818 0%,#3a1c1c 100%);
+            border: 1px solid var(--accent);
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: .95rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover { background: #d32f2f; }
+
+        /* KARTIČKY A TEST */
+        .study-panel {
+            margin: 25px 0;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: #1d1d1d;
+        }
+
+        .study-panel h2 { margin-top: 0; }
+
+        .flashcard {
+            min-height: 170px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 25px;
+            background: #292020;
+            border: 1px solid #633;
+            border-radius: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .flashcard .card-label {
             color: var(--accent-hover);
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
         }
 
-        .nav-group {
-            margin-bottom: 20px;
+        .flashcard .card-text {
+            color: #fff;
+            font-size: 1.15rem;
+            line-height: 1.6;
         }
 
-        /* Responzivita pro menší obrazovky */
+        .study-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .quiz-question {
+            background: #202020;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 12px 0;
+        }
+
+        .quiz-question label {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+            color: #ccc;
+        }
+
+        .quiz-question input { accent-color: var(--accent); margin-right: 7px; }
+
+        #quizResult {
+            margin-top: 15px;
+            color: var(--accent-hover);
+            font-weight: bold;
+        }
+
+        .muted { color: var(--text-muted); font-size: .88rem; }
+
         @media screen and (max-width: 768px) {
-            .app-layout {
-                flex-direction: column;
-                overflow-y: auto;
-            }
-            body {
-                overflow: auto;
-                height: auto;
-            }
+            header { padding: 12px 15px; gap: 10px; }
+            header h1 { font-size: 1rem; }
+            .back-btn { padding: 7px 10px; font-size: .8rem; }
+
+            .app-layout { flex-direction: column; }
+
             sidebar {
                 width: 100%;
-                max-height: 300px;
+                min-width: 0;
+                flex: 0 0 auto;
+                max-height: 42%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
             }
-            main {
-                padding: 15px;
+
+            .app-layout.sidebar-hidden sidebar { display: none; }
+
+            .sidebar-toggle {
+                top: auto;
+                bottom: 12px;
+                left: auto;
+                right: 12px;
+                width: 42px;
+                height: 42px;
+                border: 1px solid #555;
+                border-radius: 50%;
+                box-shadow: 0 3px 12px rgba(0,0,0,.5);
+                background: var(--accent);
+                color: #fff;
             }
+
+            .app-layout.sidebar-hidden .sidebar-toggle {
+                left: auto;
+                right: 12px;
+                border: 1px solid #555;
+                border-radius: 50%;
+            }
+
+            main { flex: 1; min-height: 0; padding: 15px; }
+            .content-box { padding: 22px; min-height: 250px; }
+            .placeholder-state { margin-top: 45px; }
+            .app-layout.sidebar-hidden main { padding: 15px; }
+            .app-layout.sidebar-hidden .content-box { max-width: 100%; }
+            .reading-mode .content-box { padding: 24px; }
+            .reader-toolbar { gap: 6px; }
+            .reader-toolbar .tool-btn { font-size: .82rem; padding: 7px 9px; }
         }
     </style>
 </head>
+
 <body>
+    <div id="readingProgress"></div>
 
     <header>
         <h1>Co to kurva je, stejně se to nenaučím</h1>
         <a href="index.html" class="back-btn">Chcu zpět</a>
     </header>
 
-    <div class="app-layout">
-        <!-- Sidebar s vyhledáváním a tlačítky -->
-        <sidebar>
-            <!-- Vyhledávací pole -->
+    <div class="app-layout" id="appLayout">
+        <button
+            class="sidebar-toggle"
+            id="sidebarToggle"
+            onclick="toggleSidebar()"
+            title="Schovat výběr souborů"
+            aria-label="Schovat nebo zobrazit výběr souborů"
+            aria-expanded="true"
+        >&lt;</button>
+
+        <sidebar id="sidebar">
             <div class="search-container">
-                <input type="text" id="mdSearchInput" placeholder="Hledat v názvech .md..." onkeyup="filterMarkdownDocs()">
+                <input
+                    type="text"
+                    id="mdSearchInput"
+                    placeholder="Hledat v názvech .md..."
+                    oninput="filterMarkdownDocs()"
+                >
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-heading">📑 Obsah článku</div>
+                <p class="muted" id="tocHint">Otevři článek, aby se zde zobrazily nadpisy.</p>
+                <ul id="tocList"></ul>
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-title">1. Úvod & Architektura</div>
+                <div class="nav-group-title">1. Úvod &amp; Architektura</div>
                 <ul>
-                    <li><button onclick="loadMarkdown('md/01_Vypocetni_system.md', this)">01_Vypocetni_system.md</button></li>
-                    <li><button onclick="loadMarkdown('md/01_STRUKTURA_OPERAČNÍCH_SYSTÉMŮ (1).md', this)">01_STRUKTURA_OS</button></li>
-                    <li><button onclick="loadMarkdown('md/02_Co_je_to_operacni_system.md', this)">02_Co_je_to_operacni_system.md</button></li>
-                    <li><button onclick="loadMarkdown('md/02_BIOS_UEFI.md', this)">02_BIOS_UEFI.md</button></li>
-                    <li><button onclick="loadMarkdown('md/03_Funkce_OS.md', this)">03_Funkce_OS.md</button></li>
-                    <li><button onclick="loadMarkdown('md/04_Rozdeleni_OS.md', this)">04_Rozdeleni_OS.md</button></li>
-                    <li><button onclick="loadMarkdown('md/05_Historie_OS.md', this)">05_Historie_OS.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/01_Vypocetni_system.md',this)">01_Vypocetni_system.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/01_STRUKTURA_OPERAČNÍCH_SYSTÉMŮ (1).md',this)">01_STRUKTURA_OS</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/02_Co_je_to_operacni_system.md',this)">02_Co_je_to_operacni_system.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/02_BIOS_UEFI.md',this)">02_BIOS_UEFI.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/03_Funkce_OS.md',this)">03_Funkce_OS.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/04_Rozdeleni_OS.md',this)">04_Rozdeleni_OS.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/05_Historie_OS.md',this)">05_Historie_OS.md</button></li>
                 </ul>
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-title">2. Hardware, Periferie & Paměť</div>
+                <div class="nav-group-title">2. Hardware, Periferie &amp; Paměť</div>
                 <ul>
-                    <li><button onclick="loadMarkdown('md/01_Sprava_periferii_a_preruseni.md', this)">01_Sprava_periferii</button></li>
-                    <li><button onclick="loadMarkdown('md/01_Sprava_pameti_uvod.md', this)">01_Sprava_pameti_uvod.md</button></li>
-                    <li><button onclick="loadMarkdown('md/02_Hlavni_pamet.md', this)">02_Hlavni_pamet.md</button></li>
-                    <li><button onclick="loadMarkdown('md/03_Segmentace.md', this)">03_Segmentace.md</button></li>
-                    <li><button onclick="loadMarkdown('md/04_Strankovani.md', this)">04_Strankovani.md</button></li>
-                    <li><button onclick="loadMarkdown('md/05_Virtualni_pamet.md', this)">05_Virtualni_pamet.md</button></li>
-                    <li><button onclick="loadMarkdown('md/03_Device_Drivers.md', this)">03_Device_Drivers.md</button></li>
-                    <li><button onclick="loadMarkdown('md/01_Mass_Storage_Structure.md', this)">01_Mass_Storage</button></li>
-                    <li><button onclick="loadMarkdown('md/02_Disk_Scheduling_Management.md', this)">02_Disk_Scheduling</button></li>
-                    <li><button onclick="loadMarkdown('md/03_RAID_Stable_Storage.md', this)">03_RAID_Stable_Storage.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/01_Sprava_periferii_a_preruseni.md',this)">01_Sprava_periferii</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/01_Sprava_pameti_uvod.md',this)">01_Sprava_pameti_uvod.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/02_Hlavni_pamet.md',this)">02_Hlavni_pamet.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/03_Segmentace.md',this)">03_Segmentace.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/04_Strankovani.md',this)">04_Strankovani.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/05_Virtualni_pamet.md',this)">05_Virtualni_pamet.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/03_Device_Drivers.md',this)">03_Device_Drivers.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/01_Mass_Storage_Structure.md',this)">01_Mass_Storage</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/02_Disk_Scheduling_Management.md',this)">02_Disk_Scheduling</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/03_RAID_Stable_Storage.md',this)">03_RAID_Stable_Storage.md</button></li>
                 </ul>
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-title">3. Procesy & Plánování</div>
+                <div class="nav-group-title">3. Procesy &amp; Plánování</div>
                 <ul>
-                    <li><button onclick="loadMarkdown('md/01_Process_Concept.md', this)">01_Process_Concept.md</button></li>
-                    <li><button onclick="loadMarkdown('md/02_Process_Scheduling.md', this)">02_Process_Scheduling.md</button></li>
-                    <li><button onclick="loadMarkdown('md/03_Operations_on_Processes.md', this)">03_Operations_on_Processes.md</button></li>
-                    <li><button onclick="loadMarkdown('md/04_IPC.md', this)">04_IPC.md</button></li>
-                    <li><button onclick="loadMarkdown('md/05_Process_Synchronisation.md', this)">05_Process_Synchronisation.md</button></li>
-                    <li><button onclick="loadMarkdown('md/06_CPU_Scheduling.md', this)">06_CPU_Scheduling.md</button></li>
-                    <li><button onclick="loadMarkdown('md/07_Multitasking_Multithreading.md', this)">07_Multitasking</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/01_Process_Concept.md',this)">01_Process_Concept.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/02_Process_Scheduling.md',this)">02_Process_Scheduling.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/03_Operations_on_Processes.md',this)">03_Operations_on_Processes.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/04_IPC.md',this)">04_IPC.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/05_Process_Synchronisation.md',this)">05_Process_Synchronisation.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/06_CPU_Scheduling.md',this)">06_CPU_Scheduling.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/07_Multitasking_Multithreading.md',this)">07_Multitasking</button></li>
                 </ul>
             </div>
 
             <div class="nav-group">
-                <div class="nav-group-title">4. Souborové systémy & Rozhraní</div>
+                <div class="nav-group-title">4. Souborové systémy &amp; Rozhraní</div>
                 <ul>
-                    <li><button onclick="loadMarkdown('md/04_File_Concept_Access.md', this)">04_File_Concept_Access.md</button></li>
-                    <li><button onclick="loadMarkdown('md/05_Directory_Structures.md', this)">05_Directory_Structures.md</button></li>
-                    <li><button onclick="loadMarkdown('md/05_Souborove_systemy.md', this)">05_Souborove_systemy.md</button></li>
-                    <li><button onclick="loadMarkdown('md/06_File_System_Implementation.md', this)">06_File_System_Implementation</button></li>
-                    <li><button onclick="loadMarkdown('md/04_Systemova_volani.md', this)">04_Systemova_volani.md</button></li>
-                    <li><button onclick="loadMarkdown('md/06_Zakladni_datove_struktury.md', this)">06_Zakladni_datove_struktury.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/04_File_Concept_Access.md',this)">04_File_Concept_Access.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/05_Directory_Structures.md',this)">05_Directory_Structures.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/05_Souborove_systemy.md',this)">05_Souborove_systemy.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/06_File_System_Implementation.md',this)">06_File_System_Implementation</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/04_Systemova_volani.md',this)">04_Systemova_volani.md</button></li>
+                    <li><button class="file-btn" onclick="loadMarkdown('md/06_Zakladni_datove_struktury.md',this)">06_Zakladni_datove_struktury.md</button></li>
                 </ul>
             </div>
         </sidebar>
 
-        <!-- Hlavní obsah pro vykreslení -->
-        <main>
+        <main id="mainContent">
             <div class="content-box" id="content">
+                <div class="reader-toolbar">
+                    <button class="tool-btn" onclick="changeFontSize(-1)" title="Zmenšit písmo">A−</button>
+                    <button class="tool-btn" onclick="changeFontSize(1)" title="Zvětšit písmo">A+</button>
+                    <button class="tool-btn" onclick="toggleReadingMode()" id="readingModeBtn">📖 Čtecí režim</button>
+                    <button class="tool-btn" onclick="scrollToTop()">↑ Nahoru</button>
+                    <button class="tool-btn" onclick="openStudyPanel()">🧠 Učení a test</button>
+                    <button class="tool-btn" id="readStatusBtn" onclick="toggleCurrentRead()" disabled title="Nejdřív otevři článek">○ Nepřečteno</button>
+                </div>
+
                 <div class="placeholder-state" id="placeholderState">
-                    <h2>😢😢😢 - nechcu to dělat</h2>
-                    <p style="color: var(--text-muted);">Kliknutím na libovolný soubor se jeho obsah z .md souboru automaticky načte a vykreslí přímo zde. Bezbolestně</p>
-                    <div style="background: #1f1f1f; border-left: 4px solid var(--accent); padding: 12px; margin-top: 30px; border-radius: 0 6px 6px 0; font-style: italic; color: #bbb; text-align: left;">
+                    <h2>😢😢😢 – nechcu to dělat</h2>
+                    <p style="color:var(--text-muted)">
+                        Kliknutím na libovolný soubor se jeho obsah z .md souboru automaticky načte a vykreslí přímo zde.
+                    </p>
+                    <div style="background:#1f1f1f;border-left:4px solid var(--accent);padding:12px;margin-top:30px;border-radius:0 6px 6px 0;font-style:italic;color:#bbb;text-align:left">
                         „Teorie je, když víte všechno, ale nic nefunguje. V předmětu OPS nefunguje ani jedno, tak hodně štěstí při klikání.“
                     </div>
                 </div>
-                
+
                 <div id="markdownContent"></div>
 
-                <!-- Tlačítko pro stažení souboru umístěné až na konci -->
+                <section class="study-panel" id="studyPanel" hidden>
+                    <h2>🧠 Procvičování OPS</h2>
+                    <p class="muted">Kartičky a krátký test. Otázky jsou obecné, takže si můžeš procvičit základní pojmy.</p>
+
+                    <h3>📇 Kartičky</h3>
+                    <div class="flashcard" id="flashcard" onclick="flipCard()" role="button" tabindex="0" aria-label="Otočit kartičku">
+                        <div class="card-label" id="cardLabel">Otázka</div>
+                        <div class="card-text" id="cardText">Klikni na „Další kartička“.</div>
+                    </div>
+                    <div class="study-actions">
+                        <button class="tool-btn" onclick="previousCard()">← Předchozí</button>
+                        <button class="tool-btn" onclick="flipCard()">Otočit</button>
+                        <button class="tool-btn" onclick="nextCard()">Další →</button>
+                    </div>
+                    <p class="muted" id="cardCounter"></p>
+
+                    <h3>📝 Mini test</h3>
+                    <form id="quizForm"></form>
+                    <button class="tool-btn" type="button" onclick="gradeQuiz()">Vyhodnotit test</button>
+                    <button class="tool-btn" type="button" onclick="buildQuiz()">Nový test</button>
+                    <div id="quizResult" aria-live="polite"></div>
+                </section>
+
                 <div id="downloadContainer" class="download-container">
                     <a id="downloadBtn" class="download-btn" href="#" download>📥 Stáhnout .md</a>
                 </div>
@@ -479,10 +743,56 @@
 
     <script>
         let currentFilePath = '';
+        let currentCard = 0;
+        let cardFlipped = false;
+        let fontSize = Number(localStorage.getItem('opsFontSize')) || 16;
+        let scrollSaveTimer;
+        let loadRequestId = 0;
 
-        // Kompletní mapa wikilinků a klíčových pojmů na odpovídající .md soubory
+        const STORAGE_KEYS = {
+            completed: 'opsCompletedTopics',
+            positions: 'opsReadingPositions',
+            lastFile: 'opsLastFile',
+            fontSize: 'opsFontSize',
+            readingMode: 'opsReadingMode'
+        };
+
+        const FLASHCARDS = [
+            { q: 'Co je operační systém?', a: 'Systémový software, který spravuje hardware a poskytuje služby aplikacím a uživatelům.' },
+            { q: 'Co je kernel neboli jádro OS?', a: 'Základní část operačního systému, která spravuje například procesy, paměť a přístup k zařízení.' },
+            { q: 'Co je BIOS/UEFI?', a: 'Firmware, který po zapnutí inicializuje hardware a zahajuje proces spouštění počítače.' },
+            { q: 'Co je proces?', a: 'Běžící instance programu se svým stavem, prostředky a adresním prostorem.' },
+            { q: 'Co je vlákno?', a: 'Jednotka vykonávání uvnitř procesu. Vlákna jednoho procesu obvykle sdílejí jeho paměť.' },
+            { q: 'Co je plánování CPU?', a: 'Rozhodování, kterému připravenému procesu nebo vláknu bude přidělen procesor.' },
+            { q: 'Co je Round Robin?', a: 'Plánovací algoritmus, který přiděluje procesům CPU na omezené časové kvantum a poté je případně vystřídá.' },
+            { q: 'Co je přerušení?', a: 'Událost, která upozorní procesor na potřebu obsloužit určitý stav nebo zařízení.' },
+            { q: 'Co je DMA?', a: 'Direct Memory Access – mechanismus umožňující zařízení přenášet data do nebo z paměti s menším zapojením CPU.' },
+            { q: 'Co je virtuální paměť?', a: 'Mechanismus, který poskytuje procesům virtuální adresní prostor a mapuje jej na fyzickou paměť nebo jiné úložiště.' },
+            { q: 'Co je stránkování?', a: 'Správa paměti rozdělující virtuální a fyzickou paměť na stránky a rámce.' },
+            { q: 'Co je segmentace?', a: 'Správa paměti, která dělí adresní prostor na logické části různé velikosti.' },
+            { q: 'Co je deadlock?', a: 'Situace, kdy skupina procesů čeká na prostředky držené ostatními členy skupiny a nemůže pokračovat.' },
+            { q: 'Co je mutex?', a: 'Synchronizační mechanismus, který umožňuje vzájemné vyloučení při přístupu ke sdílenému prostředku.' },
+            { q: 'Co je IPC?', a: 'Inter-Process Communication – komunikace a výměna dat mezi procesy.' },
+            { q: 'Co je RAID?', a: 'Technologie kombinující více disků kvůli výkonu, redundanci nebo kombinaci obojího; vlastnosti záleží na úrovni RAID.' },
+            { q: 'Co je souborový systém?', a: 'Způsob organizace, ukládání a správy souborů a adresářů na úložném zařízení.' },
+            { q: 'Co je systémové volání?', a: 'Mechanismus, kterým program žádá jádro operačního systému o službu.' }
+        ];
+
+        const QUIZ_QUESTIONS = [
+            { q: 'Která část OS zajišťuje základní správu procesů a paměti?', options: ['Jádro (kernel)', 'Textový editor', 'BIOS baterie'], answer: 0 },
+            { q: 'Co znamená zkratka DMA?', options: ['Disk Memory Allocation', 'Direct Memory Access', 'Dynamic Machine Architecture'], answer: 1 },
+            { q: 'Který algoritmus využívá časové kvantum?', options: ['Round Robin', 'FCFS bez přerušování', 'Pouze FIFO pro soubory'], answer: 0 },
+            { q: 'K čemu slouží mutex?', options: ['K synchronizaci přístupu ke sdílenému prostředku', 'K formátování disku', 'K měření teploty CPU'], answer: 0 },
+            { q: 'Co popisuje deadlock?', options: ['Úspěšné ukončení procesu', 'Vzájemné čekání procesů na prostředky', 'Rychlejší přístup do RAM'], answer: 1 },
+            { q: 'K čemu slouží systémové volání?', options: ['K požádání jádra o službu', 'K výměně ventilátoru', 'K přímé změně zdrojového kódu'], answer: 0 },
+            { q: 'Co je virtuální paměť?', options: ['Pouze paměť grafické karty', 'Abstrakce adresního prostoru procesu', 'Jiný název pro BIOS'], answer: 1 },
+            { q: 'Co je hlavním účelem souborového systému?', options: ['Organizovat soubory a adresáře', 'Plánovat procesorová vlákna', 'Řídit obnovovací frekvenci monitoru'], answer: 0 },
+            { q: 'Co je proces?', options: ['Pouze soubor na disku', 'Běžící instance programu', 'Typ síťového kabelu'], answer: 1 },
+            { q: 'K čemu slouží přerušení?', options: ['Upozornit CPU na událost vyžadující obsluhu', 'Vždy vypnout operační systém', 'Zvýšit kapacitu SSD'], answer: 0 }
+        ];
+
+        /* MAPA WIKILINKŮ A KLÍČOVÝCH POJMŮ – PŮVODNÍ POLOŽKY ZACHOVÁNY */
         const WIKI_MAP = {
-            // Přímé soubory
             "01_mass_storage_structure": "md/01_Mass_Storage_Structure.md",
             "01_process_concept": "md/01_Process_Concept.md",
             "01_sprava_pameti_uvod": "md/01_Sprava_pameti_uvod.md",
@@ -515,7 +825,6 @@
             "06_zakladni_datove_struktury": "md/06_Zakladni_datove_struktury.md",
             "07_multitasking_multithreading": "md/07_Multitasking_Multithreading.md",
 
-            // Klíčové pojmy (česky i anglicky)
             "cpu": "md/01_Vypocetni_system.md",
             "procesor": "md/01_Vypocetni_system.md",
             "registr": "md/01_Vypocetni_system.md",
@@ -526,6 +835,7 @@
             "firmware": "md/01_Vypocetni_system.md",
             "eeprom": "md/01_Vypocetni_system.md",
             "rom": "md/01_Vypocetni_system.md",
+
             "bios": "md/02_BIOS_UEFI.md",
             "post": "md/02_BIOS_UEFI.md",
             "operacni system": "md/02_Co_je_to_operacni_system.md",
@@ -533,20 +843,24 @@
             "kernel": "md/02_Co_je_to_operacni_system.md",
             "jadro": "md/02_Co_je_to_operacni_system.md",
             "jádro": "md/02_Co_je_to_operacni_system.md",
+
             "gui": "md/03_Funkce_OS.md",
             "cli": "md/03_Funkce_OS.md",
             "api": "md/03_Funkce_OS.md",
+
             "smp": "md/04_Rozdeleni_OS.md",
             "asmp": "md/04_Rozdeleni_OS.md",
             "numa": "md/04_Rozdeleni_OS.md",
             "dns": "md/04_Rozdeleni_OS.md",
             "dhcp": "md/04_Rozdeleni_OS.md",
+
             "preruseni": "md/01_Sprava_periferii_a_preruseni.md",
             "přerušení": "md/01_Sprava_periferii_a_preruseni.md",
             "dma": "md/01_Sprava_periferii_a_preruseni.md",
             "radic": "md/01_Sprava_periferii_a_preruseni.md",
             "řadič": "md/01_Sprava_periferii_a_preruseni.md",
             "port": "md/01_Sprava_periferii_a_preruseni.md",
+
             "mmu": "md/01_Sprava_pameti_uvod.md",
             "ram": "md/02_Hlavni_pamet.md",
             "hlavni pamet": "md/02_Hlavni_pamet.md",
@@ -557,6 +871,7 @@
             "virtualni pamet": "md/05_Virtualni_pamet.md",
             "virtuální paměť": "md/05_Virtualni_pamet.md",
             "swapping": "md/05_Virtualni_pamet.md",
+
             "hdd": "md/01_Mass_Storage_Structure.md",
             "ssd": "md/01_Mass_Storage_Structure.md",
             "rpm": "md/01_Mass_Storage_Structure.md",
@@ -566,6 +881,7 @@
             "starvation": "md/02_Disk_Scheduling_Management.md",
             "vyhladoveni": "md/02_Disk_Scheduling_Management.md",
             "raid": "md/03_RAID_Stable_Storage.md",
+
             "proces": "md/01_Process_Concept.md",
             "procesy": "md/01_Process_Concept.md",
             "pcb": "md/01_Process_Concept.md",
@@ -574,12 +890,15 @@
             "heap": "md/01_Process_Concept.md",
             "prepnuti kontextu": "md/01_Process_Concept.md",
             "přepnutí kontextu": "md/01_Process_Concept.md",
+
             "planovani procesu": "md/02_Process_Scheduling.md",
             "plánování procesů": "md/02_Process_Scheduling.md",
             "fronta": "md/02_Process_Scheduling.md",
             "pid": "md/03_Operations_on_Processes.md",
+
             "ipc": "md/04_IPC.md",
             "socket": "md/04_IPC.md",
+
             "proces synchronizace": "md/05_Process_Synchronisation.md",
             "synchronizace procesu": "md/05_Process_Synchronisation.md",
             "synchronizace procesů": "md/05_Process_Synchronisation.md",
@@ -590,16 +909,19 @@
             "uvaznuti": "md/05_Process_Synchronisation.md",
             "uváznutí": "md/05_Process_Synchronisation.md",
             "deadlock": "md/05_Process_Synchronisation.md",
+
             "cpu scheduling": "md/06_CPU_Scheduling.md",
             "sjf": "md/06_CPU_Scheduling.md",
             "fcfs": "md/06_CPU_Scheduling.md",
             "round robin": "md/06_CPU_Scheduling.md",
+
             "vlakno": "md/07_Multitasking_Multithreading.md",
             "vlákno": "md/07_Multitasking_Multithreading.md",
             "vlakna": "md/07_Multitasking_Multithreading.md",
             "vlákna": "md/07_Multitasking_Multithreading.md",
             "multitasking": "md/07_Multitasking_Multithreading.md",
             "multithreading": "md/07_Multitasking_Multithreading.md",
+
             "fcb": "md/04_File_Concept_Access.md",
             "koncept souboru": "md/04_File_Concept_Access.md",
             "adresarove struktury": "md/05_Directory_Structures.md",
@@ -608,11 +930,14 @@
             "žurnálování": "md/05_Souborove_systemy.md",
             "nfs": "md/05_Souborove_systemy.md",
             "ext4": "md/05_Souborove_systemy.md",
+
             "i-node": "md/06_File_System_Implementation.md",
             "inode": "md/06_File_System_Implementation.md",
+
             "systemove volani": "md/04_Systemova_volani.md",
             "systémové volání": "md/04_Systemova_volani.md",
             "posix": "md/04_Systemova_volani.md",
+
             "spojovy seznam": "md/06_Zakladni_datove_struktury.md",
             "spojový seznam": "md/06_Zakladni_datove_struktury.md",
             "pole": "md/06_Zakladni_datove_struktury.md",
@@ -621,199 +946,648 @@
             "bst": "md/06_Zakladni_datove_struktury.md"
         };
 
-        // Zpracování Obsidian wikilinků před předáním do marked.js
+        function getCompletedTopics() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEYS.completed)) || {};
+            } catch {
+                return {};
+            }
+        }
+
+        function getPositions() {
+            try {
+                return JSON.parse(localStorage.getItem(STORAGE_KEYS.positions)) || {};
+            } catch {
+                return {};
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        function normalizeWikiTarget(target) {
+            return target.toLowerCase().trim()
+                .replace(/\.md$/, '')
+                .replace(/^md\//, '')
+                .replace(/\\/g, '/');
+        }
+
         function processMarkdownWikilinks(rawMd) {
             if (!rawMd) return '';
 
-            // 1. Odstranění chybějících vložených obrázků ![[...]]
             let clean = rawMd.replace(/!\[\[([^\]]+)\]\]/g, '');
 
-            // 2. Převod [[Target|Label]] na interaktivní wiki odkaz
-            clean = clean.replace(/(?<!\!)\[\[([^\]|]+)\|([^\]]+)\]\]/g, function(match, target, label) {
-                return `<a href="javascript:void(0)" class="wiki-link" data-wiki="${target.trim()}" title="Přejít na téma: ${target.trim()}">${label.trim()}</a>`;
-            });
+            clean = clean.replace(/(?<!\!)\[\[([^\]|]+)\|([^\]]+)\]\]/g,
+                (match, target, label) =>
+                    '<a href="#" class="wiki-link" data-wiki="' +
+                    escapeHtml(target.trim()) + '">' +
+                    escapeHtml(label.trim()) + '</a>'
+            );
 
-            // 3. Převod [[Target]] na interaktivní wiki odkaz
-            clean = clean.replace(/(?<!\!)\[\[([^\]]+)\]\]/g, function(match, target) {
-                return `<a href="javascript:void(0)" class="wiki-link" data-wiki="${target.trim()}" title="Přejít na téma: ${target.trim()}">${target.trim()}</a>`;
-            });
+            clean = clean.replace(/(?<!\!)\[\[([^\]]+)\]\]/g,
+                (match, target) =>
+                    '<a href="#" class="wiki-link" data-wiki="' +
+                    escapeHtml(target.trim()) + '">' +
+                    escapeHtml(target.trim()) + '</a>'
+            );
 
             return clean;
         }
 
-        // Navigace na cílové téma z wikilinku nebo interního odkazu
+        function getFilePathFromButton(button) {
+            const match = (button.getAttribute('onclick') || '')
+                .match(/loadMarkdown\('([^']+)'/);
+            return match ? match[1] : '';
+        }
+
+        function findMarkdownButton(filePath) {
+            return Array.from(document.querySelectorAll('#sidebar button.file-btn'))
+                .find(button => getFilePathFromButton(button) === filePath);
+        }
+
+        function toggleSidebar() {
+            const layout = document.getElementById('appLayout');
+            const button = document.getElementById('sidebarToggle');
+            const hidden = layout.classList.toggle('sidebar-hidden');
+
+            button.innerHTML = hidden ? '&gt;' : '&lt;';
+            button.title = hidden
+                ? 'Zobrazit výběr souborů'
+                : 'Schovat výběr souborů';
+            button.setAttribute('aria-expanded', String(!hidden));
+            button.setAttribute(
+                'aria-label',
+                hidden ? 'Zobrazit výběr souborů' : 'Schovat výběr souborů'
+            );
+        }
+
+        /* STAV PŘEČTENÍ AKTUÁLNÍHO ČLÁNKU */
+        function isCurrentFileRead() {
+            if (!currentFilePath) return false;
+            return Boolean(getCompletedTopics()[currentFilePath]);
+        }
+
+        function updateReadButton() {
+            const button = document.getElementById('readStatusBtn');
+            const hasFile = Boolean(currentFilePath);
+
+            button.disabled = !hasFile;
+            button.classList.toggle('read', hasFile && isCurrentFileRead());
+
+            if (!hasFile) {
+                button.textContent = '○ Nepřečteno';
+                button.title = 'Nejdřív otevři článek';
+                return;
+            }
+
+            if (isCurrentFileRead()) {
+                button.textContent = '✓ Přečteno';
+                button.title = 'Kliknutím označení přečtení zrušíš';
+                button.setAttribute('aria-pressed', 'true');
+            } else {
+                button.textContent = '○ Nepřečteno';
+                button.title = 'Označit aktuální článek jako přečtený';
+                button.setAttribute('aria-pressed', 'false');
+            }
+        }
+
+        function toggleCurrentRead() {
+            if (!currentFilePath) return;
+
+            const completed = getCompletedTopics();
+            completed[currentFilePath] = !completed[currentFilePath];
+
+            localStorage.setItem(
+                STORAGE_KEYS.completed,
+                JSON.stringify(completed)
+            );
+
+            updateReadButton();
+            updateSidebarReadMarkers();
+        }
+
+        /* Zelená fajfka u přečtených článků v seznamu */
+        function updateSidebarReadMarkers() {
+            const completed = getCompletedTopics();
+
+            document.querySelectorAll('#sidebar button.file-btn').forEach(button => {
+                const path = getFilePathFromButton(button);
+                const isRead = Boolean(completed[path]);
+                let marker = button.querySelector('.completed-marker');
+
+                if (isRead && !marker) {
+                    marker = document.createElement('span');
+                    marker.className = 'completed-marker';
+                    marker.textContent = ' ✓';
+                    marker.style.color = '#79d98b';
+                    button.appendChild(marker);
+                } else if (!isRead && marker) {
+                    marker.remove();
+                }
+            });
+        }
+
+        function updateReadingProgress() {
+            const main = document.getElementById('mainContent');
+            const maxScroll = main.scrollHeight - main.clientHeight;
+            const percent = maxScroll > 0
+                ? Math.min(100, Math.max(0, main.scrollTop / maxScroll * 100))
+                : 0;
+
+            document.getElementById('readingProgress').style.width = percent + '%';
+        }
+
+        function saveReadingPosition() {
+            if (!currentFilePath) return;
+
+            const positions = getPositions();
+            positions[currentFilePath] =
+                document.getElementById('mainContent').scrollTop;
+
+            localStorage.setItem(
+                STORAGE_KEYS.positions,
+                JSON.stringify(positions)
+            );
+            localStorage.setItem(STORAGE_KEYS.lastFile, currentFilePath);
+        }
+
+        function restoreReadingPosition(filePath) {
+            const positions = getPositions();
+            const position = positions[filePath] || 0;
+            const main = document.getElementById('mainContent');
+
+            requestAnimationFrame(() => {
+                main.scrollTop = position;
+                updateReadingProgress();
+            });
+        }
+
+        function changeFontSize(direction) {
+            fontSize = Math.min(26, Math.max(12, fontSize + direction));
+            document.documentElement.style.setProperty(
+                '--font-size',
+                fontSize + 'px'
+            );
+            localStorage.setItem(STORAGE_KEYS.fontSize, fontSize);
+        }
+
+        function toggleReadingMode() {
+            const enabled = document.body.classList.toggle('reading-mode');
+
+            localStorage.setItem(STORAGE_KEYS.readingMode, String(enabled));
+            document.getElementById('readingModeBtn').textContent = enabled
+                ? '📖 Vypnout čtecí režim'
+                : '📖 Čtecí režim';
+        }
+
+        function scrollToTop() {
+            document.getElementById('mainContent')
+                .scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function buildTableOfContents() {
+            const markdownContent = document.getElementById('markdownContent');
+            const tocList = document.getElementById('tocList');
+            const hint = document.getElementById('tocHint');
+
+            tocList.innerHTML = '';
+
+            const headings = Array.from(
+                markdownContent.querySelectorAll('h1,h2,h3')
+            );
+
+            if (!headings.length) {
+                hint.style.display = 'block';
+                hint.textContent = 'V tomto článku nejsou žádné nadpisy.';
+                return;
+            }
+
+            hint.style.display = 'none';
+
+            headings.forEach((heading, index) => {
+                const id = 'ops-heading-' + index;
+                heading.id = id;
+
+                const li = document.createElement('li');
+                const button = document.createElement('button');
+
+                button.className = 'toc-h' + heading.tagName.substring(1);
+                button.textContent = heading.textContent;
+                button.title = 'Přejít na: ' + heading.textContent;
+                button.onclick = () => {
+                    const main = document.getElementById('mainContent');
+                    const headingTop = heading.getBoundingClientRect().top
+                        - main.getBoundingClientRect().top
+                        + main.scrollTop;
+
+                    main.scrollTo({
+                        top: headingTop - 15,
+                        behavior: 'smooth'
+                    });
+                };
+
+                li.appendChild(button);
+                tocList.appendChild(li);
+            });
+        }
+
         function navigateToWikiTarget(target) {
             if (!target) return;
-            let norm = target.toLowerCase().trim().replace(/\.md$/, '').replace(/^md\//, '');
-            let mappedFile = WIKI_MAP[norm];
 
-            // Pokud není přímo v mapě, zkusíme najít tlačítko v sidebaru odpovídající názvu
+            const normalized = normalizeWikiTarget(target);
+            let mappedFile = WIKI_MAP[normalized];
+
             if (!mappedFile) {
-                let buttons = Array.from(document.querySelectorAll('sidebar button'));
-                let foundBtn = buttons.find(b => {
-                    let onclick = b.getAttribute('onclick') || '';
-                    return onclick.toLowerCase().includes(norm);
-                });
-                if (foundBtn) {
-                    foundBtn.click();
+                const buttons = Array.from(
+                    document.querySelectorAll('#sidebar button.file-btn')
+                );
+
+                const foundButton = buttons.find(button =>
+                    (button.getAttribute('onclick') || '')
+                        .toLowerCase().includes(normalized)
+                );
+
+                if (foundButton) {
+                    foundButton.click();
                     return;
+                }
+
+                if (/\.md$/i.test(target)) {
+                    const fileName = target.split('/').pop();
+                    const candidate = 'md/' + fileName;
+                    const button = findMarkdownButton(candidate);
+
+                    if (button) {
+                        loadMarkdown(candidate, button);
+                        return;
+                    }
                 }
             }
 
             if (mappedFile) {
-                let foundBtn = Array.from(document.querySelectorAll('sidebar button')).find(b => {
-                    let onclick = b.getAttribute('onclick') || '';
-                    return onclick.includes(mappedFile.split('/').pop());
-                });
-                loadMarkdown(mappedFile, foundBtn);
-                if (foundBtn) {
-                    foundBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-                let mainElem = document.querySelector('main');
-                if (mainElem) mainElem.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                // Pokud téma nemá vlastní soubor, zkusíme jej vyhledat v postranním panelu
-                let searchInput = document.getElementById('mdSearchInput');
-                if (searchInput) {
-                    searchInput.value = target;
-                    filterMarkdownDocs();
-                    searchInput.focus();
-                }
+                loadMarkdown(mappedFile, findMarkdownButton(mappedFile));
+                return;
+            }
+
+            document.getElementById('appLayout')
+                .classList.remove('sidebar-hidden');
+
+            const toggle = document.getElementById('sidebarToggle');
+            toggle.innerHTML = '&lt;';
+            toggle.title = 'Schovat výběr souborů';
+            toggle.setAttribute('aria-expanded', 'true');
+
+            const searchInput = document.getElementById('mdSearchInput');
+
+            if (searchInput) {
+                searchInput.value = target;
+                filterMarkdownDocs();
+                searchInput.focus();
             }
         }
 
-        function loadMarkdown(filePath, btnElement) {
+        async function loadMarkdown(filePath, btnElement) {
+            if (!filePath) return;
+
+            if (currentFilePath) saveReadingPosition();
+
+            const requestId = ++loadRequestId;
             currentFilePath = filePath;
 
-            // Aktualizace URL hash pro přímé sdílení a historii prohlížeče
-            let fileName = filePath.split('/').pop();
-            if (window.location.hash !== '#' + fileName) {
-                history.pushState(null, '', '#' + fileName);
+            localStorage.setItem(STORAGE_KEYS.lastFile, filePath);
+            updateReadButton();
+
+            const fileName = filePath.split('/').pop();
+            const placeholder = document.getElementById('placeholderState');
+            const markdownContent = document.getElementById('markdownContent');
+            const downloadContainer = document.getElementById('downloadContainer');
+
+            if (window.location.hash !== '#' + encodeURIComponent(fileName)) {
+                history.pushState(null, '', '#' + encodeURIComponent(fileName));
             }
 
-            // Označení aktivního tlačítka v menu
-            document.querySelectorAll('sidebar button').forEach(b => b.classList.remove('active'));
-            if (btnElement) {
-                btnElement.classList.add('active');
-            } else {
-                // Pokus najít tlačítko podle souboru
-                let matchBtn = Array.from(document.querySelectorAll('sidebar button')).find(b => {
-                    let onclick = b.getAttribute('onclick') || '';
-                    return onclick.includes(fileName);
-                });
-                if (matchBtn) matchBtn.classList.add('active');
+            document.querySelectorAll('#sidebar button.file-btn')
+                .forEach(button => button.classList.remove('active'));
+
+            if (!btnElement) btnElement = findMarkdownButton(filePath);
+            if (btnElement) btnElement.classList.add('active');
+
+            placeholder.style.display = 'none';
+            downloadContainer.style.display = 'none';
+            document.getElementById('studyPanel').hidden = true;
+
+            markdownContent.innerHTML =
+                '<p class="muted" style="text-align:center;padding:40px">Načítám moudra z Markdownu...</p>';
+
+            try {
+                const response = await fetch(filePath);
+
+                if (!response.ok) {
+                    throw new Error('Soubor nebyl nalezen');
+                }
+
+                const markdown = await response.text();
+
+                /* Pokud uživatel mezitím otevřel jiný článek,
+                   starší požadavek nesmí přepsat jeho obsah. */
+                if (requestId !== loadRequestId) return;
+
+                const processed = processMarkdownWikilinks(markdown);
+                markdownContent.innerHTML = marked.parse(processed);
+
+                buildTableOfContents();
+
+                const downloadBtn = document.getElementById('downloadBtn');
+                downloadBtn.href = filePath;
+                downloadBtn.download = fileName;
+                downloadBtn.textContent = '📥 Stáhnout ' + fileName;
+                downloadContainer.style.display = 'block';
+
+                updateReadButton();
+                restoreReadingPosition(filePath);
+                updateReadingProgress();
+            } catch (error) {
+                if (requestId !== loadRequestId) return;
+
+                console.error('Chyba při načítání:', error);
+
+                markdownContent.innerHTML = `
+                    <div style="text-align:center;padding:30px">
+                        <h3 style="color:#f87171">Nejde 😭</h3>
+                        <p class="muted">Soubor se nepodařilo načíst. Zkontroluj, zda existuje:</p>
+                        <code>${escapeHtml(filePath)}</code>
+                        <p class="muted">Pokud otevíráš HTML přímo jako file://, zkus ho spustit přes lokální webový server.</p>
+                    </div>`;
+
+                document.getElementById('tocList').innerHTML = '';
+                document.getElementById('tocHint').style.display = 'block';
+                document.getElementById('tocHint').textContent =
+                    'Obsah se nepodařilo vytvořit.';
+                updateReadingProgress();
             }
-
-            // Skrytí placeholderu a schování tlačítka během načítání
-            document.getElementById('placeholderState').style.display = 'none';
-            document.getElementById('downloadContainer').style.display = 'none';
-            document.getElementById('markdownContent').innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 40px;">Načítám moudra z Markdownu...</p>';
-
-            fetch(filePath)
-                .then(response => {
-                    if (!response.ok) throw new Error('Soubor nenalezen');
-                    return response.text();
-                })
-                .then(markdown => {
-                    // Předzpracování wikilinků a formátování
-                    let processed = processMarkdownWikilinks(markdown);
-
-                    // Vykreslení markdownu pomocí knihovny Marked
-                    document.getElementById('markdownContent').innerHTML = marked.parse(processed);
-                    
-                    // Nastavení a zobrazení tlačítka pro stažení až na konci obsahu
-                    let downloadBtn = document.getElementById('downloadBtn');
-                    downloadBtn.href = filePath;
-                    downloadBtn.download = fileName;
-                    downloadBtn.innerText = `📥 Stáhnout ${fileName}`;
-                    document.getElementById('downloadContainer').style.display = 'block';
-
-                    // Posun na začátek stránky
-                    let mainElem = document.querySelector('main');
-                    if (mainElem) mainElem.scrollTop = 0;
-                })
-                .catch(err => {
-                    document.getElementById('markdownContent').innerHTML = `
-                        <div style="text-align: center; padding: 30px;">
-                            <h3 style="color: #f87171; margin-bottom: 8px;">Nejde</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem;">Soubor se nepodařilo načíst.</p>
-                        </div>
-                    `;
-                });
         }
 
-        // Globální odchytávání kliknutí na odkazy uvnitř markdown obsahu
-        document.getElementById('markdownContent').addEventListener('click', function(e) {
-            let link = e.target.closest('a');
-            if (!link) return;
+        document.getElementById('markdownContent')
+            .addEventListener('click', function(event) {
+                const link = event.target.closest('a');
+                if (!link) return;
 
-            // Klik na wiki odkaz
-            let wikiTarget = link.getAttribute('data-wiki');
-            if (wikiTarget) {
-                e.preventDefault();
-                navigateToWikiTarget(wikiTarget);
-                return;
-            }
+                const wikiTarget = link.getAttribute('data-wiki');
 
-            let href = link.getAttribute('href');
-            // Externí webové odkazy otevírat v novém okně
-            if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                return;
-            }
+                if (wikiTarget) {
+                    event.preventDefault();
+                    navigateToWikiTarget(wikiTarget);
+                    return;
+                }
 
-            // Odkazy na jiné .md soubory načítat dynamicky
-            if (href && (href.endsWith('.md') || href.includes('.md#'))) {
-                e.preventDefault();
-                let cleanFile = href.split('#')[0].replace(/^(\.\.\/|\.\/)/, '');
-                if (!cleanFile.startsWith('md/')) cleanFile = 'md/' + cleanFile;
-                navigateToWikiTarget(cleanFile);
-                return;
-            }
-        });
+                const href = link.getAttribute('href');
 
-        // Funkce pro živé vyhledávání / filtrování tlačítek podle názvu souboru
+                if (href && /^https?:\/\//i.test(href)) {
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    return;
+                }
+
+                if (href && /\.md(?:#.*)?$/i.test(href)) {
+                    event.preventDefault();
+
+                    const cleanFile = decodeURIComponent(href.split('#')[0])
+                        .replace(/^(\.\.\/|\.\/)+/, '');
+
+                    const filePath = cleanFile.startsWith('md/')
+                        ? cleanFile
+                        : 'md/' + cleanFile;
+
+                    navigateToWikiTarget(filePath);
+                }
+            });
+
         function filterMarkdownDocs() {
-            let input = document.getElementById('mdSearchInput');
-            let filter = input.value.toLowerCase();
-            let navGroups = document.querySelectorAll('.nav-group');
+            const filter = document.getElementById('mdSearchInput')
+                .value.toLowerCase().trim();
 
-            navGroups.forEach(group => {
-                let items = group.querySelectorAll('li');
+            document.querySelectorAll('.nav-group').forEach(group => {
                 let hasVisibleItems = false;
 
-                items.forEach(li => {
-                    let button = li.querySelector('button');
-                    let textValue = button.textContent || button.innerText;
+                group.querySelectorAll('li').forEach(item => {
+                    const button = item.querySelector('button.file-btn');
+                    const label = (button.textContent || '')
+                        .replace(/\s*✓\s*$/, '')
+                        .toLowerCase();
 
-                    if (textValue.toLowerCase().indexOf(filter) > -1) {
-                        li.style.display = "";
-                        hasVisibleItems = true;
-                    } else {
-                        li.style.display = "none";
-                    }
+                    const matches = label.includes(filter);
+                    item.style.display = matches ? '' : 'none';
+
+                    if (matches) hasVisibleItems = true;
                 });
 
-                group.style.display = hasVisibleItems ? "" : "none";
+                group.style.display = hasVisibleItems ? '' : 'none';
             });
         }
 
-        // Obsluha URL hashe při načtení a změně historie prohlížeče
-        function checkUrlHash() {
-            let hash = window.location.hash.replace(/^#/, '');
-            if (hash) {
-                let filePath = hash.startsWith('md/') ? hash : 'md/' + hash;
-                let foundBtn = Array.from(document.querySelectorAll('sidebar button')).find(b => {
-                    let onclick = b.getAttribute('onclick') || '';
-                    return onclick.includes(hash.split('/').pop());
-                });
-                loadMarkdown(filePath, foundBtn);
+        function openStudyPanel() {
+            const panel = document.getElementById('studyPanel');
+            panel.hidden = !panel.hidden;
+
+            if (!panel.hidden) {
+                if (!document.querySelector('.quiz-question')) buildQuiz();
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
-        window.addEventListener('load', checkUrlHash);
+        function renderCard() {
+            const card = FLASHCARDS[currentCard];
+
+            document.getElementById('cardLabel').textContent =
+                cardFlipped ? 'Odpověď' : 'Otázka';
+
+            document.getElementById('cardText').textContent =
+                cardFlipped ? card.a : card.q;
+
+            document.getElementById('cardCounter').textContent =
+                'Kartička ' + (currentCard + 1) + ' z ' + FLASHCARDS.length;
+        }
+
+        function flipCard() {
+            cardFlipped = !cardFlipped;
+            renderCard();
+        }
+
+        function nextCard() {
+            currentCard = (currentCard + 1) % FLASHCARDS.length;
+            cardFlipped = false;
+            renderCard();
+        }
+
+        function previousCard() {
+            currentCard = (currentCard - 1 + FLASHCARDS.length)
+                % FLASHCARDS.length;
+            cardFlipped = false;
+            renderCard();
+        }
+
+        function buildQuiz() {
+            const form = document.getElementById('quizForm');
+            form.innerHTML = '';
+            document.getElementById('quizResult').textContent = '';
+
+            const questions = [...QUIZ_QUESTIONS]
+                .sort(() => Math.random() - .5)
+                .slice(0, 5);
+
+            questions.forEach((question, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'quiz-question';
+
+                const title = document.createElement('strong');
+                title.textContent = (index + 1) + '. ' + question.q;
+                wrapper.appendChild(title);
+
+                question.options.forEach((option, optionIndex) => {
+                    const label = document.createElement('label');
+                    const input = document.createElement('input');
+
+                    input.type = 'radio';
+                    input.name = 'question-' + index;
+                    input.value = optionIndex;
+                    input.dataset.answer = question.answer;
+
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(option));
+                    wrapper.appendChild(label);
+                });
+
+                form.appendChild(wrapper);
+            });
+        }
+
+        function gradeQuiz() {
+            const questions = Array.from(
+                document.querySelectorAll('.quiz-question')
+            );
+
+            if (!questions.length) {
+                buildQuiz();
+                document.getElementById('quizResult').textContent =
+                    'Vyplň nově vytvořený test.';
+                return;
+            }
+
+            let correct = 0;
+            let answered = 0;
+
+            questions.forEach(question => {
+                const selected = question.querySelector(
+                    'input[type="radio"]:checked'
+                );
+
+                if (selected) {
+                    answered++;
+                    if (Number(selected.value) === Number(selected.dataset.answer)) {
+                        correct++;
+                    }
+                }
+            });
+
+            document.getElementById('quizResult').textContent =
+                'Výsledek: ' + correct + ' / ' + questions.length +
+                ' správně. Zodpovězeno: ' + answered +
+                ' / ' + questions.length + '.';
+        }
+
+        function checkUrlHash() {
+            const hash = decodeURIComponent(
+                window.location.hash.replace(/^#/, '')
+            );
+
+            if (!hash) {
+                const lastFile = localStorage.getItem(STORAGE_KEYS.lastFile);
+                if (lastFile) {
+                    loadMarkdown(lastFile, findMarkdownButton(lastFile));
+                }
+                return;
+            }
+
+            const filePath = hash.startsWith('md/') ? hash : 'md/' + hash;
+            loadMarkdown(filePath, findMarkdownButton(filePath));
+        }
+
+        document.getElementById('mainContent').addEventListener('scroll', () => {
+            updateReadingProgress();
+
+            clearTimeout(scrollSaveTimer);
+            scrollSaveTimer = setTimeout(saveReadingPosition, 250);
+        });
+
+        window.addEventListener('beforeunload', saveReadingPosition);
         window.addEventListener('popstate', checkUrlHash);
+
+        window.addEventListener('load', () => {
+            document.documentElement.style.setProperty(
+                '--font-size',
+                fontSize + 'px'
+            );
+
+            if (localStorage.getItem(STORAGE_KEYS.readingMode) === 'true') {
+                document.body.classList.add('reading-mode');
+                document.getElementById('readingModeBtn').textContent =
+                    '📖 Vypnout čtecí režim';
+            }
+
+            updateSidebarReadMarkers();
+            updateReadButton();
+            renderCard();
+            buildQuiz();
+
+            const hash = decodeURIComponent(
+                window.location.hash.replace(/^#/, '')
+            );
+            const lastFile = localStorage.getItem(STORAGE_KEYS.lastFile);
+
+            const initialFile = hash
+                ? (hash.startsWith('md/') ? hash : 'md/' + hash)
+                : lastFile;
+
+            if (initialFile) {
+                loadMarkdown(initialFile, findMarkdownButton(initialFile));
+            }
+        });
+
+        /* OVLÁDÁNÍ KLÁVESNICÍ */
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                const panel = document.getElementById('studyPanel');
+                if (!panel.hidden) panel.hidden = true;
+            }
+
+            if ((event.ctrlKey || event.metaKey) &&
+                event.key.toLowerCase() === 'k') {
+                event.preventDefault();
+
+                const search = document.getElementById('mdSearchInput');
+
+                document.getElementById('appLayout')
+                    .classList.remove('sidebar-hidden');
+
+                document.getElementById('sidebarToggle').innerHTML = '&lt;';
+                search.focus();
+                search.select();
+            }
+        });
+
+        document.getElementById('flashcard').addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                flipCard();
+            }
+        });
     </script>
 </body>
 </html>
