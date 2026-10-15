@@ -678,7 +678,7 @@ tags: [os]
 ![[6ec1a6fb8def4315e0d84f3de39c75061b414bed4ab5b82fa28a5114fd34da0e.png]]
 
 ## UNIX a UNIX LIKE SYSTÉMY
-
+![Juchelka jse speciální](img/IHATETHISFUCKINGBULLSHITKILLYOURSELF.svg)
 - Většina UNIX a UNIX LIKE systémů má podobnou strukturu (kromně těch upravených pro RealTimový provoz - RT).
 - Jádro běží v privilegovaném režimu, je tvořeno ==jediným souborem== a využívá jediný souvislý adresový prostor, proto je nazýváno **monolitické**, i když má bohatou vnitřní strukturu. U linuxu je to soubor `/boot/vmlinuz`.
 - UNIXové systémy jsou **víceprocesorové, víceuživatelské, víceúlohové, síťové** systémy od svého počátku (1970).
