@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 680" width="100%" height="100%">
+  <defs>
+    <!-- Background & Styling -->
+    <style>
+      .bg { fill: #0f172a; }
+      .title { font-family: system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; fill: #f8fafc; text-anchor: middle; }
+      .subtitle { font-family: system-ui, -apple-system, sans-serif; font-size: 14px; fill: #94a3b8; text-anchor: middle; }
+      .col-header { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; fill: #cbd5e1; }
+      .row-title { font-family: system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 700; fill: #f8fafc; }
+      .row-sub { font-family: system-ui, -apple-system, sans-serif; font-size: 11px; fill: #64748b; }
+      .badge-text { font-family: system-ui, -apple-system, sans-serif; font-size: 10px; font-weight: 600; text-anchor: middle; }
+      .card { fill: #1e293b; rx: 10px; stroke: #334155; stroke-width: 1; }
+    </style>
+
+    <!-- Gradients -->
+    <linearGradient id="fat32-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#1e293b" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="ntfs-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#1e293b" stop-opacity="0.8"/>
+    </linearGradient>
+
+    <!-- Icons -->
+    <g id="icon-check">
+      <circle cx="0" cy="0" r="9" fill="#22c55e" fill-opacity="0.2"/>
+      <path d="M-3.5 0 L-1 2.5 L3.5 -2.5" stroke="#22c55e" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g id="icon-cross">
+      <circle cx="0" cy="0" r="9" fill="#ef4444" fill-opacity="0.2"/>
+      <path d="M-2.5 -2.5 L2.5 2.5 M2.5 -2.5 L-2.5 2.5" stroke="#ef4444" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+    <g id="icon-partial">
+      <circle cx="0" cy="0" r="9" fill="#eab308" fill-opacity="0.2"/>
+      <path d="M-3 0 L3 0" stroke="#eab308" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="680" class="bg"/>
+
+  <!-- Header -->
+  <text x="550" y="40" class="title">Rozšířené Srovnání Souborových Systémů</text>
+  <text x="550" y="62" class="subtitle">FAT32 • NTFS • ext2 • ext4 • ZFS • Btrfs</text>
+
+  <!-- Table Headers -->
+  <g transform="translate(0, 90)">
+    <text x="50" y="20" class="col-header">Systém &amp; Určení</text>
+    <text x="230" y="20" class="col-header">Max. Soubor</text>
+    <text x="330" y="20" class="col-header" text-anchor="middle">Žurnalování</text>
+    <text x="415" y="20" class="col-header" text-anchor="middle">Oprávnění</text>
+    <text x="495" y="20" class="col-header" text-anchor="middle">Kvóty</text>
+    <text x="575" y="20" class="col-header" text-anchor="middle">Komprese</text>
+    <text x="655" y="20" class="col-header" text-anchor="middle">Šifrování</text>
+    <text x="735" y="20" class="col-header" text-anchor="middle">Snapshots</text>
+    <text x="815" y="20" class="col-header" text-anchor="middle">RAID</text>
+    <text x="895" y="20" class="col-header" text-anchor="middle">Deduplikace</text>
+    <text x="980" y="20" class="col-header" text-anchor="middle">Self-Healing</text>
+    <line x1="40" y1="30" x2="1060" y2="30" stroke="#334155" stroke-width="2"/>
+  </g>
+
+  <!-- Rows Container -->
+  <g transform="translate(40, 130)">
+
+    <!-- ROW 1: FAT32 -->
+    <g transform="translate(0, 0)">
+      <rect width="1020" height="72" class="card" fill="url(#fat32-grad)"/>
+      <text x="15" y="28" class="row-title">FAT32</text>
+      <text x="15" y="46" class="row-sub">USB disky, SD karty</text>
+      <text x="15" y="60" class="row-sub" fill="#38bdf8">Simple File Handling</text>
+      
+      <rect x="180" y="24" width="50" height="22" rx="4" fill="#ef4444" fill-opacity="0.2"/>
+      <text x="205" y="39" class="badge-text" fill="#fca5a5">4 GB</text>
+      
+      <use href="#icon-cross" x="290" y="36"/>
+      <use href="#icon-cross" x="375" y="36"/>
+      <use href="#icon-cross" x="455" y="36"/>
+      <use href="#icon-cross" x="535" y="36"/>
+      <use href="#icon-cross" x="615" y="36"/>
+      <use href="#icon-cross" x="695" y="36"/>
+      <use href="#icon-cross" x="775" y="36"/>
+      <use href="#icon-cross" x="855" y="36"/>
+      <use href="#icon-cross" x="940" y="36"/>
+    </g>
+
+    <!-- ROW 2: NTFS -->
+    <g transform="translate(0, 82)">
+      <rect width="1020" height="72" class="card" fill="url(#ntfs-grad)"/>
+      <text x="15" y="28" class="row-title">NTFS</text>
+      <text x="15" y="46" class="row-sub">Windows OS</text>
+      <text x="15" y="60" class="row-sub" fill="#38bdf8">MFT, B-Tree, Streams</text>
+      
+      <text x="180" y="40" font-family="system-ui" font-size="12px" font-weight="600" fill="#cbd5e1">16 TB</text>
+      
+      <use href="#icon-check" x="290" y="36"/>
+      <use href="#icon-check" x="375" y="36"/>
+      <use href="#icon-check" x="455" y="36"/>
+      <use href="#icon-check" x="535" y="36"/>
+      <use href="#icon-check" x="615" y="36"/>
+      <use href="#icon-cross" x="695" y="36"/>
+      <use href="#icon-cross" x="775" y="36"/>
+      <rect x="825" y="25" width="60" height="20" rx="10" fill="#eab308" fill-opacity="0.15"/>
+      <text x="855" y="39" class="badge-text" fill="#fde047">Server*</text>
+      <use href="#icon-cross" x="940" y="36"/>
+    </g>
+
+    <!-- ROW 3: ext2 -->
+    <g transform="translate(0, 164)">
+      <rect width="1020" height="72" class="card"/>
+      <text x="15" y="28" class="row-title">ext2</text>
+      <text x="15" y="46" class="row-sub">Historický Linux, Flash</text>
+      <text x="15" y="60" class="row-sub" fill="#38bdf8">Direct Inodes, Block Groups</text>
+      
+      <text x="180" y="40" font-family="system-ui" font-size="12px" font-weight="600" fill="#cbd5e1">2 TB</text>
+      
+      <use href="#icon-cross" x="290" y="36"/>
+      <use href="#icon-check" x="375" y="36"/>
+      <use href="#icon-check" x="455" y="36"/>
+      <use href="#icon-cross" x="535" y="36"/>
+      <use href="#icon-cross" x="615" y="36"/>
+      <use href="#icon-cross" x="695" y="36"/>
+      <use href="#icon-cross" x="775" y="36"/>
+      <use href="#icon-cross" x="855" y="36"/>
+      <use href="#icon-cross" x="940" y="36"/>
+    </g>
+
+    <!-- ROW 4: ext4 -->
+    <g transform="translate(0, 246)">
+      <rect width="1020" height="72" class="card"/>
+      <text x="15" y="28" class="row-title">ext4</text>
+      <text x="15" y="46" class="row-sub">Moderní Linux, Android</text>
+      <text x="15" y="60" class="row-sub" fill="#38bdf8">Extents, HTree Inodes</text>
+      
+      <text x="180" y="40" font-family="system-ui" font-size="12px" font-weight="600" fill="#cbd5e1">16 TB</text>
+      
+      <use href="#icon-check" x="290" y="36"/>
+      <use href="#icon-check" x="375" y="36"/>
+      <use href="#icon-check" x="455" y="36"/>
+      <use href="#icon-cross" x="535" y="36"/>
+      <use href="#icon-check" x="615" y="36"/>
+      <use href="#icon-cross" x="695" y="36"/>
+      <use href="#icon-cross" x="775" y="36"/>
+      <use href="#icon-cross" x="855" y="36"/>
+      <use href="#icon-cross" x="940" y="36"/>
+    </g>
+
+    <!-- ROW 5: ZFS -->
+    <g transform="translate(0, 328)">
+      <rect width="1020" height="72" class="card"/>
+      <text x="15" y="28" class="row-title">ZFS</text>
+      <text x="15" y="46" class="row-sub">Servery, NAS, Enterprise</text>
+      <text x="15" y="60" class="row-sub" fill="#38bdf8">Storage Pools (zpools), CoW</text>
+      
+      <text x="180" y="40" font-family="system-ui" font-size="12px" font-weight="600" fill="#a855f7">16 EB</text>
+      
+      <use href="#icon-check" x="290" y="36"/>
+      <use href="#icon-check" x="375" y="36"/>
+      <use href="#icon-check" x="455" y="36"/>
+      <use href="#icon-check" x="535" y="36"/>
+      <use href="#icon-check" x="615" y="36"/>
+      <use href="#icon-check" x="695" y="36"/>
+      <use href="#icon-check" x="775" y="36"/>
+      <use href="#icon-check" x="855" y="36"/>
+      <use href="#icon-check" x="940" y="36"/>
+    </g>
+
+    <!-- ROW 6: Btrfs -->
+    <g transform="translate(0, 410)">
+      <rect width="1020" height="72" class="card"/>
+      <text x="15" y="28" class="row-title">Btrfs</text>
+      <text x="15" y="46" class="row-sub">Linux, Synology NAS</text>
+      <text x="15" y="60" class="row-sub" fill="#38bdf8">B-Trees, Copy-on-Write</text>
+      
+      <text x="180" y="40" font-family="system-ui" font-size="12px" font-weight="600" fill="#06b6d4">16 EB</text>
+      
+      <use href="#icon-check" x="290" y="36"/>
+      <use href="#icon-check" x="375" y="36"/>
+      <use href="#icon-check" x="455" y="36"/>
+      <use href="#icon-check" x="535" y="36"/>
+      <rect x="585" y="25" width="60" height="20" rx="10" fill="#ef4444" fill-opacity="0.15"/>
+      <text x="615" y="39" class="badge-text" fill="#fca5a5">Ext.*</text>
+      <use href="#icon-check" x="695" y="36"/>
+      <use href="#icon-check" x="775" y="36"/>
+      <use href="#icon-check" x="855" y="36"/>
+      <use href="#icon-check" x="940" y="36"/>
+    </g>
+  </g>
+
+  <!-- Legend & Notes -->
+  <g transform="translate(50, 625)">
+    <text x="0" y="0" font-family="system-ui, -apple-system, sans-serif" font-size="11px" fill="#94a3b8">
+      <tspan font-weight="700" fill="#f8fafc">Vysvětlivky k parametrům:</tspan>
+      • <tspan fill="#38bdf8">File Handling</tspan>: Architektura alokace bloků a adresování (nativní Inodes, Extents, B-Trees vs. zpool)
+      • <tspan fill="#cbd5e1">Deduplikace</tspan>: Eliminace duplicitních bloků dat v reálném čase nebo skriptem
+    </text>
+    <text x="0" y="16" font-family="system-ui, -apple-system, sans-serif" font-size="11px" fill="#64748b">
+      * NTFS Deduplikace je dostupná pouze ve Windows Serveru. Btrfs nativně šifrování na úrovni souborového systému nemá (řeší se např. pomocí LUKS v Linuxovém jádře).
+    </text>
+  </g>
+</svg>
