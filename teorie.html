@@ -84,11 +84,74 @@
         sidebar button.file-btn.active {
             background: #332222; color: var(--accent-hover); border-color: var(--accent); font-weight: bold;
         }
-        .sidebar-section {
-            border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; background: rgba(0,0,0,.12);
+
+        /* TOC Bubble / Floating Widget v pravém dolním rohu */
+        .toc-bubble-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1500;
         }
-        .section-heading { font-size: .85rem; color: #fff; font-weight: bold; margin: 0 0 10px; }
-        #tocList { padding-left: 0; margin: 0; list-style: none; max-height: 45vh; overflow-y: auto; }
+
+        .toc-fab {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            border: 1px solid #ff7777;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 22px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .toc-fab:hover {
+            background: var(--accent-hover);
+            transform: scale(1.05);
+        }
+
+        .toc-popup {
+            position: absolute;
+            bottom: 68px;
+            right: 0;
+            width: 320px;
+            max-height: 420px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+        }
+
+        .toc-bubble-container.open .toc-popup {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .toc-header-title {
+            font-size: .85rem;
+            color: #fff;
+            font-weight: bold;
+            margin: 0 0 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        #tocList { padding-left: 0; margin: 0; list-style: none; overflow-y: auto; flex: 1; }
         #tocList li { margin: 3px 0; }
         #tocList button {
             display: block; width: 100%; border: 0; background: transparent; color: #bbb; text-align: left;
@@ -209,7 +272,6 @@
             .reading-mode .content-box { padding: 24px; }
             .reader-toolbar { gap: 6px; }
             .reader-toolbar .tool-btn { font-size: .82rem; padding: 7px 9px; }
-            #tocList { max-height: 24vh; }
         }
     </style>
 </head>
@@ -230,12 +292,6 @@
             <div class="search-container">
                 <input type="text" id="mdSearchInput" placeholder="⌕ Hledat v názvech .md..."
                     oninput="filterMarkdownDocs()">
-            </div>
-
-            <div class="sidebar-section">
-                <div class="section-heading">☷ Obsah článku</div>
-                <p class="muted" id="tocHint">Otevři článek, aby se zde zobrazily nadpisy.</p>
-                <ul id="tocList"></ul>
             </div>
 
             <div class="nav-group">
@@ -340,6 +396,21 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Floating TOC Bubble vpravo dole -->
+    <div class="toc-bubble-container" id="tocBubbleContainer">
+        <div class="toc-popup">
+            <div class="toc-header-title">
+                <span>☷ Obsah článku</span>
+                <span id="tocItemCount" class="muted" style="font-size:.75rem;"></span>
+            </div>
+            <p class="muted" id="tocHint" style="margin: 0; padding: 4px 0;">Otevři článek, aby se zde zobrazily nadpisy.</p>
+            <ul id="tocList"></ul>
+        </div>
+        <button class="toc-fab" id="tocFabBtn" onclick="toggleTocBubble()" title="Obsah článku" aria-label="Otevřít obsah článku">
+            ☷
+        </button>
     </div>
 
 <script>
@@ -514,7 +585,6 @@ function findMarkdownButton(filePath) {
         .find(button => getFilePathFromButton(button) === filePath);
 }
 
-/* Přepnutí sidebaru se symbolem a bez skoku ve čtení */
 function toggleSidebar() {
     const layout = document.getElementById('appLayout');
     const button = document.getElementById('sidebarToggle');
@@ -534,6 +604,11 @@ function toggleSidebar() {
             updateReadingProgress();
         }
     }));
+}
+
+function toggleTocBubble() {
+    const container = document.getElementById('tocBubbleContainer');
+    container.classList.toggle('open');
 }
 
 function isCurrentFileRead() {
@@ -622,14 +697,17 @@ function buildTableOfContents() {
     const markdownContent = document.getElementById('markdownContent');
     const tocList = document.getElementById('tocList');
     const hint = document.getElementById('tocHint');
+    const countBadge = document.getElementById('tocItemCount');
     tocList.innerHTML = '';
     const headings = Array.from(markdownContent.querySelectorAll('h1,h2,h3'));
     if (!headings.length) {
         hint.style.display = 'block';
         hint.textContent = 'V tomto článku nejsou žádné nadpisy.';
+        if (countBadge) countBadge.textContent = '';
         return;
     }
     hint.style.display = 'none';
+    if (countBadge) countBadge.textContent = '(' + headings.length + ')';
     headings.forEach((heading, index) => {
         heading.id = 'ops-heading-' + index;
         const li = document.createElement('li');
@@ -641,6 +719,7 @@ function buildTableOfContents() {
             const main = document.getElementById('mainContent');
             const headingTop = heading.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop;
             main.scrollTo({ top: headingTop - 15, behavior: 'smooth' });
+            document.getElementById('tocBubbleContainer').classList.remove('open');
         };
         li.appendChild(button);
         tocList.appendChild(li);
@@ -718,8 +797,11 @@ async function loadMarkdown(filePath, btnElement) {
         console.error('Chyba při načítání:', error);
         markdownContent.innerHTML = `<div style="text-align:center;padding:30px"><h3 style="color:#f87171">Nejde 😭</h3><p class="muted">Soubor se nepodařilo načíst. Zkontroluj, zda existuje:</p><code>${escapeHtml(filePath)}</code><p class="muted">Pokud otevíráš HTML přímo jako file://, zkus ho spustit přes lokální webový server.</p></div>`;
         document.getElementById('tocList').innerHTML = '';
-        document.getElementById('tocHint').style.display = 'block';
-        document.getElementById('tocHint').textContent = 'Obsah se nepodařilo vytvořit.';
+        const hint = document.getElementById('tocHint');
+        hint.style.display = 'block';
+        hint.textContent = 'Obsah se nepodařilo vytvořit.';
+        const countBadge = document.getElementById('tocItemCount');
+        if (countBadge) countBadge.textContent = '';
         updateReadingProgress();
     }
 }
@@ -844,10 +926,22 @@ window.addEventListener('load', () => {
     const initialFile = hash ? (hash.startsWith('md/') ? hash : 'md/' + hash) : lastFile;
     if (initialFile) loadMarkdown(initialFile, findMarkdownButton(initialFile));
 });
+
+document.addEventListener('click', event => {
+    const container = document.getElementById('tocBubbleContainer');
+    if (container && container.classList.contains('open')) {
+        if (!container.contains(event.target)) {
+            container.classList.remove('open');
+        }
+    }
+});
+
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
         const panel = document.getElementById('studyPanel');
         if (panel && !panel.hidden) panel.hidden = true;
+        const tocContainer = document.getElementById('tocBubbleContainer');
+        if (tocContainer) tocContainer.classList.remove('open');
     }
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
