@@ -477,6 +477,30 @@ Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4</code><
       </div>
       <p>IP adresa, prefix (<code>24</code> = maska <code>255.255.255.0</code>), brána i DNS server odpovídají hodnotám v <code>__zadani.md</code> pro daný server. Adresa <strong>není</strong> převzatá z DHCP (<code>Get-NetIPAddress ... | Select PrefixOrigin</code> ukazuje <code>Manual</code>, ne <code>Dhcp</code>).</p>
 
+      <h4>Ověření konektivity a povolení pingů (Windows Defender Firewall)</h4>
+      <p>Ve výchozím nastavení blokuje Windows Defender Firewall příchozí ICMP Echo Request. Aby bylo možné ověřit spojení pingem mezi stroji (<code>SRV1-DC</code> a <code>SRV2-FS</code>), povolte pravidla pro ICMPv4 i ICMPv6 ve všech směrech:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Povolení pingu do všech směrů)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code># Povolení pingování do všech směrů (IPv4 i IPv6, Inbound i Outbound):
+New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any</code></pre>
+      </div>
+      <p>Následně ověřte spojení pingem na druhý stroj (např. ze SRV2-FS na SRV1-DC <code>192.168.X.10</code>):</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Test konektivity)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Test-NetConnection -ComputerName 192.168.X.10 -InformationLevel Detailed
+ping 192.168.X.10</code></pre>
+      </div>
+      <p>Příkaz <code>ping</code> vrací odpovědi s 0% ztrátou paketů a <code>Test-NetConnection</code> hlásí <code>PingSucceeded : True</code>.</p>
+
       <h3>5. Přihlášení administrátora funguje</h3>
       <p>Po odhlášení a novém přihlášení funguje přihlášení jako <code>Administrator</code> s heslem <code>Pa55w.rd</code> (lokálně — server ještě není v doméně). Žádný Microsoft účet u přihlášení nefiguruje — <code>Get-LocalUser</code> neobsahuje žádný účet typu Microsoft, jen vestavěné lokální účty.</p>
 

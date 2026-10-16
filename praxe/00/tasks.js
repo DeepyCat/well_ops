@@ -169,48 +169,81 @@ window.OPS_MODULE_TASKS["00"] = [
         </div>
       `;
 
+      const pingCard = `
+        <div class="ping-helper-card">
+          <div class="ping-helper-header">
+            <div class="ping-helper-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+              <span>FIREWALL: Povolení pingu (ICMP Echo) mezi virtuálními stroji</span>
+            </div>
+            <button type="button" class="ping-helper-btn" onclick="window.openPingModal ? window.openPingModal() : window.togglePingHelper(this)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+              <span>JAK POVOLIT PINGY</span>
+            </button>
+          </div>
+          <div class="ping-helper-desc">
+            Windows Server i Windows 11 ve výchozím nastavení blokují příchozí ICMP Echo Request. Pokud testujete spojení příkazem <code>ping</code> a výsledek je <em>"Request timed out"</em>, klikněte na tlačítko <strong>JAK POVOLIT PINGY</strong> pro otevření kompletního návodu nebo rozbalte příkazy níže pro povolení pravidel firewallu do všech směrů.
+          </div>
+          <div class="ping-helper-inline" style="display:block;">
+            <div class="ping-code-title">PowerShell příkaz pro povolení pingu do všech směrů (spustit na SRV1-DC, SRV2-FS i PC1-WIN):</div>
+            <pre class="ping-code-snippet"><code># Povolení ICMP Echo (ping) do všech směrů (IPv4 i IPv6, Inbound i Outbound):
+New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any</code></pre>
+          </div>
+        </div>
+      `;
+
       if (vm === "SRV1-DC") {
         return `
           ${nicBanner}
+          ${pingCard}
           <p>Pro pracoviště <strong>č. ${x}</strong> nastavte na rozhraní <strong>NIC 2 (Ethernet1)</strong> statickou IP adresu <strong>192.168.${x}.10/24</strong>, výchozí bránu <strong>192.168.${x}.1</strong> a preferovaný DNS server <strong>192.168.${x}.10</strong> (sám na sebe pro budoucí roli doménového řadiče a DNS).</p>
         `;
       }
       if (vm === "SRV2-FS") {
         return `
           ${nicBanner}
+          ${pingCard}
           <p>Pro pracoviště <strong>č. ${x}</strong> nastavte na rozhraní <strong>NIC 2 (Ethernet1)</strong> statickou IP adresu <strong>192.168.${x}.20/24</strong> (servery mají krok po 10), výchozí bránu <strong>192.168.${x}.1</strong> a preferovaný DNS <strong>192.168.${x}.10</strong> (směřující na SRV1-DC).</p>
         `;
       }
       return `
         ${nicBanner}
+        ${pingCard}
         <p>Pro klientskou stanici <strong>PC1-WIN</strong> ponechte síťové rozhraní NIC 2 (Ethernet1) ve výchozím nastavení <strong>DHCP</strong> (automatické přidělení adresy). Klient obdrží IP z dynamického rozsahu <strong>192.168.${x}.100 – 192.168.${x}.200</strong> v Modulu 2 po spuštění a autorizaci DHCP serveru na SRV1-DC.</p>
       `;
     },
     how: (vm, wsX) => {
       const x = wsX || 2;
       if (vm === "SRV1-DC") {
-        return `# 1. Zkontrolujte adaptéry (NIC 2 je v CyLabu Ethernet1):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet1" -IPAddress "192.168.${x}.10" -PrefixLength 24 -DefaultGateway "192.168.${x}.1"\n\n# 3. Nastavte DNS na adresu budoucího řadiče (sám na sebe):\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ServerAddresses ("192.168.${x}.10")`;
+        return `# 1. Zkontrolujte adaptéry (NIC 2 je v CyLabu Ethernet1):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet1" -IPAddress "192.168.${x}.10" -PrefixLength 24 -DefaultGateway "192.168.${x}.1"\n\n# 3. Nastavte DNS na adresu budoucího řadiče (sám na sebe):\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ServerAddresses ("192.168.${x}.10")\n\n# 4. Povolte ping ve Windows Defender Firewallu do všech směrů (tlačítko JAK POVOLIT PINGY):\nNew-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any`;
       }
       if (vm === "SRV2-FS") {
-        return `# 1. Zkontrolujte adaptéry (NIC 2 je v CyLabu Ethernet1):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet1" -IPAddress "192.168.${x}.20" -PrefixLength 24 -DefaultGateway "192.168.${x}.1"\n\n# 3. Nastavte DNS směřující na SRV1-DC:\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ServerAddresses ("192.168.${x}.10")`;
+        return `# 1. Zkontrolujte adaptéry (NIC 2 je v CyLabu Ethernet1):\nGet-NetAdapter\n\n# 2. Nastavte statickou IP a bránu na NIC 2:\nNew-NetIPAddress -InterfaceAlias "Ethernet1" -IPAddress "192.168.${x}.20" -PrefixLength 24 -DefaultGateway "192.168.${x}.1"\n\n# 3. Nastavte DNS směřující na SRV1-DC:\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ServerAddresses ("192.168.${x}.10")\n\n# 4. Povolte ping ve Windows Defender Firewallu do všech směrů (tlačítko JAK POVOLIT PINGY):\nNew-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any`;
       }
-      return `# 1. Zkontrolujte adaptéry (NIC 2 je v CyLabu Ethernet1):\nGet-NetAdapter\n\n# 2. Ověřte, že NIC 2 je nakonfigurován pro automatické DHCP:\nSet-NetIPInterface -InterfaceAlias "Ethernet1" -Dhcp Enabled\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ResetServerAddresses`;
+      return `# 1. Zkontrolujte adaptéry (NIC 2 je v CyLabu Ethernet1):\nGet-NetAdapter\n\n# 2. Ověřte, že NIC 2 je nakonfigurován pro automatické DHCP:\nSet-NetIPInterface -InterfaceAlias "Ethernet1" -Dhcp Enabled\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ResetServerAddresses\n\n# 3. Povolte ping ve Windows Defender Firewallu do všech směrů (tlačítko JAK POVOLIT PINGY):\nNew-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any\nNew-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any`;
     },
-    verify: (vm) => {
+    verify: (vm, wsX) => {
+      const x = wsX || 2;
       if (vm === "PC1-WIN") {
-        return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixOrigin\nGet-NetIPInterface -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, Dhcp`;
+        return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixOrigin\nGet-NetIPInterface -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, Dhcp\nGet-NetFirewallRule -DisplayName "*Ping*" | Select-Object DisplayName, Direction, Action, Enabled`;
       }
-      return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses`;
+      if (vm === "SRV1-DC") {
+        return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses\n\n# Test spojení pingem na SRV2-FS (po nastavení IP a povolení pingu na obou serverech):\nTest-NetConnection -ComputerName "192.168.${x}.20" -InformationLevel Detailed`;
+      }
+      return `Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet1 | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses\n\n# Test spojení pingem na SRV1-DC (po nastavení IP a povolení pingu na obou serverech):\nTest-NetConnection -ComputerName "192.168.${x}.10" -InformationLevel Detailed`;
     },
     expected: (vm, wsX) => {
       const x = wsX || 2;
       if (vm === "SRV1-DC") {
-        return `IPAddress       : 192.168.${x}.10\nPrefixLength    : 24\nPrefixOrigin    : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)    : 192.168.${x}.1\nServerAddresses : {192.168.${x}.10}`;
+        return `IPAddress       : 192.168.${x}.10\nPrefixLength    : 24\nPrefixOrigin    : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)    : 192.168.${x}.1\nServerAddresses : {192.168.${x}.10}\n\nTest-NetConnection (ping na SRV2-FS):\nPingSucceeded : True (po povolení pravidel firewallu do všech směrů přes tlačítko JAK POVOLIT PINGY)`;
       }
       if (vm === "SRV2-FS") {
-        return `IPAddress       : 192.168.${x}.20\nPrefixLength    : 24\nPrefixOrigin    : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)    : 192.168.${x}.1\nServerAddresses : {192.168.${x}.10}`;
+        return `IPAddress       : 192.168.${x}.20\nPrefixLength    : 24\nPrefixOrigin    : Manual (statická adresa, nikoliv DHCP)\nNextHop (GW)    : 192.168.${x}.1\nServerAddresses : {192.168.${x}.10}\n\nTest-NetConnection (ping na SRV1-DC):\nPingSucceeded : True (po povolení pravidel firewallu do všech směrů přes tlačítko JAK POVOLIT PINGY)`;
       }
-      return `Dhcp         : Enabled\nPrefixOrigin : Dhcp (případně AutoConfiguration před spuštěním DHCP serveru v Modulu 2)\nU klientského PC nesmí být zadána ruční statická adresa (Manual).`;
+      return `Dhcp         : Enabled\nPrefixOrigin : Dhcp (případně AutoConfiguration před spuštěním DHCP serveru v Modulu 2)\nU klientského PC nesmí být zadána ruční statická adresa (Manual).\nPravidla firewallu pro Ping (ICMPv4/v6 Inbound a Outbound) jsou ve stavu Enabled.`;
     }
   },
   {
