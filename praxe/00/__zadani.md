@@ -53,6 +53,32 @@ Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný a
 
 > PC1-WIN v tomto modulu ještě nemá funkční síť se zbytkem infrastruktury (DHCP server ještě neexistuje) — připojení k internetu/síti během vlastní instalace Windows 11 řešíme jen kvůli aktivaci a případnému stažení aktualizací, viz níže.
 
+### Jak povolit pingy (PowerShell pravidla firewallu do všech směrů)
+
+Ve výchozím nastavení Windows Server 2025 i Windows 11 blokuje příchozí ICMP Echo Request. Příkaz `ping` mezi servery proto končí chybou `Request timed out`.
+
+Pro povolení pingování v obou směrech (Inbound i Outbound) pro IPv4 i IPv6 na všech síťových profilech spusťte v PowerShellu jako Administrator:
+
+```powershell
+# 1. Povolení příchozího pingu (Inbound IPv4 a IPv6):
+New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any
+
+# 2. Povolení odchozího pingu (Outbound IPv4 a IPv6):
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any
+```
+
+Jednořádkový příkaz pro rychlé spuštění v PowerShellu:
+```powershell
+New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any
+```
+
+Alternativa přes vestavěná pravidla Windows:
+```powershell
+Enable-NetFirewallRule -Name "FPS-ICMP4-ERQ-In", "FPS-ICMP6-ERQ-In", "FPS-ICMP4-ERQ-Out", "FPS-ICMP6-ERQ-Out"
+```
+
 ### Aktivace Windows (LAB KEY)
 
 Všechny tři instalace se aktivují školními produktovými klíči **LAB KEY**.
@@ -100,7 +126,7 @@ Instalace Windows Serveru **nenabízí přihlášení Microsoft účtem** — ve
 
 ## Ověření (shrnutí, detaily viz `_vysledek.md`)
 
-- Server/klient odpovídá na `ping` a hostname sedí přesně podle tabulky výše.
+- Server/klient odpovídá na `ping` (po povolení pravidel firewallu viz sekce Jak povolit pingy) a hostname sedí přesně podle tabulky výše.
 - Přihlášení jako `Administrator` / `Pa55w.rd` funguje na všech třech strojích (u PC1-WIN jako lokální účet).
 - `Get-TimeZone`, `Get-Culture` / `Get-WinSystemLocale` a `Get-WinHomeLocation` v PowerShellu vrací hodnoty odpovídající tabulce.
 - Datum a čas (nebo výstup `Get-Date`) je ve formátu `d.M.yyyy H:mm:ss`.

@@ -577,6 +577,43 @@
         <p><strong>Upozornění k síti:</strong> PC1-WIN v tomto modulu ještě nemá funkční síť se zbytkem infrastruktury (DHCP server ještě neexistuje) — připojení k internetu/síti během vlastní instalace Windows 11 řešíme jen kvůli aktivaci a případnému stažení aktualizací.</p>
       </blockquote>
 
+      <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-left: 4px solid #38bdf8; border-radius: 6px; padding: 14px 18px; margin: 18px 0; color: #e0e0e0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+          <strong style="color: #38bdf8; font-size: 1.05rem;">JAK POVOLIT PINGY (Windows Defender Firewall do všech směrů)</strong>
+          <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-weight: 600;">PowerShell</span>
+        </div>
+        <p style="margin: 0 0 10px 0; line-height: 1.5; font-size: 0.92rem;">Ve výchozím nastavení Windows Server 2025 i Windows 11 blokuje příchozí ICMP Echo Request. Příkaz <code>ping</code> mezi servery proto končí chybou <em>"Request timed out"</em>. Pro povolení pingu v obou směrech (příchozí i odchozí) pro IPv4 i IPv6 na všech síťových profilech spusťte v PowerShellu jako Administrator:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span>PowerShell (Spustit na SRV1-DC, SRV2-FS i PC1-WIN)</span>
+            <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+          </div>
+          <pre><code># 1. Povolení příchozího pingu (Inbound IPv4 a IPv6):
+New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any
+
+# 2. Povolení odchozího pingu (Outbound IPv4 a IPv6):
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any</code></pre>
+        </div>
+        <p style="margin: 12px 0 6px 0; font-size: 0.86rem; color: #94a3b8;">Jednořádkový příkaz pro rychlé spuštění v konzoli:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span>PowerShell (Jednořádek)</span>
+            <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+          </div>
+          <pre><code>New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any</code></pre>
+        </div>
+        <p style="margin: 12px 0 6px 0; font-size: 0.86rem; color: #94a3b8;">Alternativa přes vestavěná pravidla Windows:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span>PowerShell (Vestavěná pravidla)</span>
+            <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+          </div>
+          <pre><code>Enable-NetFirewallRule -Name "FPS-ICMP4-ERQ-In", "FPS-ICMP6-ERQ-In", "FPS-ICMP4-ERQ-Out", "FPS-ICMP6-ERQ-Out"</code></pre>
+        </div>
+      </div>
+
       <h3>Aktivace Windows (LAB KEY)</h3>
       <p>Všechny tři instalace se aktivují školními produktovými klíči <strong>LAB KEY</strong>.</p>
       <div style="background: rgba(255, 85, 85, 0.08); border: 1px solid rgba(255, 85, 85, 0.3); border-left: 4px solid #ff5555; border-radius: 6px; padding: 12px 16px; margin: 14px 0; color: #e0e0e0;">
@@ -680,7 +717,7 @@ slmgr.vbs /ato</code></pre>
 
       <h2>Ověření (shrnutí, detaily viz `_vysledek.md`)</h2>
       <ul>
-        <li>Server/klient odpovídá na <code>ping</code> a hostname sedí přesně podle tabulky výše.</li>
+        <li>Server/klient odpovídá na <code>ping</code> (po povolení pravidel firewallu viz sekce Jak povolit pingy) a hostname sedí přesně podle tabulky výše.</li>
         <li>Přihlášení jako <code>Administrator</code> / <code>Pa55w.rd</code> funguje na všech třech strojích (u PC1-WIN jako lokální účet).</li>
         <li><code>Get-TimeZone</code>, <code>Get-Culture</code> / <code>Get-WinSystemLocale</code> a <code>Get-WinHomeLocation</code> v PowerShellu vrací hodnoty odpovídající tabulce.</li>
         <li>Datum a čas (nebo výstup <code>Get-Date</code>) je ve formátu <code>d.M.yyyy H:mm:ss</code>.</li>

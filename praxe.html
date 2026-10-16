@@ -1967,6 +1967,258 @@
       transform: translateY(-1px);
     }
 
+    /* Ping Helper Button in Header */
+    .ping-nav-btn {
+      background-color: #112030;
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #38bdf8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .ping-nav-btn:hover {
+      background-color: #0c4a6e;
+      border-color: #38bdf8;
+      color: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 12px rgba(56, 189, 248, 0.35);
+    }
+
+    /* Ping Modal Card */
+    .ping-modal-card {
+      background: #161b22;
+      border: 2px solid #38bdf8;
+      border-radius: 12px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px 26px;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(56, 189, 248, 0.25);
+      animation: slideUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      color: #e6edf3;
+      text-align: left;
+      position: relative;
+    }
+
+    .ping-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .ping-modal-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ping-modal-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin: 0;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .ping-modal-subtitle {
+      font-size: 0.85rem;
+      color: #8b949e;
+      margin-top: 3px;
+    }
+
+    .ping-modal-notice {
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-left: 4px solid #38bdf8;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 0.88rem;
+      color: #bae6fd;
+      line-height: 1.5;
+    }
+
+    .ping-modal-section {
+      margin-bottom: 18px;
+    }
+
+    .ping-modal-section-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #f0f6fc;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ping-copy-action-btn {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #c9d1d9;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .ping-copy-action-btn:hover {
+      background: #38bdf8;
+      color: #0b1120;
+      border-color: #38bdf8;
+    }
+
+    .ping-code-block {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: #7dd3fc;
+      overflow-x: auto;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .ping-modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid #30363d;
+    }
+
+    .ping-modal-close-btn {
+      background: #21262d;
+      border: 1px solid #363b42;
+      color: #f0f6fc;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .ping-modal-close-btn:hover {
+      background: #30363d;
+      border-color: #8b949e;
+    }
+
+    /* Ping Banner inside Task 4 (tasks.js) */
+    .ping-helper-card {
+      background: #0f172a;
+      border: 1px solid #1e3a5f;
+      border-left: 5px solid #38bdf8;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      color: #e2e8f0;
+    }
+
+    .ping-helper-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .ping-helper-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #38bdf8;
+    }
+
+    .ping-helper-btn {
+      background: #0284c7;
+      border: 1px solid #38bdf8;
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.4px;
+    }
+
+    .ping-helper-btn:hover {
+      background: #0369a1;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .ping-helper-desc {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #94a3b8;
+    }
+
+    .ping-helper-inline {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed #1e3a5f;
+    }
+
+    .ping-code-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+
+    .ping-code-snippet {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      font-size: 0.8rem;
+      color: #7dd3fc;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 0;
+      white-space: pre;
+    }
+
     #confetti-canvas {
       position: fixed;
       top: 0;
@@ -2086,6 +2338,81 @@
     </div>
   </div>
 
+  <!-- Ping Helper Modal -->
+  <div id="ping-helper-modal" class="warning-modal-overlay" style="display: none;" onclick="if(event.target === this) closePingModal()">
+    <div class="ping-modal-card">
+      <div class="ping-modal-header">
+        <div class="ping-modal-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+        </div>
+        <div>
+          <h2 class="ping-modal-title">JAK POVOLIT PINGY</h2>
+          <div class="ping-modal-subtitle">Povolení pravidel Windows Defender Firewall do všech směrů (IPv4 + IPv6, Inbound + Outbound)</div>
+        </div>
+      </div>
+
+      <div class="ping-modal-notice">
+        <strong>Proč ping nefunguje:</strong> Windows Server 2025 i Windows 11 mají ve výchozím nastavení zapnutý firewall, který zahazuje příchozí pakety ICMP Echo Request. Při pingu z jiného stroje proto vidíte chybu <code>Request timed out</code>, i když je síť a IP adresa nastavena správně.
+      </div>
+
+      <div class="ping-modal-section">
+        <div class="ping-modal-section-title">
+          <span>1. Povolení pingu do všech směrů (doporučeno pro lab)</span>
+          <button type="button" class="ping-copy-action-btn" onclick="copySnippetText(this, 'ping-code-all')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Kopírovat pravidla</span>
+          </button>
+        </div>
+        <pre class="ping-code-block" id="ping-code-all"><code># Povolení příchozího pingu (ICMPv4 i ICMPv6 Inbound):
+New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any
+
+# Povolení odchozího pingu (ICMPv4 i ICMPv6 Outbound):
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any</code></pre>
+      </div>
+
+      <div class="ping-modal-section">
+        <div class="ping-modal-section-title">
+          <span>2. Rychlý jednořádkový příkaz (vložit do PowerShellu)</span>
+          <button type="button" class="ping-copy-action-btn" onclick="copySnippetText(this, 'ping-code-oneliner')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Kopírovat jednořádek</span>
+          </button>
+        </div>
+        <pre class="ping-code-block" id="ping-code-oneliner"><code>New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any; New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any</code></pre>
+      </div>
+
+      <div class="ping-modal-section">
+        <div class="ping-modal-section-title">
+          <span>3. Alternativa: Povolení vestavěných pravidel Windows</span>
+          <button type="button" class="ping-copy-action-btn" onclick="copySnippetText(this, 'ping-code-builtin')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Kopírovat alternativu</span>
+          </button>
+        </div>
+        <pre class="ping-code-block" id="ping-code-builtin"><code>Enable-NetFirewallRule -Name "FPS-ICMP4-ERQ-In", "FPS-ICMP6-ERQ-In", "FPS-ICMP4-ERQ-Out", "FPS-ICMP6-ERQ-Out"</code></pre>
+      </div>
+
+      <div class="ping-modal-section">
+        <div class="ping-modal-section-title">
+          <span>4. Jak otestovat spojení po povolení firewallu</span>
+          <button type="button" class="ping-copy-action-btn" onclick="copySnippetText(this, 'ping-code-test')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Kopírovat test</span>
+          </button>
+        </div>
+        <pre class="ping-code-block" id="ping-code-test"><code># Test pingem např. ze SRV2-FS na SRV1-DC (nahraďte X číslem svého pracoviště):
+Test-NetConnection -ComputerName 192.168.2.10 -InformationLevel Detailed
+ping 192.168.2.10</code></pre>
+      </div>
+
+      <div class="ping-modal-footer">
+        <button type="button" class="ping-modal-close-btn" onclick="closePingModal()">Zavřít</button>
+      </div>
+    </div>
+  </div>
+
   <canvas id="confetti-canvas"></canvas>
 
   <header>
@@ -2102,6 +2429,10 @@
       <h1 id="page-title">Konfigurace zkurvených VM</h1>
     </div>
     <div class="header-actions">
+      <button type="button" class="ping-nav-btn" id="btn-ping-helper" onclick="openPingModal()" title="Zobrazit návod a PowerShell příkazy pro povolení pingu do všech směrů">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+        <span>JAK POVOLIT PINGY</span>
+      </button>
       <a href="praxe/00/__zadani.html" target="_blank" rel="noopener noreferrer" class="doc-link-btn" id="btn-doc-zadani" title="Otevřít zformátované zadání (_zadani.md) v nové záložce">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
         <span>_zadani.md</span>
@@ -2244,6 +2575,7 @@
     function updateDocLinks() {
       const zadaniBtn = document.getElementById("btn-doc-zadani");
       const reseniBtn = document.getElementById("btn-doc-reseni");
+      const pingBtn = document.getElementById("btn-ping-helper");
       const pageTitle = document.getElementById("page-title");
       const folder = (currentModuleConfig && currentModuleConfig.folder) || `praxe/${currentModuleId}`;
       const title = (currentModuleConfig && (currentModuleConfig.shortTitle || currentModuleConfig.title)) || `Modul ${currentModuleId}`;
@@ -2256,10 +2588,55 @@
         reseniBtn.href = `${folder}/__reseni.html`;
         reseniBtn.title = `Otevřít zformátované řešení (__reseni.md) pro ${title} v nové záložce`;
       }
+      if (pingBtn) {
+        pingBtn.style.display = currentModuleId === "00" ? "inline-flex" : "none";
+      }
       if (pageTitle && currentModuleConfig && currentModuleConfig.title) {
         pageTitle.textContent = currentModuleConfig.title;
       }
     }
+
+    function openPingModal() {
+      const modal = document.getElementById("ping-helper-modal");
+      if (modal) {
+        modal.style.display = "flex";
+      }
+    }
+    window.openPingModal = openPingModal;
+
+    function closePingModal() {
+      const modal = document.getElementById("ping-helper-modal");
+      if (modal) {
+        modal.style.display = "none";
+      }
+    }
+    window.closePingModal = closePingModal;
+
+    function togglePingHelper(btn) {
+      const card = btn.closest(".ping-helper-card");
+      if (!card) return;
+      const inlineBox = card.querySelector(".ping-helper-inline");
+      if (inlineBox) {
+        const isHidden = inlineBox.style.display === "none";
+        inlineBox.style.display = isHidden ? "block" : "none";
+      }
+    }
+    window.togglePingHelper = togglePingHelper;
+
+    function copySnippetText(btn, elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const text = el.innerText || el.textContent;
+      navigator.clipboard.writeText(text.trim()).then(() => {
+        const span = btn.querySelector("span");
+        if (span) {
+          const orig = span.textContent;
+          span.textContent = "Zkopírováno!";
+          setTimeout(() => { span.textContent = orig; }, 1400);
+        }
+      });
+    }
+    window.copySnippetText = copySnippetText;
 
     function loadScript(src) {
       return new Promise((resolve) => {
@@ -3172,6 +3549,12 @@
     window.addEventListener("DOMContentLoaded", () => {
       const initialModId = initModuleFromURL();
       loadModule(initialModId);
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closePingModal();
+      }
     });
   </script>
 </body>

@@ -31,6 +31,23 @@ Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4
 ```
 IP adresa, prefix (`24` = maska `255.255.255.0`), brána i DNS server odpovídají hodnotám v `__zadani.md` pro daný server. Adresa **není** převzatá z DHCP (`Get-NetIPAddress ... | Select PrefixOrigin` ukazuje `Manual`, ne `Dhcp`).
 
+#### Ověření konektivity a povolení pingů (Windows Defender Firewall)
+Ve výchozím nastavení blokuje Windows Defender Firewall příchozí ICMP Echo Request. Aby bylo možné ověřit spojení pingem mezi stroji (`SRV1-DC` a `SRV2-FS`), povolte pravidla pro ICMPv4 i ICMPv6 ve všech směrech:
+```powershell
+# Povolení pingování do všech směrů (IPv4 i IPv6, Inbound i Outbound):
+New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Inbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
+New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any
+```
+
+Následně ověřte spojení pingem na druhý stroj (např. ze SRV2-FS na SRV1-DC `192.168.X.10`):
+```powershell
+Test-NetConnection -ComputerName 192.168.X.10 -InformationLevel Detailed
+ping 192.168.X.10
+```
+Příkaz `ping` vrací odpovědi s 0% ztrátou paketů a `Test-NetConnection` hlásí `PingSucceeded : True`.
+
 ### 5. Přihlášení administrátora funguje
 Po odhlášení a novém přihlášení funguje přihlášení jako `Administrator` s heslem `Pa55w.rd` (lokálně — server ještě není v doméně). Žádný Microsoft účet u přihlášení nefiguruje — `Get-LocalUser` neobsahuje žádný účet typu Microsoft, jen vestavěné lokální účty.
 
