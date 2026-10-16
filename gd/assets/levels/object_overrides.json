@@ -72,14 +72,14 @@
     "frame": "portal_01_front_001.png",
     "gridW": 0.83,
     "gridH": 2.5,
-    "sub": "gravity_flip"
+    "sub": "gravity_normal"
   },
   "11": {
     "type": "portal",
     "frame": "portal_02_front_001.png",
     "gridW": 0.83,
     "gridH": 2.5,
-    "sub": "gravity_normal"
+    "sub": "gravity_flip"
   },
   "12": {
     "type": "portal",
@@ -208,7 +208,7 @@
     "frame": "bump_01_001.png",
     "gridW": 1,
     "gridH": 1,
-    "padBoost": 25.8
+    "padBoost": 34
   },
   "36": {
     "type": "ring",
@@ -386,7 +386,7 @@
     "frame": "gravbump_01_001.png",
     "gridW": 1,
     "gridH": 1,
-    "padBoost": 16,
+    "padBoost": 28,
     "flipGravity": true
   },
   "68": {
@@ -7130,7 +7130,7 @@
     "frame": "bump_02_001.png",
     "gridW": 1,
     "gridH": 1,
-    "padBoost": 31.6
+    "padBoost": 42
   },
   "1333": {
     "type": "ring",
