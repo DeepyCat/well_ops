@@ -4119,7 +4119,7 @@ const OBJECT_DEFS = {
     frame: "bump_01_001.png",
     gridW: 0x1,
     gridH: 0x1,
-    padBoost: 25.8
+    padBoost: 34
   },
   0x43: {
     type: OBJ_PAD,
@@ -4127,7 +4127,7 @@ const OBJECT_DEFS = {
     gridW: 0x1,
     gridH: 0x1,
     flipGravity: true,
-    padBoost: 16
+    padBoost: 28
   },
   0x8c: {
     type: OBJ_PAD,
@@ -4710,7 +4710,7 @@ const OBJECT_DEFS = {
     frame: "bump_02_001.png",
     gridW: 0x1,
     gridH: 0x1,
-    padBoost: 31.6
+    padBoost: 42
   }
 };
 const DEFAULT_OBJECT_IDS = [0x1, 0x2, 0x3, 0x4, 0x6, 0x7, 0x53, 0x8, 0x27, 0x67, 0x188, 0x23, 0x43, 0x24, 0x28, 0x8c, 0x8e, 0x8d, 0x3fe, 0x3e, 0x41, 0x42, 0x44, 0xc3, 0xc4, 0x534];
@@ -6821,15 +6821,15 @@ class ps {
       return _0x1453f2;
     }
     if (0x43 === _0x4a2eb0) {
-      return 16;
+      return 28;
     }
     if (0x8c === _0x4a2eb0) {
       return 18.2;
     }
     if (0x534 === _0x4a2eb0) {
-      return 31.6;
+      return 42;
     }
-    return 25.8;
+    return 34;
   }
   ["_getRingBoost"](_0x2ea630, _0x46f586) {
     if (Number.isFinite(_0x46f586)) {
