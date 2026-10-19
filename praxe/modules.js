@@ -34,7 +34,15 @@ window.OPS_MODULES = [
     vms: ["SRV1-DC", "PC1-WIN"],
     defaultVM: "SRV1-DC",
     tasksFile: "praxe/02/tasks.js",
-    verifiedFile: "praxe/02/verified.json"
+    verifiedFile: "praxe/02/verified.json",
+    submission: {
+      title: "CO ODEVZDAT",
+      zipName: "Prijmeni_Jmeno_Modul2.zip",
+      folders: [
+        "<code>Moje dokumentace / Modul 2 DHCP</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)",
+        "<code>Moje dokumentace / Modul 0 Příprava</code> (část <code>PC1-WIN</code>)"
+      ]
+    }
   }
 ];
 

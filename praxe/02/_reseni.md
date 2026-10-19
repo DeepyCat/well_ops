@@ -135,3 +135,11 @@ Name                                           IP4Address
 srv1-dc.<prijmeni>.cyberschool.internal        192.168.N.10
 ```
 Počítač PC1-WIN má plnou síťovou konektivitu v interním labu a je připraven na vstup do domény v Modulu 03.
+
+---
+
+## Co odevzdat
+
+Jeden ZIP s názvem `Prijmeni_Jmeno_Modul2.zip`, ve kterém budou složky:
+- `Moje dokumentace / Modul 2 DHCP` (`postup.md`, `overeni.md` a složka `images` se screenshoty)
+- `Moje dokumentace / Modul 0 Příprava` (část `PC1-WIN`)
