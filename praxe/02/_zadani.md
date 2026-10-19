@@ -100,3 +100,9 @@ Resolve-DnsName -Name "srv1-dc.<prijmeni>.cyberschool.internal"
 Na serveru **SRV1-DC** je dostupná grafická konzole **DHCP Manager** (`dhcpmgmt.msc`), přístupná přes **Server Manager → Tools → DHCP**:
 - V kořenovém stromu je u názvu serveru zobrazena zelená značka (autorizováno v doméně).
 - Ve větvi **IPv4 → Scope [192.168.N.0] Ucebna** je zobrazen Address Pool (`.100`–`.200`), Scope Options (Router `.1`, DNS Server `.10`, DNS Domain Name) a v sekci **Address Leases** je evidován klientský počítač `PC1-WIN`.
+
+## Co odevzdat
+
+Jeden ZIP s názvem `Prijmeni_Jmeno_Modul2.zip`, ve kterém budou složky:
+- `Moje dokumentace / Modul 2 DHCP` (`postup.md`, `overeni.md` a složka `images` se screenshoty)
+- `Moje dokumentace / Modul 0 Příprava` (část `PC1-WIN`)

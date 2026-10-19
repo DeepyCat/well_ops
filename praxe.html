@@ -1835,7 +1835,7 @@
       background: #1b1b1b;
       border: 2px solid #22c55e;
       border-radius: 16px;
-      max-width: 500px;
+      max-width: 540px;
       width: 100%;
       padding: 28px 24px;
       text-align: center;
@@ -1876,13 +1876,20 @@
       margin-bottom: 18px;
     }
 
+    .module-complete-doc-hint {
+      color: #f59e0b;
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin: -6px 0 16px 0;
+    }
+
     .module-complete-gif-wrap {
       width: 100%;
       max-height: 250px;
       min-height: 160px;
       border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
       background: #111;
       border: 1px solid #333;
       display: flex;
@@ -1897,6 +1904,57 @@
       max-height: 250px;
       object-fit: cover;
       display: block;
+    }
+
+    .module-complete-submission {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-left: 4px solid #38bdf8;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      text-align: left;
+      font-size: 0.88rem;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .submission-box-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .submission-zip-desc {
+      color: #e2e8f0;
+      margin-bottom: 8px;
+      line-height: 1.45;
+    }
+
+    .submission-zip-desc code, .submission-list code {
+      background: #090d16;
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.85em;
+    }
+
+    .submission-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .submission-list li {
+      margin-bottom: 4px;
     }
 
     .module-complete-actions {
@@ -2322,9 +2380,16 @@
       </div>
       <h2 class="module-complete-title" id="module-complete-title">Gratulujeme!</h2>
       <p class="module-complete-sub" id="module-complete-sub">Juchelka je na tebe pyšný... Dokončil jsi všechny úkoly v tomto modulu!</p>
-      <h4 class="module-complete-title" id="module-complete-title">Nezapomeň na dokumentaci pokud je potřeba udělat...</h4>
+      <h4 class="module-complete-doc-hint">Nezapomeň na dokumentaci pokud je potřeba udělat...</h4>
       <div class="module-complete-gif-wrap">
         <img id="module-complete-gif" src="img/celebration/proud-of-you1.gif" alt="Juchelka je na tebe pyšný...">
+      </div>
+      <div id="module-complete-submission" class="module-complete-submission" style="display: none;">
+        <div class="submission-box-header">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <span>CO ODEVZDAT</span>
+        </div>
+        <div class="submission-box-body" id="module-complete-submission-body"></div>
       </div>
       <div class="module-complete-actions">
         <a href="games.html" class="module-complete-btn module-complete-games-btn">
@@ -2851,6 +2916,34 @@ ping 192.168.2.10</code></pre>
       if (titleEl) {
         const title = (currentModuleConfig && (currentModuleConfig.shortTitle || currentModuleConfig.title)) || `Modul ${currentModuleId}`;
         titleEl.textContent = `Gratulujeme! ${title} dokončen!`;
+      }
+
+      const submissionBox = document.getElementById("module-complete-submission");
+      const submissionBody = document.getElementById("module-complete-submission-body");
+      if (submissionBox && submissionBody) {
+        if (currentModuleId === "02" || (currentModuleConfig && currentModuleConfig.submission)) {
+          submissionBox.style.display = "block";
+          if (currentModuleConfig && currentModuleConfig.submission) {
+            const sub = currentModuleConfig.submission;
+            submissionBody.innerHTML = `
+              <p class="submission-zip-desc">Jeden ZIP s názvem <code>${sub.zipName}</code>, ve kterém budou složky:</p>
+              <ul class="submission-list">
+                ${sub.folders.map(f => `<li>${f}</li>`).join('')}
+              </ul>
+            `;
+          } else {
+            submissionBody.innerHTML = `
+              <p class="submission-zip-desc">Jeden ZIP s názvem <code>Prijmeni_Jmeno_Modul2.zip</code>, ve kterém budou složky:</p>
+              <ul class="submission-list">
+                <li><code>Moje dokumentace / Modul 2 DHCP</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)</li>
+                <li><code>Moje dokumentace / Modul 0 Příprava</code> (část <code>PC1-WIN</code>)</li>
+              </ul>
+            `;
+          }
+        } else {
+          submissionBox.style.display = "none";
+          submissionBody.innerHTML = "";
+        }
       }
 
       modal.style.display = "flex";
