@@ -114,14 +114,17 @@ window.OPS_MODULE_TASKS["02"] = [
     forVMs: ["SRV1-DC"],
     what: () => {
       return `
-        <p>Po instalaci binárních souborů role je nutné provést dokončení instalace (Post-Install configuration): vytvořit lokální bezpečnostní skupiny <strong>DHCP Users</strong> a <strong>DHCP Administrators</strong> a restartovat službu <strong>DHCPServer</strong>.</p>
+        <p>Po instalaci binárních souborů role je nutné provést dokončení instalace (Post-Install configuration): vytvořit bezpečnostní skupiny <strong>DHCP Users</strong> a <strong>DHCP Administrators</strong> a restartovat službu <strong>DHCPServer</strong>.</p>
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-left: 4px solid #38bdf8; border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 0.88rem;">
+          <strong>Poznámka pro řadič domény (DC):</strong> Protože server <strong>SRV1-DC</strong> je řadičem domény Active Directory (nemá lokální SAM databázi), příkaz <code>Add-DhcpServerSecurityGroup</code> vytvoří obě skupiny přímo v doméně Active Directory jako doménové lokální skupiny. Pro jejich ověření se proto na řadiči domény používá cmdlet <code>Get-ADGroup</code> (nikoliv <code>Get-LocalGroup</code>, který je určen pro členské stanice a na DC vrací neúplný výstup).
+        </div>
       `;
     },
     how: () => {
-      return `# 1. Vytvoření bezpečnostních skupin pro správu DHCP:\nAdd-DhcpServerSecurityGroup\n\n# 2. Restartování služby DHCP Serveru pro načtení nového oprávnění:\nRestart-Service -Name DHCPServer`;
+      return `# 1. Vytvoření bezpečnostních skupin pro správu DHCP v Active Directory:\nAdd-DhcpServerSecurityGroup\n\n# 2. Restartování služby DHCP Serveru pro načtení nového oprávnění:\nRestart-Service -Name DHCPServer`;
     },
     verify: () => {
-      return `Get-Service -Name DHCPServer | Select-Object Name, Status, StartType\nGet-LocalGroup -Name "DHCP *" | Select-Object Name`;
+      return `Get-Service -Name DHCPServer | Select-Object Name, Status, StartType\nGet-ADGroup -Filter 'Name -like "DHCP*"' | Select-Object Name`;
     },
     expected: () => {
       return `Name       Status  StartType\n----       ------  ---------\nDHCPServer Running Automatic\n\nName\n----\nDHCP Administrators\nDHCP Users`;
