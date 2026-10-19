@@ -34,6 +34,11 @@ DnsName                                 IPAddress
 SRV1-DC.<prijmeni>.cyberschool.internal 192.168.N.10
 ```
 
+> [!NOTE]
+> **Žlutá notifikační vlajka v Server Manageru (DHCP Post-Install wizard):**
+> Pokud se v horní liště Server Manageru objeví žlutá výstražná vlajka s textem *Complete DHCP configuration* nebo vyskočí okno *DHCP Post-Install configuration wizard*, je to standardní chování Windows Serveru. Tento průvodce pouze vytváří skupiny `DHCP Administrators` / `DHCP Users` a autorizuje server v AD. V okně stačí kliknout na **Next >** -> **Commit** -> **Close**. Pokud konfigurujete přes PowerShell, skupiny a autorizaci již máte hotové z úkolů 3 a 4 a žlutou vlajku můžete v Server Manageru potvrdit příkazem:
+> `Set-ItemProperty -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ServerManager\Roles\12' -Name 'ConfigurationState' -Value 2`
+
 ---
 
 ### 2. DHCP Scope je aktivní a pokrývá správný rozsah (SRV1-DC)

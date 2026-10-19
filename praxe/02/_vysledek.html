@@ -381,6 +381,11 @@ DnsName                                 IPAddress
 -------                                 ---------
 SRV1-DC.&lt;prijmeni&gt;.cyberschool.internal 192.168.N.10</code></pre>
       </div>
+      <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-left: 4px solid #f59e0b; border-radius: 6px; padding: 10px 14px; margin: 12px 0 16px 0; font-size: 0.88rem; line-height: 1.5;">
+        <strong>Upozornění ze Server Manageru (žlutá vlajka / DHCP Post-Install wizard):</strong><br>
+        Pokud se v horní liště Server Manageru objeví žlutá výstražná vlaječka <em>Complete DHCP configuration</em> nebo vyskočí okno <em>DHCP Post-Install configuration wizard</em>, je to naprosto normální stav. Tento průvodce slouží pouze k vytvoření skupin <code>DHCP Administrators</code> / <code>DHCP Users</code> a autorizaci serveru v AD. V okně stačí kliknout na <strong>Next &gt;</strong> &rarr; <strong>Commit</strong> &rarr; <strong>Close</strong>. Pokud jste úkoly provedli v PowerShellu, skupiny a autorizace jsou již hotové a žlutou vlajku můžete v Server Manageru potvrdit příkazem:<br>
+        <code>Set-ItemProperty -Path 'registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ServerManager\Roles\12' -Name 'ConfigurationState' -Value 2</code>
+      </div>
 
       <h3>2. DHCP Scope je aktivní a pokrývá správný rozsah (SRV1-DC)</h3>
       <p>V konzoli DHCP existuje obor s názvem <strong>[192.168.N.0] Ucebna</strong>. Ikona oboru je zelená (aktivní), nikoliv červená.</p>

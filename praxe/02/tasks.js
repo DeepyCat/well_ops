@@ -115,13 +115,23 @@ window.OPS_MODULE_TASKS["02"] = [
     what: () => {
       return `
         <p>Po instalaci binárních souborů role je nutné provést dokončení instalace (Post-Install configuration): vytvořit bezpečnostní skupiny <strong>DHCP Users</strong> a <strong>DHCP Administrators</strong> a restartovat službu <strong>DHCPServer</strong>.</p>
+        <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-left: 4px solid #f59e0b; border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 0.88rem; line-height: 1.5;">
+          <strong>Oznámení v Server Manageru (žlutá vlajka / DHCP Post-Install wizard):</strong><br>
+          Po instalaci role se v Server Manageru u horní vlajky objeví výzva <em>Complete DHCP configuration</em>. Pokud na ni kliknete, otevře se okno <em>DHCP Post-Install configuration wizard</em>. To je zcela v pořádku! Průvodce dělá přesně to samé, co tyto dva úkoly:
+          <ol style="margin: 6px 0 6px 20px; padding: 0;">
+            <li>Vytvoří skupiny <strong>DHCP Administrators</strong> a <strong>DHCP Users</strong> (tento úkol 3).</li>
+            <li>Autorizuje server v Active Directory (následující úkol 4).</li>
+          </ol>
+          <strong>Jak naložit s otevřeným oknem průvodce:</strong><br>
+          V okně můžete kliknout na <strong>Next &gt;</strong> &rarr; na stránce Authorization nechat výchozí doménový účet administrátora &rarr; kliknout na <strong>Commit</strong> a poté <strong>Close</strong>. Tím žlutá notifikace zmizí. Alternativně, pokud postupujete čistě přes PowerShell, provedete úkoly 3 a 4 skriptem a žlutou vlaječku můžete v Server Manageru potvrdit příkazem v bodu 3 níže.
+        </div>
         <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-left: 4px solid #38bdf8; border-radius: 6px; padding: 10px 14px; margin: 10px 0; font-size: 0.88rem;">
           <strong>Poznámka pro řadič domény (DC):</strong> Protože server <strong>SRV1-DC</strong> je řadičem domény Active Directory (nemá lokální SAM databázi), příkaz <code>Add-DhcpServerSecurityGroup</code> vytvoří obě skupiny přímo v doméně Active Directory jako doménové lokální skupiny. Pro jejich ověření se proto na řadiči domény používá cmdlet <code>Get-ADGroup</code> (nikoliv <code>Get-LocalGroup</code>, který je určen pro členské stanice a na DC vrací neúplný výstup).
         </div>
       `;
     },
     how: () => {
-      return `# 1. Vytvoření bezpečnostních skupin pro správu DHCP v Active Directory:\nAdd-DhcpServerSecurityGroup\n\n# 2. Restartování služby DHCP Serveru pro načtení nového oprávnění:\nRestart-Service -Name DHCPServer`;
+      return `# 1. Vytvoření bezpečnostních skupin pro správu DHCP v Active Directory:\nAdd-DhcpServerSecurityGroup\n\n# 2. Restartování služby DHCP Serveru pro načtení nového oprávnění:\nRestart-Service -Name DHCPServer\n\n# 3. (Volitelné) Potvrzení dokončení konfigurace pro Server Manager (odstraní žlutou notifikační vlajku):\nSet-ItemProperty -Path 'registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\ServerManager\\Roles\\12' -Name 'ConfigurationState' -Value 2`;
     },
     verify: () => {
       return `Get-Service -Name DHCPServer | Select-Object Name, Status, StartType\nGet-ADGroup -Filter 'Name -like "DHCP*"' | Select-Object Name`;
@@ -139,6 +149,7 @@ window.OPS_MODULE_TASKS["02"] = [
       return `
         <p>V prostředí Active Directory smí DHCP adresy přidělovat pouze <strong>autorizovaný</strong> DHCP server. Neautorizovaný server je systémem automaticky zablokován, aby se zabránilo vzniku falešných (rogue) DHCP serverů a konfliktům v síti.</p>
         <p>Autorizujte server <strong>SRV1-DC</strong> s IP adresou <code>192.168.${x}.10</code> v Active Directory doméně <code>&lt;prijmeni&gt;.cyberschool.internal</code>.</p>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 4px;"><em>Poznámka:</em> Pokud jste po instalaci role proklikli grafického průvodce <strong>DHCP Post-Install configuration wizard</strong> (krok <em>Commit</em>), autorizace v AD již proběhla. Příkaz níže stav bezpečně potvrdí a ověření přes <code>Get-DhcpServerInDC</code> zkontroluje správnost záznamu v doméně.</p>
       `;
     },
     how: (vm, wsX) => {
