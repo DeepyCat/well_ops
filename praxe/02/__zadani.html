@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zadání: Modul 02 – DHCP Server (__zadani.md)</title>
+  <link rel="icon" type="image/x-icon" href="../../img/bird.png">
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --card-bg: #222222;
+      --border: #333333;
+      --border-subtle: #2c2c2c;
+      --text: #e0e0e0;
+      --text-muted: #888888;
+      --text-bright: #ffffff;
+      --accent: #ff5555;
+      --accent-hover: #ff7777;
+      --accent-bg: rgba(255, 85, 85, 0.15);
+      --code-bg: #151515;
+      --table-header: #1e1e1e;
+      --table-row-alt: #181818;
+      --quote-border: #ff5555;
+      --quote-bg: rgba(255, 85, 85, 0.08);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: #444 var(--bg);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(34, 34, 34, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-breadcrumb a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-bg);
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: var(--accent-hover);
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Red Action Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background-color: #242424;
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: #f0f6fc;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #382222;
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(255, 85, 85, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #d32f2f 0%, #ff5555 100%);
+      border: 1px solid #ff7777;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(211, 47, 47, 0.45);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #b71c1c 0%, #ff6666 100%);
+      border-color: #ff9999;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(255, 85, 85, 0.6);
+      transform: translateY(-1px);
+    }
+
+    /* Document Container */
+    .container {
+      max-width: 960px;
+      margin: 32px auto 80px auto;
+      padding: 0 24px;
+    }
+
+    .markdown-body {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-top: 36px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent-hover);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    blockquote {
+      margin: 20px 0;
+      padding: 12px 18px;
+      background-color: var(--quote-bg);
+      border-left: 4px solid var(--quote-border);
+      border-radius: 0 6px 6px 0;
+      color: #d1d5db;
+    }
+
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    ul, ol {
+      margin-top: 0;
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: var(--code-bg);
+      color: #fca5a5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #332222;
+    }
+
+    /* Tables */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--table-header);
+      color: var(--text-bright);
+      font-weight: 600;
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    tr:nth-child(even) td {
+      background-color: var(--table-row-alt);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Code Blocks */
+    .code-block-wrapper {
+      position: relative;
+      margin: 18px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: var(--code-bg);
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 14px;
+      background-color: #1a1a1a;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .copy-code-btn {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 0.15s ease;
+    }
+
+    .copy-code-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #f0f6fc;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: inherit;
+    }
+
+    .alert-box {
+      background: rgba(255, 85, 85, 0.08);
+      border: 1px solid rgba(255, 85, 85, 0.3);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 18px 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-breadcrumb">
+      <a href="../../praxe.html?modul=02">OPS Lab</a>
+      <span>/</span>
+      <span>Modul 02</span>
+      <span>/</span>
+      <span class="file-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        __zadani.md
+      </span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="__reseni.html" class="btn btn-primary" title="Zobrazit vzorové ověření výsledku">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+        <span>Otevřít řešení (__reseni.md)</span>
+      </a>
+      <a href="../../praxe.html?modul=02" class="btn" title="Zpět do interaktivního portálu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Zpět do labu</span>
+      </a>
+      <a href="_zadani.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Raw .md</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Document Body -->
+  <main class="container">
+    <article class="markdown-body">
+      <h1>[Co má být na konci modulu a jak to vypadá?]</h1>
+
+      <blockquote>
+        <p><strong>Přibližný potřebný čas:</strong> 2 vyučovací hodiny &nbsp;|&nbsp; <strong>Verze:</strong> 2026-10-17</p>
+      </blockquote>
+
+      <h2>Kontext (proč to děláme)</h2>
+      <p>Škola právě vybavila novou počítačovou učebnu patnácti počítači. Ruční nastavování IP adresy na každém z nich je zdlouhavé a náchylné na chyby (dvě stejné IP adresy = konflikt a výpadek sítě). Řešením je <strong>DHCP server (Dynamic Host Configuration Protocol)</strong>, který adresy přiděluje automaticky.</p>
+
+      <div class="alert-box">
+        <strong>Pravidlo pro pracoviště:</strong> Ve vzorovém postupu je číslo pracoviště <code>200</code> a příjmení <code>novak</code>. Vy všude dosaďte číslo svého pracoviště (<code>192.168.N.x</code>, kde <code>N</code> je číslo vašeho pracoviště) a své příjmení bez diakritiky (<code>prijmeni.cyberschool.internal</code>).
+      </div>
+
+      <h2>Předpoklad: hotový Modul 00 a Modul 01</h2>
+      <p>Tento modul předpokládá, že server <strong>SRV1-DC</strong> už úspěšně prošel předchozími kroky: je povýšen na řadič domény <code>prijmeni.cyberschool.internal</code>, má statickou IP adresu <code>192.168.N.10/24</code> na interním rozhraní <code>Ethernet1</code>, funkční DNS server a doménového správce <code>Administrator</code> s heslem <code>Pa55w.rd</code>. Klientská stanice <strong>PC1-WIN</strong> má nainstalovaný systém Windows 11 a zapnutý interní adaptér <code>Ethernet1</code> v CyLabu.</p>
+
+      <h2>Cílový stav: Plně funkční DHCP server pro učebnu</h2>
+      <p>Na konci tohoto modulu bude na serveru <strong>SRV1-DC</strong> nainstalovaná, autorizovaná a plně nakonfigurovaná role <strong>DHCP Server</strong>:</p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Parametr</th>
+              <th>Hodnota na SRV1-DC (Server)</th>
+              <th>Hodnota na PC1-WIN (Klient)</th>
+              <th>Poznámka</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Role serveru</strong></td>
+              <td>DHCP Server, AD DS, DNS</td>
+              <td>Klient (Windows 11)</td>
+              <td>Instaluje se včetně nástrojů RSAT-DHCP</td>
+            </tr>
+            <tr>
+              <td><strong>Interní rozhraní (NIC 2)</strong></td>
+              <td><code>Ethernet1</code></td>
+              <td><code>Ethernet1</code></td>
+              <td>Na rozhraní NIC 1 (Ethernet0 / NAT) nikdy nesahejte</td>
+            </tr>
+            <tr>
+              <td><strong>Způsob konfigurace IP</strong></td>
+              <td>Staticky zadaná IP adresa</td>
+              <td>Automaticky přiděleno (DHCP)</td>
+              <td>Režim Obtain an IP address automatically</td>
+            </tr>
+            <tr>
+              <td><strong>IPv4 adresa</strong></td>
+              <td><code>192.168.N.10 / 24</code></td>
+              <td><code>192.168.N.100</code> – <code>.200</code></td>
+              <td>Přidělena ze scope Ucebna</td>
+            </tr>
+            <tr>
+              <td><strong>Maska podsítě</strong></td>
+              <td><code>255.255.255.0</code> (/24)</td>
+              <td><code>255.255.255.0</code> (/24)</td>
+              <td>Maska interní sítě učebny</td>
+            </tr>
+            <tr>
+              <td><strong>Výchozí brána (Router)</strong></td>
+              <td><code>192.168.N.1</code></td>
+              <td><code>192.168.N.1</code></td>
+              <td>DHCP Option 003 Router</td>
+            </tr>
+            <tr>
+              <td><strong>DNS Server</strong></td>
+              <td><code>127.0.0.1</code> / <code>192.168.N.10</code></td>
+              <td><code>192.168.N.10</code></td>
+              <td>DHCP Option 006 DNS Servers</td>
+            </tr>
+            <tr>
+              <td><strong>Doménový suffix</strong></td>
+              <td><code>prijmeni.cyberschool.internal</code></td>
+              <td><code>prijmeni.cyberschool.internal</code></td>
+              <td>DHCP Option 015 DNS Domain Name</td>
+            </tr>
+            <tr>
+              <td><strong>Autorizace v doméně</strong></td>
+              <td>Autorizován v Active Directory</td>
+              <td>N/A</td>
+              <td>Neautorizovaný DHCP server v doméně nesmí odpovídat</td>
+            </tr>
+            <tr>
+              <td><strong>Stav DHCP oboru (Scope)</strong></td>
+              <td>Active (Aktivní)</td>
+              <td>N/A</td>
+              <td>Připraven k obsluze požadavků</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ul>
+        <li><strong>DHCP Scope pro klientské počítače:</strong> Pokrývá rozsah <code>192.168.N.100</code> až <code>192.168.N.200</code> v podsíti <code>192.168.N.0/24</code>. Adresy <code>.1</code> až <code>.99</code> jsou vyhrazeny pro servery a síťové prvky s pevnou konfigurací.</li>
+        <li><strong>Kompletní síťové volby (Scope Options):</strong> Klientům se automaticky předá maska, výchozí brána <code>192.168.N.1</code>, DNS server <code>192.168.N.10</code> a název domény <code>&lt;prijmeni&gt;.cyberschool.internal</code>.</li>
+        <li><strong>Autorizace v Active Directory:</strong> Server je autorizován v doméně, v konzoli DHCP Manageru svítí zelená značka bez varování.</li>
+        <li><strong>Ověřený klient PC1-WIN:</strong> Po přepnutí adaptéru <code>Ethernet1</code> na DHCP získá stanice funkční IP adresu bez jakéhokoliv ručního zásahu.</li>
+        <li><strong>Evidence zápůjček bez konfliktů:</strong> V konzoli DHCP v sekci Address Leases je evidován právě jeden lease pro <code>PC1-WIN</code> bez duplicit.</li>
+      </ul>
+
+      <h2>Postup konfigurace v PowerShellu</h2>
+
+      <p>Krok 1: Instalace role DHCP Serveru s nástroji pro správu na SRV1-DC:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Install-WindowsFeature -Name DHCP -IncludeManagementTools</code></pre>
+      </div>
+
+      <p>Krok 2: Vytvoření bezpečnostních skupin a restartování služby DHCPServer na SRV1-DC:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Add-DhcpServerSecurityGroup
+Restart-Service -Name DHCPServer</code></pre>
+      </div>
+
+      <p>Krok 3: Autorizace DHCP serveru v Active Directory na SRV1-DC:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$DnsName = "$env:COMPUTERNAME.$((Get-ADDomain).DNSRoot)"
+$IP = "192.168.N.10"
+Add-DhcpServerInDC -DnsName $DnsName -IPAddress $IP</code></pre>
+      </div>
+
+      <p>Krok 4: Vytvoření a aktivace DHCP Scope pro učebnu na SRV1-DC:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Add-DhcpServerv4Scope -Name "Ucebna" -StartRange "192.168.N.100" -EndRange "192.168.N.200" -SubnetMask "255.255.255.0" -State Active</code></pre>
+      </div>
+
+      <p>Krok 5: Nastavení voleb Router, DNS Server a DNS Domain Name na SRV1-DC:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$DomainName = (Get-ADDomain).DNSRoot
+Set-DhcpServerv4OptionValue -ScopeId "192.168.N.0" -Router "192.168.N.1" -DnsServer "192.168.N.10" -DnsDomain $DomainName</code></pre>
+      </div>
+
+      <p>Krok 6: Aktivace automatického DHCP na klientovi PC1-WIN a obnova adresy:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator na PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Set-NetIPInterface -InterfaceAlias "Ethernet1" -Dhcp Enabled
+Set-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ResetServerAddresses
+ipconfig /release Ethernet1
+ipconfig /renew Ethernet1</code></pre>
+      </div>
+
+      <p>Krok 7: Kontrola zápůjček a síťového spojení:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Ověření na SRV1-DC i PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code># Na SRV1-DC:
+Get-DhcpServerv4Lease -ScopeId "192.168.N.0" | Select-Object IPAddress, HostName, ClientId, AddressState
+
+# Na PC1-WIN:
+Test-NetConnection -ComputerName "192.168.N.10"
+Resolve-DnsName -Name "srv1-dc.&lt;prijmeni&gt;.cyberschool.internal"</code></pre>
+      </div>
+
+      <h2>Ověření nástroji</h2>
+      <p>Na serveru <strong>SRV1-DC</strong> je dostupná grafická konzole <strong>DHCP Manager</strong> (<code>dhcpmgmt.msc</code>):</p>
+      <ul>
+        <li><strong>Server Manager → Tools → DHCP</strong>: V kořenovém stromu je u názvu serveru zobrazena zelená značka (autorizováno v AD).</li>
+        <li><strong>Scope [192.168.N.0] Ucebna → Address Pool</strong>: Definuje rozsah <code>192.168.N.100</code> až <code>192.168.N.200</code>.</li>
+        <li><strong>Scope Options</strong>: Zahrnuje Option 003 (Router), Option 006 (DNS Servers) a Option 015 (DNS Domain Name).</li>
+        <li><strong>Address Leases</strong>: Zobrazuje aktivní zápůjčku klientského počítače <code>PC1-WIN</code>.</li>
+      </ul>
+    </article>
+  </main>
+
+  <script>
+    function copySnippet(btn) {
+      const code = btn.closest('.code-block-wrapper').querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Zkopírováno!';
+        setTimeout(() => { btn.innerText = orig; }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>
