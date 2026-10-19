@@ -143,7 +143,7 @@ window.OPS_MODULE_TASKS["02"] = [
     },
     how: (vm, wsX) => {
       const x = wsX || 2;
-      return `# 1. Zjištění FQDN řadiče a domény:\n$DnsName = "$env:COMPUTERNAME.$((Get-ADDomain).DNSRoot)"\n$IP = "192.168.${x}.10"\n\n# 2. Autorizace DHCP serveru v Active Directory:\nAdd-DhcpServerInDC -DnsName $DnsName -IPAddress $IP`;
+      return `# 1. Zjištění FQDN řadiče a domény (přiřazení do proměnné a výpis):\n$DnsName = "$env:COMPUTERNAME.$((Get-ADDomain).DNSRoot)"\n$DnsName\n\n# 2. Autorizace DHCP serveru v Active Directory:\nAdd-DhcpServerInDC -DnsName $DnsName -IPAddress "192.168.${x}.10"`;
     },
     verify: () => {
       return `Get-DhcpServerInDC | Select-Object DnsName, IPAddress`;
@@ -262,7 +262,7 @@ window.OPS_MODULE_TASKS["02"] = [
     },
     how: (vm, wsX) => {
       const x = wsX || 2;
-      return `# 1. Zjištění názvu domény:\n$DomainName = (Get-ADDomain).DNSRoot\n\n# 2. Nastavení voleb oboru (Router, DNS Server, DNS Domain Name):\nSet-DhcpServerv4OptionValue -ScopeId "192.168.${x}.0" -Router "192.168.${x}.1" -DnsServer "192.168.${x}.10" -DnsDomain $DomainName`;
+      return `# 1. Zjištění názvu domény (přiřazení do proměnné a výpis):\n$DomainName = (Get-ADDomain).DNSRoot\n$DomainName\n\n# 2. Nastavení voleb oboru (Router, DNS Server, DNS Domain Name):\nSet-DhcpServerv4OptionValue -ScopeId "192.168.${x}.0" -Router "192.168.${x}.1" -DnsServer "192.168.${x}.10" -DnsDomain $DomainName`;
     },
     verify: (vm, wsX) => {
       const x = wsX || 2;
