@@ -411,10 +411,12 @@ SRV1-DC.&lt;prijmeni&gt;.cyberschool.internal 192.168.N.10</code></pre>
       <div class="code-block-wrapper">
         <pre><code>OptionId Name            Value
 -------- ----            -----
+      51 Lease           {691200}
+      15 DNS Domain Name {&lt;prijmeni&gt;.cyberschool.internal}
        3 Router          {192.168.N.1}
-       6 DNS Servers     {192.168.N.10}
-      15 DNS Domain Name {&lt;prijmeni&gt;.cyberschool.internal}</code></pre>
+       6 DNS Servers     {192.168.N.10}</code></pre>
       </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-top:-10px;"><em>Poznámka: Option 51 Lease (691200 sekund = 8 dní) je automatická výchozí doba zapůjčení ve Windows Server DHCP a je naprosto v pořádku.</em></p>
 
       <h3>4. Klient PC1-WIN dostane adresu automaticky (PC1-WIN)</h3>
       <p>Na klientské stanici <strong>PC1-WIN</strong> je rozhraní <code>Ethernet1</code> (NIC 2) nastaveno na automatické získávání. Příkaz <code>ipconfig /all</code> nebo PowerShell ukazuje přidělenou IP adresu ze scope <code>192.168.N.100</code>–<code>.200</code>, masku <code>255.255.255.0</code>, bránu <code>192.168.N.1</code> a DNS <code>192.168.N.10</code>:</p>

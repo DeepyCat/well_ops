@@ -270,7 +270,7 @@ window.OPS_MODULE_TASKS["02"] = [
     },
     expected: (vm, wsX) => {
       const x = wsX || 2;
-      return `OptionId Name            Value\n-------- ----            -----\n       3 Router          {192.168.${x}.1}\n       6 DNS Servers     {192.168.${x}.10}\n      15 DNS Domain Name {<prijmeni>.cyberschool.internal}`;
+      return `OptionId Name            Value\n-------- ----            -----\n      51 Lease           {691200}\n      15 DNS Domain Name {<prijmeni>.cyberschool.internal}\n       3 Router          {192.168.${x}.1}\n       6 DNS Servers     {192.168.${x}.10}\n\n(Option 51 Lease je automatická výchozí doba zápůjčky 8 dní = 691200 s)`;
     }
   },
   {

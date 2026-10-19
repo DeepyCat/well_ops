@@ -65,10 +65,12 @@ Očekávaný výstup:
 ```text
 OptionId Name            Value
 -------- ----            -----
+      51 Lease           {691200}
+      15 DNS Domain Name {<prijmeni>.cyberschool.internal}
        3 Router          {192.168.N.1}
        6 DNS Servers     {192.168.N.10}
-      15 DNS Domain Name {<prijmeni>.cyberschool.internal}
 ```
+*(Option 51 Lease je automatická výchozí doba zápůjčky 8 dní = 691200 sekund a je zcela v pořádku).*
 
 ---
 
