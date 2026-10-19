@@ -1,4 +1,4 @@
 {
-  "SRV1-DC": false,
-  "PC1-WIN": false
+  "SRV1-DC": true,
+  "PC1-WIN": true
 }
