@@ -24,6 +24,17 @@ window.OPS_MODULES = [
     defaultVM: "SRV1-DC",
     tasksFile: "praxe/01/tasks.js",
     verifiedFile: "praxe/01/verified.json"
+  },
+  {
+    id: "02",
+    code: "M02",
+    title: "Modul 02: DHCP Server",
+    shortTitle: "Modul 02",
+    folder: "praxe/02",
+    vms: ["SRV1-DC", "PC1-WIN"],
+    defaultVM: "SRV1-DC",
+    tasksFile: "praxe/02/tasks.js",
+    verifiedFile: "praxe/02/verified.json"
   }
 ];
 
@@ -36,5 +47,9 @@ window.OPS_MODULE_VERIFIED = {
   },
   "01": {
     "SRV1-DC": false
+  },
+  "02": {
+    "SRV1-DC": false,
+    "PC1-WIN": false
   }
 };
