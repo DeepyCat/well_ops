@@ -5449,7 +5449,7 @@ class us {
         this._registerGroupVisual(_0x1bed6b, _0x5920d7);
       }
       if (_0x24471f) {
-        if (_0x24471f.type === OBJ_SOLID && _0x24471f.gridW > 0x0 && _0x24471f.gridH > 0x0) {
+        if (_0x24471f.type === OBJ_SOLID && _0x24471f.gridW > 0x0 && _0x24471f.gridH > 0x0 && _0x24471f.frame !== "square_05_001.png" && _0x24471f.frame !== "d_square_05_001.png") {
           let _0x10e5ae = _0x24471f.gridW * 0x3c;
           let _0x11e08d = _0x24471f.gridH * 0x3c;
           let _0x4628ff = new O(y, _0x173c58, _0x7ab528, _0x10e5ae, _0x11e08d);
@@ -7722,6 +7722,18 @@ class GameScene extends Phaser.Scene {
         }
       }
     }
+    OBJECT_DEFS[5] = {
+      type: OBJ_DECO,
+      frame: "square_05_001.png",
+      gridW: 1,
+      gridH: 1
+    };
+    OBJECT_DEFS["5"] = OBJECT_DEFS[5];
+    for (const [id, def] of Object.entries(OBJECT_DEFS)) {
+      if (def && (def.frame === "square_05_001.png" || def.frame === "d_square_05_001.png" || String(id) === "5")) {
+        def.type = OBJ_DECO;
+      }
+    }
     let _0x591888 = this.cache.text.get("level_selected") || this.cache.text.get("level_1");
     if (_0x591888) {
       const _0x41f190 = this._level.loadLevel(_0x591888);
@@ -7932,6 +7944,76 @@ class GameScene extends Phaser.Scene {
     this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H).on("down", () => {
       this._fpsText.setVisible(!this._fpsText.visible);
     });
+    this._buildProgressBar();
+  }
+  _buildProgressBar() {
+    const frame = this.textures.getFrame("GJ_WebSheet", "GJ_progressBar_001.png");
+    const origW = frame ? frame.width : 680;
+    const origH = frame ? frame.height : 40;
+
+    this._progressOrigW = origW;
+    this._progressOrigH = origH;
+    this._lastShownPercent = -1;
+
+    const targetW = Math.min(380, r - 120);
+    const scale = targetW / origW;
+
+    this._progressBarContainer = this.add.container(r / 2, 20).setScrollFactor(0).setDepth(80).setVisible(false);
+
+    this._progressBg = this.add.image(0, 0, 'GJ_WebSheet', "GJ_progressBar_001.png")
+      .setTint(0x000000)
+      .setAlpha(0.55)
+      .setScale(scale);
+    this._progressBarContainer.add(this._progressBg);
+
+    const fillScaleX = scale * 0.992;
+    const fillScaleY = scale * 0.86;
+    this._progressFillScaleX = fillScaleX;
+    this._progressFillScaleY = fillScaleY;
+
+    this._progressFill = this.add.image(-fillScaleX * origW / 2, 0, 'GJ_WebSheet', "GJ_progressBar_001.png")
+      .setTint(0x00ff44)
+      .setScale(fillScaleX, fillScaleY)
+      .setOrigin(0, 0.5)
+      .setVisible(false);
+    this._progressBarContainer.add(this._progressFill);
+
+    this._progressText = this.add.bitmapText(0, 0, "bigFont", "0%", 24)
+      .setOrigin(0.5, 0.5)
+      .setScale(0.42);
+    this._progressBarContainer.add(this._progressText);
+  }
+  _updateProgressBar(percent) {
+    if (!this._progressBarContainer) return;
+    const pct = Math.min(100, Math.max(0, Math.floor(percent)));
+    if (this._lastShownPercent === pct) return;
+    this._lastShownPercent = pct;
+
+    if (pct > 0) {
+      const cropW = Math.max(1, Math.floor(this._progressOrigW * (pct / 100)));
+      this._progressFill.setVisible(true);
+      this._progressFill.setCrop(0, 0, cropW, this._progressOrigH);
+    } else {
+      this._progressFill.setVisible(false);
+    }
+    this._progressText.setText(pct + "%");
+  }
+  _positionProgressBar() {
+    if (this._progressBarContainer) {
+      this._progressBarContainer.x = r / 2;
+      this._progressBarContainer.y = 20;
+      const targetW = Math.min(380, r - 120);
+      const scale = targetW / (this._progressOrigW || 680);
+      if (this._progressBg) this._progressBg.setScale(scale);
+      const fillScaleX = scale * 0.992;
+      const fillScaleY = scale * 0.86;
+      this._progressFillScaleX = fillScaleX;
+      this._progressFillScaleY = fillScaleY;
+      if (this._progressFill) {
+        this._progressFill.setScale(fillScaleX, fillScaleY);
+        this._progressFill.x = -fillScaleX * (this._progressOrigW || 680) / 2;
+      }
+    }
   }
   ["toggleGlitter"](_0x34c21a) {
     if (_0x34c21a) {
@@ -7959,6 +8041,9 @@ class GameScene extends Phaser.Scene {
     if (!(this._paused || this._menuActive || this._slideIn || this._state.isDead || this._levelWon)) {
       this._paused = true;
       this._pauseBtn.setVisible(false);
+      if (this._progressBarContainer) {
+        this._progressBarContainer.setVisible(false);
+      }
       this._audio.pauseMusic();
       this._setParticleTimeScale(0x0);
       this._buildPauseOverlay();
@@ -7969,6 +8054,9 @@ class GameScene extends Phaser.Scene {
       this._setParticleTimeScale(0x1);
       this._paused = false;
       this._pauseBtn.setVisible(true).setAlpha(0.29411764705882354);
+      if (this._progressBarContainer && !this._menuActive) {
+        this._progressBarContainer.setVisible(true).setAlpha(1);
+      }
       this._audio.resumeMusic();
       if (this._pauseContainer) {
         this._pauseContainer.destroy();
@@ -8485,6 +8573,12 @@ class GameScene extends Phaser.Scene {
     this._player.reset();
     this._attemptsLabel.setVisible(this._attempts > 0x1);
     this._positionAttemptsLabel();
+    if (this._progressBarContainer) {
+      this._progressBarContainer.setVisible(true).setAlpha(1);
+      this._lastShownPercent = -1;
+      this._positionProgressBar();
+      this._updateProgressBar(0);
+    }
   }
   ["_pushButton"]() {
     if (this._menuActive) {
@@ -8616,6 +8710,11 @@ class GameScene extends Phaser.Scene {
     this._attemptsLabel.setText("Attempt " + this._attempts);
     this._attemptsLabel.setVisible(true);
     this._positionAttemptsLabel();
+    if (this._progressBarContainer) {
+      this._progressBarContainer.setVisible(true).setAlpha(1);
+      this._lastShownPercent = -1;
+      this._updateProgressBar(0);
+    }
   }
   ["_applyBaseLevelColors"]() {
     if (this._baseBgColor) {
@@ -8647,6 +8746,9 @@ class GameScene extends Phaser.Scene {
     this._bg.setSize(r, 0x280);
     this._drawBgShade();
     this._pauseBtn.x = r - 0x1e;
+    if (this._progressBarContainer) {
+      this._positionProgressBar();
+    }
     if (this._menuActive) {
       this._positionMenuItems();
     }
@@ -8815,6 +8917,7 @@ class GameScene extends Phaser.Scene {
       }
     }
     if (this._levelWon) {
+      this._updateProgressBar(100);
       this._deltaBuffer = 0x0;
       if (this._endCamTween) {
         const _0x3eb8cf = this._endCamTween;
@@ -8859,6 +8962,7 @@ class GameScene extends Phaser.Scene {
           });
         }
       }
+      this._updateProgressBar(this._lastPercent);
       this._player.updateExplosionPieces(_0xaf2ffd);
       this._deathTimer += _0xaf2ffd;
       let _0x237728 = this._hadNewBest ? 0x578 : 0x3e8;
@@ -8956,6 +9060,11 @@ class GameScene extends Phaser.Scene {
     this._updateBackground();
     this._level.stepGroundAnimation(_0xaf2ffd / 0x3e8);
     this._level.updateGroundTiles(this._cameraY);
+    if (!this._state.isDead && !this._levelWon) {
+      const _lvlEndX = this._level.endXPos || 0x1770;
+      const _livePct = Math.min(100, Math.max(0, Math.floor(Math.max(0, this._playerWorldX) / _lvlEndX * 100)));
+      this._updateProgressBar(_livePct);
+    }
     if (this._state.isFlying) {
       this._player.updateShipRotation(_0x30fa5d);
     }
@@ -9145,6 +9254,13 @@ class GameScene extends Phaser.Scene {
     if (this._pauseBtn) {
       this.tweens.add({
         targets: this._pauseBtn,
+        alpha: 0x0,
+        duration: 0x12c
+      });
+    }
+    if (this._progressBarContainer) {
+      this.tweens.add({
+        targets: this._progressBarContainer,
         alpha: 0x0,
         duration: 0x12c
       });

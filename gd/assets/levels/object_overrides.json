@@ -30,7 +30,7 @@
     "gridH": 1
   },
   "5": {
-    "type": "solid",
+    "type": "deco",
     "frame": "square_05_001.png",
     "gridW": 1,
     "gridH": 1
