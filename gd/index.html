@@ -53,7 +53,7 @@
       top: 14px;
       right: 14px;
       z-index: 9998;
-      min-width: 280px;
+      min-width: 320px;
       padding: 12px 14px;
       border-radius: 10px;
       border: 1px solid rgba(255, 51, 68, 0.35);
@@ -219,12 +219,14 @@
 
     function getCompletedLevels() {
       var completed = [];
+      var hadRaw = false;
       try {
         var raw = localStorage.getItem('gd_completed_levels');
         if (raw) {
           var parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) {
-            completed = parsed.map(function (n) { return parseInt(n, 10); }).filter(function (n) { return Number.isFinite(n); });
+            hadRaw = true;
+            completed = parsed.map(function (n) { return parseInt(n, 10); }).filter(function (n) { return Number.isFinite(n) && n > 0; });
           }
         }
       } catch (e) {}
@@ -236,11 +238,33 @@
           if (stats && stats.gd && Array.isArray(stats.gd.completedLevels)) {
             stats.gd.completedLevels.forEach(function (n) {
               var id = parseInt(n, 10);
-              if (Number.isFinite(id) && completed.indexOf(id) === -1) {
+              if (Number.isFinite(id) && id > 0 && completed.indexOf(id) === -1) {
                 completed.push(id);
               }
             });
           }
+          if (stats && stats.gd && stats.gd.bestPercent && typeof stats.gd.bestPercent === 'object') {
+            Object.keys(stats.gd.bestPercent).forEach(function (k) {
+              if (stats.gd.bestPercent[k] >= 100) {
+                var id = parseInt(k, 10);
+                if (Number.isFinite(id) && id > 0 && completed.indexOf(id) === -1) {
+                  completed.push(id);
+                }
+              }
+            });
+          }
+        }
+      } catch (e) {}
+
+      completed = completed.filter(function (val, idx, arr) {
+        return arr.indexOf(val) === idx;
+      }).sort(function (a, b) { return a - b; });
+
+      try {
+        var cleanJson = JSON.stringify(completed);
+        var currentRaw = localStorage.getItem('gd_completed_levels');
+        if (cleanJson !== currentRaw && (completed.length > 0 || hadRaw)) {
+          localStorage.setItem('gd_completed_levels', cleanJson);
         }
       } catch (e) {}
 
@@ -251,6 +275,7 @@
     window.refreshCompletedLevelsUI = function () {};
 
     function mountLevelSelector() {
+      if (document.getElementById('gdLevelSelect')) return;
       var meta = selectedLevelMeta();
       var wrap = document.createElement('section');
       wrap.className = 'level-picker';
@@ -273,28 +298,39 @@
       LEVELS.forEach(function (entry) {
         var option = document.createElement('option');
         option.value = String(entry.id);
+        option.textContent = entry.id + '. ' + entry.name;
         if (entry.id === meta.id) option.selected = true;
         select.appendChild(option);
       });
 
+      var lastUpdate = 0;
       function updateOptionsAndProgress() {
-        var completed = getCompletedLevels();
-        var completedCount = 0;
-        Array.from(select.options).forEach(function (option) {
-          var id = parseInt(option.value, 10);
-          var entry = LEVELS.find(function (e) { return e.id === id; });
-          if (!entry) return;
-          var isDone = completed.indexOf(entry.id) !== -1;
-          if (isDone) completedCount++;
-          option.textContent = entry.id + '. ' + entry.name + (isDone ? ' [DOHRÁNO]' : '');
-          if (isDone) {
-            option.classList.add('completed');
-          } else {
-            option.classList.remove('completed');
+        try {
+          var now = Date.now();
+          if (now - lastUpdate < 16) return;
+          lastUpdate = now;
+
+          var completed = getCompletedLevels();
+          var completedCount = 0;
+          for (var i = 0; i < select.options.length; i++) {
+            var option = select.options[i];
+            var id = parseInt(option.value, 10);
+            var entry = LEVELS.find(function (e) { return e.id === id; });
+            if (!entry) continue;
+            var isDone = completed.indexOf(entry.id) !== -1;
+            if (isDone) completedCount++;
+            option.textContent = entry.id + '. ' + entry.name + (isDone ? ' [DOHRÁNO]' : '');
+            if (isDone) {
+              option.classList.add('completed');
+            } else {
+              option.classList.remove('completed');
+            }
           }
-        });
-        if (progressCounter) {
-          progressCounter.textContent = 'Dokončeno: ' + completedCount + ' / ' + LEVELS.length;
+          if (progressCounter) {
+            progressCounter.textContent = 'Dokončeno: ' + completedCount + ' / ' + LEVELS.length;
+          }
+        } catch (err) {
+          console.warn('Chyba při aktualizaci výběru levelů:', err);
         }
       }
 
@@ -324,6 +360,12 @@
     }
 
     updateTitleFromQuery();
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountLevelSelector);
+    } else {
+      mountLevelSelector();
+    }
 
     window.addEventListener('load', function () {
       mountLevelSelector();
