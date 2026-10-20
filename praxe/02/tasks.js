@@ -304,26 +304,24 @@ window.OPS_MODULE_TASKS["02"] = [
 
       if (vm === "SRV1-DC") {
         return `
-          <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;">
-            <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #60a5fa; margin-bottom: 6px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-              <span>TENTO KROK PROVEĎTE NA STANICI PC1-WIN</span>
+          <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 18px 20px; margin: 8px 0 16px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; color: #60a5fa; font-size: 1.05rem; margin-bottom: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span>Tento úkol proveďte na virtuálním stroji PC1-WIN</span>
             </div>
-            <div style="color: #cbd5e1; font-size: 0.9rem; line-height: 1.5;">
-              DHCP server na SRV1-DC je nyní plně připraven. Aby bylo možné ověřit zápůjčky v dalším kroku, <strong>musíte nejprve dokončit konfiguraci na PC1-WIN</strong>:
-              <ol style="margin: 8px 0 10px 20px; padding: 0;">
-                <li>V horní liště přepněte na záložku <strong>PC1-WIN</strong> (nebo otevřete VM PC1-WIN v CyLabu).</li>
-                <li>Na PC1-WIN povolte DHCP na adaptéru <code>Ethernet1</code> a vyžádejte si novou adresu příkazem <code>ipconfig /renew Ethernet1</code>.</li>
-                <li>Jakmile PC1-WIN získá adresu z rozsahu <code>192.168.${x}.100</code> až <code>.200</code>, <strong>vraťte se zpět sem na SRV1-DC</strong> k <strong>Úkolu 8</strong> (kontrola aktivních zápůjček).</li>
-              </ol>
-              <button class="nav-step-btn" onclick="switchVM('PC1-WIN')" style="margin-top: 4px; cursor: pointer;">
-                Přepnout na záložku PC1-WIN
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </button>
-            </div>
+            <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.6; margin: 0 0 12px 0;">
+              Serverová konfigurace DHCP na <strong>SRV1-DC</strong> je kompletní. Tento krok slouží k otestování přidělování adres a provádí se <strong>výhradně na klientské stanici PC1-WIN</strong>:
+            </p>
+            <ol style="color: #e2e8f0; font-size: 0.92rem; line-height: 1.6; margin: 0 0 16px 22px; padding: 0;">
+              <li>V horní liště přepněte na záložku <strong>PC1-WIN</strong> (nebo klikněte na tlačítko níže).</li>
+              <li>Na stanici <strong>PC1-WIN</strong> proveďte Úkol 7 (zapnutí DHCP na adaptéru <code>Ethernet1</code> a vyžádání nové adresy).</li>
+              <li>Jakmile klient obdrží IP adresu z rozsahu <code>192.168.${x}.100</code>–<code>.200</code>, <strong>vraťte se zpět sem na SRV1-DC</strong> k <strong>Úkolu 8</strong> (kontrola aktivních zápůjček v databázi DHCP).</li>
+            </ol>
+            <button class="nav-step-btn" onclick="switchVM('PC1-WIN')" style="cursor: pointer; background: #2563eb; color: #fff; border: 1px solid #3b82f6; font-weight: 600; padding: 8px 16px; border-radius: 6px;">
+              Přepnout na záložku PC1-WIN
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 6px;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
           </div>
-          ${nicBanner}
-          <p>Níže naleznete příkazy, které je potřeba zadat na stanici <strong>PC1-WIN</strong> pro aktivaci DHCP klienta.</p>
         `;
       }
 
@@ -335,22 +333,16 @@ window.OPS_MODULE_TASKS["02"] = [
       `;
     },
     how: (vm, wsX) => {
-      if (vm === "SRV1-DC") {
-        return `# Tyto příkazy spusťte na klientském stroji PC1-WIN (PowerShell jako Administrator):\n\n# 1. Povolení DHCP pro IP adresu i automatického získání DNS na rozhraní Ethernet1:\nSet-NetIPInterface -InterfaceAlias "Ethernet1" -Dhcp Enabled\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ResetServerAddresses\n\n# 2. Uvolnění staré konfigurace a obnovení zápůjčky z DHCP:\nipconfig /release Ethernet1\nipconfig /renew Ethernet1\n\n# 3. Po dokončení se vraťte sem na SRV1-DC k Úkolu 8.`;
-      }
+      if (vm === "SRV1-DC") return "";
       return `# 1. Povolení DHCP pro IP adresu i automatického získání DNS na rozhraní Ethernet1:\nSet-NetIPInterface -InterfaceAlias "Ethernet1" -Dhcp Enabled\nSet-DnsClientServerAddress -InterfaceAlias "Ethernet1" -ResetServerAddresses\n\n# 2. Uvolnění staré konfigurace a obnovení zápůjčky z DHCP:\nipconfig /release Ethernet1\nipconfig /renew Ethernet1`;
     },
     verify: (vm, wsX) => {
-      if (vm === "SRV1-DC") {
-        return `# Ověření na PC1-WIN:\nGet-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway\n\n# Jakmile je na PC1-WIN hotovo, vraťte se na SRV1-DC k Úkolu 8.`;
-      }
+      if (vm === "SRV1-DC") return "";
       return `Get-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object IPAddress, PrefixLength, PrefixOrigin\nGet-NetIPConfiguration -InterfaceAlias Ethernet1 | Select-Object -ExpandProperty IPv4DefaultGateway\nGet-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object ServerAddresses`;
     },
     expected: (vm, wsX) => {
+      if (vm === "SRV1-DC") return "";
       const x = wsX || 2;
-      if (vm === "SRV1-DC") {
-        return `Výstup na klientském počítači PC1-WIN:\nIPAddress     PrefixLength PrefixOrigin\n---------     ------------ ------------\n192.168.${x}.100           24 Dhcp\n\nNextHop: 192.168.${x}.1\nServerAddresses: {192.168.${x}.10}\n\n(Po ověření na PC1-WIN se vraťte sem na SRV1-DC a pokračujte Úkolem 8)`;
-      }
       return `IPAddress     PrefixLength PrefixOrigin\n---------     ------------ ------------\n192.168.${x}.100           24 Dhcp\n\nNextHop: 192.168.${x}.1\nServerAddresses: {192.168.${x}.10}`;
     }
   },
