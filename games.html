@@ -9,120 +9,99 @@
     <link rel="icon" type="image/x-icon" href="img/bird.png">
 
     <style>
-/* ===== FINÁLNÍ OPRAVA NAVIGACE ===== */
 
-/* Průhledný kontejner přes celou obrazovku */
-html body .scroll-nav {
+/* OPRAVA: pouze šipky, žádné pozadí sloupce */
+body .scroll-nav {
     position: fixed !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-
-    display: block !important;
-
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: 54px !important;
+    height: auto !important;
     padding: 0 !important;
     margin: 0 !important;
-
+    display: block !important;
     background: transparent !important;
-    background-color: transparent !important;
-    border: 0 !important;
+    border: none !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-
     pointer-events: none !important;
-    z-index: 10000 !important;
+    z-index: 99999 !important;
 }
 
-/* Společné vlastnosti tlačítek */
-html body .scroll-nav button {
+body .scroll-nav button,
+body .scroll-nav button:first-child,
+body .scroll-nav button:last-child {
     position: fixed !important;
+    right: 0 !important;
     left: auto !important;
-    right: 4px !important;
-
-    width: 48px !important;
-    height: 54px !important;
-    min-height: 54px !important;
+    width: 54px !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
     margin: 0 !important;
     padding: 0 !important;
-
     display: block !important;
-
+    flex: none !important;
     background: transparent !important;
     background-color: transparent !important;
     border: none !important;
     border-radius: 0 !important;
     box-shadow: none !important;
-    outline-offset: -3px;
-
+    transform: none !important;
     pointer-events: auto !important;
-    cursor: pointer !important;
-    transform: none;
 }
 
-/* Horní šipka – přímo u horního okraje */
-html body .scroll-nav button:first-child {
+/* První šipka: horní okraj */
+body .scroll-nav button:first-child {
     top: 0 !important;
     bottom: auto !important;
 }
 
-/* Dolní šipka – přímo u spodního okraje */
-html body .scroll-nav button:last-child {
+/* Druhá šipka: dolní okraj */
+body .scroll-nav button:last-child {
     top: auto !important;
     bottom: 0 !important;
 }
 
-/* Vlastní vykreslení šipek */
-html body .scroll-nav button::before {
+/* Vypnutí původních znaků a vykreslení vlastních šipek */
+body .scroll-nav button {
+    font-size: 0 !important;
+    color: transparent !important;
+}
+
+body .scroll-nav button::before {
     content: "" !important;
     position: absolute !important;
-    left: 50% !important;
     top: 50% !important;
-
+    left: 50% !important;
     width: 14px !important;
     height: 14px !important;
-
-    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
     border-top: 4px solid white !important;
     border-left: 4px solid white !important;
-    border-radius: 0 !important;
-
     background: transparent !important;
-    box-shadow: none !important;
-
     filter: drop-shadow(0 1px 3px black) !important;
 }
 
-/* Směr horní šipky */
-html body .scroll-nav button:first-child::before {
+body .scroll-nav button:first-child::before {
     transform: translate(-50%, -30%) rotate(45deg) !important;
 }
 
-/* Směr dolní šipky */
-html body .scroll-nav button:last-child::before {
+body .scroll-nav button:last-child::before {
     transform: translate(-50%, -70%) rotate(225deg) !important;
 }
 
-/* Hover bez pozadí */
-html body .scroll-nav button:hover {
-    background: transparent !important;
-    background-color: transparent !important;
-}
-
-html body .scroll-nav button:hover::before {
-    border-top-color: #22d3ee !important;
-    border-left-color: #22d3ee !important;
-}
-
 @media (max-width: 700px) {
-    html body .scroll-nav button {
-        right: 0 !important;
-        width: 40px !important;
-        height: 48px !important;
-        min-height: 48px !important;
+    body .scroll-nav,
+    body .scroll-nav button {
+        width: 42px !important;
     }
 }
+
 </style>
 </head>
 
