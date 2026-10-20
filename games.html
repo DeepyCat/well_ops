@@ -9,7 +9,32 @@
     <link rel="icon" type="image/x-icon" href="img/bird.png">
 
     <style>
+.home-portal-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.85);
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 10px 20px;
+        border-radius: 30px;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
 
+    .home-portal-btn:hover {
+        background: rgba(220, 38, 38, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+    }
 /* OPRAVA: pouze šipky, žádné pozadí sloupce */
 body .scroll-nav {
     position: fixed !important;
