@@ -9,367 +9,121 @@
     <link rel="icon" type="image/x-icon" href="img/bird.png">
 
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            margin: 0;
-            padding: 0;
-            scroll-behavior: smooth;
-            scroll-snap-type: y mandatory;
-        }
-
-        body.scroll-body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100vh;
-            overflow-x: hidden;
-            overflow-y: auto;
-            background: #0f172a;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        /* ===== OBRAZOVKY ===== */
-
-        .landing-page {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            width: calc(100% - 58px);
-            height: 100vh;
-            height: 100dvh;
-            min-height: 400px;
-            overflow: hidden;
-            position: relative;
-            isolation: isolate;
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-        }
-
-        /* ===== PANELY HER ===== */
-
-        .landing-page .choice-btn {
-            flex: 1 1 0;
-            min-width: 0;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            text-decoration: none;
-            color: white;
-            background-color: #172033;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            transition: flex 0.4s ease-in-out, filter 0.4s ease-in-out;
-            will-change: flex, filter;
-        }
-
-        /* Názvy her */
-
-        .landing-page .choice-btn::after {
-            content: attr(data-text);
-            position: relative;
-            z-index: 2;
-            max-width: 88%;
-            padding: 12px 20px;
-            border: 1px solid rgba(255,255,255,0.22);
-            border-radius: 50px;
-            background: rgba(0,0,0,0.58);
-            color: white;
-            font-size: clamp(1rem, 1.6vw, 1.8rem);
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-align: center;
-            overflow-wrap: anywhere;
-            text-shadow: 2px 2px 8px #000;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            transition: transform 0.3s ease, background 0.3s ease;
-        }
-
-        /* Ztmavení pozadí */
-
-        .landing-page .choice-btn::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            z-index: 1;
-            background: rgba(0,0,0,0.12);
-            pointer-events: none;
-            transition: background 0.3s ease;
-        }
-
-        .landing-page .choice-btn:hover {
-            flex: 1.4 1 0;
-            filter: brightness(1.2);
-            z-index: 10;
-        }
-
-        .landing-page .choice-btn:hover::after {
-            transform: scale(1.08);
-            background: rgba(0,0,0,0.75);
-        }
-
-        .landing-page .choice-btn:hover::before {
-            background: rgba(0,0,0,0.02);
-        }
-
-        /* Šikmé okraje panelů */
-
-        .landing-page .choice-btn:nth-child(1) {
-            clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%);
-            z-index: 4;
-        }
-
-        .landing-page .choice-btn:nth-child(2) {
-            clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
-            margin-left: -3%;
-            z-index: 3;
-        }
-
-        .landing-page .choice-btn:nth-child(3) {
-            clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
-            margin-left: -3%;
-            z-index: 2;
-        }
-
-        .landing-page .choice-btn:nth-child(4) {
-            clip-path: polygon(7% 0, 100% 0, 100% 100%, 0 100%);
-            margin-left: -3%;
-            z-index: 1;
-        }
-
-        /* ===== OBRÁZKY PRVNÍ OBRAZOVKY ===== */
-
-        .choice-btn.gd {
-            background-image: url('gd/assets/juchelkaD.png');
-            background-position: center;
-        }
-
-        .choice-btn.hero {
-            background-image: url('stratagem/data/Images/heroJ.png');
-            background-position: center;
-        }
-
-        .choice-btn.maturita {
-            background-image: url('maturita/barina_run.png');
-            background-position: center;
-        }
-
-        .choice-btn.craft {
-            background-image: url('mc/juchelka_craft.png');
-            background-position: 80% center;
-        }
-
-        /* ===== OBRÁZKY DRUHÉ OBRAZOVKY ===== */
-
-        .choice-btn.race {
-            background-image: url('hyperdrive/kokes_race.gif');
-            background-position: center;
-        }
-
-        .choice-btn.click {
-            background-image: url('clicker/02_.png');
-            background-position: center;
-        }
-
-        .choice-btn.stat {
-            background-image: none;
-            background-color: #1e293b;
-        }
-
-        .choice-btn.custom {
-            background-image: url('img/all1-b.jpg');
-            background-position: center;
-            background-size: cover;
-        }
-
-        /* ===== ZPĚT NA OPS PORTÁL ===== */
-
-        .home-portal-btn {
-            position: fixed;
-            top: 14px;
-            left: 14px;
-            z-index: 10001;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border: 1px solid rgba(255,255,255,0.22);
-            border-radius: 30px;
-            background: rgba(15,23,42,0.88);
-            color: white;
-            font-size: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            transition: background 0.25s ease, transform 0.25s ease;
-        }
-
-        .home-portal-btn:hover {
-            background: rgba(220,38,38,0.9);
-            transform: translateY(-2px);
-        }
-
-        /* ===== PRŮHLEDNÉ ŠIPKY ===== */
-
-        .scroll-nav {
-            position: fixed;
-            inset: 0 0 0 auto;
-            width: 58px;
-            height: 100vh;
-            height: 100dvh;
-            z-index: 10000;
-
-            /* Žádné pozadí ani viditelný sloupec */
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-
-            pointer-events: none;
-        }
-
-        /* Obě tlačítka mají vlastní pevnou pozici */
-
-        .scroll-nav button {
-            position: absolute;
-            left: 0;
-            width: 58px;
-            height: 72px;
-            margin: 0;
-            padding: 0;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: transparent !important;
-            border: none !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-
-            cursor: pointer;
-            pointer-events: auto;
-            transition: transform 0.2s ease;
-        }
-
-        /* Horní tlačítko */
-
-        .scroll-nav button:first-child {
-            top: 0;
-        }
-
-        /* Dolní tlačítko */
-
-        .scroll-nav button:last-child {
-            bottom: 0;
-        }
-
-        /* Šipka je vykreslena pomocí CSS */
-
-        .scroll-nav button::before {
-            content: "";
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 14px;
-            height: 14px;
-
-            border-top: 4px solid #fff;
-            border-left: 4px solid #fff;
-
-            filter:
-                drop-shadow(0 2px 2px #000)
-                drop-shadow(0 0 5px rgba(0,0,0,0.9));
-        }
-
-        /* Směr horní šipky */
-
-        .scroll-nav button:first-child::before {
-            transform: translate(-50%, -30%) rotate(45deg);
-        }
-
-        /* Směr dolní šipky */
-
-        .scroll-nav button:last-child::before {
-            transform: translate(-50%, -70%) rotate(225deg);
-        }
-
-        /* Hover – stále průhledné pozadí */
-
-        .scroll-nav button:hover {
-            background: transparent !important;
-            transform: scale(1.2);
-        }
-
-        .scroll-nav button:hover::before {
-            border-color: #22d3ee;
-        }
-
-        .scroll-nav button:focus-visible {
-            outline: 2px solid #22d3ee;
-            outline-offset: -5px;
-        }
-
-        /* ===== UŽIVATELSKÝ PROFIL ===== */
-
-        .ops-user-badge {
-            position: fixed;
-            z-index: 10001;
-        }
-
-        /* ===== MOBIL ===== */
-
-        @media (max-width: 700px) {
-            .landing-page {
-                width: calc(100% - 42px);
-                min-height: 100svh;
-            }
-
-            .landing-page .choice-btn::after {
-                max-width: 90%;
-                padding: 10px 8px;
-                border-radius: 18px;
-                font-size: clamp(0.75rem, 2.8vw, 1.2rem);
-                letter-spacing: 0;
-            }
-
-            .landing-page .choice-btn:hover {
-                flex-grow: 1.25;
-            }
-
-            .home-portal-btn {
-                top: 10px;
-                left: 10px;
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-
-            .scroll-nav {
-                width: 42px;
-            }
-
-            .scroll-nav button {
-                width: 42px;
-                height: 58px;
-            }
-
-            .scroll-nav button::before {
-                width: 12px;
-                height: 12px;
-                border-width: 3px;
-            }
-        }
-    </style>
+/* ===== FINÁLNÍ OPRAVA NAVIGACE ===== */
+
+/* Průhledný kontejner přes celou obrazovku */
+html body .scroll-nav {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+
+    display: block !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    pointer-events: none !important;
+    z-index: 10000 !important;
+}
+
+/* Společné vlastnosti tlačítek */
+html body .scroll-nav button {
+    position: fixed !important;
+    left: auto !important;
+    right: 4px !important;
+
+    width: 48px !important;
+    height: 54px !important;
+    min-height: 54px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: block !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline-offset: -3px;
+
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    transform: none;
+}
+
+/* Horní šipka – přímo u horního okraje */
+html body .scroll-nav button:first-child {
+    top: 0 !important;
+    bottom: auto !important;
+}
+
+/* Dolní šipka – přímo u spodního okraje */
+html body .scroll-nav button:last-child {
+    top: auto !important;
+    bottom: 0 !important;
+}
+
+/* Vlastní vykreslení šipek */
+html body .scroll-nav button::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+
+    width: 14px !important;
+    height: 14px !important;
+
+    border: 0 !important;
+    border-top: 4px solid white !important;
+    border-left: 4px solid white !important;
+    border-radius: 0 !important;
+
+    background: transparent !important;
+    box-shadow: none !important;
+
+    filter: drop-shadow(0 1px 3px black) !important;
+}
+
+/* Směr horní šipky */
+html body .scroll-nav button:first-child::before {
+    transform: translate(-50%, -30%) rotate(45deg) !important;
+}
+
+/* Směr dolní šipky */
+html body .scroll-nav button:last-child::before {
+    transform: translate(-50%, -70%) rotate(225deg) !important;
+}
+
+/* Hover bez pozadí */
+html body .scroll-nav button:hover {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html body .scroll-nav button:hover::before {
+    border-top-color: #22d3ee !important;
+    border-left-color: #22d3ee !important;
+}
+
+@media (max-width: 700px) {
+    html body .scroll-nav button {
+        right: 0 !important;
+        width: 40px !important;
+        height: 48px !important;
+        min-height: 48px !important;
+    }
+}
+</style>
 </head>
 
 <body class="scroll-body">
