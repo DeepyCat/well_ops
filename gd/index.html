@@ -304,11 +304,24 @@
       });
 
       var lastUpdate = 0;
+      var updateTimer = null;
       function updateOptionsAndProgress() {
         try {
           var now = Date.now();
-          if (now - lastUpdate < 16) return;
+          if (now - lastUpdate < 16) {
+            if (!updateTimer) {
+              updateTimer = setTimeout(function () {
+                updateTimer = null;
+                updateOptionsAndProgress();
+              }, 25);
+            }
+            return;
+          }
           lastUpdate = now;
+          if (updateTimer) {
+            clearTimeout(updateTimer);
+            updateTimer = null;
+          }
 
           var completed = getCompletedLevels();
           var completedCount = 0;
