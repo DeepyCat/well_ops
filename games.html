@@ -9,7 +9,8 @@
     <link rel="icon" type="image/x-icon" href="img/bird.png">
 
     <style>
-.home-portal-btn {
+        /* ===== ZPĚT NA PORTÁL ===== */
+        .home-portal-btn {
             position: fixed;
             top: 20px;
             left: 20px;
@@ -35,91 +36,125 @@
             background: rgba(220,38,38,0.9);
             transform: translateY(-2px);
         }
-/* OPRAVA: pouze šipky, žádné pozadí sloupce */
-body .scroll-nav {
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: auto !important;
-    width: 54px !important;
-    height: auto !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: block !important;
-    background: rgba(52, 52, 52, 0.218) !important;
-    border: none !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    pointer-events: none !important;
-    z-index: 99999 !important;
-}
 
-body .scroll-nav button,
-body .scroll-nav button:first-child,
-body .scroll-nav button:last-child {
-    position: fixed !important;
-    right: 0 !important;
-    left: auto !important;
-    width: 54px !important;
-    height: 60px !important;
-    min-height: 60px !important;
-    max-height: 60px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    display: block !important;
-    flex: none !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    transform: none !important;
-    pointer-events: auto !important;
-}
+        /* ===== NAVIGAČNÍ SLOUPEC ===== */
+        body .scroll-nav {
+            position: fixed !important;
+            top: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            left: auto !important;
 
-/* První šipka: horní okraj */
-body .scroll-nav button:first-child {
-    top: 0 !important;
-    bottom: auto !important;
-}
+            width: 54px !important;
+            height: 100vh !important;
+            height: 100dvh !important;
 
-/* Druhá šipka: dolní okraj */
-body .scroll-nav button:last-child {
-    top: auto !important;
-    bottom: 0 !important;
-}
+            display: block !important;
+            padding: 0 !important;
+            margin: 0 !important;
 
-/* Vypnutí původních znaků a vykreslení vlastních šipek */
-body .scroll-nav button {
-    font-size: 0 !important;
-    color: transparent !important;
-}
+            /* Černá barva s 75% neprůhledností */
+            background: rgba(0, 0, 0, 0.75) !important;
 
-body .scroll-nav button::before {
-    content: "" !important;
-    position: absolute !important;
-    top: 50% !important;
-    left: 50% !important;
-    width: 14px !important;
-    height: 14px !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border-top: 4px solid white !important;
-    border-left: 4px solid white !important;
-    background: transparent !important;
-    filter: drop-shadow(0 1px 3px black) !important;
-}
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
 
-body .scroll-nav button:first-child::before {
-    transform: translate(-50%, -30%) rotate(45deg) !important;
-}
+            pointer-events: none !important;
+            z-index: 99999 !important;
+        }
 
-body .scroll-nav button:last-child::before {
-    transform: translate(-50%, -70%) rotate(225deg) !important;
-}
-         .choice-btn.gd {
+        /* Základ obou tlačítek */
+        body .scroll-nav button,
+        body .scroll-nav button:first-child,
+        body .scroll-nav button:last-child {
+            position: fixed !important;
+            right: 0 !important;
+            left: auto !important;
+
+            width: 54px !important;
+            height: 60px !important;
+            min-height: 60px !important;
+            max-height: 60px !important;
+
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: none !important;
+
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+
+            transform: none !important;
+            color: transparent !important;
+            font-size: 0 !important;
+
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+
+        /* Horní šipka – úplně nahoře */
+        body .scroll-nav button:first-child {
+            top: 0 !important;
+            bottom: auto !important;
+        }
+
+        /* Dolní šipka – úplně dole */
+        body .scroll-nav button:last-child {
+            top: auto !important;
+            bottom: 0 !important;
+        }
+
+        /* Vlastní vykreslení šipek */
+        body .scroll-nav button::before {
+            content: "" !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+
+            width: 14px !important;
+            height: 14px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+
+            border-top: 4px solid white !important;
+            border-left: 4px solid white !important;
+            background: transparent !important;
+
+            filter: drop-shadow(0 1px 3px black) !important;
+            pointer-events: none !important;
+        }
+
+        /* Směr horní šipky */
+        body .scroll-nav button:first-child::before {
+            transform: translate(-50%, -30%) rotate(45deg) !important;
+        }
+
+        /* Směr dolní šipky */
+        body .scroll-nav button:last-child::before {
+            transform: translate(-50%, -70%) rotate(225deg) !important;
+        }
+
+        /* Zvýraznění při najetí myší */
+        body .scroll-nav button:hover::before {
+            border-color: #22d3ee !important;
+        }
+
+        body .scroll-nav button:focus-visible {
+            outline: 2px solid #22d3ee !important;
+            outline-offset: -5px !important;
+        }
+
+        /* ===== OBRÁZKY PRVNÍ OBRAZOVKY ===== */
+        .choice-btn.gd {
             background-image: url('gd/assets/juchelkaD.png') !important;
             background-position: center;
         }
@@ -140,7 +175,6 @@ body .scroll-nav button:last-child::before {
         }
 
         /* ===== OBRÁZKY DRUHÉ OBRAZOVKY ===== */
-
         .choice-btn.race {
             background-image: url('hyperdrive/kokes_race.gif') !important;
             background-position: center;
@@ -161,14 +195,29 @@ body .scroll-nav button:last-child::before {
             background-position: center;
         }
 
-@media (max-width: 700px) {
-    body .scroll-nav,
-    body .scroll-nav button {
-        width: 42px !important;
-    }
-}
+        /* ===== MOBIL ===== */
+        @media (max-width: 700px) {
+            body .scroll-nav,
+            body .scroll-nav button,
+            body .scroll-nav button:first-child,
+            body .scroll-nav button:last-child {
+                width: 42px !important;
+            }
 
-</style>
+            body .scroll-nav button::before {
+                width: 12px !important;
+                height: 12px !important;
+                border-width: 3px !important;
+            }
+
+            .home-portal-btn {
+                top: 10px;
+                left: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 
 <body class="scroll-body">
@@ -177,6 +226,7 @@ body .scroll-nav button:last-child::before {
         &larr; Zpět na OPS Portál
     </a>
 
+    <!-- Průhledný navigační sloupec se dvěma šipkami -->
     <nav class="scroll-nav" aria-label="Navigace mezi obrazovkami">
         <button
             type="button"
@@ -194,7 +244,6 @@ body .scroll-nav button:last-child::before {
     </nav>
 
     <!-- ===== PRVNÍ OBRAZOVKA ===== -->
-
     <section class="landing-page" id="sec-0">
 
         <a href="gd/index.html"
@@ -220,7 +269,6 @@ body .scroll-nav button:last-child::before {
     </section>
 
     <!-- ===== DRUHÁ OBRAZOVKA ===== -->
-
     <section class="landing-page" id="sec-1">
 
         <a href="hyperdrive/index.html"
