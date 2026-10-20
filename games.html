@@ -8,6 +8,11 @@
     <link rel="icon" type="image/x-icon" href="img/bird.png">
 
     <style>
+        /* Globální plynulé scrollování podpořené pro Windows */
+        html {
+            scroll-behavior: smooth;
+        }
+
         /* ===== ZPĚT NA PORTÁL ===== */
         .home-portal-btn {
             position: fixed;
@@ -57,7 +62,7 @@
             padding: 6px !important;
             margin: 0 !important;
 
-            /* Černá barva s průhledností a oblými rohy */
+            /* Výchozí průhledný panel s rozostřením */
             background: rgba(0, 0, 0, 0.75) !important;
             border: 1px solid rgba(255, 255, 255, 0.15) !important;
             border-radius: 30px !important;
@@ -67,6 +72,11 @@
 
             pointer-events: auto !important;
             z-index: 99999 !important;
+        }
+
+        /* ZÁLOHA PRO WINDOWS: Pokud prohlížeč nezvládá blur, uděláme panel plnější, aby šel vidět */
+        body.no-backdrop-support .scroll-nav {
+            background: rgba(0, 0, 0, 0.95) !important;
         }
 
         /* Tlačítka uvnitř panelu */
@@ -221,6 +231,13 @@
 
 <body class="scroll-body">
 
+    <!-- Kontrola podpory backdrop-filter hned po načtení -->
+    <script>
+        if (!CSS.supports('backdrop-filter', 'blur(10px)') && !CSS.supports('-webkit-backdrop-filter', 'blur(10px)')) {
+            document.body.classList.add('no-backdrop-support');
+        }
+    </script>
+
     <a href="index.html" class="home-portal-btn">
         &larr; Zpět na OPS Portál
     </a>
@@ -303,10 +320,11 @@
     <script>
         function scrollToSection(index) {
             const section = document.getElementById('sec-' + index);
+            const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             if (section) {
                 section.scrollIntoView({
-                    behavior: 'smooth',
+                    behavior: reducedMotion ? 'auto' : 'smooth',
                     block: 'start'
                 });
             }
