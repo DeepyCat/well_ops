@@ -1451,7 +1451,8 @@
                                 window.location.pathname.includes("/stratagem/") || 
                                 window.location.pathname.includes("/hyperdrive/") || 
                                 window.location.pathname.includes("/mc/") ||
-                                window.location.pathname.includes("/maturita/");
+                                window.location.pathname.includes("/maturita/") ||
+                                window.location.pathname.includes("/clicker/");
 
             if (isGameOrHub) {
                 const user = OPS_STATS.getUsername();
