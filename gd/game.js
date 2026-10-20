@@ -9101,6 +9101,39 @@ class GameScene extends Phaser.Scene {
     this._player.playEndAnimation(this._level.endXPos, () => this._levelComplete(), this._endPortalGameY);
   }
   ['_levelComplete']() {
+    try {
+      const _meta = this.game.registry.get("selectedLevelMeta");
+      const lvlId = (_meta && _meta.id) || this.game.registry.get("selectedLevelId") || 1;
+      let completed = [];
+      try {
+        const raw = localStorage.getItem('gd_completed_levels');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            completed = parsed.map(n => parseInt(n, 10)).filter(n => Number.isFinite(n));
+          }
+        }
+      } catch (_e) {}
+
+      if (!completed.includes(lvlId)) {
+        completed.push(lvlId);
+        completed.sort((a, b) => a - b);
+        localStorage.setItem('gd_completed_levels', JSON.stringify(completed));
+      }
+
+      if (window.OPS_STATS) {
+        window.OPS_STATS.recordScore('gd', 100, { levelId: lvlId });
+      }
+
+      if (typeof window.refreshCompletedLevelsUI === 'function') {
+        window.refreshCompletedLevelsUI();
+      }
+      window.dispatchEvent(new CustomEvent('gd_level_completed', {
+        detail: { levelId: lvlId, completedLevels: completed }
+      }));
+    } catch (_err) {
+      console.warn("Failed to record completed level:", _err);
+    }
     const _0x356782 = this._level.endXPos - this._cameraX;
     const _0x2d967b = 0x1cc - this._endPortalGameY + this._cameraY;
     for (let _0x481f7c = 0x0; _0x481f7c < 0x5; _0x481f7c++) {

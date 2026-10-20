@@ -63,15 +63,32 @@
       backdrop-filter: blur(8px);
       box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 15px rgba(255, 51, 68, 0.12);
     }
+    .level-picker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
     .level-picker h2 {
       font: 700 12px/1.2 Consolas, monospace;
       letter-spacing: 0.05em;
-      margin-bottom: 8px;
+      margin-bottom: 0;
       color: #ff5566;
       text-transform: uppercase;
       display: flex;
       align-items: center;
       gap: 6px;
+    }
+    .level-progress-count {
+      font: 700 11px/1.2 Consolas, monospace;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 2px 7px;
+      border-radius: 9999px;
+      white-space: nowrap;
     }
     .level-picker .row {
       display: flex;
@@ -95,6 +112,14 @@
     }
     .level-picker select:focus {
       border-color: #ff3344;
+    }
+    .level-picker select option {
+      background: #161922;
+      color: #f3f4f6;
+    }
+    .level-picker select option.completed {
+      color: #34d399;
+      font-weight: 700;
     }
     .level-picker button {
       cursor: pointer;
@@ -192,12 +217,48 @@
       document.title = 'Juchelka Dash | ' + meta.name;
     }
 
+    function getCompletedLevels() {
+      var completed = [];
+      try {
+        var raw = localStorage.getItem('gd_completed_levels');
+        if (raw) {
+          var parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            completed = parsed.map(function (n) { return parseInt(n, 10); }).filter(function (n) { return Number.isFinite(n); });
+          }
+        }
+      } catch (e) {}
+
+      try {
+        var statsRaw = localStorage.getItem('ops_game_stats');
+        if (statsRaw) {
+          var stats = JSON.parse(statsRaw);
+          if (stats && stats.gd && Array.isArray(stats.gd.completedLevels)) {
+            stats.gd.completedLevels.forEach(function (n) {
+              var id = parseInt(n, 10);
+              if (Number.isFinite(id) && completed.indexOf(id) === -1) {
+                completed.push(id);
+              }
+            });
+          }
+        }
+      } catch (e) {}
+
+      return completed;
+    }
+
+    window.getCompletedGDLevels = getCompletedLevels;
+    window.refreshCompletedLevelsUI = function () {};
+
     function mountLevelSelector() {
       var meta = selectedLevelMeta();
       var wrap = document.createElement('section');
       wrap.className = 'level-picker';
       wrap.innerHTML =
-        '<h2>Juchelka Dash (1-22)</h2>' +
+        '<div class="level-picker-header">' +
+          '<h2>Juchelka Dash (1-22)</h2>' +
+          '<span class="level-progress-count" id="gdProgressCounter">Dokončeno: 0 / 22</span>' +
+        '</div>' +
         '<div class="row">' +
           '<select id="gdLevelSelect"></select>' +
           '<button id="gdLevelLoad" type="button">Hrát</button>' +
@@ -207,13 +268,45 @@
 
       var select = document.getElementById('gdLevelSelect');
       var songInfo = document.getElementById('gdSongInfo');
+      var progressCounter = document.getElementById('gdProgressCounter');
+
       LEVELS.forEach(function (entry) {
         var option = document.createElement('option');
         option.value = String(entry.id);
-        option.textContent = entry.id + '. ' + entry.name;
         if (entry.id === meta.id) option.selected = true;
         select.appendChild(option);
       });
+
+      function updateOptionsAndProgress() {
+        var completed = getCompletedLevels();
+        var completedCount = 0;
+        Array.from(select.options).forEach(function (option) {
+          var id = parseInt(option.value, 10);
+          var entry = LEVELS.find(function (e) { return e.id === id; });
+          if (!entry) return;
+          var isDone = completed.indexOf(entry.id) !== -1;
+          if (isDone) completedCount++;
+          option.textContent = entry.id + '. ' + entry.name + (isDone ? ' [DOHRÁNO]' : '');
+          if (isDone) {
+            option.classList.add('completed');
+          } else {
+            option.classList.remove('completed');
+          }
+        });
+        if (progressCounter) {
+          progressCounter.textContent = 'Dokončeno: ' + completedCount + ' / ' + LEVELS.length;
+        }
+      }
+
+      window.refreshCompletedLevelsUI = updateOptionsAndProgress;
+      window.addEventListener('gd_level_completed', updateOptionsAndProgress);
+      window.addEventListener('storage', function (e) {
+        if (e.key === 'gd_completed_levels' || e.key === 'ops_game_stats') {
+          updateOptionsAndProgress();
+        }
+      });
+
+      updateOptionsAndProgress();
 
       function refreshSongInfo() {
         var id = parseInt(select.value, 10);
