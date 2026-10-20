@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="img/bird.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
 
 <style>
     /* ===== ZÁKLAD STRÁNKY ===== */
@@ -68,7 +67,8 @@
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        transition: flex 0.4s ease, filter 0.4s ease;
+        transition: flex 0.4s ease-in-out, filter 0.4s ease-in-out;
+        will-change: flex, filter;
     }
 
     /* Text na panelech */
@@ -222,35 +222,51 @@
         box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
     }
 
-    /* ===== NAVIGACE VPRAVO ===== */
+    /* ===== CELOVÝŠKOVÁ NAVIGACE VPRAVO ===== */
 
     .scroll-nav {
         position: fixed;
-        top: 50%;
-        right: 20px;
-        transform: translateY(-50%);
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 58px;
         z-index: 9999;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 0;
+        background: rgba(8, 15, 30, 0.78);
+        border-left: 1px solid rgba(255, 255, 255, 0.25);
+        box-shadow: -5px 0 24px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .scroll-nav button {
-        width: 44px;
-        height: 44px;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 50%;
-        color: white;
-        background: rgba(15, 23, 42, 0.85);
-        backdrop-filter: blur(8px);
+        flex: 1;
+        width: 100%;
+        min-height: 0;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0;
+        color: #fff;
+        background: rgba(30, 41, 59, 0.45);
         cursor: pointer;
-        font-size: 18px;
-        transition: background 0.25s ease, transform 0.25s ease;
+        font-size: 30px;
+        font-weight: 800;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+        transition: background-color 0.25s ease, color 0.25s ease;
     }
 
-    .scroll-nav button:hover {
-        background: rgba(220, 38, 38, 0.9);
-        transform: scale(1.1);
+    .scroll-nav button:hover,
+    .scroll-nav button:focus-visible {
+        background: rgba(220, 38, 38, 0.94);
+        color: #fff;
+        outline: 2px solid rgba(255, 255, 255, 0.85);
+        outline-offset: -4px;
+    }
+
+    .scroll-nav button:active {
+        background: #b91c1c;
     }
 
     /* ===== UŽIVATELSKÝ PROFIL ===== */
@@ -288,32 +304,22 @@
         }
 
         .scroll-nav {
-            right: 10px;
+            width: 44px;
         }
 
         .scroll-nav button {
-            width: 38px;
-            height: 38px;
+            width: 100%;
+            font-size: 25px;
+        }
+
+        .landing-page .choice-btn::after {
+            max-width: calc(100% - 8px);
         }
     }
 
-    /* ===== OMEZENÍ ANIMACÍ ===== */
-
-    @media (prefers-reduced-motion: reduce) {
-        html {
-            scroll-behavior: auto;
-        }
-
-        .landing-page .choice-btn,
-        .landing-page .choice-btn::after,
-        .landing-page .choice-btn::before,
-        .home-portal-btn {
-            transition: none;
-        }
-    }
+    /* Hover animace jsou ponechány aktivní napříč systémy. */
 </style>
-
-
+</head>
 
 <body class="scroll-body">
   <a href="index.html" class="home-portal-btn">
@@ -372,7 +378,7 @@
        data-text="Work in progress"
        aria-label="Reklama"></a>
 </section>
-    <div id="opsUserBadge" class="ops-user-badge" onclick="OPS_STATS.promptUsernameModal()"></div>
+    <div id="opsUserBadge" class="ops-user-badge" onclick="if (window.OPS_STATS) OPS_STATS.promptUsernameModal()"></div>
 
     <script src="js/ops-stats.js"></script>
     <script>
