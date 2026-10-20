@@ -101,18 +101,20 @@
         background: rgba(0, 0, 0, 0.7);
     }
 
-    .choice-btn:nth-child(1) { clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%); z-index: 6; }
-    .choice-btn:nth-child(2) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 5; }
-    .choice-btn:nth-child(3) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 4; }
-    .choice-btn:nth-child(4) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 3; }
-    .choice-btn:nth-child(5) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 2; }
-    .choice-btn:nth-child(6) { clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%); margin-left: -3%; z-index: 1; }
+    .choice-btn:nth-child(1) { clip-path: polygon(0 0, 100% 0, 93% 100%, 0% 100%); z-index: 7; }
+    .choice-btn:nth-child(2) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 6; }
+    .choice-btn:nth-child(3) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 5; }
+    .choice-btn:nth-child(4) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 4; }
+    .choice-btn:nth-child(5) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 3; }
+    .choice-btn:nth-child(6) { clip-path: polygon(7% 0, 100% 0, 93% 100%, 0% 100%); margin-left: -3%; z-index: 2; }
+    .choice-btn:nth-child(7) { clip-path: polygon(7% 0, 100% 0, 100% 100%, 0% 100%); margin-left: -3%; z-index: 1; }
 
     .choice-btn.gd { background-image: url('gd/assets/juchelkaD.png'); }
     .choice-btn.hero {  background-image: url('stratagem/data/Images/heroJ.png'); }
     .choice-btn.maturita { background-image: url('maturita/barina_run.png'); background-position: center; }
     .choice-btn.craft { background-image: url('mc/juchelka_craft.png'); background-position: 80% 50%; }
     .choice-btn.race { background-image: url('hyperdrive/kokes_race.gif'); background-position: center; }
+    .choice-btn.click { background-image: url('clicker/02_.png'); background-position: center; }
     .choice-btn.stat { background-image: none; background-color: #1e293b; }
 </style>
 
@@ -125,7 +127,9 @@
         <a href="maturita/index.html" class="choice-btn maturita" data-text="Run From Maturita"></a>
         <a href="mc/index.html" class="choice-btn craft" data-text="JuchelkaCraft"></a>
         <a href="hyperdrive/index.html" class="choice-btn race" data-text="Race with Kokeš"></a>
+        <a href="clicker/index.html" class="choice-btn click" data-text="Maturita click"></a>
         <a href="statistika.html" class="choice-btn stat" data-text="Statistiky"></a>
+    </section>
     <div id="opsUserBadge" class="ops-user-badge" onclick="OPS_STATS.promptUsernameModal()"></div>
 
     <script src="js/ops-stats.js"></script>
