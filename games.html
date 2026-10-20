@@ -1,408 +1,265 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OPS - Games</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="img/bird.png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-    /* ===== ZÁKLAD STRÁNKY ===== */
+    <style>
 
-    * {
-        box-sizing: border-box;
-    }
+/* OPRAVA: pouze šipky, žádné pozadí sloupce */
+body .scroll-nav {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: auto !important;
+    width: 54px !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
+    z-index: 99999 !important;
+}
 
-    html {
-        margin: 0;
-        padding: 0;
-        scroll-behavior: smooth;
-        scroll-snap-type: y mandatory;
-    }
+body .scroll-nav button,
+body .scroll-nav button:first-child,
+body .scroll-nav button:last-child {
+    position: fixed !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 54px !important;
+    height: 60px !important;
+    min-height: 60px !important;
+    max-height: 60px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    flex: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    pointer-events: auto !important;
+}
 
-    body.scroll-body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        min-height: 100vh;
-        display: block;
-        overflow-x: hidden;
-        overflow-y: auto;
-        background-color: #0f172a;
-        color: white;
-    }
+/* První šipka: horní okraj */
+body .scroll-nav button:first-child {
+    top: 0 !important;
+    bottom: auto !important;
+}
 
-    /* ===== JEDNOTLIVÉ OBRAZOVKY ===== */
+/* Druhá šipka: dolní okraj */
+body .scroll-nav button:last-child {
+    top: auto !important;
+    bottom: 0 !important;
+}
 
-    .landing-page {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        min-height: 400px;
-        overflow: hidden;
-        position: relative;
-        isolation: isolate;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
-    }
+/* Vypnutí původních znaků a vykreslení vlastních šipek */
+body .scroll-nav button {
+    font-size: 0 !important;
+    color: transparent !important;
+}
 
-    /* ===== PANELY ===== */
+body .scroll-nav button::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-top: 4px solid white !important;
+    border-left: 4px solid white !important;
+    background: transparent !important;
+    filter: drop-shadow(0 1px 3px black) !important;
+}
 
-    .landing-page .choice-btn {
-        flex: 1 1 0;
-        min-width: 0;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-decoration: none;
-        color: white;
-        font-size: 2rem;
-        position: relative;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        transition: flex 0.4s ease-in-out, filter 0.4s ease-in-out;
-        will-change: flex, filter;
-    }
+body .scroll-nav button:first-child::before {
+    transform: translate(-50%, -30%) rotate(45deg) !important;
+}
 
-    /* Text na panelech */
-
-    .landing-page .choice-btn::after {
-        content: attr(data-text);
-        font-size: clamp(1.1rem, 1.6vw, 1.8rem);
-        font-weight: bold;
-        letter-spacing: 1px;
-        color: white;
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
-        background: rgba(0, 0, 0, 0.45);
-        padding: 12px 20px;
-        border-radius: 50px;
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: transform 0.3s ease, background 0.3s ease;
-        text-align: center;
-        max-width: 88%;
-        overflow-wrap: anywhere;
-        position: relative;
-        z-index: 2;
-    }
-
-    /* Ztmavení pozadí */
-
-    .landing-page .choice-btn::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.12);
-        transition: background 0.3s ease;
-        pointer-events: none;
-    }
-
-    /* Efekt při najetí myší */
-
-    .landing-page .choice-btn:hover {
-        flex: 1.4 1 0;
-        filter: brightness(1.25);
-        z-index: 10;
-    }
-
-    .landing-page .choice-btn:hover::after {
-        transform: scale(1.1);
-        background: rgba(0, 0, 0, 0.65);
-    }
-
-    .landing-page .choice-btn:hover::before {
-        background: rgba(0, 0, 0, 0.02);
-    }
-
-    /* ===== ŠIKMÉ OKRAJE PANELŮ ===== */
-
-    .landing-page .choice-btn:nth-child(1) {
-        clip-path: polygon(0 0, 100% 0, 93% 100%, 0 100%);
-        z-index: 4;
-    }
-
-    .landing-page .choice-btn:nth-child(2) {
-        clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
-        margin-left: -3%;
-        z-index: 3;
-    }
-
-    .landing-page .choice-btn:nth-child(3) {
-        clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
-        margin-left: -3%;
-        z-index: 2;
-    }
-
-    .landing-page .choice-btn:nth-child(4) {
-        clip-path: polygon(7% 0, 100% 0, 100% 100%, 0 100%);
-        margin-left: -3%;
-        z-index: 1;
-    }
-
-    /* ===== PRVNÍ OBRAZOVKA: SEC-0 ===== */
-
-    .choice-btn.gd {
-        background-image: url('gd/assets/juchelkaD.png');
-        background-position: center;
-    }
-
-    .choice-btn.hero {
-        background-image: url('stratagem/data/Images/heroJ.png');
-        background-position: center;
-    }
-
-    .choice-btn.maturita {
-        background-image: url('maturita/barina_run.png');
-        background-position: center;
-    }
-
-    .choice-btn.craft {
-        background-image: url('mc/juchelka_craft.png');
-        background-position: 80% 50%;
-    }
-
-    /* ===== DRUHÁ OBRAZOVKA: SEC-1 ===== */
-
-    .choice-btn.race {
-        background-image: url('hyperdrive/kokes_race.gif');
-        background-position: center;
-    }
-
-    .choice-btn.click {
-        background-image: url('clicker/02_.png');
-        background-position: center;
-    }
-
-    .choice-btn.stat {
-        background-image: none;
-        background-color: #1e293b;
-    }
-
-    .choice-btn.custom {
-        background-image: url('img/all1-b.jpg');
-        background-position: 50% 50%;
-        background-size: cover;
-    }
-
-    /* ===== TLAČÍTKO ZPĚT ===== */
-
-    .home-portal-btn {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 9999;
-        background: rgba(15, 23, 42, 0.85);
-        color: white;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 700;
-        padding: 10px 20px;
-        border-radius: 30px;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        transition: all 0.25s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .home-portal-btn:hover {
-        background: rgba(220, 38, 38, 0.9);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-    }
-
-    /* ===== CELOVÝŠKOVÁ NAVIGACE VPRAVO ===== */
-
-    .scroll-nav {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        width: 58px;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        background: rgba(8, 15, 30, 0.78);
-        border-left: 1px solid rgba(255, 255, 255, 0.25);
-        box-shadow: -5px 0 24px rgba(0, 0, 0, 0.25);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-    }
-
-    .scroll-nav button {
-        flex: 1;
-        width: 100%;
-        min-height: 0;
-        border: 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 0;
-        color: #fff;
-        background: rgba(30, 41, 59, 0.45);
-        cursor: pointer;
-        font-size: 30px;
-        font-weight: 800;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
-        transition: background-color 0.25s ease, color 0.25s ease;
-    }
-
-    .scroll-nav button:hover,
-    .scroll-nav button:focus-visible {
-        background: rgba(220, 38, 38, 0.94);
-        color: #fff;
-        outline: 2px solid rgba(255, 255, 255, 0.85);
-        outline-offset: -4px;
-    }
-
-    .scroll-nav button:active {
-        background: #b91c1c;
-    }
-
-    /* ===== UŽIVATELSKÝ PROFIL ===== */
-
-    .ops-user-badge {
-        position: fixed;
-      
-        z-index: 9999;
-    }
-
-    /* ===== MOBILNÍ ZAŘÍZENÍ ===== */
-
-    @media (max-width: 700px) {
-        .landing-page {
-            min-height: 100svh;
+body .scroll-nav button:last-child::before {
+    transform: translate(-50%, -70%) rotate(225deg) !important;
+}
+         .choice-btn.gd {
+            background-image: url('gd/assets/juchelkaD.png') !important;
+            background-position: center;
         }
 
-        .landing-page .choice-btn::after {
-            font-size: clamp(0.75rem, 2.8vw, 1.2rem);
-            padding: 10px 8px;
-            letter-spacing: 0;
-            max-width: 90%;
-            border-radius: 18px;
+        .choice-btn.hero {
+            background-image: url('stratagem/data/Images/heroJ.png') !important;
+            background-position: center;
         }
 
-        .landing-page .choice-btn:hover {
-            flex-grow: 1.25;
+        .choice-btn.maturita {
+            background-image: url('maturita/barina_run.png') !important;
+            background-position: center;
         }
 
-        .home-portal-btn {
-            top: 10px;
-            left: 10px;
-            font-size: 12px;
-            padding: 8px 12px;
+        .choice-btn.craft {
+            background-image: url('mc/juchelka_craft.png') !important;
+            background-position: 80% center;
         }
 
-        .scroll-nav {
-            width: 44px;
+        /* ===== OBRÁZKY DRUHÉ OBRAZOVKY ===== */
+
+        .choice-btn.race {
+            background-image: url('hyperdrive/kokes_race.gif') !important;
+            background-position: center;
         }
 
-        .scroll-nav button {
-            width: 100%;
-            font-size: 25px;
+        .choice-btn.click {
+            background-image: url('clicker/02_.png') !important;
+            background-position: center;
         }
 
-        .landing-page .choice-btn::after {
-            max-width: calc(100% - 8px);
+        .choice-btn.stat {
+            background-image: none !important;
+            background-color: #1e293b;
         }
+
+        .choice-btn.custom {
+            background-image: url('img/all1-b.jpg') !important;
+            background-position: center;
+        }
+
+@media (max-width: 700px) {
+    body .scroll-nav,
+    body .scroll-nav button {
+        width: 42px !important;
     }
+}
 
-    /* Hover animace jsou ponechány aktivní napříč systémy. */
 </style>
 </head>
 
 <body class="scroll-body">
-  <a href="index.html" class="home-portal-btn">
-    &larr; Zpět na OPS Portál
-</a>
 
-<div class="scroll-nav">
-    <button onclick="scrollToSection(0)" title="První obrazovka" aria-label="Přejít na první obrazovku">▲</button>
-    <button onclick="scrollToSection(1)" title="Druhá obrazovka" aria-label="Přejít na druhou obrazovku">▼</button>
-</div>
+    <a href="index.html" class="home-portal-btn">
+        &larr; Zpět na OPS Portál
+    </a>
 
-<!-- ===== PRVNÍ OBRAZOVKA: 4 PANELY ===== -->
+    <nav class="scroll-nav" aria-label="Navigace mezi obrazovkami">
+        <button
+            type="button"
+            onclick="scrollToSection(0)"
+            title="První obrazovka"
+            aria-label="Přejít na první obrazovku">
+        </button>
 
-<section class="landing-page" id="sec-0">
-    <a href="gd/index.html"
-       class="choice-btn gd"
-       data-text="Juchelka dash"
-       aria-label="Juchelka dash"></a>
+        <button
+            type="button"
+            onclick="scrollToSection(1)"
+            title="Druhá obrazovka"
+            aria-label="Přejít na druhou obrazovku">
+        </button>
+    </nav>
 
-    <a href="stratagem/index.html"
-       class="choice-btn hero"
-       data-text="Juchelka Hero"
-       aria-label="Juchelka Hero"></a>
+    <!-- ===== PRVNÍ OBRAZOVKA ===== -->
 
-    <a href="maturita/index.html"
-       class="choice-btn maturita"
-       data-text="Run From Maturita"
-       aria-label="Run From Maturita"></a>
+    <section class="landing-page" id="sec-0">
 
-    <a href="mc/index.html"
-       class="choice-btn craft"
-       data-text="JuchelkaCraft"
-       aria-label="JuchelkaCraft"></a>
-</section>
+        <a href="gd/index.html"
+           class="choice-btn gd"
+           data-text="Juchelka dash"
+           aria-label="Juchelka dash"></a>
 
-<!-- ===== DRUHÁ OBRAZOVKA: 4 PANELY ===== -->
+        <a href="stratagem/index.html"
+           class="choice-btn hero"
+           data-text="Juchelka Hero"
+           aria-label="Juchelka Hero"></a>
 
-<section class="landing-page" id="sec-1">
-    <a href="hyperdrive/index.html"
-       class="choice-btn race"
-       data-text="Race with Kokeš"
-       aria-label="Race with Kokeš"></a>
+        <a href="maturita/index.html"
+           class="choice-btn maturita"
+           data-text="Run From Maturita"
+           aria-label="Run From Maturita"></a>
 
-    <a href="clicker/index.html"
-       class="choice-btn click"
-       data-text="Maturita click"
-       aria-label="Maturita click"></a>
+        <a href="mc/index.html"
+           class="choice-btn craft"
+           data-text="JuchelkaCraft"
+           aria-label="JuchelkaCraft"></a>
 
-    <a href="statistika.html"
-       class="choice-btn stat"
-       data-text="Statistiky"
-       aria-label="Statistiky"></a>
+    </section>
 
-    <a href="custom.html"
-       class="choice-btn custom"
-       data-text="Work in progress"
-       aria-label="Reklama"></a>
-</section>
-    <div id="opsUserBadge" class="ops-user-badge" onclick="if (window.OPS_STATS) OPS_STATS.promptUsernameModal()"></div>
+    <!-- ===== DRUHÁ OBRAZOVKA ===== -->
+
+    <section class="landing-page" id="sec-1">
+
+        <a href="hyperdrive/index.html"
+           class="choice-btn race"
+           data-text="Race with Kokeš"
+           aria-label="Race with Kokeš"></a>
+
+        <a href="clicker/index.html"
+           class="choice-btn click"
+           data-text="Maturita click"
+           aria-label="Maturita click"></a>
+
+        <a href="statistika.html"
+           class="choice-btn stat"
+           data-text="Statistiky"
+           aria-label="Statistiky"></a>
+
+        <a href="custom.html"
+           class="choice-btn custom"
+           data-text="Work in progress"
+           aria-label="Reklama"></a>
+
+    </section>
+
+    <div
+        id="opsUserBadge"
+        class="ops-user-badge"
+        onclick="if (window.OPS_STATS) OPS_STATS.promptUsernameModal()">
+    </div>
 
     <script src="js/ops-stats.js"></script>
+
     <script>
         function scrollToSection(index) {
-            const sections = document.querySelectorAll('.landing-page');
-            if (sections[index]) {
-                sections[index].scrollIntoView({ behavior: 'smooth' });
+            const section = document.getElementById('sec-' + index);
+
+            if (section) {
+                section.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             }
         }
+
         document.addEventListener('keydown', function (event) {
-        if (event.key === 'ArrowDown' || event.key === 'PageDown') {
-            event.preventDefault();
+            if (event.key === 'ArrowDown' || event.key === 'PageDown') {
+                event.preventDefault();
 
-            const current = window.scrollY < window.innerHeight / 2 ? 0 : 1;
-            scrollToSection(Math.min(current + 1, 1));
-        }
+                const current =
+                    window.scrollY < window.innerHeight / 2 ? 0 : 1;
 
-        if (event.key === 'ArrowUp' || event.key === 'PageUp') {
-            event.preventDefault();
+                scrollToSection(Math.min(current + 1, 1));
+            }
 
-            const current = window.scrollY < window.innerHeight / 2 ? 0 : 1;
-            scrollToSection(Math.max(current - 1, 0));
-        }
-    });
+            if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+                event.preventDefault();
+
+                const current =
+                    window.scrollY < window.innerHeight / 2 ? 0 : 1;
+
+                scrollToSection(Math.max(current - 1, 0));
+            }
+        });
     </script>
+
 </body>
 </html>
