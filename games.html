@@ -10,31 +10,31 @@
 
     <style>
 .home-portal-btn {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 9999;
-        background: rgba(15, 23, 42, 0.85);
-        color: white;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 700;
-        padding: 10px 20px;
-        border-radius: 30px;
-        backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        transition: all 0.25s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10001;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 30px;
+            background: rgba(15,23,42,0.88);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: background 0.25s ease, transform 0.25s ease;
+        }
 
-    .home-portal-btn:hover {
-        background: rgba(220, 38, 38, 0.9);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
-    }
+        .home-portal-btn:hover {
+            background: rgba(220,38,38,0.9);
+            transform: translateY(-2px);
+        }
 /* OPRAVA: pouze šipky, žádné pozadí sloupce */
 body .scroll-nav {
     position: fixed !important;
@@ -47,7 +47,7 @@ body .scroll-nav {
     padding: 0 !important;
     margin: 0 !important;
     display: block !important;
-    background: transparent !important;
+    background: rgba(52, 52, 52, 0.218) !important;
     border: none !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
