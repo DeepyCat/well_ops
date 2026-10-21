@@ -63,7 +63,8 @@
             upgrades: [],
             achievements: [],
             playTime: 0,
-            lastSave: 0
+            lastSave: 0,
+            inactiveAccumulatedMs: 0
         },
         meta: {
             totalPlayTime: 0,
@@ -140,7 +141,8 @@
             upgrades: Array.isArray(saveData.upgrades) ? [...saveData.upgrades] : [],
             achievements: Array.isArray(saveData.achievements) ? [...saveData.achievements] : [],
             playTime: existingPlayTime || 0,
-            lastSave: typeof saveData.lastSave === "number" ? saveData.lastSave : Date.now()
+            lastSave: typeof saveData.lastSave === "number" ? saveData.lastSave : Date.now(),
+            inactiveAccumulatedMs: typeof saveData.inactiveAccumulatedMs === "number" ? saveData.inactiveAccumulatedMs : 0
         };
     }
 
@@ -166,6 +168,7 @@
                         }
                         clickerState.cps = computeClickerCps(s);
                         clickerState.lastSave = Math.max(clickerState.lastSave || 0, Number(s.lastSave) || 0);
+                        clickerState.inactiveAccumulatedMs = typeof s.inactiveAccumulatedMs === "number" ? s.inactiveAccumulatedMs : (clickerState.inactiveAccumulatedMs || 0);
                     }
                 }
             }
@@ -392,6 +395,7 @@
                             buildingMultipliers: baseSource.buildingMultipliers || {},
                             startTime: baseSource.startTime || Date.now(),
                             lastCursorClick: baseSource.lastCursorClick || Date.now(),
+                            inactiveAccumulatedMs: typeof baseSource.inactiveAccumulatedMs === "number" ? baseSource.inactiveAccumulatedMs : 0,
                             lastSave: newerLastSave
                         };
 
@@ -411,6 +415,7 @@
                             upgrades: mergedSaveObj.upgrades,
                             achievements: mergedSaveObj.achievements,
                             playTime: higherPlayTime,
+                            inactiveAccumulatedMs: mergedSaveObj.inactiveAccumulatedMs,
                             lastSave: mergedSaveObj.lastSave
                         };
 
@@ -1081,7 +1086,8 @@
             upgrades: Array.isArray(data.upgrades) ? [...data.upgrades] : [],
             achievements: Array.isArray(data.achievements) ? [...data.achievements] : [],
             playTime: curPlayTime,
-            lastSave: typeof data.lastSave === "number" ? data.lastSave : Date.now()
+            lastSave: typeof data.lastSave === "number" ? data.lastSave : Date.now(),
+            inactiveAccumulatedMs: typeof data.inactiveAccumulatedMs === "number" ? data.inactiveAccumulatedMs : 0
         };
 
         saveLocalStats(stats);
@@ -1146,7 +1152,21 @@
         });
 
         document.addEventListener("visibilitychange", function() {
-            if (document.hidden && syncCloudDebounceTimer) {
+            if (syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncToCloud();
+            }
+        });
+
+        window.addEventListener("blur", function() {
+            if (syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncToCloud();
+            }
+        });
+
+        window.addEventListener("focus", function() {
+            if (syncCloudDebounceTimer) {
                 clearTimeout(syncCloudDebounceTimer);
                 syncToCloud();
             }
