@@ -792,6 +792,47 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Maturita click -->
+                <div class="game-card">
+                    <div class="game-card-header">
+                        <div class="game-title-group">
+                            <img src="clicker/02_.png" class="game-icon-img" alt="Maturita click">
+                            <div class="game-title">Maturita click</div>
+                        </div>
+                        <a href="clicker/index.html" class="game-play-link">Spustit</a>
+                    </div>
+                    <div class="metric-rows">
+                        <div class="metric-row">
+                            <span class="metric-label">Celkem Mpoints:</span>
+                            <span id="clickerTotalCookiesText" class="metric-value" style="color:var(--accent-yellow);font-size:1.15rem;">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Aktuální Mpoints:</span>
+                            <span id="clickerCookiesText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Celkem kliknutí:</span>
+                            <span id="clickerClicksText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Počet budov:</span>
+                            <span id="clickerBuildingsText" class="metric-value">0 ks</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Odemčeno vylepšení:</span>
+                            <span id="clickerUpgradesText" class="metric-value">0 ks</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Produkce (Mpoints / s):</span>
+                            <span id="clickerCpsText" class="metric-value">0</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Odehraný čas:</span>
+                            <span id="clickerTimeText" class="metric-value">0m</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -830,20 +871,26 @@
             return `${m}m`;
         }
 
+        function formatNumber(num) {
+            num = Math.floor(num || 0);
+            return num.toLocaleString("cs-CZ");
+        }
+
         function calculateGamerLevel(stats) {
             const timeXp = Math.floor((stats.meta.totalPlayTime || 0) / 30); // 1 XP každých 30s
             const heroXp = (stats.stratagem.highScore || 0) * 15;
             const gdXp = (stats.gd.completedLevels?.length || 0) * 100 + Math.floor((stats.gd.jumps || 0) / 10);
-            const totalXp = timeXp + heroXp + gdXp;
+            const clickerXp = Math.min(1000, Math.floor(Math.sqrt(stats.clicker?.totalCookies || 0) / 5));
+            const totalXp = timeXp + heroXp + gdXp + clickerXp;
             const level = Math.max(1, Math.floor(Math.sqrt(totalXp / 10)) + 1);
             return `LVL ${level}`;
         }
 
-        function renderStats() {
+        function renderStats(statsParam) {
             const user = OPS_STATS.getUsername() || "Neznámý hráč";
             document.getElementById('topUsernameDisplay').textContent = user;
 
-            const stats = OPS_STATS.getStats();
+            const stats = statsParam || OPS_STATS.getStats();
 
             // Highlights
             document.getElementById('statTotalTime').textContent = formatDuration(stats.meta.totalPlayTime);
@@ -864,7 +911,7 @@
 
             for (let i = 1; i <= 22; i++) {
                 const lvlKey = String(i);
-                const percent = stats.gd.bestPercent[lvlKey] || 0;
+                const percent = stats.gd?.bestPercent?.[lvlKey] || 0;
                 sumPercent += percent;
                 const isComplete = percent >= 100;
 
@@ -925,6 +972,35 @@
             document.getElementById('maturitaDistanceText').textContent = `${stats.maturita?.bestDistance || 0}m`;
             document.getElementById('maturitaGamesText').textContent = stats.maturita?.totalGames || 0;
             document.getElementById('maturitaTimeText').textContent = formatDuration(stats.maturita?.playTime || 0);
+
+            // Maturita click
+            const clicker = stats.clicker || {};
+            const clickerBuildingsTotal = Object.values(clicker.buildings || {}).reduce((sum, n) => sum + (Number(n) || 0), 0);
+            const clickerUpgradesTotal = Array.isArray(clicker.upgrades) ? clicker.upgrades.length : 0;
+
+            const clickerTotalEl = document.getElementById('clickerTotalCookiesText');
+            if (clickerTotalEl) clickerTotalEl.textContent = formatNumber(clicker.totalCookies || 0);
+
+            const clickerCurrentEl = document.getElementById('clickerCookiesText');
+            if (clickerCurrentEl) clickerCurrentEl.textContent = formatNumber(clicker.cookies || 0);
+
+            const clickerClicksEl = document.getElementById('clickerClicksText');
+            if (clickerClicksEl) clickerClicksEl.textContent = formatNumber(clicker.clicks || 0);
+
+            const clickerBuildingsEl = document.getElementById('clickerBuildingsText');
+            if (clickerBuildingsEl) clickerBuildingsEl.textContent = `${formatNumber(clickerBuildingsTotal)} ks`;
+
+            const clickerUpgradesEl = document.getElementById('clickerUpgradesText');
+            if (clickerUpgradesEl) clickerUpgradesEl.textContent = `${clickerUpgradesTotal} ks`;
+
+            const clickerCpsEl = document.getElementById('clickerCpsText');
+            if (clickerCpsEl) {
+                const cpsVal = Number(clicker.cps) || 0;
+                clickerCpsEl.textContent = cpsVal >= 100 ? formatNumber(cpsVal) : cpsVal.toFixed(1);
+            }
+
+            const clickerTimeEl = document.getElementById('clickerTimeText');
+            if (clickerTimeEl) clickerTimeEl.textContent = formatDuration(clicker.playTime || 0);
         }
 
         function switchTab(tabId) {
