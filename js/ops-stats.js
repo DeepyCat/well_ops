@@ -59,6 +59,8 @@
             clicks: 0,
             clickPower: 1,
             cps: 0,
+            clickCps: 0,
+            peakClickCps: 0,
             buildings: {},
             upgrades: [],
             achievements: [],
@@ -102,7 +104,17 @@
             mine: 260,
             shipment: 1400,
             lab: 10000,
-            portal: 65000
+            portal: 65000,
+            timemachine: 450000,
+            antimatter: 3200000,
+            prism: 24000000,
+            chancemaker: 180000000,
+            fractal: 1400000000,
+            javascript: 11000000000,
+            idleverse: 90000000000,
+            cortex: 750000000000,
+            quantum_server: 6500000000000,
+            maturita_singularity: 55000000000000
         };
         const buildings = clickerData.buildings || {};
         const multipliers = clickerData.buildingMultipliers || {};
@@ -137,6 +149,8 @@
             clicks: typeof saveData.clicks === "number" ? saveData.clicks : 0,
             clickPower: typeof saveData.clickPower === "number" ? saveData.clickPower : 1,
             cps: computeClickerCps(saveData),
+            clickCps: typeof saveData.clickCps === "number" ? saveData.clickCps : 0,
+            peakClickCps: typeof saveData.peakClickCps === "number" ? saveData.peakClickCps : 0,
             buildings: saveData.buildings && typeof saveData.buildings === "object" ? { ...saveData.buildings } : {},
             upgrades: Array.isArray(saveData.upgrades) ? [...saveData.upgrades] : [],
             achievements: Array.isArray(saveData.achievements) ? [...saveData.achievements] : [],
@@ -167,6 +181,8 @@
                             clickerState.achievements = Array.from(new Set([...clickerState.achievements, ...s.achievements]));
                         }
                         clickerState.cps = computeClickerCps(s);
+                        clickerState.clickCps = typeof s.clickCps === "number" ? s.clickCps : (clickerState.clickCps || 0);
+                        clickerState.peakClickCps = Math.max(clickerState.peakClickCps || 0, Number(s.peakClickCps) || 0);
                         clickerState.lastSave = Math.max(clickerState.lastSave || 0, Number(s.lastSave) || 0);
                         clickerState.inactiveAccumulatedMs = typeof s.inactiveAccumulatedMs === "number" ? s.inactiveAccumulatedMs : (clickerState.inactiveAccumulatedMs || 0);
                     }
@@ -191,6 +207,8 @@
             const clickerState = {
                 ...DEFAULT_STATS.clicker,
                 ...clickerParsed,
+                clickCps: typeof clickerParsed.clickCps === "number" ? clickerParsed.clickCps : 0,
+                peakClickCps: typeof clickerParsed.peakClickCps === "number" ? clickerParsed.peakClickCps : 0,
                 buildings: { ...(clickerParsed.buildings || {}) },
                 upgrades: Array.isArray(clickerParsed.upgrades) ? [...clickerParsed.upgrades] : [],
                 achievements: Array.isArray(clickerParsed.achievements) ? [...clickerParsed.achievements] : []
@@ -377,6 +395,7 @@
                         const higherClicks = Math.max(Number(localEffective.clicks) || 0, Number(cloudClicker.clicks) || 0);
                         const higherPlayTime = Math.max(Number(localEffective.playTime) || 0, Number(cloudClicker.playTime) || 0);
                         const higherClickPower = Math.max(Number(localEffective.clickPower) || 1, Number(cloudClicker.clickPower) || 1);
+                        const higherPeakClickCps = Math.min(20, Math.max(Number(localEffective.peakClickCps) || 0, Number(cloudClicker.peakClickCps) || 0));
                         const spendableCookies = preferCloud
                             ? (typeof cloudClicker.cookies === "number" ? cloudClicker.cookies : localEffective.cookies)
                             : (typeof localEffective.cookies === "number" ? localEffective.cookies : cloudClicker.cookies);
@@ -396,6 +415,7 @@
                             startTime: baseSource.startTime || Date.now(),
                             lastCursorClick: baseSource.lastCursorClick || Date.now(),
                             inactiveAccumulatedMs: typeof baseSource.inactiveAccumulatedMs === "number" ? baseSource.inactiveAccumulatedMs : 0,
+                            peakClickCps: higherPeakClickCps,
                             lastSave: newerLastSave
                         };
 
@@ -411,6 +431,8 @@
                             clicks: mergedSaveObj.clicks,
                             clickPower: mergedSaveObj.clickPower,
                             cps: computeClickerCps(mergedSaveObj),
+                            clickCps: Math.min(20, localEffective.clickCps || 0),
+                            peakClickCps: higherPeakClickCps,
                             buildings: mergedSaveObj.buildings,
                             upgrades: mergedSaveObj.upgrades,
                             achievements: mergedSaveObj.achievements,
@@ -1295,7 +1317,11 @@
         fetchLeaderboard: async function(orderBy = "total_play_time", limit = 10) {
             if (!isSupabaseConfigured()) return [];
             try {
-                const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at&order=${encodeURIComponent(orderBy)}.desc&limit=${limit}`;
+                let orderParam = encodeURIComponent(orderBy) + ".desc";
+                if (orderBy === "clicker_total_cookies") {
+                    orderParam = "stats->clicker->totalCookies.desc.nullslast";
+                }
+                const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats&order=${orderParam}&limit=${limit}`;
                 const res = await fetch(endpoint, {
                     method: "GET",
                     headers: getSupabaseHeaders()
