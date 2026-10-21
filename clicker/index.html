@@ -8,11 +8,140 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      .ops-top-navbar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 99999;
+        background: rgba(15, 23, 42, 0.94);
+        border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+        box-sizing: border-box;
+      }
+      .ops-top-navbar-left,
+      .ops-top-navbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .ops-nav-back-btn {
+        text-decoration: none;
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(59, 130, 246, 0.25));
+        border: 1px solid #38bdf8;
+        color: #fff;
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-family: Consolas, monospace;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+      }
+      .ops-nav-back-btn:hover {
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.35), rgba(59, 130, 246, 0.45));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+      }
+      .ops-cloud-sync-badge {
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 9999px;
+        padding: 6px 14px;
+        font-family: Consolas, monospace;
+        font-size: 12px;
+        color: #cbd5e1;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+        user-select: none;
+      }
+      .ops-cloud-sync-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #94a3b8;
+        box-shadow: 0 0 6px rgba(148, 163, 184, 0.6);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      .ops-cloud-sync-text {
+        font-weight: 600;
+      }
+      .ops-user-badge-btn {
+        background: rgba(30, 41, 59, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        color: #e2e8f0;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-family: Consolas, monospace;
+        font-size: 12px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+      .ops-user-badge-btn:hover {
+        border-color: #38bdf8;
+        background: rgba(51, 65, 85, 0.95);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(56, 189, 248, 0.25);
+      }
+      .ops-user-badge-name {
+        color: #38bdf8;
+        font-weight: 700;
+      }
+      @media (max-width: 640px) {
+        .ops-top-navbar {
+          padding: 8px 10px;
+          gap: 6px;
+        }
+        .ops-nav-back-btn {
+          padding: 6px 10px;
+          font-size: 11px;
+        }
+        .ops-cloud-sync-badge,
+        .ops-user-badge-btn {
+          padding: 5px 10px;
+          font-size: 11px;
+        }
+      }
+    </style>
     <script src="../js/ops-stats.js"></script>
     <script type="module" crossorigin src="./assets/index-BZ_H0cX1.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-CJY1JsmG.css">
   </head>
   <body>
+    <header class="ops-top-navbar">
+      <div class="ops-top-navbar-left">
+        <a href="../games.html" class="ops-nav-back-btn">
+          &larr; Zpět na OPS Portál
+        </a>
+      </div>
+      <div class="ops-top-navbar-right">
+        <div id="opsCloudSyncBadge" class="ops-cloud-sync-badge">
+          <span class="ops-cloud-sync-dot"></span>
+          <span class="ops-cloud-sync-text">Cloud: Kontrola...</span>
+        </div>
+        <button type="button" id="opsUserBadge" class="ops-user-badge-btn" onclick="OPS_STATS.promptUsernameModal()">
+          <span class="ops-user-badge-name">...</span>
+        </button>
+      </div>
+    </header>
     <div id="root"></div>
   </body>
 </html>

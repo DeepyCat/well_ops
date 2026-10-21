@@ -53,6 +53,18 @@
             runnerHighScore: 0,
             playTime: 0
         },
+        clicker: {
+            cookies: 0,
+            totalCookies: 0,
+            clicks: 0,
+            clickPower: 1,
+            cps: 0,
+            buildings: {},
+            upgrades: [],
+            achievements: [],
+            playTime: 0,
+            lastSave: 0
+        },
         meta: {
             totalPlayTime: 0,
             lastPlayedGame: null,
@@ -73,13 +85,116 @@
     }
 
     // -------------------------------------------------------------------------
+    // CLICKER STATS HELPERS
+    // -------------------------------------------------------------------------
+    function computeClickerCps(clickerData) {
+        if (!clickerData) return 0;
+        if (typeof clickerData.cps === "number" && clickerData.cps > 0 && !clickerData.buildings) {
+            return clickerData.cps;
+        }
+        const baseCpsMap = {
+            cursor: 0.1,
+            grandma: 1,
+            farm: 8,
+            steroids: 20,
+            factory: 47,
+            mine: 260,
+            shipment: 1400,
+            lab: 10000,
+            portal: 65000
+        };
+        const buildings = clickerData.buildings || {};
+        const multipliers = clickerData.buildingMultipliers || {};
+        const bBonus = typeof clickerData.buildingBonus === "number" ? clickerData.buildingBonus : 0;
+        const gBonus = typeof clickerData.grandmaBonus === "number" ? clickerData.grandmaBonus : 0;
+        const sBonus = typeof clickerData.steroidBonus === "number" ? clickerData.steroidBonus : 1;
+
+        let totalCps = 0;
+        for (const [id, baseCps] of Object.entries(baseCpsMap)) {
+            const count = Number(buildings[id]) || 0;
+            if (count <= 0) continue;
+            const mult = Number(multipliers[id]) || 1;
+            let cps = count * baseCps * (1 + bBonus) * mult;
+            if (id === "grandma" && (Number(buildings.steroids) || 0) > 0) {
+                cps *= (1 + gBonus);
+            }
+            if (id === "steroids") {
+                cps *= sBonus;
+            }
+            totalCps += cps;
+        }
+        return totalCps;
+    }
+
+    function extractClickerStateFromSave(saveData, existingPlayTime = 0) {
+        if (!saveData || typeof saveData !== "object") {
+            return { ...DEFAULT_STATS.clicker, playTime: existingPlayTime };
+        }
+        return {
+            cookies: typeof saveData.cookies === "number" ? saveData.cookies : 0,
+            totalCookies: typeof saveData.totalCookies === "number" ? saveData.totalCookies : 0,
+            clicks: typeof saveData.clicks === "number" ? saveData.clicks : 0,
+            clickPower: typeof saveData.clickPower === "number" ? saveData.clickPower : 1,
+            cps: computeClickerCps(saveData),
+            buildings: saveData.buildings && typeof saveData.buildings === "object" ? { ...saveData.buildings } : {},
+            upgrades: Array.isArray(saveData.upgrades) ? [...saveData.upgrades] : [],
+            achievements: Array.isArray(saveData.achievements) ? [...saveData.achievements] : [],
+            playTime: existingPlayTime || 0,
+            lastSave: typeof saveData.lastSave === "number" ? saveData.lastSave : Date.now()
+        };
+    }
+
+    function populateClickerFromStorage(clickerState) {
+        if (typeof localStorage === "undefined") return;
+        try {
+            const rawSave = localStorage.getItem("cookieClickerSave");
+            if (rawSave) {
+                const s = JSON.parse(rawSave);
+                if (s && typeof s === "object") {
+                    const totalFromSave = Number(s.totalCookies) || 0;
+                    if (totalFromSave >= (clickerState.totalCookies || 0)) {
+                        clickerState.cookies = typeof s.cookies === "number" ? s.cookies : clickerState.cookies;
+                        clickerState.totalCookies = totalFromSave;
+                        clickerState.clicks = Math.max(clickerState.clicks || 0, Number(s.clicks) || 0);
+                        clickerState.clickPower = Math.max(clickerState.clickPower || 1, Number(s.clickPower) || 1);
+                        clickerState.buildings = s.buildings && typeof s.buildings === "object" ? { ...s.buildings } : clickerState.buildings;
+                        if (Array.isArray(s.upgrades)) {
+                            clickerState.upgrades = Array.from(new Set([...clickerState.upgrades, ...s.upgrades]));
+                        }
+                        if (Array.isArray(s.achievements)) {
+                            clickerState.achievements = Array.from(new Set([...clickerState.achievements, ...s.achievements]));
+                        }
+                        clickerState.cps = computeClickerCps(s);
+                        clickerState.lastSave = Math.max(clickerState.lastSave || 0, Number(s.lastSave) || 0);
+                    }
+                }
+            }
+        } catch (e) {}
+    }
+
+    // -------------------------------------------------------------------------
     // LOCAL STORAGE HELPERS
     // -------------------------------------------------------------------------
     function loadLocalStats() {
         try {
             const raw = localStorage.getItem(STORAGE_KEY_STATS);
-            if (!raw) return JSON.parse(JSON.stringify(DEFAULT_STATS));
+            if (!raw) {
+                const def = JSON.parse(JSON.stringify(DEFAULT_STATS));
+                populateClickerFromStorage(def.clicker);
+                return def;
+            }
             const parsed = JSON.parse(raw);
+            const clickerParsed = parsed.clicker || {};
+            const clickerState = {
+                ...DEFAULT_STATS.clicker,
+                ...clickerParsed,
+                buildings: { ...(clickerParsed.buildings || {}) },
+                upgrades: Array.isArray(clickerParsed.upgrades) ? [...clickerParsed.upgrades] : [],
+                achievements: Array.isArray(clickerParsed.achievements) ? [...clickerParsed.achievements] : []
+            };
+
+            populateClickerFromStorage(clickerState);
+
             return {
                 gd: { ...DEFAULT_STATS.gd, ...(parsed.gd || {}) },
                 stratagem: { ...DEFAULT_STATS.stratagem, ...(parsed.stratagem || {}) },
@@ -87,11 +202,14 @@
                 mc: { ...DEFAULT_STATS.mc, ...(parsed.mc || {}) },
                 maturita: { ...DEFAULT_STATS.maturita, ...(parsed.maturita || {}) },
                 runner404: { ...DEFAULT_STATS.runner404, ...(parsed.runner404 || {}) },
+                clicker: clickerState,
                 meta: { ...DEFAULT_STATS.meta, ...(parsed.meta || {}) }
             };
         } catch (e) {
             console.warn("[OPS Stats] Chyba při čtení localStorage:", e);
-            return JSON.parse(JSON.stringify(DEFAULT_STATS));
+            const def = JSON.parse(JSON.stringify(DEFAULT_STATS));
+            populateClickerFromStorage(def.clicker);
+            return def;
         }
     }
 
@@ -107,10 +225,48 @@
     // -------------------------------------------------------------------------
     // CLOUD SYNC (SUPABASE)
     // -------------------------------------------------------------------------
+    let isSyncingFromCloud = false;
+    let syncCloudDebounceTimer = null;
+
+    function updateCloudSyncBadge(state, customText) {
+        const badge = document.getElementById("opsCloudSyncBadge");
+        if (!badge) return;
+
+        let dotColor = "#94a3b8";
+        let defaultText = "Cloud: Neaktivni";
+        let titleText = "";
+
+        if (state === "syncing") {
+            dotColor = "#38bdf8";
+            defaultText = "Cloud: Ukladam...";
+            titleText = "Probiha ukladani dat na Supabase server";
+        } else if (state === "synced") {
+            dotColor = "#22c55e";
+            defaultText = "Cloud: Ulozeno";
+            titleText = "Data jsou uspesne synchronizovana se Supabase";
+        } else if (state === "offline") {
+            dotColor = "#fbbf24";
+            defaultText = "Cloud: Pouze lokalne";
+            titleText = "Hrajete bez prihlaseni nebo offline, data se ukladaji do prohlizece";
+        } else if (state === "error") {
+            dotColor = "#ef4444";
+            defaultText = "Cloud: Chyba spojeni";
+            titleText = "Nepodarilo se spojit se Supabase serverem";
+        }
+
+        const text = customText || defaultText;
+        badge.innerHTML = `<span class="ops-cloud-sync-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${dotColor};box-shadow:0 0 6px ${dotColor};"></span> <span class="ops-cloud-sync-text">${text}</span>`;
+        if (titleText) badge.title = titleText;
+    }
+
     async function syncToCloud() {
         const username = OPS_STATS.getUsername();
-        if (!username || !isSupabaseConfigured() || username.startsWith("Host")) return;
+        if (!username || !isSupabaseConfigured() || username.startsWith("Host")) {
+            updateCloudSyncBadge("offline");
+            return;
+        }
 
+        updateCloudSyncBadge("syncing", "Cloud: Ukladam...");
         const stats = loadLocalStats();
         const payload = {
             username: username,
@@ -130,33 +286,144 @@
                     ...getSupabaseHeaders(),
                     "Prefer": "resolution=merge-duplicates"
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
+                keepalive: true
             });
             if (!res.ok) {
                 const errText = await res.text();
                 console.warn("[OPS Stats Cloud] Upsert selhal:", res.status, errText);
+                updateCloudSyncBadge("error");
+            } else {
+                updateCloudSyncBadge("synced");
             }
         } catch (err) {
-            console.warn("[OPS Stats Cloud] Síťová chyba při syncToCloud:", err);
+            console.warn("[OPS Stats Cloud] Sitova chyba pri syncToCloud:", err);
+            updateCloudSyncBadge("error");
         }
     }
 
     async function syncFromCloud(username) {
-        if (!username || !isSupabaseConfigured() || username.startsWith("Host")) return null;
+        if (!username || !isSupabaseConfigured() || username.startsWith("Host")) {
+            updateCloudSyncBadge("offline");
+            return null;
+        }
 
+        updateCloudSyncBadge("syncing", "Cloud: Nacitam...");
         try {
             const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=*`;
             const res = await fetch(endpoint, {
                 method: "GET",
                 headers: getSupabaseHeaders()
             });
-            if (!res.ok) return null;
+            if (!res.ok) {
+                updateCloudSyncBadge("error");
+                return null;
+            }
             const rows = await res.json();
             if (rows && rows.length > 0 && rows[0].stats) {
                 const cloudStats = rows[0].stats;
                 const local = loadLocalStats();
 
-                // Merge stats — zachováme vyšší skóre a maxima
+                let mergedClicker = { ...local.clicker };
+                if (cloudStats.clicker) {
+                    isSyncingFromCloud = true;
+                    try {
+                        const cloudClicker = cloudStats.clicker;
+                        const localClicker = local.clicker || DEFAULT_STATS.clicker;
+
+                        let localRawSave = null;
+                        try {
+                            const raw = localStorage.getItem("cookieClickerSave");
+                            if (raw) localRawSave = JSON.parse(raw);
+                        } catch (e) {}
+
+                        const localEffective = localRawSave ? extractClickerStateFromSave(localRawSave, localClicker.playTime) : localClicker;
+
+                        const cloudTotal = Number(cloudClicker.totalCookies) || 0;
+                        const localTotal = Number(localEffective.totalCookies) || 0;
+                        const cloudLastSave = Number(cloudClicker.lastSave) || 0;
+                        const localLastSave = Number(localEffective.lastSave) || 0;
+
+                        const preferCloud = (cloudTotal > localTotal) || (cloudTotal === localTotal && cloudLastSave >= localLastSave);
+                        const baseSource = preferCloud ? cloudClicker : (localRawSave || localEffective);
+
+                        const allBuildingKeys = new Set([
+                            ...Object.keys(localEffective.buildings || {}),
+                            ...Object.keys(cloudClicker.buildings || {})
+                        ]);
+                        const mergedBuildings = {};
+                        for (const key of allBuildingKeys) {
+                            mergedBuildings[key] = Math.max(
+                                Number(localEffective.buildings?.[key]) || 0,
+                                Number(cloudClicker.buildings?.[key]) || 0
+                            );
+                        }
+
+                        const mergedUpgrades = Array.from(new Set([
+                            ...(localEffective.upgrades || []),
+                            ...(cloudClicker.upgrades || [])
+                        ]));
+                        const mergedAchievements = Array.from(new Set([
+                            ...(localEffective.achievements || []),
+                            ...(cloudClicker.achievements || [])
+                        ]));
+
+                        const higherTotalCookies = Math.max(localTotal, cloudTotal);
+                        const newerLastSave = Math.max(localLastSave, cloudLastSave, Date.now());
+                        const higherClicks = Math.max(Number(localEffective.clicks) || 0, Number(cloudClicker.clicks) || 0);
+                        const higherPlayTime = Math.max(Number(localEffective.playTime) || 0, Number(cloudClicker.playTime) || 0);
+                        const higherClickPower = Math.max(Number(localEffective.clickPower) || 1, Number(cloudClicker.clickPower) || 1);
+                        const spendableCookies = preferCloud
+                            ? (typeof cloudClicker.cookies === "number" ? cloudClicker.cookies : localEffective.cookies)
+                            : (typeof localEffective.cookies === "number" ? localEffective.cookies : cloudClicker.cookies);
+
+                        const mergedSaveObj = {
+                            cookies: Math.max(0, Number(spendableCookies) || 0),
+                            totalCookies: higherTotalCookies,
+                            clicks: higherClicks,
+                            buildings: mergedBuildings,
+                            upgrades: mergedUpgrades,
+                            achievements: mergedAchievements,
+                            clickPower: higherClickPower,
+                            buildingBonus: baseSource.buildingBonus || 0,
+                            grandmaBonus: baseSource.grandmaBonus || 0,
+                            steroidBonus: baseSource.steroidBonus || 1,
+                            buildingMultipliers: baseSource.buildingMultipliers || {},
+                            startTime: baseSource.startTime || Date.now(),
+                            lastCursorClick: baseSource.lastCursorClick || Date.now(),
+                            lastSave: newerLastSave
+                        };
+
+                        try {
+                            localStorage.setItem("cookieClickerSave", JSON.stringify(mergedSaveObj));
+                        } catch (e) {
+                            console.warn("[OPS Stats] Nelze zapsat cookieClickerSave:", e);
+                        }
+
+                        mergedClicker = {
+                            cookies: mergedSaveObj.cookies,
+                            totalCookies: mergedSaveObj.totalCookies,
+                            clicks: mergedSaveObj.clicks,
+                            clickPower: mergedSaveObj.clickPower,
+                            cps: computeClickerCps(mergedSaveObj),
+                            buildings: mergedSaveObj.buildings,
+                            upgrades: mergedSaveObj.upgrades,
+                            achievements: mergedSaveObj.achievements,
+                            playTime: higherPlayTime,
+                            lastSave: mergedSaveObj.lastSave
+                        };
+
+                        if (window.location.pathname.includes("/clicker/") && preferCloud && cloudTotal > localTotal) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 50);
+                        }
+                    } finally {
+                        isSyncingFromCloud = false;
+                    }
+                }
+
+                // Merge stats — zachovame vyssi skore a maxima
                 const merged = {
                     gd: {
                         attempts: Math.max(local.gd.attempts, cloudStats.gd?.attempts || 0),
@@ -193,6 +460,7 @@
                         runnerHighScore: Math.max(local.runner404.runnerHighScore, cloudStats.runner404?.runnerHighScore || 0),
                         playTime: Math.max(local.runner404.playTime, cloudStats.runner404?.playTime || 0)
                     },
+                    clicker: mergedClicker,
                     meta: {
                         totalPlayTime: Math.max(local.meta.totalPlayTime, cloudStats.meta?.totalPlayTime || 0),
                         lastPlayedGame: cloudStats.meta?.lastPlayedGame || local.meta.lastPlayedGame,
@@ -201,10 +469,14 @@
                 };
 
                 saveLocalStats(merged);
+                updateCloudSyncBadge("synced");
                 return merged;
+            } else {
+                updateCloudSyncBadge("synced");
             }
         } catch (e) {
-            console.warn("[OPS Stats Cloud] Chyba při syncFromCloud:", e);
+            console.warn("[OPS Stats Cloud] Chyba pri syncFromCloud:", e);
+            updateCloudSyncBadge("error");
         }
         return null;
     }
@@ -778,6 +1050,103 @@
     }
 
     // -------------------------------------------------------------------------
+    // CLICKER LOCALSTORAGE HOOK & AUTOSAVE
+    // -------------------------------------------------------------------------
+    function handleSaveClickerState(data) {
+        if (!data || typeof data !== "object") return;
+
+        const stats = loadLocalStats();
+        stats.meta.lastPlayedGame = "clicker";
+        stats.meta.lastActive = Date.now();
+
+        const curPlayTime = stats.clicker?.playTime || 0;
+        const cps = computeClickerCps(data);
+
+        stats.clicker = {
+            cookies: typeof data.cookies === "number" ? data.cookies : 0,
+            totalCookies: typeof data.totalCookies === "number" ? data.totalCookies : 0,
+            clicks: typeof data.clicks === "number" ? data.clicks : 0,
+            clickPower: typeof data.clickPower === "number" ? data.clickPower : 1,
+            cps: cps,
+            buildings: data.buildings && typeof data.buildings === "object" ? { ...data.buildings } : {},
+            upgrades: Array.isArray(data.upgrades) ? [...data.upgrades] : [],
+            achievements: Array.isArray(data.achievements) ? [...data.achievements] : [],
+            playTime: curPlayTime,
+            lastSave: typeof data.lastSave === "number" ? data.lastSave : Date.now()
+        };
+
+        saveLocalStats(stats);
+
+        if (!isSyncingFromCloud) {
+            updateCloudSyncBadge("syncing", "Cloud: Ukladam...");
+            if (syncCloudDebounceTimer) clearTimeout(syncCloudDebounceTimer);
+            syncCloudDebounceTimer = setTimeout(() => {
+                syncToCloud();
+            }, 2000);
+        }
+    }
+
+    function handleResetClickerState() {
+        const stats = loadLocalStats();
+        stats.clicker = {
+            ...DEFAULT_STATS.clicker,
+            playTime: stats.clicker?.playTime || 0,
+            lastSave: Date.now()
+        };
+        saveLocalStats(stats);
+        if (syncCloudDebounceTimer) clearTimeout(syncCloudDebounceTimer);
+        syncToCloud();
+    }
+
+    function hookCookieClickerStorage() {
+        if (typeof window === "undefined" || !window.localStorage) return;
+
+        const originalSetItem = window.localStorage.setItem.bind(window.localStorage);
+        const originalRemoveItem = window.localStorage.removeItem ? window.localStorage.removeItem.bind(window.localStorage) : null;
+
+        window.localStorage.setItem = function(key, value) {
+            originalSetItem(key, value);
+            if (key === "cookieClickerSave" && !isSyncingFromCloud) {
+                try {
+                    const data = typeof value === "string" ? JSON.parse(value) : value;
+                    handleSaveClickerState(data);
+                } catch (e) {
+                    console.warn("[OPS Stats] Chyba pri zpracovani cookieClickerSave:", e);
+                }
+            }
+        };
+
+        if (originalRemoveItem) {
+            window.localStorage.removeItem = function(key) {
+                originalRemoveItem(key);
+                if (key === "cookieClickerSave" && !isSyncingFromCloud) {
+                    try {
+                        handleResetClickerState();
+                    } catch (e) {
+                        console.warn("[OPS Stats] Chyba pri resetu cookieClickerSave:", e);
+                    }
+                }
+            };
+        }
+
+        window.addEventListener("beforeunload", function() {
+            if (syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncToCloud();
+            }
+        });
+
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden && syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncToCloud();
+            }
+        });
+    }
+
+    hookCookieClickerStorage();
+
+    // -------------------------------------------------------------------------
     // PUBLIC API
     // -------------------------------------------------------------------------
     const OPS_STATS = {
@@ -809,7 +1178,7 @@
                 await syncToCloud();
             }
 
-            if (window.location.pathname.includes("/mc/")) {
+            if (window.location.pathname.includes("/mc/") || window.location.pathname.includes("/clicker/")) {
                 window.location.reload();
             }
 
@@ -930,6 +1299,7 @@
         resetLocalStats: function() {
             if (confirm("Opravdu si přejete smazat všechny lokální herní statistiky?")) {
                 localStorage.removeItem(STORAGE_KEY_STATS);
+                localStorage.removeItem("cookieClickerSave");
                 window.location.reload();
             }
         },
@@ -937,6 +1307,23 @@
         // Otevření modalu pro přezdívku
         promptUsernameModal: function() {
             showUsernameModal();
+        },
+
+        // Clicker Storage & Sync API
+        saveClickerState: function(data) {
+            handleSaveClickerState(data);
+        },
+
+        syncFromCloud: function(username) {
+            return syncFromCloud(username || OPS_STATS.getUsername());
+        },
+
+        syncToCloud: function() {
+            return syncToCloud();
+        },
+
+        updateCloudSyncBadge: function(state, text) {
+            updateCloudSyncBadge(state, text);
         },
 
         // Minecraft (Eaglercraft) Storage & Backup API
@@ -1013,6 +1400,33 @@
             .ops-user-badge-name {
                 color: #38bdf8;
                 font-weight: bold;
+            }
+            .ops-cloud-sync-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 12px;
+                border-radius: 9999px;
+                background: rgba(15, 23, 42, 0.88);
+                border: 1px solid rgba(56, 189, 248, 0.25);
+                backdrop-filter: blur(8px);
+                font-family: Consolas, monospace;
+                font-size: 12px;
+                color: #cbd5e1;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+                user-select: none;
+            }
+            .ops-cloud-sync-dot {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #94a3b8;
+                box-shadow: 0 0 6px rgba(148, 163, 184, 0.6);
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+            .ops-cloud-sync-text {
+                font-weight: 600;
             }
             .ops-modal-backdrop {
                 position: fixed;
@@ -1436,6 +1850,17 @@
     // -------------------------------------------------------------------------
     window.addEventListener("DOMContentLoaded", function() {
         injectUIStyles();
+        updatePlayerBadgeUI();
+
+        const currentUser = OPS_STATS.getUsername();
+        if (!currentUser || currentUser.startsWith("Host") || !isSupabaseConfigured()) {
+            updateCloudSyncBadge("offline");
+        } else {
+            updateCloudSyncBadge("synced");
+            syncFromCloud(currentUser).then(() => {
+                updatePlayerBadgeUI();
+            });
+        }
 
         const isGamesHub = window.location.pathname.endsWith("games.html") || 
                            window.location.pathname.includes("games.html") || 
@@ -1467,6 +1892,7 @@
         let activeGame = null;
         if (window.location.pathname.includes("/hyperdrive/")) activeGame = "hyperdrive";
         else if (window.location.pathname.includes("/mc/")) activeGame = "mc";
+        else if (window.location.pathname.includes("/clicker/")) activeGame = "clicker";
 
         if (activeGame) {
             OPS_STATS.recordSession(activeGame);
