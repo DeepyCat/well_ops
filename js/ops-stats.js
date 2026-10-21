@@ -226,6 +226,7 @@
     // CLOUD SYNC (SUPABASE)
     // -------------------------------------------------------------------------
     let isSyncingFromCloud = false;
+    let isReloadingForCloud = false;
     let syncCloudDebounceTimer = null;
 
     function updateCloudSyncBadge(state, customText) {
@@ -414,6 +415,7 @@
                         };
 
                         if (window.location.pathname.includes("/clicker/") && preferCloud && cloudTotal > localTotal) {
+                            isReloadingForCloud = true;
                             setTimeout(() => {
                                 window.location.reload();
                             }, 50);
@@ -1054,8 +1056,15 @@
     // -------------------------------------------------------------------------
     function handleSaveClickerState(data) {
         if (!data || typeof data !== "object") return;
+        if (isReloadingForCloud) return;
 
         const stats = loadLocalStats();
+        const currentTotal = Number(stats.clicker?.totalCookies) || 0;
+        const newTotal = Number(data.totalCookies) || 0;
+        if (newTotal === 0 && currentTotal > 0) {
+            console.warn("[OPS Stats] Ignoruji pokus o prepsani ulozeneho postupu prazdnym stavem.");
+            return;
+        }
         stats.meta.lastPlayedGame = "clicker";
         stats.meta.lastActive = Date.now();
 
