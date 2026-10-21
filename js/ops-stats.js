@@ -149,8 +149,8 @@
             clicks: typeof saveData.clicks === "number" ? saveData.clicks : 0,
             clickPower: typeof saveData.clickPower === "number" ? saveData.clickPower : 1,
             cps: computeClickerCps(saveData),
-            clickCps: typeof saveData.clickCps === "number" ? saveData.clickCps : 0,
-            peakClickCps: typeof saveData.peakClickCps === "number" ? saveData.peakClickCps : 0,
+            clickCps: typeof saveData.clickCps === "number" ? Math.min(20, Math.max(0, saveData.clickCps)) : 0,
+            peakClickCps: typeof saveData.peakClickCps === "number" ? Math.min(20, Math.max(0, saveData.peakClickCps)) : 0,
             buildings: saveData.buildings && typeof saveData.buildings === "object" ? { ...saveData.buildings } : {},
             upgrades: Array.isArray(saveData.upgrades) ? [...saveData.upgrades] : [],
             achievements: Array.isArray(saveData.achievements) ? [...saveData.achievements] : [],
@@ -181,8 +181,8 @@
                             clickerState.achievements = Array.from(new Set([...clickerState.achievements, ...s.achievements]));
                         }
                         clickerState.cps = computeClickerCps(s);
-                        clickerState.clickCps = typeof s.clickCps === "number" ? s.clickCps : (clickerState.clickCps || 0);
-                        clickerState.peakClickCps = Math.max(clickerState.peakClickCps || 0, Number(s.peakClickCps) || 0);
+                        clickerState.clickCps = typeof s.clickCps === "number" ? Math.min(20, Math.max(0, s.clickCps)) : (clickerState.clickCps || 0);
+                        clickerState.peakClickCps = Math.min(20, Math.max(clickerState.peakClickCps || 0, Number(s.peakClickCps) || 0));
                         clickerState.lastSave = Math.max(clickerState.lastSave || 0, Number(s.lastSave) || 0);
                         clickerState.inactiveAccumulatedMs = typeof s.inactiveAccumulatedMs === "number" ? s.inactiveAccumulatedMs : (clickerState.inactiveAccumulatedMs || 0);
                     }
@@ -207,8 +207,8 @@
             const clickerState = {
                 ...DEFAULT_STATS.clicker,
                 ...clickerParsed,
-                clickCps: typeof clickerParsed.clickCps === "number" ? clickerParsed.clickCps : 0,
-                peakClickCps: typeof clickerParsed.peakClickCps === "number" ? clickerParsed.peakClickCps : 0,
+                clickCps: typeof clickerParsed.clickCps === "number" ? Math.min(20, Math.max(0, clickerParsed.clickCps)) : 0,
+                peakClickCps: typeof clickerParsed.peakClickCps === "number" ? Math.min(20, Math.max(0, clickerParsed.peakClickCps)) : 0,
                 buildings: { ...(clickerParsed.buildings || {}) },
                 upgrades: Array.isArray(clickerParsed.upgrades) ? [...clickerParsed.upgrades] : [],
                 achievements: Array.isArray(clickerParsed.achievements) ? [...clickerParsed.achievements] : []
@@ -1097,6 +1097,8 @@
 
         const curPlayTime = stats.clicker?.playTime || 0;
         const cps = computeClickerCps(data);
+        const curClickCps = typeof data.clickCps === "number" ? Math.min(20, Math.max(0, data.clickCps)) : 0;
+        const curPeakClickCps = Math.min(20, Math.max(Number(stats.clicker?.peakClickCps) || 0, Number(data.peakClickCps) || 0));
 
         stats.clicker = {
             cookies: typeof data.cookies === "number" ? data.cookies : 0,
@@ -1104,6 +1106,8 @@
             clicks: typeof data.clicks === "number" ? data.clicks : 0,
             clickPower: typeof data.clickPower === "number" ? data.clickPower : 1,
             cps: cps,
+            clickCps: curClickCps,
+            peakClickCps: curPeakClickCps,
             buildings: data.buildings && typeof data.buildings === "object" ? { ...data.buildings } : {},
             upgrades: Array.isArray(data.upgrades) ? [...data.upgrades] : [],
             achievements: Array.isArray(data.achievements) ? [...data.achievements] : [],

@@ -812,7 +812,7 @@
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
                 </div>
                 <div class="highlight-content">
-                    <h3>Maturita Mpoints</h3>
+                    <h3>Maturita MCoiny / Mpoints</h3>
                     <div id="statClickerMpoints" class="highlight-val">0</div>
                     <div id="statClickerCpsSub" class="highlight-sub">0 CPS rekord</div>
                 </div>
@@ -870,7 +870,7 @@
                         Celkový herní čas
                     </button>
                     <button type="button" class="lb-filter-btn" id="lbFilterClicker" onclick="loadLeaderboard('clicker_total_cookies', this)">
-                        Maturita Clicker (Mpoints)
+                        Maturita Clicker (MCoiny / Mpoints)
                     </button>
                     <button type="button" class="lb-filter-btn" id="lbFilterHero" onclick="loadLeaderboard('stratagem_highscore', this)">
                         Juchelka Hero (Skóre)
@@ -923,7 +923,7 @@
                         <!-- Featured Banner -->
                         <div class="stat-featured-banner">
                             <div>
-                                <div class="stat-featured-label">Celkem získáno Mpoints</div>
+                                <div class="stat-featured-label">Celkem získáno MCoinů / Mpoints</div>
                                 <div id="clickerTotalCookiesText" class="stat-featured-val">0</div>
                             </div>
                             <div style="text-align: right;">
@@ -1208,9 +1208,9 @@
         }
 
         function calculateGamerLevel(stats) {
-            const timeXp = Math.floor((stats.meta.totalPlayTime || 0) / 30);
-            const heroXp = (stats.stratagem.highScore || 0) * 15;
-            const gdXp = (stats.gd.completedLevels?.length || 0) * 100 + Math.floor((stats.gd.jumps || 0) / 10);
+            const timeXp = Math.floor((stats.meta?.totalPlayTime || 0) / 30);
+            const heroXp = (stats.stratagem?.highScore || 0) * 15;
+            const gdXp = (stats.gd?.completedLevels?.length || 0) * 100 + Math.floor((stats.gd?.jumps || 0) / 10);
             const clickerXp = Math.min(1000, Math.floor(Math.sqrt(stats.clicker?.totalCookies || 0) / 5));
             const totalXp = timeXp + heroXp + gdXp + clickerXp;
             const level = Math.max(1, Math.floor(Math.sqrt(totalXp / 10)) + 1);
@@ -1377,7 +1377,7 @@
             }
 
             const headerMap = {
-                'clicker_total_cookies': 'Mpoints (Celkem / CPS)',
+                'clicker_total_cookies': 'MCoiny / Mpoints (Celkem / CPS)',
                 'stratagem_highscore': 'Max kódů',
                 'gd_completed_levels': 'Levelů (100%)',
                 'total_play_time': 'Odehraný čas'
@@ -1407,7 +1407,8 @@
                 } else if (column === 'gd_completed_levels') {
                     myValPrimary = `${localStats.gd?.completedLevels?.length || 0} / 22`;
                 } else if (column === 'clicker_total_cookies') {
-                    myValPrimary = formatCompactNumber(localStats.clicker?.totalCookies || 0) + ' Mpoints';
+                    const totalLocal = Math.max(Number(localStats.clicker?.totalCookies) || 0, Number(localStats.clicker?.cookies) || 0);
+                    myValPrimary = formatCompactNumber(totalLocal) + ' MCoinů (Mpoints)';
                     const peak = Math.min(20, Number(localStats.clicker?.peakClickCps) || 0);
                     myValSub = `CPS: ${formatCompactNumber(localStats.clicker?.cps || 0)} | Klik: ${peak} CPS`;
                 } else {
@@ -1428,6 +1429,16 @@
                 return;
             }
 
+            if (column === 'clicker_total_cookies' && Array.isArray(data)) {
+                data.sort((a, b) => {
+                    const statsA = typeof a.stats === 'string' ? JSON.parse(a.stats || '{}') : (a.stats || {});
+                    const statsB = typeof b.stats === 'string' ? JSON.parse(b.stats || '{}') : (b.stats || {});
+                    const valA = Math.max(Number(statsA?.clicker?.totalCookies) || 0, Number(statsA?.clicker?.cookies) || 0);
+                    const valB = Math.max(Number(statsB?.clicker?.totalCookies) || 0, Number(statsB?.clicker?.cookies) || 0);
+                    return valB - valA;
+                });
+            }
+
             tbody.innerHTML = '';
             data.forEach((row, idx) => {
                 const rank = idx + 1;
@@ -1443,9 +1454,10 @@
                 let subVal = '';
 
                 if (column === 'clicker_total_cookies') {
-                    const clickerObj = row.stats?.clicker || {};
-                    const totalMpoints = Number(clickerObj.totalCookies) || 0;
-                    primaryVal = formatCompactNumber(totalMpoints) + ' Mpoints';
+                    const rawStats = typeof row.stats === 'string' ? JSON.parse(row.stats || '{}') : (row.stats || {});
+                    const clickerObj = rawStats.clicker || {};
+                    const totalMpoints = Math.max(Number(clickerObj.totalCookies) || 0, Number(clickerObj.cookies) || 0);
+                    primaryVal = formatCompactNumber(totalMpoints) + ' MCoinů (Mpoints)';
                     const passive = Number(clickerObj.cps) || 0;
                     const peak = Math.min(20, Number(clickerObj.peakClickCps) || 0);
                     subVal = `CPS: ${formatCompactNumber(passive)}/s | Klik: ${peak} CPS`;
