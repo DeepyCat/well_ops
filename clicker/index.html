@@ -120,6 +120,20 @@
           font-size: 11px;
         }
       }
+      /* Zabranit vodorovnemu scrollbaru u obchodu s budovami a vylepsenimi */
+      .max-h-96 {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+      }
+      .max-h-96 > div {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+      }
+      .max-h-96 h3,
+      .max-h-96 p {
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+      }
     </style>
     <script src="../js/ops-stats.js"></script>
     <script type="module" crossorigin src="./assets/index-BZ_H0cX1.js"></script>
