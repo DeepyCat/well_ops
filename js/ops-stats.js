@@ -139,6 +139,26 @@
         return totalCps;
     }
 
+    function computeClickerClickPower(clickerData) {
+        if (!clickerData) return 1;
+        const upgrades = new Set(Array.isArray(clickerData.upgrades) ? clickerData.upgrades : []);
+        let baseClick = 1;
+        let percentCps = 0;
+        if (upgrades.has("reinforced-index")) { baseClick *= 2; percentCps += 0.01; }
+        if (upgrades.has("carpal-tunnel-prevention")) { baseClick *= 2; percentCps += 0.01; }
+        if (upgrades.has("ambidextrous")) { baseClick *= 2; percentCps += 0.01; }
+        if (upgrades.has("titanium-fingers")) { baseClick *= 3; percentCps += 0.02; }
+        if (upgrades.has("quantum-clicks")) { baseClick *= 5; percentCps += 0.03; }
+        if (upgrades.has("laser-pointer")) { baseClick *= 5; percentCps += 0.05; }
+        if (upgrades.has("cyber-fingers")) { baseClick *= 5; percentCps += 0.04; }
+        if (upgrades.has("singularity-clicks")) { baseClick *= 5; percentCps += 0.05; }
+        const cps = computeClickerCps(clickerData);
+        const bonus = Math.round(cps * percentCps);
+        const computed = Math.max(1, baseClick + bonus);
+        const saved = typeof clickerData.clickPower === "number" ? clickerData.clickPower : 1;
+        return Math.max(saved, computed);
+    }
+
     function extractClickerStateFromSave(saveData, existingPlayTime = 0) {
         if (!saveData || typeof saveData !== "object") {
             return { ...DEFAULT_STATS.clicker, playTime: existingPlayTime };
@@ -147,7 +167,7 @@
             cookies: typeof saveData.cookies === "number" ? saveData.cookies : 0,
             totalCookies: typeof saveData.totalCookies === "number" ? saveData.totalCookies : 0,
             clicks: typeof saveData.clicks === "number" ? saveData.clicks : 0,
-            clickPower: typeof saveData.clickPower === "number" ? saveData.clickPower : 1,
+            clickPower: computeClickerClickPower(saveData),
             cps: computeClickerCps(saveData),
             clickCps: typeof saveData.clickCps === "number" ? Math.min(20, Math.max(0, saveData.clickCps)) : 0,
             peakClickCps: typeof saveData.peakClickCps === "number" ? Math.min(20, Math.max(0, saveData.peakClickCps)) : 0,
@@ -172,7 +192,7 @@
                         clickerState.cookies = typeof s.cookies === "number" ? s.cookies : clickerState.cookies;
                         clickerState.totalCookies = totalFromSave;
                         clickerState.clicks = Math.max(clickerState.clicks || 0, Number(s.clicks) || 0);
-                        clickerState.clickPower = Math.max(clickerState.clickPower || 1, Number(s.clickPower) || 1);
+                        clickerState.clickPower = Math.max(clickerState.clickPower || 1, computeClickerClickPower(s));
                         clickerState.buildings = s.buildings && typeof s.buildings === "object" ? { ...s.buildings } : clickerState.buildings;
                         if (Array.isArray(s.upgrades)) {
                             clickerState.upgrades = Array.from(new Set([...clickerState.upgrades, ...s.upgrades]));
@@ -394,7 +414,12 @@
                         const newerLastSave = Math.max(localLastSave, cloudLastSave, Date.now());
                         const higherClicks = Math.max(Number(localEffective.clicks) || 0, Number(cloudClicker.clicks) || 0);
                         const higherPlayTime = Math.max(Number(localEffective.playTime) || 0, Number(cloudClicker.playTime) || 0);
-                        const higherClickPower = Math.max(Number(localEffective.clickPower) || 1, Number(cloudClicker.clickPower) || 1);
+                        const higherClickPower = Math.max(
+                            Number(localEffective.clickPower) || 1,
+                            Number(cloudClicker.clickPower) || 1,
+                            computeClickerClickPower(localEffective),
+                            computeClickerClickPower(cloudClicker)
+                        );
                         const higherPeakClickCps = Math.min(20, Math.max(Number(localEffective.peakClickCps) || 0, Number(cloudClicker.peakClickCps) || 0));
                         const spendableCookies = preferCloud
                             ? (typeof cloudClicker.cookies === "number" ? cloudClicker.cookies : localEffective.cookies)
@@ -1104,7 +1129,7 @@
             cookies: typeof data.cookies === "number" ? data.cookies : 0,
             totalCookies: typeof data.totalCookies === "number" ? data.totalCookies : 0,
             clicks: typeof data.clicks === "number" ? data.clicks : 0,
-            clickPower: typeof data.clickPower === "number" ? data.clickPower : 1,
+            clickPower: computeClickerClickPower(data),
             cps: cps,
             clickCps: curClickCps,
             peakClickCps: curPeakClickCps,
