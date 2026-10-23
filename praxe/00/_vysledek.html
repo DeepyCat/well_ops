@@ -478,10 +478,22 @@ Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4</code><
       <p>IP adresa, prefix (<code>24</code> = maska <code>255.255.255.0</code>), brána i DNS server odpovídají hodnotám v <code>__zadani.md</code> pro daný server. Adresa <strong>není</strong> převzatá z DHCP (<code>Get-NetIPAddress ... | Select PrefixOrigin</code> ukazuje <code>Manual</code>, ne <code>Dhcp</code>).</p>
 
       <h4>Ověření konektivity a povolení pingů (Windows Defender Firewall)</h4>
-      <p>Ve výchozím nastavení blokuje Windows Defender Firewall příchozí ICMP Echo Request. Aby bylo možné ověřit spojení pingem mezi stroji (<code>SRV1-DC</code> a <code>SRV2-FS</code>), povolte pravidla pro ICMPv4 i ICMPv6 ve všech směrech:</p>
+      <p>Ve výchozím nastavení blokuje Windows Defender Firewall příchozí ICMP Echo Request.</p>
+
+      <div style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 10px 14px; margin: 12px 0;">
+        <strong style="color: #38bdf8; font-size: 0.92rem;">Rychlé povolení pingu na PC1-WIN (i serverech) jedním příkazem:</strong>
+        <div class="code-block-wrapper" style="margin-top: 8px;">
+          <div class="code-block-header">
+            <span>PowerShell (Jeden příkaz)</span>
+            <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+          </div>
+          <pre><code>Enable-NetFirewallRule -Name "FPS-ICMP4-ERQ-In"</code></pre>
+        </div>
+      </div>
+
       <div class="code-block-wrapper">
         <div class="code-block-header">
-          <span>PowerShell (Povolení pingu do všech směrů)</span>
+          <span>PowerShell (Kompletní povolení do všech směrů)</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
         <pre><code># Povolení pingování do všech směrů (IPv4 i IPv6, Inbound i Outbound):
@@ -490,6 +502,16 @@ New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Pi
 New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
 New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any</code></pre>
       </div>
+
+      <div style="background: rgba(56, 189, 248, 0.08); border-left: 4px solid #38bdf8; padding: 12px 16px; margin: 14px 0; border-radius: 4px;">
+        <strong style="color: #38bdf8;">DŮLEŽITÁ POZNÁMKA K PINGŮM MEZI PC A SERVERY:</strong>
+        <ul style="margin: 6px 0 0 18px; padding: 0; line-height: 1.6;">
+          <li>Pingy <strong>mezi servery</strong> (<code>SRV1-DC</code> &harr; <code>SRV2-FS</code>) po nastavení statických IP a firewallu prochází <strong>správně</strong>.</li>
+          <li>Ping <strong>mezi PC1-WIN a jakýmkoliv serverem ale v tomto modulu nepůjde</strong>, protože dokud je na PC1 (rozhraní <code>Ethernet1</code>) zapnuté DHCP, stanice nedostane žádnou IP adresu (DHCP server se konfiguruje až v <strong>Modulu 02</strong>).</li>
+          <li><strong>Test se statickou IP:</strong> Pro otestování konektivity můžete na PC1-WIN dočasně nastavit statickou IP <code>192.168.X.100/24</code> (kde <code>X</code> je číslo vašeho pracoviště, brána <code>192.168.X.1</code>) a ověřit ping na servery.</li>
+        </ul>
+      </div>
+
       <p>Následně ověřte spojení pingem na druhý stroj (např. ze SRV2-FS na SRV1-DC <code>192.168.X.10</code>):</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">

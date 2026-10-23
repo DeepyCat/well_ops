@@ -51,13 +51,21 @@ Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný a
 | Výchozí brána          | `192.168.200.1`                | `192.168.200.1`            | přidělena DHCP                                                                                                                           |
 | Preferovaný DNS server | `192.168.200.10` (sám na sebe) | `192.168.200.10` (SRV1-DC) | přidělen DHCP                                                                                                                            |
 
-> PC1-WIN v tomto modulu ještě nemá funkční síť se zbytkem infrastruktury (DHCP server ještě neexistuje) — připojení k internetu/síti během vlastní instalace Windows 11 řešíme jen kvůli aktivaci a případnému stažení aktualizací, viz níže.
+> **DŮLEŽITÁ INFORMACE K PINGŮM A DHCP:**
+> - **Pingy mezi servery** (`SRV1-DC` a `SRV2-FS`) budou po nastavení IP a firewallu procházet **správně**.
+> - **Ping mezi PC1 a jakýmkoliv serverem ale v tomto modulu NEPŮJDE!** Dokud je na PC1 (rozhraní `Ethernet1`) zapnuté DHCP, stanice nezíská žádnou IP adresu, protože DHCP server se bude konfigurovat až v **Modulu 02**.
+> - **Test se statickou IP:** Pokud si chcete ověřit funkčnost spojení a firewallu z PC1 už teď, můžete si na PC1 na rozhraní `Ethernet1` dočasně nastavit statickou IP adresu `192.168.X.100` (kde `X` je číslo vašeho pracoviště, maska `255.255.255.0`, výchozí brána `192.168.X.1`). Pro konečné hodnocení však adaptér ponechte na DHCP.
 
-### Jak povolit pingy (PowerShell pravidla firewallu do všech směrů)
+### Jak povolit pingy (PowerShell pravidla firewallu)
 
-Ve výchozím nastavení Windows Server 2025 i Windows 11 blokuje příchozí ICMP Echo Request. Příkaz `ping` mezi servery proto končí chybou `Request timed out`.
+Ve výchozím nastavení Windows Server 2025 i Windows 11 blokuje příchozí ICMP Echo Request. Příkaz `ping` proto končí chybou `Request timed out`.
 
-Pro povolení pingování v obou směrech (Inbound i Outbound) pro IPv4 i IPv6 na všech síťových profilech spusťte v PowerShellu jako Administrator:
+Na PC1-WIN (i serverech) stačí pro povolení příchozího pingu spustit jeden příkaz pro povolení vestavěného pravidla:
+```powershell
+Enable-NetFirewallRule -Name "FPS-ICMP4-ERQ-In"
+```
+
+Pro kompletní povolení pingování v obou směrech (Inbound i Outbound) pro IPv4 i IPv6 na všech síťových profilech spusťte v PowerShellu jako Administrator:
 
 ```powershell
 # 1. Povolení příchozího pingu (Inbound IPv4 a IPv6):

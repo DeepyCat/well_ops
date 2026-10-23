@@ -32,7 +32,14 @@ Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4
 IP adresa, prefix (`24` = maska `255.255.255.0`), brána i DNS server odpovídají hodnotám v `__zadani.md` pro daný server. Adresa **není** převzatá z DHCP (`Get-NetIPAddress ... | Select PrefixOrigin` ukazuje `Manual`, ne `Dhcp`).
 
 #### Ověření konektivity a povolení pingů (Windows Defender Firewall)
-Ve výchozím nastavení blokuje Windows Defender Firewall příchozí ICMP Echo Request. Aby bylo možné ověřit spojení pingem mezi stroji (`SRV1-DC` a `SRV2-FS`), povolte pravidla pro ICMPv4 i ICMPv6 ve všech směrech:
+Ve výchozím nastavení blokuje Windows Defender Firewall příchozí ICMP Echo Request.
+
+Na PC1-WIN (i na serverech) stačí pro povolení příchozího pingu spustit jeden vestavěný příkaz:
+```powershell
+Enable-NetFirewallRule -Name "FPS-ICMP4-ERQ-In"
+```
+
+Pro kompletní povolení pravidel pro ICMPv4 i ICMPv6 ve všech směrech (Inbound i Outbound):
 ```powershell
 # Povolení pingování do všech směrů (IPv4 i IPv6, Inbound i Outbound):
 New-NetFirewallRule -Name "Allow-Ping-In-IPv4" -DisplayName "Allow ICMPv4-In (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Inbound -Action Allow -Profile Any
@@ -40,6 +47,11 @@ New-NetFirewallRule -Name "Allow-Ping-In-IPv6" -DisplayName "Allow ICMPv6-In (Pi
 New-NetFirewallRule -Name "Allow-Ping-Out-IPv4" -DisplayName "Allow ICMPv4-Out (Ping)" -Protocol ICMPv4 -IcmpType 8 -Direction Outbound -Action Allow -Profile Any
 New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (Ping)" -Protocol ICMPv6 -IcmpType 128 -Direction Outbound -Action Allow -Profile Any
 ```
+
+> **DŮLEŽITÁ POZNÁMKA K PINGŮM MEZI PC A SERVERY:**
+> - Pingy **mezi servery** (`SRV1-DC` a `SRV2-FS`) po nastavení statických IP a firewallu prochází **správně**.
+> - Ping **mezi PC1-WIN a jakýmkoliv serverem ale v tomto modulu nepůjde**, protože dokud je na PC1 (rozhraní `Ethernet1`) zapnuté DHCP, stanice nedostane žádnou IP adresu (DHCP server se nastavuje a spouští až v **Modulu 02**).
+> - **Test se statickou IP:** Pokud chcete otestovat ping i z PC1-WIN, můžete si na PC1 na rozhraní `Ethernet1` dočasně nastavit statickou IP `192.168.X.100/24` (kde `X` je číslo vašeho pracoviště, brána `192.168.X.1`). Následně `ping 192.168.X.10` projde.
 
 Následně ověřte spojení pingem na druhý stroj (např. ze SRV2-FS na SRV1-DC `192.168.X.10`):
 ```powershell
