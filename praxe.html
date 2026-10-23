@@ -2451,7 +2451,18 @@ New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (
 
       <div class="ping-modal-section">
         <div class="ping-modal-section-title">
-          <span>3. Alternativa: Povolení vestavěných pravidel Windows</span>
+          <span>3. Rychlý příkaz pro PC1-WIN (povolení vestavěného pravidla)</span>
+          <button type="button" class="ping-copy-action-btn" onclick="copySnippetText(this, 'ping-code-pc1')">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Kopírovat pro PC</span>
+          </button>
+        </div>
+        <pre class="ping-code-block" id="ping-code-pc1"><code>Enable-NetFirewallRule -Name "FPS-ICMP4-ERQ-In"</code></pre>
+      </div>
+
+      <div class="ping-modal-section">
+        <div class="ping-modal-section-title">
+          <span>4. Alternativa: Povolení všech vestavěných pravidel ICMP</span>
           <button type="button" class="ping-copy-action-btn" onclick="copySnippetText(this, 'ping-code-builtin')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             <span>Kopírovat alternativu</span>
@@ -2462,7 +2473,7 @@ New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (
 
       <div class="ping-modal-section">
         <div class="ping-modal-section-title">
-          <span>4. Jak otestovat spojení po povolení firewallu</span>
+          <span>5. Jak otestovat spojení po povolení firewallu</span>
           <button type="button" class="ping-copy-action-btn" onclick="copySnippetText(this, 'ping-code-test')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             <span>Kopírovat test</span>
@@ -2471,6 +2482,9 @@ New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (
         <pre class="ping-code-block" id="ping-code-test"><code># Test pingem např. ze SRV2-FS na SRV1-DC (nahraďte X číslem svého pracoviště):
 Test-NetConnection -ComputerName 192.168.2.10 -InformationLevel Detailed
 ping 192.168.2.10</code></pre>
+        <div style="background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; padding: 10px 14px; margin-top: 10px; border-radius: 4px; font-size: 0.88rem; color: #cbd5e1;">
+          <strong>DŮLEŽITÉ K TESTOVÁNÍ:</strong> Pingy mezi servery (SRV1 &harr; SRV2) budou po nastavení IP fungovat správně. Mezi PC1-WIN a jakýmkoliv serverem ale ping v tomto modulu neprojde, dokud je zapnuté DHCP (DHCP server budeme konfigurovat až v Modulu 02). Pro dočasný test konektivity si můžete na PC1 nastavit statickou IP <code>192.168.X.100</code> (kde X je číslo pracoviště).
+        </div>
       </div>
 
       <div class="ping-modal-footer">
