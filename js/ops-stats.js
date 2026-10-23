@@ -57,6 +57,7 @@
             cookies: 0,
             totalCookies: 0,
             clicks: 0,
+            totalClickedCookies: 0,
             clickPower: 1,
             cps: 0,
             clickCps: 0,
@@ -90,9 +91,80 @@
     // -------------------------------------------------------------------------
     // CLICKER STATS HELPERS
     // -------------------------------------------------------------------------
+    function computeClickerBonuses(upgradesList) {
+        const upgrades = new Set(Array.isArray(upgradesList) ? upgradesList : []);
+        let baseClick = 1;
+        let percentCps = 0;
+        let buildingBonus = 0;
+        let grandmaBonus = 0;
+        let steroidBonus = 1;
+        const buildingMultipliers = {};
+
+        const multUpgrades = {
+            "rolling-pins": ["grandma", 2],
+            "sturdy-rolling-pins": ["grandma", 2],
+            "cheap-fertilizer": ["farm", 2],
+            "miracle-growth": ["farm", 2],
+            "industrial-gears": ["factory", 2],
+            "steam-automation": ["factory", 2],
+            "titanium-pickaxes": ["mine", 2],
+            "diamond-drills": ["mine", 2],
+            "warp-drive": ["shipment", 2],
+            "cosmic-navigators": ["shipment", 2],
+            "philosophers-crucible": ["lab", 2],
+            "transmutation-formula": ["lab", 2],
+            "dimensional-gateways": ["portal", 2],
+            "quantum-portals": ["portal", 2],
+            "paradox-engine": ["timemachine", 2],
+            "antimatter-containment": ["antimatter", 2],
+            "optical-dispersion": ["prism", 2],
+            "quantum-probability": ["chancemaker", 2],
+            "mandelbrot-resonance": ["fractal", 2],
+            "strict-mode-bypass": ["javascript", 2],
+            "parallel-diploma": ["idleverse", 2],
+            "synaptic-overclock": ["cortex", 2],
+            "absolute-zero-cooling": ["quantum_server", 2],
+            "event-horizon-diploma": ["maturita_singularity", 2]
+        };
+
+        for (const [id, [building, mult]] of Object.entries(multUpgrades)) {
+            if (upgrades.has(id)) {
+                buildingMultipliers[building] = (buildingMultipliers[building] || 1) * mult;
+            }
+        }
+
+        if (upgrades.has("thousand-fingers")) buildingBonus += 0.1;
+        if (upgrades.has("million-fingers")) buildingBonus += 0.2;
+        if (upgrades.has("billion-fingers")) buildingBonus += 0.5;
+        if (upgrades.has("trillion-fingers")) buildingBonus += 1.0;
+        if (upgrades.has("cosmic-transcendence")) buildingBonus += 1.0;
+        if (upgrades.has("quadrillion-fingers")) buildingBonus += 2.0;
+
+        if (upgrades.has("grandma-steroids")) grandmaBonus += 0.5;
+        if (upgrades.has("advanced-steroids")) steroidBonus *= 2;
+
+        if (upgrades.has("reinforced-index")) { baseClick *= 2; percentCps += 0.01; }
+        if (upgrades.has("carpal-tunnel-prevention")) { baseClick *= 2; percentCps += 0.01; }
+        if (upgrades.has("ambidextrous")) { baseClick *= 2; percentCps += 0.01; }
+        if (upgrades.has("titanium-fingers")) { baseClick *= 3; percentCps += 0.02; }
+        if (upgrades.has("quantum-clicks")) { baseClick *= 5; percentCps += 0.03; }
+        if (upgrades.has("laser-pointer")) { baseClick *= 5; percentCps += 0.05; }
+        if (upgrades.has("cyber-fingers")) { baseClick *= 5; percentCps += 0.04; }
+        if (upgrades.has("singularity-clicks")) { baseClick *= 5; percentCps += 0.05; }
+
+        return {
+            baseClick,
+            percentCps,
+            buildingBonus,
+            grandmaBonus,
+            steroidBonus,
+            buildingMultipliers
+        };
+    }
+
     function computeClickerCps(clickerData) {
         if (!clickerData) return 0;
-        if (typeof clickerData.cps === "number" && clickerData.cps > 0 && !clickerData.buildings) {
+        if (typeof clickerData.cps === "number" && clickerData.cps > 0 && (!clickerData.buildings || Object.keys(clickerData.buildings).length === 0)) {
             return clickerData.cps;
         }
         const baseCpsMap = {
@@ -117,10 +189,19 @@
             maturita_singularity: 55000000000000
         };
         const buildings = clickerData.buildings || {};
-        const multipliers = clickerData.buildingMultipliers || {};
-        const bBonus = typeof clickerData.buildingBonus === "number" ? clickerData.buildingBonus : 0;
-        const gBonus = typeof clickerData.grandmaBonus === "number" ? clickerData.grandmaBonus : 0;
-        const sBonus = typeof clickerData.steroidBonus === "number" ? clickerData.steroidBonus : 1;
+        const bonuses = computeClickerBonuses(clickerData.upgrades);
+        const multipliers = clickerData.buildingMultipliers && Object.keys(clickerData.buildingMultipliers).length > 0
+            ? clickerData.buildingMultipliers
+            : bonuses.buildingMultipliers;
+        const bBonus = typeof clickerData.buildingBonus === "number" && clickerData.buildingBonus > 0
+            ? clickerData.buildingBonus
+            : bonuses.buildingBonus;
+        const gBonus = typeof clickerData.grandmaBonus === "number" && clickerData.grandmaBonus > 0
+            ? clickerData.grandmaBonus
+            : bonuses.grandmaBonus;
+        const sBonus = typeof clickerData.steroidBonus === "number" && clickerData.steroidBonus > 1
+            ? clickerData.steroidBonus
+            : bonuses.steroidBonus;
 
         let totalCps = 0;
         for (const [id, baseCps] of Object.entries(baseCpsMap)) {
@@ -141,20 +222,10 @@
 
     function computeClickerClickPower(clickerData) {
         if (!clickerData) return 1;
-        const upgrades = new Set(Array.isArray(clickerData.upgrades) ? clickerData.upgrades : []);
-        let baseClick = 1;
-        let percentCps = 0;
-        if (upgrades.has("reinforced-index")) { baseClick *= 2; percentCps += 0.01; }
-        if (upgrades.has("carpal-tunnel-prevention")) { baseClick *= 2; percentCps += 0.01; }
-        if (upgrades.has("ambidextrous")) { baseClick *= 2; percentCps += 0.01; }
-        if (upgrades.has("titanium-fingers")) { baseClick *= 3; percentCps += 0.02; }
-        if (upgrades.has("quantum-clicks")) { baseClick *= 5; percentCps += 0.03; }
-        if (upgrades.has("laser-pointer")) { baseClick *= 5; percentCps += 0.05; }
-        if (upgrades.has("cyber-fingers")) { baseClick *= 5; percentCps += 0.04; }
-        if (upgrades.has("singularity-clicks")) { baseClick *= 5; percentCps += 0.05; }
+        const bonuses = computeClickerBonuses(clickerData.upgrades);
         const cps = computeClickerCps(clickerData);
-        const bonus = Math.round(cps * percentCps);
-        const computed = Math.max(1, baseClick + bonus);
+        const bonus = Math.round(cps * bonuses.percentCps);
+        const computed = Math.max(1, bonuses.baseClick + bonus);
         const saved = typeof clickerData.clickPower === "number" ? clickerData.clickPower : 1;
         return Math.max(saved, computed);
     }
@@ -163,10 +234,18 @@
         if (!saveData || typeof saveData !== "object") {
             return { ...DEFAULT_STATS.clicker, playTime: existingPlayTime };
         }
+        const totalCookies = typeof saveData.totalCookies === "number" ? saveData.totalCookies : 0;
+        const clicks = typeof saveData.clicks === "number" ? saveData.clicks : 0;
+        const bonuses = computeClickerBonuses(saveData.upgrades);
+        const totalClickedCookies = typeof saveData.totalClickedCookies === "number"
+            ? Math.min(totalCookies, Math.max(0, saveData.totalClickedCookies))
+            : Math.min(totalCookies, clicks * bonuses.baseClick);
+
         return {
             cookies: typeof saveData.cookies === "number" ? saveData.cookies : 0,
-            totalCookies: typeof saveData.totalCookies === "number" ? saveData.totalCookies : 0,
-            clicks: typeof saveData.clicks === "number" ? saveData.clicks : 0,
+            totalCookies: totalCookies,
+            clicks: clicks,
+            totalClickedCookies: totalClickedCookies,
             clickPower: computeClickerClickPower(saveData),
             cps: computeClickerCps(saveData),
             clickCps: typeof saveData.clickCps === "number" ? Math.min(20, Math.max(0, saveData.clickCps)) : 0,
@@ -192,6 +271,11 @@
                         clickerState.cookies = typeof s.cookies === "number" ? s.cookies : clickerState.cookies;
                         clickerState.totalCookies = totalFromSave;
                         clickerState.clicks = Math.max(clickerState.clicks || 0, Number(s.clicks) || 0);
+                        if (typeof s.totalClickedCookies === "number") {
+                            clickerState.totalClickedCookies = Math.min(clickerState.totalCookies || 0, Math.max(0, s.totalClickedCookies));
+                        } else if (typeof clickerState.totalClickedCookies !== "number") {
+                            clickerState.totalClickedCookies = Math.min(clickerState.totalCookies || 0, (clickerState.clicks || 0) * (computeClickerBonuses(clickerState.upgrades).baseClick));
+                        }
                         clickerState.clickPower = Math.max(clickerState.clickPower || 1, computeClickerClickPower(s));
                         clickerState.buildings = s.buildings && typeof s.buildings === "object" ? { ...s.buildings } : clickerState.buildings;
                         if (Array.isArray(s.upgrades)) {
@@ -414,11 +498,21 @@
                         const newerLastSave = Math.max(localLastSave, cloudLastSave, Date.now());
                         const higherClicks = Math.max(Number(localEffective.clicks) || 0, Number(cloudClicker.clicks) || 0);
                         const higherPlayTime = Math.max(Number(localEffective.playTime) || 0, Number(cloudClicker.playTime) || 0);
+                        const higherTotalClicked = Math.min(
+                            higherTotalCookies,
+                            Math.max(
+                                Number(localEffective.totalClickedCookies) || 0,
+                                Number(cloudClicker.totalClickedCookies) || 0,
+                                Number(localRawSave?.totalClickedCookies) || 0
+                            )
+                        );
+                        const mergedBonuses = computeClickerBonuses(mergedUpgrades);
                         const higherClickPower = Math.max(
                             Number(localEffective.clickPower) || 1,
                             Number(cloudClicker.clickPower) || 1,
                             computeClickerClickPower(localEffective),
-                            computeClickerClickPower(cloudClicker)
+                            computeClickerClickPower(cloudClicker),
+                            computeClickerClickPower({ buildings: mergedBuildings, upgrades: mergedUpgrades })
                         );
                         const higherPeakClickCps = Math.min(20, Math.max(Number(localEffective.peakClickCps) || 0, Number(cloudClicker.peakClickCps) || 0));
                         const spendableCookies = preferCloud
@@ -429,14 +523,16 @@
                             cookies: Math.max(0, Number(spendableCookies) || 0),
                             totalCookies: higherTotalCookies,
                             clicks: higherClicks,
+                            totalClickedCookies: higherTotalClicked,
                             buildings: mergedBuildings,
                             upgrades: mergedUpgrades,
                             achievements: mergedAchievements,
                             clickPower: higherClickPower,
-                            buildingBonus: baseSource.buildingBonus || 0,
-                            grandmaBonus: baseSource.grandmaBonus || 0,
-                            steroidBonus: baseSource.steroidBonus || 1,
-                            buildingMultipliers: baseSource.buildingMultipliers || {},
+                            cps: computeClickerCps({ buildings: mergedBuildings, upgrades: mergedUpgrades, buildingMultipliers: mergedBonuses.buildingMultipliers }),
+                            buildingBonus: mergedBonuses.buildingBonus,
+                            grandmaBonus: mergedBonuses.grandmaBonus,
+                            steroidBonus: mergedBonuses.steroidBonus,
+                            buildingMultipliers: mergedBonuses.buildingMultipliers,
                             startTime: baseSource.startTime || Date.now(),
                             lastCursorClick: baseSource.lastCursorClick || Date.now(),
                             inactiveAccumulatedMs: typeof baseSource.inactiveAccumulatedMs === "number" ? baseSource.inactiveAccumulatedMs : 0,
@@ -454,6 +550,7 @@
                             cookies: mergedSaveObj.cookies,
                             totalCookies: mergedSaveObj.totalCookies,
                             clicks: mergedSaveObj.clicks,
+                            totalClickedCookies: mergedSaveObj.totalClickedCookies,
                             clickPower: mergedSaveObj.clickPower,
                             cps: computeClickerCps(mergedSaveObj),
                             clickCps: Math.min(20, localEffective.clickCps || 0),
@@ -1129,6 +1226,9 @@
             cookies: typeof data.cookies === "number" ? data.cookies : 0,
             totalCookies: typeof data.totalCookies === "number" ? data.totalCookies : 0,
             clicks: typeof data.clicks === "number" ? data.clicks : 0,
+            totalClickedCookies: typeof data.totalClickedCookies === "number"
+                ? Math.min(newTotal, Math.max(0, data.totalClickedCookies))
+                : Math.min(newTotal, (Number(data.clicks) || 0) * (computeClickerBonuses(data.upgrades).baseClick)),
             clickPower: computeClickerClickPower(data),
             cps: cps,
             clickCps: curClickCps,
