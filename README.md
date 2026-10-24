@@ -73,8 +73,8 @@ Repozitář obsahuje také několik samostatných her a herních nástrojů.
 
 | Projekt | Popis |
 |---|---|
-| [Clicker](clicker/) | Klikací hra |
-| [Geometry Dash](gd/) | Hra inspirovaná Geometry Dash |
+| [Clicker](clicker/) | Maturita clicker |
+| [Geometry Dash](gd/) | Hra inspirovaná Juchelka dash |
 | [Hyperdrive](hyperdrive/) | Samostatná webová hra |
 | [Minecraft](mc/) | Minecraft běžící v prohlížeči |
 | [Stratagem](stratagem/) | Pomůcka pro zadávání stratagemů v Helldivers 2 |
