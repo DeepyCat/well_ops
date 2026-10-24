@@ -41,15 +41,5 @@
       ]
     }
   },
-  {
-    "id": "03",
-    "code": "TEST",
-    "title": "TEST – Ověření e-mailových oznámení",
-    "shortTitle": "Testovací modul",
-    "folder": "praxe/03",
-    "vms": [],
-    "defaultVM": "",
-    "tasksFile": "praxe/03/tasks.js",
-    "verifiedFile": "praxe/03/verified.json"
-  }
+  
 ]
