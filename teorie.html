@@ -731,13 +731,10 @@ sidebar { background: rgba(20,20,20,.92) !important; border-right: 0 !important;
                     <div id="globalSearchStatus" role="status" aria-live="polite">Prohledá obsah všech OPS .md materiálů v navigaci.</div>
                     <div id="globalSearchResults"></div>
                 </section>
-                <div class="reader-toolbar">
-                    <button class="tool-btn" onclick="changeFontSize(-1)" title="Zmenšit písmo">A−</button>
-                    <button class="tool-btn" onclick="changeFontSize(1)" title="Zvětšit písmo">A+</button>
-                    <button class="tool-btn" onclick="toggleReadingMode()" id="readingModeBtn">◉ Čtecí režim</button>
-                    <button class="tool-btn" onclick="scrollToTop()">↑ Nahoru</button>
-                    <button class="tool-btn" onclick="openStudyPanel()">✦ Učení a test</button>
-                    <button class="tool-btn" id="readStatusBtn" onclick="toggleCurrentRead()" disabled title="Nejdřív otevři článek">○ Nepřečteno</button>
+
+                <div class="reader-quick-actions" aria-label="Nástroje ke studiu">
+                    <button class="quick-action-btn" type="button" onclick="openStudyPanel()" aria-controls="studyPanel">✦ Učení a test</button>
+                    <button class="quick-action-btn read-status-quick" id="readStatusBtn" type="button" onclick="toggleCurrentRead()" disabled aria-pressed="false">○ Nepřečteno</button>
                 </div>
 
                 <div class="placeholder-state" id="placeholderState">
@@ -1679,6 +1676,27 @@ button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid rgb
   .content-box { border-radius:16px !important; }
   .global-search { padding:12px !important; border-radius:13px !important; }
   .reader-toolbar { gap:6px !important; }
+}
+
+/* Compact study controls integrated with the black/red theme */
+.reader-quick-actions {
+    display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:8px;
+    margin: 14px 0 22px; padding: 0;
+}
+.quick-action-btn {
+    appearance:none; border:0; border-radius:999px; padding:8px 13px; min-height:36px;
+    color:#e8e8e8; background:rgba(255,255,255,.055); cursor:pointer;
+    font:inherit; font-size:.84rem; font-weight:600; transition:background .18s ease,color .18s ease,transform .18s ease;
+}
+.quick-action-btn:hover:not(:disabled) { background:rgba(239,68,68,.14); color:#fff; transform:translateY(-1px); }
+.quick-action-btn:focus-visible { outline:2px solid #ef4444; outline-offset:2px; }
+.quick-action-btn:disabled { opacity:.45; cursor:not-allowed; }
+.quick-action-btn.read-status-quick { color:#ff8a8a; background:rgba(239,68,68,.09); }
+.quick-action-btn.read-status-quick.read { color:#d8f7e5; background:rgba(50,160,95,.13); }
+#studyPanel[hidden] { display:none !important; }
+@media (max-width:600px) {
+  .reader-quick-actions { justify-content:stretch; margin:10px 0 18px; gap:7px; }
+  .quick-action-btn { flex:1 1 auto; min-height:40px; padding:9px 10px; font-size:.82rem; }
 }
 </style>
 
