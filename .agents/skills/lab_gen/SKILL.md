@@ -71,6 +71,16 @@ Do tagu `<head>` v `praxe.html` doplnit:
 <script src="praxe/XX/tasks.js"></script>
 ```
 
+### 6. Interaktivní ověřovací skripty v `skripty/`
+Pro každé zařízení (VM) definované v modulu vytvořit v kořenové složce `skripty/` interaktivní ověřovací skript:
+- Formát názvu: `skripty/XX_check_<VM>.bat` (např. `skripty/01_check_SRV1-DC.bat`, `skripty/02_check_PC1-WIN.bat`).
+- Skript je hybridní `.bat` spouštějící PowerShell s obcházením execution policy (`powershell -NoProfile -ExecutionPolicy Bypass ...`).
+- Skript je interaktivní: vyzve uživatele k zadání čísla pracoviště `X` (výchozí 2), prověří veškerou konfiguraci daného modulu pro daný stroj, vypíše přehledné barevné stavy `[ OK ]` / `[CHYBA]` a celkové skóre.
+- V `tasks.js` zařadit na konec kontrolního seznamu každého stroje nepovinný krok:
+  `title: "X. (Nepovinné) Rychlé ověření celého stroje"`
+  obsahující jednořádkový příkaz pro stažení a spuštění přes curl:
+  `curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat`
+
 ---
 
 ## ⚠️ Kritická pravidla a nejčastější chyby (POZOR):
@@ -95,6 +105,10 @@ Do tagu `<head>` v `praxe.html` doplnit:
      `<link rel="icon" type="image/x-icon" href="img/bird.png">`
    - V HTML stránkách v podsložkách modulů (`praxe/XX/*.html`):
      `<link rel="icon" type="image/x-icon" href="../../img/bird.png">`
+8. **POVINNÝ KROK RYCHLÉHO OVĚŘENÍ PRO KAŽDÝ STROJ:**
+   - Na konec úkolů každého stroje v `tasks.js` a v `_reseni.md` vždy zařadit krok `(Nepovinné) Rychlé ověření celého stroje`.
+   - V `how` uvést zkopírovatelný curl příkaz na skript v `skripty/XX_check_<VM>.bat`.
+   - V `verify` a `expected` ukázat spuštění skriptu a přehled `[ OK ]` výsledků.
 
 ---
 
