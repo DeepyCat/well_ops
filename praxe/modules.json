@@ -53,7 +53,7 @@
   {
     "id": "03",
     "code": "M03",
-    "title": "TEST: Notifikace nového OPS modulu",
+    "title": "TEST: Notifikace nového OPS modulu - úprva jestli to funguje",
     "shortTitle": "Testovací modul",
     "folder": "praxe/03",
     "vms": [
