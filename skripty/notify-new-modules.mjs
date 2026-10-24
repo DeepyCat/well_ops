@@ -18,12 +18,7 @@ if (!CURRENT_SHA || !REPOSITORY) {
   throw new Error("Missing CURRENT_SHA or REPOSITORY.");
 }
 
-if (!BEFORE_SHA || /^0+$/.test(BEFORE_SHA)) {
-  console.log("Initial push; no previous version to compare.");
-  process.exit(0);
-}
-
-// Načtení modulů z konkrétního commitu
+// Načtení a kontrola modulů z konkrétního commitu
 function readModules(revision) {
   const filePath = `${revision}:praxe/modules.json`;
 
@@ -40,11 +35,8 @@ function readModules(revision) {
   try {
     modules = JSON.parse(json);
   } catch (error) {
-    console.error("\n❌ Chyba při parsování praxe/modules.json");
-    console.error(`Commit: ${revision}`);
-    console.error(`Původní chyba: ${error.message}`);
-    console.error("Obsah souboru načtený z tohoto commitu:\n");
-    console.error(json);
+    console.error(`Neplatný JSON v commitu ${revision}:`);
+    console.error(error.message);
     throw error;
   }
 
@@ -86,10 +78,32 @@ console.log("=== Kontrola změn modulů OPS ===");
 console.log(`Předchozí commit: ${BEFORE_SHA}`);
 console.log(`Aktuální commit:  ${CURRENT_SHA}`);
 
-const previousModules = readModules(BEFORE_SHA);
+// Aktuální JSON musí být vždy validní.
 const currentModules = readModules(CURRENT_SHA);
 
-// Porovnání ID předchozích a aktuálních modulů
+// Historický JSON může být rozbitý.
+// V takovém případě pokračujeme s prázdným seznamem ID.
+let previousModules = [];
+
+if (BEFORE_SHA && !/^0+$/.test(BEFORE_SHA)) {
+  try {
+    previousModules = readModules(BEFORE_SHA);
+  } catch (error) {
+    console.warn(
+      "\n⚠️ Předchozí modules.json nelze načíst."
+    );
+    console.warn(
+      "Pokračuji s prázdným seznamem předchozích modulů."
+    );
+    console.warn(
+      "Tato notifikace může obsahovat všechny aktuální moduly."
+    );
+  }
+} else {
+  console.log("Není dostupná předchozí verze JSONu.");
+}
+
+// Najdi nová ID
 const previousIds = new Set(
   previousModules.map(module => String(module.id))
 );
@@ -98,17 +112,22 @@ const addedModules = currentModules.filter(
   module => !previousIds.has(String(module.id))
 );
 
-// Při přidání ID zobrazíme nové moduly.
-// Při jiné změně JSONu zobrazíme aktuální moduly.
+// Pokud přibylo nové ID, zobrazíme nové moduly.
+// Pokud se změnil JSON bez nového ID, zobrazíme aktuální moduly.
 const modulesToShow = addedModules.length > 0
   ? addedModules
   : currentModules;
 
-console.log(
-  addedModules.length > 0
-    ? `Nová ID: ${addedModules.map(module => module.id).join(", ")}`
-    : "JSON byl změněn, ale žádné nové ID nebylo přidáno."
-);
+if (addedModules.length > 0) {
+  console.log(
+    "Nová ID:",
+    addedModules.map(module => module.id).join(", ")
+  );
+} else {
+  console.log(
+    "Nebyla nalezena nová ID. Odešle se oznámení o aktualizaci."
+  );
+}
 
 // Příjemci bez duplicit
 const recipients = [
@@ -141,7 +160,7 @@ function escapeHtml(value) {
   })[char]);
 }
 
-// Karta a odkaz pro každý zobrazovaný modul
+// Karty modulů
 const moduleList = modulesToShow.map(module => {
   const moduleId = String(module.id);
 
@@ -195,6 +214,18 @@ const subject = addedModules.length > 0
     ? `🚀 OPS | Nový modul: ${addedModules[0].title}`
     : `🚀 OPS | Přidáno ${addedModules.length} nových modulů`
   : "OPS | Aktualizace modulů";
+
+// Nadpis e-mailu
+const heading = addedModules.length > 0
+  ? addedModules.length === 1
+    ? "Přibyl nový modul!"
+    : "Přibyly nové moduly!"
+  : "Moduly byly aktualizovány!";
+
+// Úvodní text
+const intro = addedModules.length > 0
+  ? "Na OPS byl právě přidán nový obsah. Vyber si modul níže a můžeš se pustit do práce."
+  : "Na OPS došlo ke změně seznamu modulů. Aktuální moduly najdeš níže.";
 
 // HTML e-mailu
 const html = `
@@ -264,24 +295,14 @@ const html = `
           font-size:25px;
           line-height:1.3;
           margin:10px 0 12px;
-        ">
-          ${addedModules.length > 0
-            ? addedModules.length === 1
-              ? "Přibyl nový modul!"
-              : "Přibyly nové moduly!"
-            : "Moduly byly aktualizovány!"}
-        </h2>
+        ">${escapeHtml(heading)}</h2>
 
         <p style="
           color:#c4c4d4;
           font-size:15px;
           line-height:1.7;
           margin:0 0 22px;
-        ">
-          ${addedModules.length > 0
-            ? "Na OPS byl právě přidán nový obsah. Vyber si modul níže a můžeš se pustit do práce."
-            : "Na OPS došlo ke změně seznamu modulů. Aktuální moduly najdeš níže."}
-        </p>
+        ">${escapeHtml(intro)}</p>
 
         ${moduleList}
 
@@ -294,9 +315,7 @@ const html = `
             color:#a5a3b8;
             font-size:13px;
             line-height:1.6;
-          ">
-            Nějaký problém? tvoje chyba
-          </p>
+          ">Nějaký problém? tvoje chyba</p>
         </div>
       </div>
 
@@ -319,9 +338,7 @@ const html = `
           color:#77758b;
           font-size:11px;
           margin:12px 0 0;
-        ">
-          © OPS · Praktická část
-        </p>
+        ">© OPS · Praktická část</p>
       </div>
 
     </div>
