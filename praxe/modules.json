@@ -40,5 +40,16 @@
         "Moje dokumentace / Modul 0 Příprava (část PC1-WIN)"
       ]
     }
+  },
+  {
+    "id": "03",
+    "code": "TEST",
+    "title": "TEST – Nový design e-mailu OPS",
+    "shortTitle": "Testovací modul",
+    "folder": "praxe/03",
+    "vms": [],
+    "defaultVM": "",
+    "tasksFile": "praxe/03/tasks.js",
+    "verifiedFile": "praxe/03/verified.json"
   }
 ]
