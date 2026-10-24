@@ -22,7 +22,11 @@
 
 Všechno je na jednom místě, takže není potřeba hledat materiály v deseti různých složkách.
 
-🌐 **Web:** [kokot.fit](https://kokot.fit/)  /  [ops.peakdle.site](https://ops.peakdle.site/)   
+🌐 **Weby:**
+
+- [kokot.fit](https://kokot.fit/)
+- [ops.peakdle.site](https://ops.peakdle.site/)
+
 📦 **GitHub:** [DeepyCat/well_ops](https://github.com/DeepyCat/well_ops)
 
 ## 🌐 Co tu najdeš
@@ -53,9 +57,29 @@ V úlohách se používají tyto virtuální stroje:
 
 Seznam modulů a jejich nastavení jsou v `praxe/modules.json`. Logiku jejich načítání řeší `praxe/modules.js`.
 
-### Kontrolní skripty
+### 📧 Upozornění na nové moduly
+
+Při přidání nového praktického modulu se automaticky odešle e-mailové upozornění. Díky tomu se o novém obsahu dozvíš bez nutnosti web pravidelně kontrolovat.
+
+Odesílání zajišťuje automatizace v `.github/workflows/notify-new-modules.yml` a související skript `skripty/notify-new-modules.mjs`.
+
+### ✅ Kontrolní skripty
 
 Ve složce `skripty/` jsou `.bat` a `.ps1` skripty, které slouží ke kontrole vybraných nastavení a splnění praktických úloh.
+
+## 🎮 Herní projekty
+
+Repozitář obsahuje také několik samostatných her a herních nástrojů.
+
+| Projekt | Popis |
+|---|---|
+| [Clicker](clicker/) | Klikací hra |
+| [Geometry Dash](gd/) | Hra inspirovaná Geometry Dash |
+| [Hyperdrive](hyperdrive/) | Samostatná webová hra |
+| [Minecraft](mc/) | Minecraft běžící v prohlížeči |
+| [Stratagem](stratagem/) | Pomůcka pro zadávání stratagemů v Helldivers 2 |
+
+Další projekty a obsah najdeš na stránce [Hry](games.html).
 
 ## 📂 Struktura projektu
 
@@ -142,8 +166,7 @@ well_ops/
 │   │   ├── levels/
 │   │   │   ├── ...
 │   │   │   └── object_overrides.json
-│   │   ├── ...
-│   │   └── herní assety a zvuky
+│   │   └── ...
 │   ├── game.js
 │   ├── index.html
 │   ├── LICENSE
