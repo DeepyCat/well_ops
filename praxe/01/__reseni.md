@@ -58,3 +58,21 @@ whoami
 Get-ADUser -Identity Administrator | Select-Object SamAccountName, UserPrincipalName, Enabled
 ```
 Výstup je ve tvaru `PRIJMENI\Administrator` a účet má `Enabled: True`. Všechny služby Active Directory a DNS běží bez červených varování.
+
+### 7. (Nepovinné) Rychlé ověření celého stroje
+Pro komplexní a automatické ověření celé konfigurace serveru **SRV1-DC** můžete spustit ověřovací skript přímo z repozitáře. Skript je **striktně read-only** (pouze čte stav, nic v systému nemění) a po použití se **neukládá na disk** (smaže se automaticky po dokončení běhu).
+
+Spuštění v PowerShellu jako Administrator:
+```powershell
+curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue
+```
+
+Nebo přímé spuštění přímo v operační paměti RAM bez uložení souboru na disk:
+```powershell
+irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex
+```
+
+Po spuštění zadejte číslo vašeho pracoviště `X` (např. `2`). Skript provede veškeré kontroly a na konci zobrazí přehledný 3-úrovňový souhrn:
+- **Zeleně `[ OK ]`**: všechny úspěšně ověřené parametry (IP adresa, brána, DNS resolver, AD DS role, povýšení na DC, doména, FSMO role, Global Catalog, služby NTDS/DNS, sdílení SYSVOL/NETLOGON).
+- **Žlutě `[KONTROLA]`**: položky vyžadující vaši vizuální kontrolu (DSRM heslo `Pa55w.rd`, které z bezpečnostních důvodů nelze z AD přečíst, a správnost vašeho příjmení v názvu domény).
+- **Červeně `[CHYBA]`**: konfigurace, které neodpovídají zadání, doplněné o nápovědu pro rychlou nápravu.

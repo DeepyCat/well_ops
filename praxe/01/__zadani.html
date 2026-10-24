@@ -521,6 +521,24 @@ Install-ADDSForest -DomainName $DomainName -SafeModeAdministratorPassword $Secur
         <li><strong>Active Directory Administrative Center (ADAC)</strong> – moderní grafické rozhraní správy domény.</li>
         <li><strong>Active Directory Domains and Trusts</strong> – správa důvěryhodností a funkčních úrovní lesa.</li>
       </ul>
+
+      <h2>Rychlé automatické ověření stroje (nepovinné)</h2>
+      <p>Konfiguraci stroje SRV1-DC si můžete ověřit také interaktivním skriptem v PowerShellu (skript je striktně read-only a po spuštění se neukládá na disk):</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue</code></pre>
+      </div>
+      <p>Nebo přímo v paměti RAM bez zápisu na disk:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex</code></pre>
+      </div>
     </article>
   </main>
 
