@@ -1,5 +1,6 @@
-Tady máme fešáka jak říka že je to good
-<img src="https://raw.githubusercontent.com/DeepyCat/well_ops/refs/heads/main/img/praxe-bg.jpg" width="400" alt="Náhled pozadí">
+Co k tomu říct... je to stránka pro OPS.
+Tady máme fešáka jak říka že je to velice dobrá stránka.
+<img src="https://raw.githubusercontent.com/DeepyCat/well_ops/refs/heads/main/img/praxe-bg.jpg" width="400" alt="Fešáak">
 
 ```
 well_ops/
