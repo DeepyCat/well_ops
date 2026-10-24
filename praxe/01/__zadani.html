@@ -523,21 +523,13 @@ Install-ADDSForest -DomainName $DomainName -SafeModeAdministratorPassword $Secur
       </ul>
 
       <h2>Rychlé automatické ověření stroje (nepovinné)</h2>
-      <p>Konfiguraci stroje SRV1-DC si můžete ověřit také interaktivním skriptem v PowerShellu (skript je striktně read-only a po spuštění se neukládá na disk):</p>
+      <p>Konfiguraci stroje SRV1-DC si můžete ověřit také interaktivním skriptem. Příkaz lze spustit v <strong>PowerShellu, CMD i Terminálu</strong> – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je striktně read-only a po dokončení se sám smaže z disku:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
-          <span>PowerShell (Spustit jako Administrator)</span>
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue</code></pre>
-      </div>
-      <p>Nebo přímo v paměti RAM bez zápisu na disk:</p>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell (Spustit jako Administrator)</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-        </div>
-        <pre><code>irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex</code></pre>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
       </div>
     </article>
   </main>

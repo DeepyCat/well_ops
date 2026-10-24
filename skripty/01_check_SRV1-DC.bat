@@ -1,6 +1,6 @@
 @echo off
 set "BAT_PATH=%~f0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"
 (goto) 2>nul & del "%~f0"
 exit /b %ERRORLEVEL%
 <#
@@ -18,6 +18,10 @@ exit /b %ERRORLEVEL%
     - Integrovany DNS Server a preklad domeny
     - 3-urovnovy souhrn: [ OK ] (zelene), [KONTROLA] (oranzove/zlute), [CHYBA] (cervene)
 #>
+
+param(
+    [int]$WorkspaceX = 0
+)
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $Host.UI.RawUI.WindowTitle = "WELL_OPS :: Overeni SRV1-DC (Modul 01)"
@@ -69,6 +73,14 @@ function Report-Fail {
 
 Write-Header "WELL_OPS :: Overeni konfigurace SRV1-DC (Modul 01)"
 
+$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+if (-not $isAdmin) {
+    Write-Host ""
+    Write-Host "[VAROVANI] Skript neni spusten s pravy Administratora!" -ForegroundColor Yellow
+    Write-Host "           Spustte konzoli jako Administrator, jinak nektere AD/DNS testy nemusi projit." -ForegroundColor Yellow
+    Write-Host ""
+}
+
 # ------------------------------------------------------------
 # 0. Interaktivni detekce a volba cisla pracoviste X
 # ------------------------------------------------------------
@@ -83,15 +95,20 @@ try {
 Write-Host "Tento skript overi pripravenost a konfiguraci stroje SRV1-DC." -ForegroundColor Gray
 Write-Host "Skript je STRIKTNE READ-ONLY - zadna nastaveni neupravuje." -ForegroundColor Gray
 Write-Host ""
-Write-Host "Zadejte cislo vaseho pracoviste (X) [vychozi: $detectedX]: " -ForegroundColor Yellow -NoNewline
-$userInput = Read-Host
 
 $wsX = $detectedX
-if (-not [string]::IsNullOrWhiteSpace($userInput)) {
-    if ($userInput -match '^\d+$') {
-        $wsX = [int]$userInput
-    } else {
-        Write-Host "Neplatny vstup, pouzivam vychozi hodnotu: $detectedX" -ForegroundColor DarkYellow
+if ($WorkspaceX -gt 0) {
+    $wsX = $WorkspaceX
+    Write-Host "Pouzito cislo pracoviste z parametru: $wsX" -ForegroundColor Cyan
+} else {
+    Write-Host "Zadejte cislo vaseho pracoviste (X) [vychozi: $detectedX]: " -ForegroundColor Yellow -NoNewline
+    $userInput = Read-Host
+    if (-not [string]::IsNullOrWhiteSpace($userInput)) {
+        if ($userInput -match '^\d+$') {
+            $wsX = [int]$userInput
+        } else {
+            Write-Host "Neplatny vstup, pouzivam vychozi hodnotu: $detectedX" -ForegroundColor DarkYellow
+        }
     }
 }
 

@@ -502,21 +502,13 @@ Get-ADUser -Identity Administrator | Select-Object SamAccountName, UserPrincipal
       <p>Výstup je ve tvaru <code>PRIJMENI\Administrator</code> a účet má <code>Enabled: True</code>. Všechny služby Active Directory i integrovaného DNS serveru běží bez červených chyb.</p>
 
       <h3>7. (Nepovinné) Rychlé ověření celého stroje</h3>
-      <p>Pro komplexní a automatické ověření celé konfigurace serveru <strong>SRV1-DC</strong> můžete spustit ověřovací skript přímo z repozitáře. Skript je <strong>striktně read-only</strong> (pouze čte stav, nic nemění) a po použití se <strong>neukládá na disk</strong> (smaže se automaticky po dokončení běhu):</p>
+      <p>Pro komplexní a automatické ověření celé konfigurace serveru <strong>SRV1-DC</strong> můžete spustit ověřovací skript přímo z repozitáře. Příkaz lze spustit v <strong>PowerShellu, CMD i Terminálu</strong> – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je <strong>striktně read-only</strong> (pouze čte stav, nic nemění) a po použití se <strong>neukládá na disk</strong> (smaže se automaticky po dokončení běhu):</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
-          <span>PowerShell (Spustit jako Administrator)</span>
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue</code></pre>
-      </div>
-      <p>Nebo přímo v paměti RAM bez zápisu na disk:</p>
-      <div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span>PowerShell (Spustit jako Administrator)</span>
-          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
-        </div>
-        <pre><code>irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex</code></pre>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
       </div>
       <p>Po spuštění zadejte číslo vašeho pracoviště <code>X</code> (např. <code>2</code>). Skript provede veškeré kontroly a na konci zobrazí přehledný 3-úrovňový souhrn:</p>
       <ul>

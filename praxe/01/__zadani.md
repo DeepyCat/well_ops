@@ -36,11 +36,7 @@ Na SRV1-DC jsou dostupné administrační nástroje pro správu domény — **Ac
 
 ### Rychlé automatické ověření stroje (nepovinné)
 
-Konfiguraci stroje SRV1-DC si můžete ověřit také interaktivním jednořádkovým skriptem v PowerShellu (skript je striktně read-only a po spuštění se neukládá na disk):
+Konfiguraci stroje SRV1-DC si můžete ověřit také interaktivním jednořádkovým skriptem. Příkaz můžete spustit v **PowerShellu, CMD i Terminálu** – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je striktně read-only a po dokončení se sám smaže z disku:
 ```powershell
-curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue
-```
-nebo přímo v paměti RAM bez zápisu na disk:
-```powershell
-irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
 ```
