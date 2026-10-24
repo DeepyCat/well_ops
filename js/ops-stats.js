@@ -1388,6 +1388,10 @@
 
         getStats: function() {
             return loadLocalStats();
+            saveStats: function(stats) {
+            saveLocalStats(stats);
+            syncToCloud();
+        },
         },
 
         // Zaznamenání skóre z různých her
