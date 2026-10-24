@@ -1,4 +1,4 @@
-
+```js
 import { execFileSync } from "node:child_process";
 
 const {
@@ -78,32 +78,28 @@ console.log("=== Kontrola změn modulů OPS ===");
 console.log(`Předchozí commit: ${BEFORE_SHA}`);
 console.log(`Aktuální commit:  ${CURRENT_SHA}`);
 
-// Aktuální JSON musí být vždy validní.
+// Aktuální JSON musí být validní.
 const currentModules = readModules(CURRENT_SHA);
 
-// Historický JSON může být rozbitý.
-// V takovém případě pokračujeme s prázdným seznamem ID.
-let previousModules = [];
-
-if (BEFORE_SHA && !/^0+$/.test(BEFORE_SHA)) {
-  try {
-    previousModules = readModules(BEFORE_SHA);
-  } catch (error) {
-    console.warn(
-      "\n⚠️ Předchozí modules.json nelze načíst."
-    );
-    console.warn(
-      "Pokračuji s prázdným seznamem předchozích modulů."
-    );
-    console.warn(
-      "Tato notifikace může obsahovat všechny aktuální moduly."
-    );
-  }
-} else {
-  console.log("Není dostupná předchozí verze JSONu.");
+// Bez předchozího commitu nelze bezpečně porovnat ID.
+if (!BEFORE_SHA || /^0+$/.test(BEFORE_SHA)) {
+  console.log(
+    "Není dostupná předchozí verze JSONu. E-mail se neposílá."
+  );
+  process.exit(0);
 }
 
-// Najdi nová ID
+let previousModules;
+
+try {
+  previousModules = readModules(BEFORE_SHA);
+} catch (error) {
+  console.error("\nPředchozí modules.json nelze načíst.");
+  console.error("Nelze bezpečně ověřit nová ID. E-mail se neposílá.");
+  process.exit(0);
+}
+
+// Najdi ID, která v předchozí verzi neexistovala.
 const previousIds = new Set(
   previousModules.map(module => String(module.id))
 );
@@ -112,24 +108,23 @@ const addedModules = currentModules.filter(
   module => !previousIds.has(String(module.id))
 );
 
-// Pokud přibylo nové ID, zobrazíme nové moduly.
-// Pokud se změnil JSON bez nového ID, zobrazíme aktuální moduly.
-const modulesToShow = addedModules.length > 0
-  ? addedModules
-  : currentModules;
-
-if (addedModules.length > 0) {
+// Žádná nová ID = žádný e-mail.
+if (addedModules.length === 0) {
   console.log(
-    "Nová ID:",
-    addedModules.map(module => module.id).join(", ")
+    "Nebyla přidána žádná nová ID. E-mail se neposílá."
   );
-} else {
-  console.log(
-    "Nebyla nalezena nová ID. Odešle se oznámení o aktualizaci."
-  );
+  process.exit(0);
 }
 
-// Příjemci bez duplicit
+console.log(
+  "Nová ID:",
+  addedModules.map(module => module.id).join(", ")
+);
+
+// E-mail obsahuje pouze nově přidané moduly.
+const modulesToShow = addedModules;
+
+// Příjemci bez duplicit.
 const recipients = [
   ...new Set(
     OPS_RECIPIENTS
@@ -149,7 +144,7 @@ for (const recipient of recipients) {
   }
 }
 
-// Ochrana textu v HTML
+// Ochrana textu v HTML.
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -160,7 +155,7 @@ function escapeHtml(value) {
   })[char]);
 }
 
-// Karty modulů
+// Karty nových modulů.
 const moduleList = modulesToShow.map(module => {
   const moduleId = String(module.id);
 
@@ -169,14 +164,14 @@ const moduleList = modulesToShow.map(module => {
 
   return `
     <div style="
-      background:#202033;
-      border:1px solid #393653;
+      background:#271719;
+      border:1px solid #54272d;
       border-radius:12px;
       padding:20px;
       margin:16px 0;
     ">
       <div style="
-        color:#a78bfa;
+        color:#ff6b6b;
         font-size:12px;
         font-weight:bold;
         letter-spacing:1.5px;
@@ -190,14 +185,14 @@ const moduleList = modulesToShow.map(module => {
       ">${escapeHtml(module.title)}</h3>
 
       <p style="
-        color:#b9b7ce;
+        color:#d0b8bb;
         font-size:13px;
         margin:0 0 18px;
       ">Složka: ${escapeHtml(module.folder ?? "neuvedena")}</p>
 
       <a href="${escapeHtml(moduleUrl)}" style="
         display:inline-block;
-        background:#8b5cf6;
+        background:#dc2626;
         color:#ffffff;
         text-decoration:none;
         font-weight:bold;
@@ -208,26 +203,22 @@ const moduleList = modulesToShow.map(module => {
   `;
 }).join("");
 
-// Předmět e-mailu
-const subject = addedModules.length > 0
-  ? addedModules.length === 1
-    ? `🚀 OPS | Nový modul: ${addedModules[0].title}`
-    : `🚀 OPS | Přidáno ${addedModules.length} nových modulů`
-  : "OPS | Aktualizace modulů";
+// Předmět e-mailu.
+const subject = addedModules.length === 1
+  ? `🚀 OPS | Nový modul: ${addedModules[0].title}`
+  : `🚀 OPS | Přidáno ${addedModules.length} nových modulů`;
 
-// Nadpis e-mailu
-const heading = addedModules.length > 0
-  ? addedModules.length === 1
-    ? "Přibyl nový modul!"
-    : "Přibyly nové moduly!"
-  : "Moduly byly aktualizovány!";
+// Nadpis e-mailu.
+const heading = addedModules.length === 1
+  ? "Přibyl nový modul!"
+  : "Přibyly nové moduly!";
 
-// Úvodní text
-const intro = addedModules.length > 0
-  ? "Na OPS byl právě přidán nový obsah. Vyber si modul níže a můžeš se pustit do práce."
-  : "Na OPS došlo ke změně seznamu modulů. Aktuální moduly najdeš níže.";
+// Úvodní text.
+const intro = addedModules.length === 1
+  ? "Na OPS byl právě přidán nový modul. Vyber si ho níže a můžeš se pustit do práce."
+  : "Na OPS byly právě přidány nové moduly. Vyber si jeden z nich níže.";
 
-// HTML e-mailu
+// HTML e-mailu.
 const html = `
 <!DOCTYPE html>
 <html lang="cs">
@@ -240,7 +231,7 @@ const html = `
 <body style="
   margin:0;
   padding:0;
-  background:#11111b;
+  background:#100b0c;
   font-family:Arial,Helvetica,sans-serif;
   color:#ffffff;
 ">
@@ -249,19 +240,19 @@ const html = `
     <div style="
       max-width:600px;
       margin:0 auto;
-      background:#181825;
-      border:1px solid #302d46;
+      background:#1c1214;
+      border:1px solid #452126;
       border-radius:16px;
       overflow:hidden;
     ">
 
       <div style="
         padding:30px 28px;
-        background:#1e1b32;
-        border-bottom:1px solid #393653;
+        background:#301719;
+        border-bottom:1px solid #54272d;
       ">
         <div style="
-          color:#a78bfa;
+          color:#ff6b6b;
           font-size:12px;
           font-weight:bold;
           letter-spacing:3px;
@@ -275,7 +266,7 @@ const html = `
         ">🚀 OPS</h1>
 
         <p style="
-          color:#c4b5fd;
+          color:#ff9999;
           margin:10px 0 0;
           font-size:14px;
         ">Novinky na webu</p>
@@ -284,7 +275,7 @@ const html = `
       <div style="padding:28px;">
 
         <div style="
-          color:#a78bfa;
+          color:#ff6b6b;
           font-size:12px;
           font-weight:bold;
           letter-spacing:1.5px;
@@ -298,7 +289,7 @@ const html = `
         ">${escapeHtml(heading)}</h2>
 
         <p style="
-          color:#c4c4d4;
+          color:#e0d0d2;
           font-size:15px;
           line-height:1.7;
           margin:0 0 22px;
@@ -309,33 +300,33 @@ const html = `
         <div style="
           margin-top:28px;
           padding-top:22px;
-          border-top:1px solid #302d46;
+          border-top:1px solid #452126;
         ">
           <p style="
-            color:#a5a3b8;
+            color:#c2a9ad;
             font-size:13px;
             line-height:1.6;
-          ">Nějaký problém? tvoje chyba</p>
+          ">Nějaký problém? Tvoje chyba. 😎</p>
         </div>
       </div>
 
       <div style="
         padding:20px 28px;
-        background:#141420;
-        border-top:1px solid #302d46;
+        background:#160e10;
+        border-top:1px solid #452126;
       ">
         <p style="
-          color:#a5a3b8;
+          color:#c2a9ad;
           font-size:12px;
           line-height:1.7;
           margin:0;
         ">
           Toto je automatické oznámení webu OPS.<br>
-          Bylo odesláno při změně souboru modules.json.
+          E-mail byl odeslán při přidání nového ID modulu.
         </p>
 
         <p style="
-          color:#77758b;
+          color:#94777b;
           font-size:11px;
           margin:12px 0 0;
         ">© OPS · Praktická část</p>
@@ -347,7 +338,7 @@ const html = `
 </html>
 `;
 
-// Každému příjemci posíláme samostatný e-mail
+// Každému příjemci posíláme samostatný e-mail.
 const failures = [];
 
 for (const recipient of recipients) {
@@ -397,3 +388,4 @@ if (failures.length > 0) {
 console.log(
   `Successfully submitted notifications to all ${recipients.length} recipients.`
 );
+```
