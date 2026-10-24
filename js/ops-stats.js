@@ -6,7 +6,7 @@
     'use strict';
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    // SUPABASE CONFIGURATION (Doplňte své údaje ze Supabase projektu)
+    // SUPABASE CONFIGURATION
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     const SUPABASE_CONFIG = {
         url: "https://xtrykhppxqngfaqadypr.supabase.co",
@@ -585,7 +585,6 @@
                     }
                 }
 
-                // Merge stats — zachovame vyssi skore a maxima
                 const merged = {
                     gd: {
                         attempts: Math.max(local.gd.attempts, cloudStats.gd?.attempts || 0),
@@ -654,7 +653,7 @@
     }
 
     // -------------------------------------------------------------------------
-    // MINECRAFT (EAGLERCRAFT) STORAGE & BACKUP HELPERS
+    // MINECRAFT STORAGE & BACKUP HELPERS
     // -------------------------------------------------------------------------
     function getSafeUsername(username) {
         const raw = (username || "").trim();
@@ -877,7 +876,6 @@
             return { migrated: false, count: existing.length };
         }
 
-        // Pokud je targetDB prázdná, zkontroluj legacy 'worlds'
         if (targetDB !== "worlds") {
             const legacyRecords = await readDatabaseRecords("worlds");
             if (legacyRecords && legacyRecords.length > 0) {
@@ -899,7 +897,6 @@
             }
         }
 
-        // Zkus načíst z dřívější zálohy tohoto uživatele
         const backup = await getBackupFromStore(safeUser + "_latest");
         if (backup) {
             const records = targetDB.includes("1_8") ? backup.worlds_1_8 : backup.worlds_1_12;
@@ -1347,7 +1344,7 @@
 
     hookCookieClickerStorage();
 
-  // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
     // PUBLIC API
     // -------------------------------------------------------------------------
     const OPS_STATS = {
@@ -1389,7 +1386,6 @@
             return loadLocalStats();
         },
 
-        // Přidáno / opraveno pro správné ukládání z gachy a her:
         saveStats: function(stats) {
             saveLocalStats(stats);
             syncToCloud();
