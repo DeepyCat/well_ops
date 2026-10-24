@@ -25,16 +25,33 @@ if (!BEFORE_SHA || /^0+$/.test(BEFORE_SHA)) {
 
 // Načtení modulů z konkrétního commitu
 function readModules(revision) {
+  const filePath = `${revision}:praxe/modules.json`;
+
+  console.log(`\nNačítám praxe/modules.json z commitu: ${revision}`);
+
   const json = execFileSync(
     "git",
-    ["show", `${revision}:praxe/modules.json`],
+    ["show", filePath],
     { encoding: "utf8" }
   );
 
-  const modules = JSON.parse(json);
+  let modules;
+
+  try {
+    modules = JSON.parse(json);
+  } catch (error) {
+    console.error("\n❌ Chyba při parsování praxe/modules.json");
+    console.error(`Commit: ${revision}`);
+    console.error(`Původní chyba: ${error.message}`);
+    console.error("Obsah souboru načtený z tohoto commitu:\n");
+    console.error(json);
+    throw error;
+  }
 
   if (!Array.isArray(modules)) {
-    throw new Error("praxe/modules.json must contain an array.");
+    throw new Error(
+      `praxe/modules.json must contain an array. Commit: ${revision}`
+    );
   }
 
   const ids = new Set();
@@ -46,7 +63,9 @@ function readModules(revision) {
       !module.title ||
       typeof module.title !== "string"
     ) {
-      throw new Error("Every module must have a valid id and title.");
+      throw new Error(
+        `Every module must have a valid id and title. Commit: ${revision}`
+      );
     }
 
     const id = String(module.id);
@@ -58,8 +77,14 @@ function readModules(revision) {
     ids.add(id);
   }
 
+  console.log(`JSON OK — počet modulů: ${modules.length}`);
+
   return modules;
 }
+
+console.log("=== Kontrola modulů OPS ===");
+console.log(`Předchozí commit: ${BEFORE_SHA}`);
+console.log(`Aktuální commit:  ${CURRENT_SHA}`);
 
 const previousModules = readModules(BEFORE_SHA);
 const currentModules = readModules(CURRENT_SHA);
@@ -114,10 +139,10 @@ function escapeHtml(value) {
   })[char]);
 }
 
-// Každý modul dostane vlastní odkaz na stránce OPS.
-// ID modulu 02 => https://www.kokot.fit/praxe.html?modul=02
+// Karta a odkaz pro každý nový modul
 const moduleList = addedModules.map(module => {
   const moduleId = String(module.id);
+
   const moduleUrl =
     `https://www.kokot.fit/praxe.html?modul=${encodeURIComponent(moduleId)}`;
 
@@ -264,14 +289,10 @@ const html = `
             font-size:13px;
             line-height:1.6;
           ">
-            Chceš vidět, co se změnilo v projektu?
+            Nějaký problém? tvoje chyba
           </p>
 
-          <a href="${escapeHtml(commitUrl)}" style="
-            color:#c4b5fd;
-            font-size:14px;
-            text-decoration:underline;
-          ">Zobrazit změny na GitHubu</a>
+         
         </div>
       </div>
 
