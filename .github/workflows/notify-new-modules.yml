@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Send email for newly added modules
+      - name: Send email about modules.json changes
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM: ${{ secrets.RESEND_FROM }}
