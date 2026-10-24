@@ -7,7 +7,7 @@
 ---
 
 ## 📂 Struktura projektu
-
+```
 well_ops/
 ├── .agents/                        # Konfigurace a nástroje AI agentů
 ├── .github/                        # GitHub Workflows
@@ -28,7 +28,7 @@ well_ops/
 ├── teorie.html                     # Teoretická část
 ├── statistika.html                 # Statistiky               
 └── games.html                       # Přehled her
-
+```
 <details>
 <summary><b>🔍 Kliknutím rozbalíte detailní strom souborů a ukázku materiálů</b></summary>
 
