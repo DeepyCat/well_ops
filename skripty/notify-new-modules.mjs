@@ -10,7 +10,6 @@ const {
   REPOSITORY
 } = process.env;
 
-// Kontrola povinných proměnných
 if (!RESEND_API_KEY || !RESEND_FROM || !OPS_RECIPIENTS) {
   throw new Error("Missing required GitHub Actions secrets.");
 }
@@ -19,7 +18,6 @@ if (!CURRENT_SHA || !REPOSITORY) {
   throw new Error("Missing CURRENT_SHA or REPOSITORY.");
 }
 
-// Při prvním pushi není co porovnávat
 if (!BEFORE_SHA || /^0+$/.test(BEFORE_SHA)) {
   console.log("Initial push; no previous version to compare.");
   process.exit(0);
@@ -48,9 +46,7 @@ function readModules(revision) {
       !module.title ||
       typeof module.title !== "string"
     ) {
-      throw new Error(
-        "Every module must have a valid id and title."
-      );
+      throw new Error("Every module must have a valid id and title.");
     }
 
     const id = String(module.id);
@@ -68,7 +64,6 @@ function readModules(revision) {
 const previousModules = readModules(BEFORE_SHA);
 const currentModules = readModules(CURRENT_SHA);
 
-// Porovnáme ID modulů
 const previousIds = new Set(
   previousModules.map(module => String(module.id))
 );
@@ -77,7 +72,6 @@ const addedModules = currentModules.filter(
   module => !previousIds.has(String(module.id))
 );
 
-// Pokud nepřibyl žádný modul, nic neposíláme
 if (addedModules.length === 0) {
   console.log("No new modules. No email will be sent.");
   process.exit(0);
@@ -89,7 +83,7 @@ console.log(
     .join(", ")}`
 );
 
-// Příjemci se očistí od mezer a prázdných položek
+// Příjemci bez duplicit
 const recipients = [
   ...new Set(
     OPS_RECIPIENTS
@@ -103,14 +97,13 @@ if (recipients.length === 0) {
   throw new Error("No email recipients configured.");
 }
 
-// Kontrola základního formátu e-mailových adres
 for (const recipient of recipients) {
   if (!/^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(recipient)) {
     throw new Error(`Invalid recipient email address: ${recipient}`);
   }
 }
 
-// Bezpečné vložení textu do HTML
+// Ochrana textu v HTML
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -121,37 +114,198 @@ function escapeHtml(value) {
   })[char]);
 }
 
-const moduleList = addedModules.map(module => `
-  <li>
-    <strong>${escapeHtml(module.title)}</strong>
-    <br>
-    Kód: ${escapeHtml(module.code ?? module.id)}
-    <br>
-    Složka: ${escapeHtml(module.folder ?? "neuvedena")}
-  </li>
-`).join("");
+// Každý modul dostane vlastní odkaz na stránce OPS.
+// ID modulu 02 => https://www.kokot.fit/praxe.html?modul=02
+const moduleList = addedModules.map(module => {
+  const moduleId = String(module.id);
+  const moduleUrl =
+    `https://www.kokot.fit/praxe.html?modul=${encodeURIComponent(moduleId)}`;
+
+  return `
+    <div style="
+      background:#202033;
+      border:1px solid #393653;
+      border-radius:12px;
+      padding:20px;
+      margin:16px 0;
+    ">
+      <div style="
+        color:#a78bfa;
+        font-size:12px;
+        font-weight:bold;
+        letter-spacing:1.5px;
+        margin-bottom:8px;
+      ">${escapeHtml(module.code ?? `M${moduleId}`)}</div>
+
+      <h3 style="
+        color:#ffffff;
+        margin:0 0 10px;
+        font-size:20px;
+      ">${escapeHtml(module.title)}</h3>
+
+      <p style="
+        color:#b9b7ce;
+        font-size:13px;
+        margin:0 0 18px;
+      ">Složka: ${escapeHtml(module.folder ?? "neuvedena")}</p>
+
+      <a href="${escapeHtml(moduleUrl)}" style="
+        display:inline-block;
+        background:#8b5cf6;
+        color:#ffffff;
+        text-decoration:none;
+        font-weight:bold;
+        padding:12px 18px;
+        border-radius:8px;
+      ">Otevřít modul →</a>
+    </div>
+  `;
+}).join("");
 
 const subject = addedModules.length === 1
-  ? `OPS: Nový modul – ${addedModules[0].title}`
-  : `OPS: Přidáno ${addedModules.length} nových modulů`;
+  ? `🚀 OPS | Nový modul: ${addedModules[0].title}`
+  : `🚀 OPS | Přidáno ${addedModules.length} nových modulů`;
 
 const commitUrl =
   `https://github.com/${REPOSITORY}/commit/${encodeURIComponent(CURRENT_SHA)}`;
 
 const html = `
-  <h2>🆕 Nový obsah na OPS</h2>
-  <p>Do praktické části byly přidány nové moduly:</p>
-  <ul>${moduleList}</ul>
-  <p>
-    <a href="${escapeHtml(commitUrl)}">
-      Zobrazit změny na GitHubu
-    </a>
-  </p>
-  <p>Automatické oznámení webu OPS.</p>
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novinky na OPS</title>
+</head>
+
+<body style="
+  margin:0;
+  padding:0;
+  background:#11111b;
+  font-family:Arial,Helvetica,sans-serif;
+  color:#ffffff;
+">
+  <div style="padding:32px 12px;">
+
+    <div style="
+      max-width:600px;
+      margin:0 auto;
+      background:#181825;
+      border:1px solid #302d46;
+      border-radius:16px;
+      overflow:hidden;
+    ">
+
+      <div style="
+        padding:30px 28px;
+        background:#1e1b32;
+        border-bottom:1px solid #393653;
+      ">
+        <div style="
+          color:#a78bfa;
+          font-size:12px;
+          font-weight:bold;
+          letter-spacing:3px;
+          margin-bottom:10px;
+        ">PRAKTICKÁ ČÁST</div>
+
+        <h1 style="
+          color:#ffffff;
+          font-size:30px;
+          margin:0;
+        ">🚀 OPS</h1>
+
+        <p style="
+          color:#c4b5fd;
+          margin:10px 0 0;
+          font-size:14px;
+        ">Novinky na webu</p>
+      </div>
+
+      <div style="padding:28px;">
+
+        <div style="
+          color:#a78bfa;
+          font-size:12px;
+          font-weight:bold;
+          letter-spacing:1.5px;
+        ">NOVÝ OBSAH</div>
+
+        <h2 style="
+          color:#ffffff;
+          font-size:25px;
+          line-height:1.3;
+          margin:10px 0 12px;
+        ">
+          ${addedModules.length === 1
+            ? "Přibyl nový modul!"
+            : "Přibyly nové moduly!"}
+        </h2>
+
+        <p style="
+          color:#c4c4d4;
+          font-size:15px;
+          line-height:1.7;
+          margin:0 0 22px;
+        ">
+          Na OPS byl právě přidán nový obsah.
+          Vyber si modul níže a můžeš se pustit do práce.
+        </p>
+
+        ${moduleList}
+
+        <div style="
+          margin-top:28px;
+          padding-top:22px;
+          border-top:1px solid #302d46;
+        ">
+          <p style="
+            color:#a5a3b8;
+            font-size:13px;
+            line-height:1.6;
+          ">
+            Chceš vidět, co se změnilo v projektu?
+          </p>
+
+          <a href="${escapeHtml(commitUrl)}" style="
+            color:#c4b5fd;
+            font-size:14px;
+            text-decoration:underline;
+          ">Zobrazit změny na GitHubu</a>
+        </div>
+      </div>
+
+      <div style="
+        padding:20px 28px;
+        background:#141420;
+        border-top:1px solid #302d46;
+      ">
+        <p style="
+          color:#a5a3b8;
+          font-size:12px;
+          line-height:1.7;
+          margin:0;
+        ">
+          Toto je automatické oznámení webu OPS.<br>
+          Bylo odesláno při přidání nového modulu.
+        </p>
+
+        <p style="
+          color:#77758b;
+          font-size:11px;
+          margin:12px 0 0;
+        ">
+          © OPS · Praktická část
+        </p>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
 `;
 
-// Každému příjemci pošleme samostatný e-mail.
-// Jejich adresy se tak navzájem nezobrazí.
+// Každému příjemci posíláme samostatný e-mail
 const failures = [];
 
 for (const recipient of recipients) {
@@ -191,7 +345,6 @@ for (const recipient of recipients) {
   }
 }
 
-// GitHub Actions označí běh jako neúspěšný, pokud některý e-mail selhal.
 if (failures.length > 0) {
   throw new Error(
     `Failed to send email to ${failures.length} recipient(s): ` +
