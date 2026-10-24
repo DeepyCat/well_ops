@@ -290,39 +290,73 @@
            class="choice-btn prezentace" data-text="Prezentace" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentace v SharePointu"></a>
     </div>
 
-    <script>
-        (() => {
-            const teorieBtn = document.querySelector('.choice-btn.teorie');
-            const praxeBtn = document.querySelector('.choice-btn.praxe');
-            const prezentaceBtn = document.querySelector('.choice-btn.prezentace');
-            const toggleBtn = document.getElementById('mode-toggle-btn');
-            const STORAGE_KEY = 'selectedBgMode';
+   <script>
+    (() => {
+        const teorieBtn = document.querySelector('.choice-btn.teorie');
+        const praxeBtn = document.querySelector('.choice-btn.praxe');
+        const prezentaceBtn = document.querySelector('.choice-btn.prezentace');
+        const toggleBtn = document.getElementById('mode-toggle-btn');
+        const STORAGE_KEY = 'selectedBgMode';
 
-            function applyMode(mode) {
-                const safeMode = mode === 'funny' ? 'funny' : 'safe';
+        function applyMode(mode) {
+            const safeMode = mode === 'funny' ? 'funny' : 'safe';
 
-                if (teorieBtn) teorieBtn.style.backgroundImage =
-                    `url('img/${safeMode === 'funny' ? 'teorie' : 'teorieS'}${safeMode === 'funny' ? '' : '-bg'}.jpg')`;
-                if (praxeBtn) praxeBtn.style.backgroundImage =
-                    `url('img/${safeMode === 'funny' ? 'praxe' : 'praxeS'}${safeMode === 'funny' ? '' : '-bg'}.jpg')`;
-                if (prezentaceBtn) prezentaceBtn.style.backgroundImage =
-                    `url('img/${safeMode === 'funny' ? 'prezentace' : 'prezentaceS'}${safeMode === 'funny' ? '' : '-bg'}.jpg')`;
+            // funny = běžné obrázky s -bg
+            // safe = obrázky s S-bg
+            const suffix = safeMode === 'funny' ? '-bg' : 'S-bg';
 
-                try { localStorage.setItem(STORAGE_KEY, safeMode); } catch (e) {}
-                toggleBtn?.setAttribute('aria-label', safeMode === 'safe' ? 'Přepnout na zábavný režim' : 'Přepnout na bezpečný režim');
-                toggleBtn?.setAttribute('title', safeMode === 'safe' ? 'Přepnout na zábavný režim' : 'Přepnout na bezpečný režim');
+            if (teorieBtn) {
+                teorieBtn.style.backgroundImage =
+                    `url('img/teorie${suffix}.jpg')`;
             }
 
-            toggleBtn?.addEventListener('click', () => {
-                let currentMode = 'safe';
-                try { currentMode = localStorage.getItem(STORAGE_KEY) || 'safe'; } catch (e) {}
-                applyMode(currentMode === 'safe' ? 'funny' : 'safe');
-            });
+            if (praxeBtn) {
+                praxeBtn.style.backgroundImage =
+                    `url('img/praxe${suffix}.jpg')`;
+            }
 
-            let savedMode = 'safe';
-            try { savedMode = localStorage.getItem(STORAGE_KEY) || 'safe'; } catch (e) {}
-            applyMode(savedMode);
-        })();
-    </script>
+            if (prezentaceBtn) {
+                prezentaceBtn.style.backgroundImage =
+                    `url('img/prezentace${suffix}.jpg')`;
+            }
+
+            try {
+                localStorage.setItem(STORAGE_KEY, safeMode);
+            } catch (e) {}
+
+            toggleBtn?.setAttribute(
+                'aria-label',
+                safeMode === 'safe'
+                    ? 'Přepnout na zábavný režim'
+                    : 'Přepnout na bezpečný režim'
+            );
+
+            toggleBtn?.setAttribute(
+                'title',
+                safeMode === 'safe'
+                    ? 'Přepnout na zábavný režim'
+                    : 'Přepnout na bezpečný režim'
+            );
+        }
+
+        toggleBtn?.addEventListener('click', () => {
+            let currentMode = 'safe';
+
+            try {
+                currentMode = localStorage.getItem(STORAGE_KEY) || 'safe';
+            } catch (e) {}
+
+            applyMode(currentMode === 'safe' ? 'funny' : 'safe');
+        });
+
+        let savedMode = 'safe';
+
+        try {
+            savedMode = localStorage.getItem(STORAGE_KEY) || 'safe';
+        } catch (e) {}
+
+        applyMode(savedMode);
+    })();
+</script>
 </body>
 </html>
