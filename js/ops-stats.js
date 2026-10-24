@@ -1347,7 +1347,7 @@
 
     hookCookieClickerStorage();
 
-    // -------------------------------------------------------------------------
+  // -------------------------------------------------------------------------
     // PUBLIC API
     // -------------------------------------------------------------------------
     const OPS_STATS = {
@@ -1373,7 +1373,6 @@
             localStorage.setItem(STORAGE_KEY_USER, clean);
             updatePlayerBadgeUI();
 
-            // Zkus stáhnout existující profil ze Supabase (pro hraní na jiném PC)
             if (isSupabaseConfigured()) {
                 await syncFromCloud(clean);
                 await syncToCloud();
@@ -1388,13 +1387,14 @@
 
         getStats: function() {
             return loadLocalStats();
-            saveStats: function(stats) {
+        },
+
+        // Přidáno / opraveno pro správné ukládání z gachy a her:
+        saveStats: function(stats) {
             saveLocalStats(stats);
             syncToCloud();
         },
-        },
 
-        // Zaznamenání skóre z různých her
         recordScore: function(gameId, score, extraData = {}) {
             const stats = loadLocalStats();
             stats.meta.lastPlayedGame = gameId;
@@ -1407,7 +1407,7 @@
                 }
             } else if (gameId === 'gd') {
                 if (extraData.attempts) stats.gd.attempts = (stats.gd.attempts || 0) + extraData.attempts;
-                if (extraData.jumps) stats.gd.jumps = (stats.gd.jumps || 0) + extraData.jumps;
+                if (extraData.jumps) stats.gd.jumps = (stats.gd.juniform || stats.gd.jumps || 0) + extraData.jumps;
                 if (extraData.levelId) {
                     const lvl = String(extraData.levelId);
                     const currentBest = stats.gd.bestPercent[lvl] || 0;
@@ -1440,7 +1440,6 @@
             syncToCloud();
         },
 
-        // Přičtení odehraného času (v sekundách)
         recordPlayTime: function(gameId, seconds) {
             if (!seconds || seconds <= 0) return;
             const stats = loadLocalStats();
@@ -1454,7 +1453,6 @@
             syncToCloud();
         },
 
-        // Přírůstek počtu sezení / spuštění hry
         recordSession: function(gameId) {
             const stats = loadLocalStats();
             stats.meta.lastPlayedGame = gameId;
@@ -1467,7 +1465,6 @@
             syncToCloud();
         },
 
-        // Načtení globálního žebříčku ze Supabase
         fetchLeaderboard: async function(orderBy = "total_play_time", limit = 10) {
             if (!isSupabaseConfigured()) return [];
             try {
@@ -1488,7 +1485,6 @@
             }
         },
 
-        // Export do JSON souboru
         exportStatsJSON: function() {
             const data = {
                 username: OPS_STATS.getUsername(),
@@ -1504,7 +1500,6 @@
             URL.revokeObjectURL(url);
         },
 
-        // Reset lokálních dat
         resetLocalStats: function() {
             if (confirm("Opravdu si přejete smazat všechny lokální herní statistiky?")) {
                 localStorage.removeItem(STORAGE_KEY_STATS);
@@ -1513,12 +1508,10 @@
             }
         },
 
-        // Otevření modalu pro přezdívku
         promptUsernameModal: function() {
             showUsernameModal();
         },
 
-        // Clicker Storage & Sync API
         saveClickerState: function(data) {
             handleSaveClickerState(data);
         },
@@ -1535,7 +1528,6 @@
             updateCloudSyncBadge(state, text);
         },
 
-        // Minecraft (Eaglercraft) Storage & Backup API
         getSafeUsername: function(username) {
             return getSafeUsername(username || OPS_STATS.getUsername());
         },
