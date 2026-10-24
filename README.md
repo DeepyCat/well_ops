@@ -1,5 +1,5 @@
 Tady máme fešáka jak říka že je to good
-![Fešák](https://raw.githubusercontent.com/DeepyCat/well_ops/refs/heads/main/img/praxe-bg.jpg)
+<img src="https://raw.githubusercontent.com/DeepyCat/well_ops/refs/heads/main/img/praxe-bg.jpg" width="400" alt="Náhled pozadí">
 
 ```
 well_ops/
