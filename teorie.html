@@ -273,6 +273,98 @@
             .reader-toolbar { gap: 6px; }
             .reader-toolbar .tool-btn { font-size: .82rem; padding: 7px 9px; }
         }
+
+        /* Mobile-first polish: comfortable reading, thumb-friendly controls, drawer navigation */
+        :root { --safe-bottom: env(safe-area-inset-bottom, 0px); }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        button, input, a { -webkit-tap-highlight-color: transparent; }
+        button, .wiki-link, .back-btn, .tool-btn { touch-action: manipulation; }
+        .content-box { overflow-wrap: anywhere; }
+        .content-box pre { max-width: 100%; -webkit-overflow-scrolling: touch; }
+        .content-box table { width: 100%; }
+        .content-box th, .content-box td { overflow-wrap: anywhere; }
+        .reader-toolbar { position: sticky; top: -1px; z-index: 5; background: var(--bg-box); padding: 8px 0 14px; }
+        .tool-btn, .back-btn, .download-btn { min-height: 42px; }
+        .content-box a, .content-box button { scroll-margin-top: 80px; }
+        #mdSearchInput { min-height: 46px; font-size: 16px; }
+        .content-box :focus-visible, #sidebar :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+        @media (max-width: 768px) {
+            body { height: 100dvh; overflow: hidden; }
+            header { min-height: 58px; padding: 10px 14px; gap: 8px; }
+            header h1 { font-size: clamp(.88rem, 3.8vw, 1.05rem); letter-spacing: 0; line-height: 1.25; max-width: 70%; }
+            .back-btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px 11px; font-size: .85rem; }
+            .app-layout { display: block; min-height: 0; }
+            sidebar {
+                position: fixed; z-index: 1200; top: 58px; bottom: 0; left: 0;
+                width: min(88vw, 360px); min-width: 0; max-height: none; height: auto;
+                padding: 18px 16px calc(90px + var(--safe-bottom)); overflow-y: auto;
+                border: 0; border-right: 1px solid #444; border-radius: 0 18px 0 0;
+                box-shadow: 18px 0 50px rgba(0,0,0,.45);
+                transform: translateX(0); transition: transform .24s ease, visibility .24s ease;
+                overscroll-behavior: contain;
+            }
+            .app-layout.sidebar-hidden sidebar { display: flex; width: min(88vw, 360px); min-width: 0; padding: 18px 16px calc(90px + var(--safe-bottom)); transform: translateX(-105%); visibility: hidden; }
+            .app-layout:not(.sidebar-hidden)::after {
+                content: ""; position: fixed; inset: 58px 0 0; z-index: 1100;
+                background: rgba(0,0,0,.58); backdrop-filter: blur(2px);
+            }
+            .nav-group { margin-bottom: 22px; }
+            .nav-group-title { font-size: .72rem; letter-spacing: .08em; margin: 8px 0 10px; }
+            sidebar button.file-btn { min-height: 46px; padding: 11px 12px; font-size: .9rem; line-height: 1.35; border-radius: 10px; }
+            #mdSearchInput { border-radius: 12px; padding: 12px 14px; }
+            .sidebar-toggle, .app-layout.sidebar-hidden .sidebar-toggle {
+                top: auto; bottom: calc(16px + var(--safe-bottom)); left: auto; right: 16px;
+                z-index: 1300; width: 54px; height: 54px; border: 0; border-radius: 18px;
+                box-shadow: 0 8px 26px rgba(0,0,0,.42); font-size: 22px;
+            }
+            main, .app-layout.sidebar-hidden main { display: block; height: 100%; min-height: 0; padding: 12px 10px calc(18px + var(--safe-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            .content-box, .app-layout.sidebar-hidden .content-box {
+                width: 100%; max-width: none; min-height: 0; padding: 18px 16px 26px;
+                border-radius: 16px; box-shadow: 0 5px 22px rgba(0,0,0,.24);
+            }
+            .reader-toolbar { gap: 8px; margin: -2px 0 20px; padding: 8px 0 12px; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+            .reader-toolbar::-webkit-scrollbar { display: none; }
+            .reader-toolbar .tool-btn { flex: 0 0 auto; min-height: 42px; padding: 9px 12px; font-size: .85rem; border-radius: 10px; }
+            .content-box h1 { font-size: 1.65rem; line-height: 1.2; }
+            .content-box h2 { font-size: 1.35rem; line-height: 1.25; }
+            .content-box h3 { font-size: 1.12rem; }
+            .content-box h1, .content-box h2, .content-box h3, .content-box h4 { scroll-margin-top: 18px; }
+            .content-box p { font-size: var(--font-size); line-height: 1.75; margin-bottom: 17px; }
+            .content-box ul, .content-box ol { padding-left: 22px; }
+            .content-box li { line-height: 1.7; margin-bottom: 9px; }
+            .content-box pre { padding: 13px; border-radius: 10px; font-size: .85rem; }
+            .content-box img { margin: 18px auto; }
+            .content-box th, .content-box td { padding: 8px 10px; font-size: .9rem; }
+            .placeholder-state { margin: 25px 0 10px; }
+            .placeholder-state h2 { font-size: 1.35rem; }
+            .study-panel { margin: 22px 0; padding: 15px; border-radius: 14px; }
+            .flashcard { min-height: 190px; padding: 22px 16px; border-radius: 14px; }
+            .flashcard .card-text { font-size: 1.08rem; }
+            .study-actions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 7px; }
+            .study-actions .tool-btn { padding: 10px 5px; font-size: .8rem; min-width: 0; }
+            .quiz-question { padding: 14px; }
+            .quiz-question label { display: flex; align-items: flex-start; gap: 8px; padding: 9px 8px; margin: 5px 0; border-radius: 8px; background: rgba(255,255,255,.035); line-height: 1.45; }
+            .quiz-question input { flex: 0 0 auto; margin: 3px 0 0; width: 18px; height: 18px; }
+            .toc-bubble-container { right: 14px; bottom: calc(82px + var(--safe-bottom)); z-index: 1050; }
+            .toc-fab { width: 48px; height: 48px; font-size: 20px; box-shadow: 0 5px 18px rgba(0,0,0,.4); }
+            .toc-popup { position: fixed; left: 12px; right: 12px; bottom: calc(138px + var(--safe-bottom)); width: auto; max-height: min(55dvh, 440px); border-radius: 16px; padding: 16px; }
+            #tocList button { min-height: 42px; padding: 10px; font-size: .9rem; }
+            .download-container { margin-top: 28px; }
+            .download-btn { max-width: 100%; overflow-wrap: anywhere; }
+            .reading-mode .content-box { padding: 20px 16px 28px; }
+            .reading-mode .content-box p { line-height: 1.9; }
+        }
+        @media (max-width: 380px) {
+            header h1 { font-size: .82rem; }
+            .content-box, .app-layout.sidebar-hidden .content-box { padding: 15px 13px 24px; }
+            .reader-toolbar .tool-btn { padding: 9px 10px; }
+            .study-actions { grid-template-columns: 1fr; }
+            .study-actions .tool-btn { min-height: 42px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        }
+
     </style>
 </head>
 
@@ -589,15 +681,20 @@ function toggleSidebar() {
     const layout = document.getElementById('appLayout');
     const button = document.getElementById('sidebarToggle');
     const main = document.getElementById('mainContent');
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
     const scrollPosition = main.scrollTop;
     const currentFile = currentFilePath;
     const hidden = layout.classList.toggle('sidebar-hidden');
 
-    button.textContent = hidden ? '▶' : '◀';
-    button.title = hidden ? 'Zobrazit výběr souborů' : 'Schovat výběr souborů';
+    button.textContent = isMobile ? (hidden ? '☰' : '×') : (hidden ? '▶' : '◀');
+    button.title = hidden ? 'Otevřít nabídku témat' : 'Zavřít nabídku témat';
     button.setAttribute('aria-expanded', String(!hidden));
-    button.setAttribute('aria-label', hidden ? 'Zobrazit výběr souborů' : 'Schovat výběr souborů');
+    button.setAttribute('aria-label', hidden ? 'Otevřít výběr souborů' : 'Zavřít výběr souborů');
 
+    if (isMobile && !hidden) {
+        const search = document.getElementById('mdSearchInput');
+        if (search) setTimeout(() => search.focus(), 180);
+    }
     requestAnimationFrame(() => requestAnimationFrame(() => {
         if (currentFilePath === currentFile) {
             main.scrollTop = scrollPosition;
@@ -772,6 +869,12 @@ async function loadMarkdown(filePath, btnElement) {
     document.querySelectorAll('#sidebar button.file-btn').forEach(button => button.classList.remove('active'));
     if (!btnElement) btnElement = findMarkdownButton(filePath);
     if (btnElement) btnElement.classList.add('active');
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        document.getElementById('appLayout').classList.add('sidebar-hidden');
+        const toggle = document.getElementById('sidebarToggle');
+        toggle.textContent = '☰';
+        toggle.setAttribute('aria-expanded', 'false');
+    }
     placeholder.style.display = 'none';
     downloadContainer.style.display = 'none';
     document.getElementById('studyPanel').hidden = true;
@@ -912,6 +1015,13 @@ document.getElementById('mainContent').addEventListener('scroll', () => {
 window.addEventListener('beforeunload', saveReadingPosition);
 window.addEventListener('popstate', checkUrlHash);
 window.addEventListener('load', () => {
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        document.getElementById('appLayout').classList.add('sidebar-hidden');
+        const mobileToggle = document.getElementById('sidebarToggle');
+        mobileToggle.textContent = '☰';
+        mobileToggle.title = 'Otevřít nabídku témat';
+        mobileToggle.setAttribute('aria-expanded', 'false');
+    }
     document.documentElement.style.setProperty('--font-size', fontSize + 'px');
     if (localStorage.getItem(STORAGE_KEYS.readingMode) === 'true') {
         document.body.classList.add('reading-mode');
@@ -927,6 +1037,17 @@ window.addEventListener('load', () => {
     if (initialFile) loadMarkdown(initialFile, findMarkdownButton(initialFile));
 });
 
+document.getElementById('appLayout').addEventListener('click', event => {
+    const layout = document.getElementById('appLayout');
+    if (window.matchMedia('(max-width: 768px)').matches &&
+        !layout.classList.contains('sidebar-hidden') && event.target === layout) {
+        layout.classList.add('sidebar-hidden');
+        const toggle = document.getElementById('sidebarToggle');
+        toggle.textContent = '☰';
+        toggle.setAttribute('aria-expanded', 'false');
+    }
+});
+
 document.addEventListener('click', event => {
     const container = document.getElementById('tocBubbleContainer');
     if (container && container.classList.contains('open')) {
@@ -938,6 +1059,13 @@ document.addEventListener('click', event => {
 
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
+        const layout = document.getElementById('appLayout');
+        if (layout && window.matchMedia('(max-width: 768px)').matches) {
+            layout.classList.add('sidebar-hidden');
+            const toggle = document.getElementById('sidebarToggle');
+            toggle.textContent = '☰';
+            toggle.setAttribute('aria-expanded', 'false');
+        }
         const panel = document.getElementById('studyPanel');
         if (panel && !panel.hidden) panel.hidden = true;
         const tocContainer = document.getElementById('tocBubbleContainer');
