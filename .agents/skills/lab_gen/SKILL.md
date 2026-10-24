@@ -3,7 +3,7 @@ name: lab_gen
 description: Návod a metodika pro AI asistenty, jak na základě podkladů (__zadani.md, _vysledek.md) vygenerovat a integrovat nová praktická cvičení (Modul 02, 03...) do dynamického webového portálu OPS.
 ---
 
-# 🛠️ Metodika generování praktických cvičení (LAB GEN)
+#  Metodika generování praktických cvičení (LAB GEN)
 
 Tento návod definuje standardy a konkrétní kroky, které **každý AI asistent musí provést**, jakmile uživatel požádá o zpracování nebo vytvoření nového cvičení (např. *„Zpracuj 2. zadání (Modul 02)“*).
 
@@ -11,7 +11,7 @@ Podrobná specifikace se nachází v hlavním souboru projektu: [lab_gen.md](../
 
 ---
 
-## 🎯 Co VŠE musí AI vytvořit pro nové zadání (Modul XX):
+##  Co VŠE musí AI vytvořit pro nové zadání (Modul XX):
 
 ### 1. Složka cvičení `praxe/XX/`
 Vytvořit složku `praxe/XX/` (např. `praxe/02/`):
@@ -83,14 +83,14 @@ Pro každé zařízení (VM) definované v modulu vytvořit v kořenové složce
 
 ---
 
-## ⚠️ Kritická pravidla a nejčastější chyby (POZOR):
+##  Kritická pravidla a nejčastější chyby (POZOR):
 
 1. **ZÁKAZ HVĚZDIČEK V INTERFACE ALIAS:**
-   - ❌ Nikdy nepoužívejte `Ethernet*1` ani `Ethernet*`.
-   - ✅ Vždy uvádějte přesný název `Ethernet1` (NIC 2 v CyLabu) bez hvězdičky!
+   -  Nikdy nepoužívejte `Ethernet*1` ani `Ethernet*`.
+   -  Vždy uvádějte přesný název `Ethernet1` (NIC 2 v CyLabu) bez hvězdičky!
 2. **ŽÁDNÉ HARDCODED PRODUKTOVÉ KLÍČE:**
-   - ❌ Nikdy nevkládejte reálné licenční klíče do repozitáře.
-   - ✅ Vždy odkažte studenty na zadání v **Microsoft Teams** (`slmgr.vbs /ipk <LAB-KEY-Z-TEAMS>`).
+   -  Nikdy nevkládejte reálné licenční klíče do repozitáře.
+   -  Vždy odkažte studenty na zadání v **Microsoft Teams** (`slmgr.vbs /ipk <LAB-KEY-Z-TEAMS>`).
 3. **ŽÁDNÉ EMOJI V HTML SOUBORECH:**
    - Používejte výhradně čisté inline SVG ikony.
 4. **PARAMETRY VŽDY V TABULCE `.params-table`:**
@@ -112,7 +112,7 @@ Pro každé zařízení (VM) definované v modulu vytvořit v kořenové složce
 
 ---
 
-## 📚 Znalostní báze a referenční příručky (Hardening & Sysadmin)
+##  Znalostní báze a referenční příručky (Hardening & Sysadmin)
 
 Pro přesné parametry zabezpečení, auditování a ověřené PowerShell one-linery využívejte podklady:
 

@@ -3,13 +3,13 @@ name: lab_gen
 description: Komplexní návod a metodika pro AI asistenty, jak na základě podkladů (__zadani.md, _vysledek.md) vygenerovat a plně integrovat nové praktické cvičení (Modul 02, 03...) do dynamického portálu OPS.
 ---
 
-# 🛠️ Metodika generování a integrace praktických cvičení (LAB GEN)
+#  Metodika generování a integrace praktických cvičení (LAB GEN)
 
 Tento dokument slouží jako **komplexní a závazný standard pro libovolné AI**, které má za úkol vytvořit, zpracovat nebo integrovat další lekci/cvičení (např. `Modul 02: DHCP`, `Modul 03: DNS`...) v rámci praktické části projektu **OPS (Operační systémy / sítě)**.
 
 ---
 
-## 🎯 Architektura a princip fungování webu
+##  Architektura a princip fungování webu
 
 Aplikace běží jako **dynamický webový portál** s centrální stránkou [praxe.html](file:///D:/%21Documents/VSCode/well_ops/praxe.html):
 1. **Přepínač zadání (Module Switcher):** Vlevo nahoře v hlavičce umožňuje studentům přepínat mezi jednotlivými moduly. Výběr se promítá do URL (`praxe.html?modul=02`).
@@ -19,7 +19,7 @@ Aplikace běží jako **dynamický webový portál** s centrální stránkou [pr
 
 ---
 
-## 📂 Co VŠE musí AI vytvořit při požadavku „Zpracuj X. zadání (Modul XX)“
+##  Co VŠE musí AI vytvořit při požadavku „Zpracuj X. zadání (Modul XX)“
 
 Při zpracování nového modulu (např. `02`) AI **VŽDY** provede následující kroky v tomto pořadí:
 
@@ -125,22 +125,22 @@ Pro každé zařízení (VM) definované v modulu vytvořte v kořenové složce
 
 ---
 
-## 📐 Striktní pravidla pro PowerShell příkazy a formátování
+##  Striktní pravidla pro PowerShell příkazy a formátování
 
 Při vytváření úkolů **VŽDY bez výjimky** dodržujte tato pravidla:
 
 ### 1. ZÁKAZ HVĚZDIČEK V `-InterfaceAlias`
-- ❌ **NIKDY NEPOUŽÍVAT:** `Get-NetIPAddress -InterfaceAlias Ethernet*1` ani `Ethernet*`.
-- ✅ **VŽDY POUŽÍVAT PŘESNÝ NÁZEV:** `Get-NetIPAddress -InterfaceAlias Ethernet1` (případně `"Ethernet1"`). V prostředí VMware/CyLab se interní adaptér NIC 2 jmenuje `Ethernet1` bez hvězdiček a bez mezer.
+-  **NIKDY NEPOUŽÍVAT:** `Get-NetIPAddress -InterfaceAlias Ethernet*1` ani `Ethernet*`.
+-  **VŽDY POUŽÍVAT PŘESNÝ NÁZEV:** `Get-NetIPAddress -InterfaceAlias Ethernet1` (případně `"Ethernet1"`). V prostředí VMware/CyLab se interní adaptér NIC 2 jmenuje `Ethernet1` bez hvězdiček a bez mezer.
 
 ### 2. ŽÁDNÉ HARDCODED PRODUKTOVÉ KLÍČE
-- ❌ **NIKDY NEVKLÁDAT:** konkrétní licenční klíče Windows do kódu ani do dokumentace.
-- ✅ **VŽDY ODKÁZAT NA TEAMS:** Použijte zástupný text `<LAB-KEY-Z-TEAMS>` a napište:
+-  **NIKDY NEVKLÁDAT:** konkrétní licenční klíče Windows do kódu ani do dokumentace.
+-  **VŽDY ODKÁZAT NA TEAMS:** Použijte zástupný text `<LAB-KEY-Z-TEAMS>` a napište:
   > *„Produktový klíč (LAB KEY) si zkopírujte přímo ze zadání v Microsoft Teams.“*
 
 ### 3. ZÁKAZ EMOJI V HTML DOKUMENTACI
-- ❌ **NIKDY NEPOUŽÍVAT:** Unicode smajlíky jako 🚀, 💻, ⚙️, ✅.
-- ✅ **VŽDY POUŽÍVAT ČISTÉ VEKTOROVÉ SVG:** Používejte inline SVG ikony (Lucide / Feather styl, `width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"`).
+-  **NIKDY NEPOUŽÍVAT:** Unicode smajlíky jako , , , .
+-  **VŽDY POUŽÍVAT ČISTÉ VEKTOROVÉ SVG:** Používejte inline SVG ikony (Lucide / Feather styl, `width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"`).
 
 ### 4. DYNAMICKÉ PRÁCOVIŠTĚ (Workstation X)
 - Síťové konfigurace musí být navázány na proměnnou `wsX` (`x = wsX || 2`):
@@ -201,7 +201,7 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 
 ---
 
-## 🔍 Ověřovací checklist pro AI před odevzdáním práce
+##  Ověřovací checklist pro AI před odevzdáním práce
 
 Než označíte úkol za dokončený, zkontrolujte v terminálu:
 1. `praxe/XX/verified.json` existuje a má platný JSON formát.
