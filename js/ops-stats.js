@@ -69,6 +69,16 @@
             lastSave: 0,
             inactiveAccumulatedMs: 0
         },
+        gacha: {
+            tokens: 2000,
+            zPity: 0,
+            sPity: 0,
+            aPity: 0,
+            guaranteed: false,
+            totalPulls: 0,
+            inventory: {},
+            history: []
+        },
         meta: {
             totalPlayTime: 0,
             lastPlayedGame: null,
@@ -328,6 +338,7 @@
                 maturita: { ...DEFAULT_STATS.maturita, ...(parsed.maturita || {}) },
                 runner404: { ...DEFAULT_STATS.runner404, ...(parsed.runner404 || {}) },
                 clicker: clickerState,
+                gacha: { ...DEFAULT_STATS.gacha, ...(parsed.gacha || {}) },
                 meta: { ...DEFAULT_STATS.meta, ...(parsed.meta || {}) }
             };
         } catch (e) {
@@ -365,7 +376,7 @@
         if (state === "syncing") {
             dotColor = "#38bdf8";
             defaultText = "Cloud: Ukladam...";
-            titleText = "Probiha ukladani dat na Supabase server";
+            titleText = "Prebiha ukladani dat na Supabase server";
         } else if (state === "synced") {
             dotColor = "#22c55e";
             defaultText = "Cloud: Ulozeno";
@@ -612,6 +623,16 @@
                         playTime: Math.max(local.runner404.playTime, cloudStats.runner404?.playTime || 0)
                     },
                     clicker: mergedClicker,
+                    gacha: {
+                        tokens: Math.max(local.gacha?.tokens || 2000, cloudStats.gacha?.tokens || 2000),
+                        zPity: Math.max(local.gacha?.zPity || 0, cloudStats.gacha?.zPity || 0),
+                        sPity: Math.max(local.gacha?.sPity || 0, cloudStats.gacha?.sPity || 0),
+                        aPity: Math.max(local.gacha?.aPity || 0, cloudStats.gacha?.aPity || 0),
+                        guaranteed: local.gacha?.guaranteed ?? cloudStats.gacha?.guaranteed ?? false,
+                        totalPulls: Math.max(local.gacha?.totalPulls || 0, cloudStats.gacha?.totalPulls || 0),
+                        inventory: { ...(cloudStats.gacha?.inventory || {}), ...(local.gacha?.inventory || {}) },
+                        history: local.gacha?.history?.length >= (cloudStats.gacha?.history?.length || 0) ? local.gacha.history : (cloudStats.gacha?.history || [])
+                    },
                     meta: {
                         totalPlayTime: Math.max(local.meta.totalPlayTime, cloudStats.meta?.totalPlayTime || 0),
                         lastPlayedGame: cloudStats.meta?.lastPlayedGame || local.meta.lastPlayedGame,
@@ -2047,14 +2068,12 @@
         }
 
         const isGamesHub = window.location.pathname.endsWith("games.html") || 
-                           window.location.pathname.includes("games.html") || 
-                           !!document.querySelector(".landing-page");
+                          window.location.pathname.includes("games.html") || 
+                          !!document.querySelector(".landing-page");
 
         if (isGamesHub) {
-            // Na games.html se ptáme pokaždé při každém příchodu na stránku
             setTimeout(() => showUsernameModal(true), 350);
         } else {
-            // Na ostatních herních stránkách se ptáme jen pokud přezdívka ještě není nastavena
             const isGameOrHub = window.location.pathname.includes("statistika.html") || 
                                 window.location.pathname.includes("/gd/") || 
                                 window.location.pathname.includes("/stratagem/") || 
@@ -2071,7 +2090,6 @@
             }
         }
 
-        // Automatické stopky odehraného času na pozadí pro celou relaci
         let sessionSeconds = 0;
         let activeGame = null;
         if (window.location.pathname.includes("/hyperdrive/")) activeGame = "hyperdrive";
