@@ -191,23 +191,6 @@ well_ops/
 
 Jednotlivé herní projekty mohou používat i další technologie.
 
-## ✉️ Automatická upozornění
-
-Při změně `praxe/modules.json` se může spustit GitHub Actions workflow, které zkontroluje změny modulů a odešle e-mailová upozornění přes Resend.
-
-Konfigurace workflow je v:
-
-```text
-.github/workflows/notify-new-modules.yml
-```
-
-Skript pro zpracování změn:
-
-```text
-skripty/notify-new-modules.mjs
-```
-
-API klíče a další citlivé údaje jsou uložené v nastavení GitHub Actions, nikoliv přímo v kódu.
 
 ## 🚀 Spuštění lokálně
 
