@@ -113,6 +113,16 @@ V souboru [praxe.html](file:///D:/%21Documents/VSCode/well_ops/praxe.html) přid
 <script src="praxe/XX/tasks.js"></script>
 ```
 
+### Krok 6: Vytvoření interaktivních ověřovacích skriptů v `skripty/`
+Pro každé zařízení (VM) definované v modulu vytvořte v kořenové složce `skripty/` interaktivní ověřovací `.bat` skript:
+- Formát názvu: `skripty/XX_check_<VM>.bat` (např. `skripty/01_check_SRV1-DC.bat`, `skripty/02_check_PC1-WIN.bat`).
+- Skript je hybridní `.bat` spouštějící PowerShell s obcházením execution policy (`powershell -NoProfile -ExecutionPolicy Bypass ...`).
+- Skript je interaktivní: vyzve uživatele k zadání čísla pracoviště `X` (výchozí 2), prověří veškerou konfiguraci daného modulu pro daný stroj, vypíše přehledné barevné stavy `[ OK ]` / `[CHYBA]` a celkové skóre.
+- V `tasks.js` zařaďte na konec kontrolního seznamu každého stroje nepovinný krok:
+  `title: "X. (Nepovinné) Rychlé ověření celého stroje"`
+  obsahující jednořádkový příkaz pro stažení a spuštění přes curl:
+  `curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat`
+
 ---
 
 ## 📐 Striktní pravidla pro PowerShell příkazy a formátování
@@ -181,6 +191,14 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
     <link rel="icon" type="image/x-icon" href="../../img/bird.png">
     ```
 
+### 8. POVINNÝ KROK RYCHLÉHO OVĚŘENÍ PRO KAŽDÝ STROJ (.bat v `skripty/`)
+- Na konec úkolů každého stroje v `tasks.js` a v `_reseni.md` vždy zařadit krok `(Nepovinné) Rychlé ověření celého stroje`.
+- V `how` uvést zkopírovatelný curl příkaz na skript v `skripty/XX_check_<VM>.bat`:
+  ```powershell
+  curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat
+  ```
+- V `verify` a `expected` ukázat spuštění skriptu a přehled `[ OK ]` výsledků.
+
 ---
 
 ## 🔍 Ověřovací checklist pro AI před odevzdáním práce
@@ -194,4 +212,5 @@ Než označíte úkol za dokončený, zkontrolujte v terminálu:
 6. Žádný příkaz neobsahuje `Ethernet*`.
 7. Žádné heslo ani klíč nejsou v rozporu se zadáním (klíče z Teams, heslo `Pa55w.rd`).
 8. Všechny HTML stránky obsahují v `<head>` favicon odkazující na `bird.png` (`img/bird.png` resp. `../../img/bird.png`).
-9. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
+9. Ve složce `skripty/` existují funkční kontrolní skripty `XX_check_<VM>.bat` pro všechny VM modulu.
+10. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
