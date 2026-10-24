@@ -338,5 +338,36 @@ New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (
     how: () => "V instalačním rozhraní OOBE nepoužívat Microsoft účet. Účet musí mít typ Local account.",
     verify: () => "Get-LocalUser | Select-Object Name, Enabled",
     expected: () => "Name          Enabled\n----          -------\nAdministrator True\n(V Settings -> Accounts -> Your info je uveden typ \"Local account\", nikoliv e-mailová adresa Microsoft účtu.)"
+  },
+  {
+    id: "quick-verification",
+    title: "13. (Nepovinné) Rychlé ověření celého stroje",
+    forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
+    what: (vm, wsX) => {
+      const x = wsX || 2;
+      return `
+        <p>Pro rychlou a komplexní kontrolu celé základní konfigurace stroje <strong>${vm}</strong> můžete spustit interaktivní ověřovací skript přímo z repozitáře.</p>
+        <div style="background: rgba(85, 255, 170, 0.08); border: 1px solid rgba(85, 255, 170, 0.3); border-left: 4px solid #55ffaa; border-radius: 6px; padding: 10px 14px; margin: 12px 0; font-size: 0.88rem;">
+          <strong>Vlastnosti skriptu:</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0;">
+            <li><strong>Univerzální spuštění:</strong> Příkaz můžete vložit do PowerShellu, CMD i Terminálu – vždy automaticky běží v prostředí PowerShell.</li>
+            <li><strong>Průběh stahování:</strong> Zobrazuje vizuální progress bar při stahování skriptu z GitHubu.</li>
+            <li><strong>Striktně Read-Only:</strong> Pouze čte konfiguraci, žádná nastavení neupravuje.</li>
+            <li><strong>Neukládá se na disk:</strong> Po dokončení testu se automaticky smaže ze systému.</li>
+            <li><strong>3-úrovňový souhrn:</strong> Zeleně <code>[ OK ]</code> pro splněné body, žlutě <code>[KONTROLA]</code> pro položky vyžadující ruční kontrolu a červeně <code>[CHYBA]</code> s nápovědou pro opravu.</li>
+          </ul>
+        </div>
+      `;
+    },
+    how: (vm, wsX) => {
+      return `# Spusťte v PowerShellu, CMD nebo Terminálu na ${vm}:\npowershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_${vm}.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`;
+    },
+    verify: (vm, wsX) => {
+      return `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_${vm}.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`;
+    },
+    expected: (vm, wsX) => {
+      const x = wsX || 2;
+      return `######################################################################## 100.0%\n\n============================================================\n  WELL_OPS :: Overeni ${vm} - Priprava OS (Modul 00)\n============================================================\nZadejte cislo vaseho pracoviste (X) [vychozi: ${x}]: ${x}\n\n--- 1. Hostname a edice Windows ---\n  [ OK ]       Hostname stroje je '${vm}'\n  [ OK ]       Edice operacniho systemu overena\n\n--- 2. Sitovy adapter Ethernet1 ---\n  [ OK ]       Adapter 'Ethernet1' (NIC 2 v CyLabu) existuje a je ve stavu Up\n  [ OK ]       Sitova konfigurace odpovida zadani pro ${vm}\n\n--- 3. Ucet spravce (Administrator) ---\n  [ OK ]       Ucet 'Administrator' existuje a je aktivni\n  [KONTROLA]   Heslo administratora: Overte, ze jste nastavili heslo 'Pa55w.rd'\n\n--- 4. Lokalizace, cas a regionalni nastaveni ---\n  [ OK ]       Casove pasmo je nastaveno na Central Europe Standard Time (Praha)\n  [ OK ]       Regionalni format je nastaven na cs-CZ (Cestina)\n  [ OK ]       Klavesnice obsahuje ceske i americke rozlozeni\n\n--- 5. Windows Firewall a ICMP Echo (Ping) ---\n  [ OK ]       Pravidlo pro prichozi ICMP Echo (Ping) je ve Windows Firewallu povoleno\n\n--- 6. Aktivace licence Windows ---\n  [KONTROLA]   Aktivace Windows: Licencni klic (LAB KEY) si overte pomoci 'slmgr.vbs /dli'\n\n============================================================\n                    VYSLEDNY SOUHRN                         \n============================================================\n  Pocet uspesnych kontrol [ OK ]:        8\n  Pocet k rucni kontrole  [KONTROLA]:    2\n  Pocet nalezenych chyb   [CHYBA]:       0\n------------------------------------------------------------\n\nVYSLEDEK: VSE V PORADKU! Stroj ${vm} splnuje zakladni pozadavky Modulu 00.\n============================================================`;
+    }
   }
 ];

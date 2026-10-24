@@ -397,5 +397,67 @@ window.OPS_MODULE_TASKS["02"] = [
       const x = wsX || 2;
       return `PingSucceeded : True\n\nName                                           IP4Address\n----                                           ----------\nsrv1-dc.<prijmeni>.cyberschool.internal        192.168.${x}.10`;
     }
+  },
+  {
+    id: "quick-verification-srv1",
+    title: "10. (Nepovinné) Rychlé ověření stroje SRV1-DC",
+    forVMs: ["SRV1-DC"],
+    what: (vm, wsX) => {
+      const x = wsX || 2;
+      return `
+        <p>Pro komplexní a automatické ověření celé konfigurace DHCP Serveru na <strong>SRV1-DC</strong> můžete spustit ověřovací skript přímo z repozitáře.</p>
+        <div style="background: rgba(85, 255, 170, 0.08); border: 1px solid rgba(85, 255, 170, 0.3); border-left: 4px solid #55ffaa; border-radius: 6px; padding: 10px 14px; margin: 12px 0; font-size: 0.88rem;">
+          <strong>Vlastnosti skriptu:</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0;">
+            <li><strong>Univerzální spuštění:</strong> Příkaz můžete vložit do PowerShellu, CMD i Terminálu – vždy automaticky běží v prostředí PowerShell.</li>
+            <li><strong>Průběh stahování:</strong> Zobrazuje vizuální progress bar při stahování skriptu z GitHubu.</li>
+            <li><strong>Striktně Read-Only:</strong> Pouze čte konfiguraci, žádná nastavení neupravuje.</li>
+            <li><strong>Neukládá se na disk:</strong> Po dokončení testu se automaticky smaže ze systému.</li>
+            <li><strong>3-úrovňový souhrn:</strong> Zeleně <code>[ OK ]</code> pro splněné body, žlutě <code>[KONTROLA]</code> pro položky vyžadující ruční kontrolu a červeně <code>[CHYBA]</code> s nápovědou pro opravu.</li>
+          </ul>
+        </div>
+      `;
+    },
+    how: (vm, wsX) => {
+      return `# Spusťte v PowerShellu, CMD nebo Terminálu na SRV1-DC:\npowershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_SRV1-DC.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`;
+    },
+    verify: (vm, wsX) => {
+      return `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_SRV1-DC.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`;
+    },
+    expected: (vm, wsX) => {
+      const x = wsX || 2;
+      return `######################################################################## 100.0%\n\n============================================================\n  WELL_OPS :: Overeni SRV1-DC - DHCP Server (Modul 02)\n============================================================\nZadejte cislo vaseho pracoviste (X) [vychozi: ${x}]: ${x}\n\n--- 1. Predpoklady: System a sitova konfigurace ---\n  [ OK ]       Hostname serveru je 'SRV1-DC'\n  [ OK ]       Adapter 'Ethernet1' (NIC 2) je ve stavu Up\n  [ OK ]       Staticka IPv4 adresa na Ethernet1 je 192.168.${x}.10/24\n\n--- 2. Instalace role DHCP Server a RSAT nastroju ---\n  [ OK ]       Windows Feature 'DHCP' je nainstalovana\n  [ OK ]       Administracni nastroje 'RSAT-DHCP' jsou nainstalovany\n\n--- 3. Sluzba DHCPServer a bezpecnostni skupiny ---\n  [ OK ]       Sluzba 'DHCPServer' bezi (Running)\n  [ OK ]       Bezpecnostni skupiny 'DHCP Users' a 'DHCP Administrators' existuji\n\n--- 4. Autorizace DHCP serveru v Active Directory ---\n  [ OK ]       DHCP Server je autorizovan v Active Directory (192.168.${x}.10)\n\n--- 5. Konfigurace DHCP oboru (Scope) a rozsahu ---\n  [ OK ]       DHCP Scope 'Ucebna' pro podsyt 192.168.${x}.0 existuje\n  [ OK ]       Rozsah adres oboru je spravny: 192.168.${x}.100 az 192.168.${x}.200\n  [ OK ]       Maska podsiti je 255.255.255.0 (/24)\n  [ OK ]       Stav DHCP Scope je 'Active'\n\n--- 6. Konfigurace DHCP voleb (Options) ---\n  [ OK ]       Option 003 (Router / Default Gateway): 192.168.${x}.1\n  [ OK ]       Option 006 (DNS Servers): 192.168.${x}.10\n  [ OK ]       Option 015 (DNS Domain Name): <prijmeni>.cyberschool.internal\n  [KONTROLA]   Overte vizualne: Odpovida nazev domeny v Option 015 tvaru '<prijmeni>.cyberschool.internal'?\n\n--- 7. Kontrola evidovanych zapujcek (Address Leases) ---\n  [ OK ]       Aktivni zapujcka pro klienta PC1 nalezena: IP 192.168.${x}.100\n\n--- 8. Vizuální kontrola v grafické konzoli ---\n  [KONTROLA]   Graficka konzole DHCP Manager (dhcpmgmt.msc): Overte zelenou ikonu aktivniho a autorizovaneho serveru\n\n============================================================\n                    VYSLEDNY SOUHRN                         \n============================================================\n  Pocet uspesnych kontrol [ OK ]:       13\n  Pocet k rucni kontrole  [KONTROLA]:    2\n  Pocet nalezenych chyb   [CHYBA]:       0\n------------------------------------------------------------\n\nVYSLEDEK: VSE V PORADKU! DHCP Server na SRV1-DC splnuje pozadavky Modulu 02.\nMuzete pokracovat overenim na klientovi PC1-WIN.\n============================================================`;
+    }
+  },
+  {
+    id: "quick-verification-pc1",
+    title: "11. (Nepovinné) Rychlé ověření stroje PC1-WIN",
+    forVMs: ["PC1-WIN"],
+    what: (vm, wsX) => {
+      const x = wsX || 2;
+      return `
+        <p>Pro komplexní a automatické ověření nastavení DHCP klienta na stanici <strong>PC1-WIN</strong> můžete spustit ověřovací skript přímo z repozitáře.</p>
+        <div style="background: rgba(85, 255, 170, 0.08); border: 1px solid rgba(85, 255, 170, 0.3); border-left: 4px solid #55ffaa; border-radius: 6px; padding: 10px 14px; margin: 12px 0; font-size: 0.88rem;">
+          <strong>Vlastnosti skriptu:</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0;">
+            <li><strong>Univerzální spuštění:</strong> Příkaz můžete vložit do PowerShellu, CMD i Terminálu – vždy automaticky běží v prostředí PowerShell.</li>
+            <li><strong>Průběh stahování:</strong> Zobrazuje vizuální progress bar při stahování skriptu z GitHubu.</li>
+            <li><strong>Striktně Read-Only:</strong> Pouze čte konfiguraci, žádná nastavení neupravuje.</li>
+            <li><strong>Neukládá se na disk:</strong> Po dokončení testu se automaticky smaže ze systému.</li>
+            <li><strong>3-úrovňový souhrn:</strong> Zeleně <code>[ OK ]</code> pro splněné body, žlutě <code>[KONTROLA]</code> pro položky vyžadující ruční kontrolu a červeně <code>[CHYBA]</code> s nápovědou pro opravu.</li>
+          </ul>
+        </div>
+      `;
+    },
+    how: (vm, wsX) => {
+      return `# Spusťte v PowerShellu, CMD nebo Terminálu na PC1-WIN:\npowershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_PC1-WIN.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`;
+    },
+    verify: (vm, wsX) => {
+      return `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_PC1-WIN.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`;
+    },
+    expected: (vm, wsX) => {
+      const x = wsX || 2;
+      return `######################################################################## 100.0%\n\n============================================================\n  WELL_OPS :: Overeni PC1-WIN - DHCP Klient (Modul 02)\n============================================================\nZadejte cislo vaseho pracoviste (X) [vychozi: ${x}]: ${x}\n\n--- 1. Identifikace stanice a adapteru ---\n  [ OK ]       Hostname klientske stanice je 'PC1-WIN'\n  [ OK ]       Adapter 'Ethernet1' (NIC 2 v CyLabu) existuje a je pripojen (Status: Up)\n\n--- 2. Nastaveni DHCP klienta na Ethernet1 ---\n  [ OK ]       Rozhrani Ethernet1 ma aktivni rezim DHCP klienta (Dhcp: Enabled)\n\n--- 3. Pridelena IPv4 adresa ---\n  [ OK ]       IPv4 adresa je uspesne pridelena z DHCP rozsahu: 192.168.${x}.100/24\n  [ OK ]       Puvod adresy je potvrzen z DHCP (PrefixOrigin: Dhcp)\n\n--- 4. Prevzate parametry site (DHCP Options) ---\n  [ OK ]       Vychozi brana byla prevzata spravne: 192.168.${x}.1\n  [ OK ]       DNS server byl prevzat spravne: 192.168.${x}.10\n  [ OK ]       Domenovy suffix pripojeni byl prevzat: <prijmeni>.cyberschool.internal\n  [KONTROLA]   Overte vizualne: Odpovida predpona suffixu '<prijmeni>' vasemu prijmeni?\n\n--- 5. Test spojeni a rozlisovani jmen ---\n  [ OK ]       Spojeni na vychozi branu (192.168.${x}.1) je funkcni (ICMP Ping OK)\n  [ OK ]       Spojeni na server SRV1-DC (192.168.${x}.10) je funkcni\n  [ OK ]       Preklad domenovych jmen pres DNS server funguje\n\n--- 6. Doporucena prakticka zkouska ---\n  [KONTROLA]   Prakticky test obnoveni: Vyzkousejte 'ipconfig /release Ethernet1' nasledovane 'ipconfig /renew Ethernet1'\n\n============================================================\n                    VYSLEDNY SOUHRN                         \n============================================================\n  Pocet uspesnych kontrol [ OK ]:       10\n  Pocet k rucni kontrole  [KONTROLA]:    2\n  Pocet nalezenych chyb   [CHYBA]:       0\n------------------------------------------------------------\n\nVYSLEDEK: VSE V PORADKU! Klient PC1-WIN je korektne obsluhovan DHCP serverem.\nModul 02 byl na tomto stroji uspesne dokoncen.\n============================================================`;
+    }
   }
 ];

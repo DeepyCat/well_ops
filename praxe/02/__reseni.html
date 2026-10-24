@@ -486,6 +486,29 @@ Name                                           IP4Address
 srv1-dc.&lt;prijmeni&gt;.cyberschool.internal        192.168.N.10</code></pre>
       </div>
 
+      <h3>7. (Nepovinné) Rychlé ověření celého stroje</h3>
+      <p>Pro komplexní a automatické ověření celé konfigurace Modulu 02 můžete spustit ověřovací skript přímo z repozitáře. Příkaz lze spustit v <strong>PowerShellu, CMD i Terminálu</strong> – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je <strong>striktně read-only</strong> (pouze čte stav, nic nemění) a po použití se <strong>neukládá na disk</strong> (smaže se automaticky po dokončení běhu):</p>
+      
+      <p><strong>Pro server SRV1-DC:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+
+      <p><strong>Pro klienta PC1-WIN:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+
+      <p>Po spuštění zadejte číslo vašeho pracoviště <code>X</code> (např. <code>2</code>). Skripty provedou veškeré kontroly a na konci zobrazí přehledný 3-úrovňový souhrn stavů (<code>[ OK ]</code>, <code>[KONTROLA]</code>, <code>[CHYBA]</code>).</p>
+
       <h2>Co odevzdat</h2>
       <p>Až budete mít modul dokončený, odevzdává se jeden ZIP archiv s přesným názvem <code>Prijmeni_Jmeno_Modul2.zip</code>, ve kterém budou následující složky:</p>
       <ul>

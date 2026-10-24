@@ -145,6 +145,23 @@ Počítač PC1-WIN má plnou síťovou konektivitu v interním labu a je připra
 
 ---
 
+### 7. (Nepovinné) Rychlé ověření celého stroje
+Pro komplexní a automatické ověření celé konfigurace Modulu 02 můžete spustit ověřovací skript přímo z repozitáře. Příkaz můžete spustit v **PowerShellu, CMD i Terminálu** – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je **striktně read-only** (pouze čte stav, nic nemění) a po použití se **neukládá na disk** (smaže se automaticky po dokončení běhu):
+
+**Pro server SRV1-DC:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+**Pro klienta PC1-WIN:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+Po spuštění zadejte číslo vašeho pracoviště `X` (např. `2`). Skripty provedou veškeré kontroly a na konci zobrazí přehledný 3-úrovňový souhrn stavů (`[ OK ]`, `[KONTROLA]`, `[CHYBA]`).
+
+---
+
 ## Co odevzdat
 
 Jeden ZIP s názvem `Prijmeni_Jmeno_Modul2.zip`, ve kterém budou složky:

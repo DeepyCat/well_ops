@@ -101,6 +101,20 @@ Na serveru **SRV1-DC** je dostupná grafická konzole **DHCP Manager** (`dhcpmgm
 - V kořenovém stromu je u názvu serveru zobrazena zelená značka (autorizováno v doméně).
 - Ve větvi **IPv4 → Scope [192.168.N.0] Ucebna** je zobrazen Address Pool (`.100`–`.200`), Scope Options (Router `.1`, DNS Server `.10`, DNS Domain Name) a v sekci **Address Leases** je evidován klientský počítač `PC1-WIN`.
 
+### Rychlé automatické ověření strojů (nepovinné)
+
+Pro oba stroje jsou k dispozici interaktivní jednořádkové skripty spustitelné v **PowerShellu, CMD i Terminálu** (skripty jsou striktně read-only a po spuštění se neukládají na disk):
+
+**Na serveru SRV1-DC:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+**Na klientovi PC1-WIN:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
 ## Co odevzdat
 
 Jeden ZIP s názvem `Prijmeni_Jmeno_Modul2.zip`, ve kterém budou složky:
