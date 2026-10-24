@@ -3,76 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="idk co tu napsat prostě nemáme rádi FUCKING OPS a tak vznikla tato stránka, kde je vše co budete potřebovat asi idk...">
+    <meta name="description" content="OPS – teorie, praxe a prezentace na jednom místě.">
+    <meta name="theme-color" content="#111111">
     <link rel="icon" type="image/x-icon" href="img/bird.png">
-    <title>OPS</title>
+    <title>OPS | Portál</title>
     <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0b0b0d;
+            --surface: rgba(24, 24, 27, .72);
+            --surface-strong: rgba(20, 20, 22, .91);
+            --text: #f7f7f8;
+            --muted: #b7b7bd;
+            --red: #ef4444;
+            --red-bright: #ff5b5b;
+            --red-soft: rgba(239, 68, 68, .16);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { width: 100%; min-height: 100%; }
+
         body.custom-layout {
             margin: 0;
-            height: 100vh;
+            min-height: 100svh;
             display: flex;
             flex-direction: column;
-            background-color: #1a1a1a;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 50% 0%, rgba(150, 25, 35, .14), transparent 55%),
+                var(--bg);
+            font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
+
         .top-row {
             display: flex;
             flex: 2;
             width: 100%;
+            min-height: 0;
             position: relative;
+            isolation: isolate;
         }
+
         .bottom-row {
             display: flex;
             flex: 1;
             width: 100%;
+            min-height: 0;
             position: relative;
         }
 
-        /* Základní styl pro tlačítka s obrázky na pozadí */
         .choice-btn {
             display: flex;
             justify-content: center;
             align-items: center;
+            min-width: 0;
+            min-height: 0;
             text-decoration: none;
-            color: white;
+            color: var(--text);
             background-size: cover;
             background-position: center;
             position: relative;
-            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), filter 0.35s ease;
+            overflow: hidden;
+            isolation: isolate;
+            transition: transform .35s cubic-bezier(.2,.8,.2,1), filter .35s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* Tmavý filtr přes obrázek, aby byl text skvěle vidět */
         .choice-btn::before {
-            content: '';
+            content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            transition: background 0.3s ease;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.62)),
+                        linear-gradient(135deg, rgba(15,15,18,.15), rgba(150,20,30,.13));
+            transition: background .3s ease;
         }
 
-        /* Vzhled textu uvnitř tlačítek */
         .choice-btn::after {
             content: attr(data-text);
-            font-size: 2.2rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-            color: white;
-            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-            background: rgba(0, 0, 0, 0.35);
-            padding: 15px 30px;
-            border-radius: 50px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            transition: transform 0.3s ease, background 0.3s ease;
+            display: block;
+            max-width: calc(100% - 32px);
+            font-size: clamp(1.5rem, 3.3vw, 2.7rem);
+            font-weight: 800;
+            letter-spacing: .04em;
+            color: #fff;
+            text-shadow: 0 3px 18px rgba(0,0,0,.7);
+            background: rgba(12,12,14,.48);
+            padding: .75em 1.45em;
+            border-radius: 999px;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 8px 32px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.10);
+            transition: transform .3s ease, background .3s ease;
             text-align: center;
             z-index: 1;
         }
 
-        /* Teorie – výchozí obrázek (Safe) */
         .choice-btn.teorie {
             background-image: url('img/teorieS-bg.jpg');
             width: 53%;
@@ -81,7 +109,6 @@
             z-index: 2;
         }
 
-        /* Praxe – výchozí obrázek (Safe) */
         .choice-btn.praxe {
             background-image: url('img/praxeS-bg.jpg');
             width: 53%;
@@ -90,7 +117,6 @@
             z-index: 1;
         }
 
-        /* Prezentace – výchozí obrázek (Safe) */
         .choice-btn.prezentace {
             background-image: url('img/prezentaceS-bg.jpg');
             width: 100%;
@@ -98,181 +124,205 @@
             margin-left: 0;
         }
 
-        /* Hover efekt: zvětšení, posun nahoru a zjasnění obrázku */
         .choice-btn:hover {
-            transform: translateY(-8px) scale(1.02);
-            filter: brightness(1.15);
-            z-index: 10;
+            transform: translateY(-4px) scale(1.008);
+            filter: brightness(1.08);
+            z-index: 5;
         }
 
         .choice-btn:hover::before {
-            background: rgba(0, 0, 0, 0.2);
+            background: linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.48)),
+                        linear-gradient(135deg, rgba(15,15,18,.08), rgba(180,25,35,.18));
         }
 
         .choice-btn:hover::after {
-            transform: scale(1.08);
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        /* Čisté tlačítko ♦ v rohu */
-        #mode-toggle-btn {
-            position: fixed;
-            bottom: 5px;
-            right: 5px;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.2);
-            color: rgba(255, 255, 255, 0.4);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            user-select: none;
-            border: none;
-        }
-
-        #mode-toggle-btn:hover {
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
+            transform: scale(1.035);
+            background: rgba(12,12,14,.62);
         }
 
         .games-bar {
             position: fixed;
-            bottom: 8px;
-            left: 8px;
-            z-index: 9999;
+            left: max(16px, env(safe-area-inset-left));
+            bottom: max(16px, env(safe-area-inset-bottom));
+            z-index: 20;
             display: flex;
             gap: 8px;
             align-items: center;
         }
 
         .game-btn {
-            background: rgba(0, 0, 0, 0.55);
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            font-family: 'Consolas', monospace;
+            color: #fff;
+            background: rgba(15,15,17,.72);
+            padding: 10px 15px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 750;
+            font-family: inherit;
             text-decoration: none;
-            backdrop-filter: blur(4px);
-            transition: all 0.25s ease;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 5px 24px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.08);
+            transition: transform .2s ease, background .2s ease;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
 
-        .game-btn.gd {
-            color: #00f0ff;
-            border: 1px solid rgba(0, 240, 255, 0.35);
-        }
-
-        .game-btn.gd:hover {
-            background: rgba(0, 240, 255, 0.25);
-            color: #fff;
-            border-color: #00f0ff;
-            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+        .game-btn:hover {
+            background: rgba(120,20,28,.78);
             transform: translateY(-2px);
         }
 
-        .game-btn.stratagem {
-            color: #FFE900;
-            border: 1px solid rgba(255, 233, 0, 0.35);
+        #mode-toggle-btn {
+            position: fixed;
+            bottom: max(16px, env(safe-area-inset-bottom));
+            right: max(16px, env(safe-area-inset-right));
+            z-index: 20;
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            background: rgba(15,15,17,.62);
+            color: rgba(255,255,255,.72);
+            border: 0;
+            border-radius: 50%;
+            font-size: 17px;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: color .2s ease, background .2s ease, transform .2s ease;
         }
 
-        .game-btn.stratagem:hover {
-            background: rgba(255, 233, 0, 0.25);
-            color: #fff;
-            border-color: #FFE900;
-            box-shadow: 0 0 12px rgba(255, 233, 0, 0.5);
-            transform: translateY(-2px);
+        #mode-toggle-btn:hover {
+            color: white;
+            background: rgba(150,25,35,.78);
+            transform: rotate(45deg);
         }
 
-        .game-btn.minecraft {
-            color: #22c55e;
-            border: 1px solid rgba(34, 197, 94, 0.4);
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--red-bright);
+            outline-offset: 4px;
         }
 
-        .game-btn.minecraft:hover {
-            background: rgba(34, 197, 94, 0.25);
-            color: #fff;
-            border-color: #22c55e;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
-            transform: translateY(-2px);
+        @media (min-width: 1500px) {
+            .choice-btn::after { font-size: 2.8rem; }
         }
 
-        /* Responzivita pro mobily */
         @media screen and (max-width: 768px) {
             body.custom-layout {
+                min-height: 100svh;
                 height: auto;
                 overflow-y: auto;
+                overflow-x: hidden;
             }
+
             .top-row {
+                flex: none;
                 flex-direction: column;
+                gap: 12px;
+                padding: 12px;
             }
+
             .choice-btn.teorie, .choice-btn.praxe {
                 width: 100% !important;
                 clip-path: none !important;
                 margin-left: 0 !important;
-                height: 250px;
+                height: clamp(190px, 29svh, 260px);
+                border-radius: 22px;
             }
+
+            .bottom-row {
+                flex: none;
+                padding: 0 12px 86px;
+            }
+
             .choice-btn.prezentace {
-                height: 250px;
+                height: clamp(190px, 27svh, 240px);
+                border-radius: 22px;
+            }
+
+            .choice-btn::after {
+                font-size: clamp(1.5rem, 7vw, 2rem);
+                padding: .7em 1.25em;
+            }
+
+            .games-bar {
+                left: 12px;
+                bottom: max(12px, env(safe-area-inset-bottom));
+            }
+
+            .game-btn {
+                min-height: 42px;
+                padding: 10px 14px;
+            }
+
+            #mode-toggle-btn {
+                right: 12px;
+                bottom: max(12px, env(safe-area-inset-bottom));
+                width: 42px;
+                height: 42px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+                scroll-behavior: auto !important;
             }
         }
     </style>
 </head>
 <body class="custom-layout">
-    <!-- Panel her v levém dolním rohu -->
     <div class="games-bar">
-        <a href="games.html" class="game-btn gd" title="Hry (Juchelka Dash, Race with Kokeš, Juchelka Hero, JuchelkaCraft, Maturita click...)">🎮 Games 🎮</a>
+        <a href="games.html" class="game-btn" title="Hry (Juchelka Dash, Race with Kokeš, Juchelka Hero, JuchelkaCraft, Maturita click...)">🎮 <span>Games</span> 🎮</a>
     </div>
 
-    <!-- Čisté přepínací tlačítko -->
-    <button id="mode-toggle-btn" title="Přepnout režim">♦</button>
+    <button id="mode-toggle-btn" type="button" title="Přepnout režim pozadí" aria-label="Přepnout režim pozadí">♦</button>
 
-    <!-- Horní řada: Teorie a Praxe -->
     <div class="top-row">
-        <a href="teorie.html" class="choice-btn teorie" data-text="Teorie"></a>
-        <a href="praxe.html" class="choice-btn praxe" data-text="Praxe"></a>
+        <a href="teorie.html" class="choice-btn teorie" data-text="Teorie" aria-label="Otevřít teorii"></a>
+        <a href="praxe.html" class="choice-btn praxe" data-text="Praxe" aria-label="Otevřít praxi"></a>
     </div>
 
-    <!-- Dolní řada: Prezentace -->
-   <div class="bottom-row">
-        <a href="https://frengp.sharepoint.com/:x:/r/sites/OPST3ASKA2026/Vukov%20materily/REFER%C3%81TY-T3A2026.xlsx?d=wfb85ec39e54e4c3f956a90053bbc30f1&csf=1&web=1&e=5OsbBZ" class="choice-btn prezentace" data-text="Prezentace" target="_blank" rel="noopener noreferrer"></a>
+    <div class="bottom-row">
+        <a href="https://frengp.sharepoint.com/:x:/r/sites/OPST3ASKA2026/Vukov%20materily/REFER%C3%81TY-T3A2026.xlsx?d=wfb85ec39e54e4c3f956a90053bbc30f1&csf=1&web=1&e=5OsbBZ"
+           class="choice-btn prezentace" data-text="Prezentace" target="_blank" rel="noopener noreferrer" aria-label="Otevřít prezentace v SharePointu"></a>
     </div>
 
     <script>
-        function applyMode(mode) {
+        (() => {
             const teorieBtn = document.querySelector('.choice-btn.teorie');
             const praxeBtn = document.querySelector('.choice-btn.praxe');
             const prezentaceBtn = document.querySelector('.choice-btn.prezentace');
+            const toggleBtn = document.getElementById('mode-toggle-btn');
+            const STORAGE_KEY = 'selectedBgMode';
 
-            if (mode === 'funny') {
-                if (teorieBtn) teorieBtn.style.backgroundImage = "url('img/teorie-bg.jpg')";
-                if (praxeBtn) praxeBtn.style.backgroundImage = "url('img/praxe-bg.jpg')";
-                if (prezentaceBtn) prezentaceBtn.style.backgroundImage = "url('img/prezentace-bg.jpg')";
-            } else {
-                // safe (výchozí)
-                if (teorieBtn) teorieBtn.style.backgroundImage = "url('img/teorieS-bg.jpg')";
-                if (praxeBtn) praxeBtn.style.backgroundImage = "url('img/praxeS-bg.jpg')";
-                if (prezentaceBtn) prezentaceBtn.style.backgroundImage = "url('img/prezentaceS-bg.jpg')";
+            function applyMode(mode) {
+                const safeMode = mode === 'funny' ? 'funny' : 'safe';
+
+                if (teorieBtn) teorieBtn.style.backgroundImage =
+                    `url('img/${safeMode === 'funny' ? 'teorie' : 'teorieS'}${safeMode === 'funny' ? '' : '-bg'}.jpg')`;
+                if (praxeBtn) praxeBtn.style.backgroundImage =
+                    `url('img/${safeMode === 'funny' ? 'praxe' : 'praxeS'}${safeMode === 'funny' ? '' : '-bg'}.jpg')`;
+                if (prezentaceBtn) prezentaceBtn.style.backgroundImage =
+                    `url('img/${safeMode === 'funny' ? 'prezentace' : 'prezentaceS'}${safeMode === 'funny' ? '' : '-bg'}.jpg')`;
+
+                try { localStorage.setItem(STORAGE_KEY, safeMode); } catch (e) {}
+                toggleBtn?.setAttribute('aria-label', safeMode === 'safe' ? 'Přepnout na zábavný režim' : 'Přepnout na bezpečný režim');
+                toggleBtn?.setAttribute('title', safeMode === 'safe' ? 'Přepnout na zábavný režim' : 'Přepnout na bezpečný režim');
             }
-            
-            localStorage.setItem('selectedBgMode', mode);
-        }
 
-        // Kliknutím na tlačítko se režim přepne na opačný
-        document.getElementById('mode-toggle-btn').addEventListener('click', function() {
-            const currentMode = localStorage.getItem('selectedBgMode') || 'safe';
-            const newMode = (currentMode === 'safe') ? 'funny' : 'safe';
-            applyMode(newMode);
-        });
+            toggleBtn?.addEventListener('click', () => {
+                let currentMode = 'safe';
+                try { currentMode = localStorage.getItem(STORAGE_KEY) || 'safe'; } catch (e) {}
+                applyMode(currentMode === 'safe' ? 'funny' : 'safe');
+            });
 
-        // Načtení uloženého režimu při spuštění stránky (výchozí je 'safe')
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedMode = localStorage.getItem('selectedBgMode') || 'safe';
+            let savedMode = 'safe';
+            try { savedMode = localStorage.getItem(STORAGE_KEY) || 'safe'; } catch (e) {}
             applyMode(savedMode);
-        });
+        })();
     </script>
 </body>
 </html>
