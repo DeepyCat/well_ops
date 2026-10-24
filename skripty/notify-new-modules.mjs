@@ -1,4 +1,3 @@
-```js
 import { execFileSync } from "node:child_process";
 
 const {
@@ -11,24 +10,22 @@ const {
 } = process.env;
 
 if (!RESEND_API_KEY || !RESEND_FROM || !OPS_RECIPIENTS) {
-  throw new Error("Missing required GitHub Actions secrets.");
+  throw new Error("Missing required GitHub Actions secrets or variables.");
 }
 
 if (!CURRENT_SHA || !REPOSITORY) {
   throw new Error("Missing CURRENT_SHA or REPOSITORY.");
 }
 
-// Načtení a kontrola modulů z konkrétního commitu
+// Načtení a kontrola modulů z konkrétního commitu.
 function readModules(revision) {
   const filePath = `${revision}:praxe/modules.json`;
 
   console.log(`\nNačítám praxe/modules.json z commitu: ${revision}`);
 
-  const json = execFileSync(
-    "git",
-    ["show", filePath],
-    { encoding: "utf8" }
-  );
+  const json = execFileSync("git", ["show", filePath], {
+    encoding: "utf8"
+  });
 
   let modules;
 
@@ -52,8 +49,8 @@ function readModules(revision) {
     if (
       module.id == null ||
       String(module.id).trim() === "" ||
-      !module.title ||
-      typeof module.title !== "string"
+      typeof module.title !== "string" ||
+      !module.title.trim()
     ) {
       throw new Error(
         `Every module must have a valid id and title. Commit: ${revision}`
@@ -81,7 +78,7 @@ console.log(`Aktuální commit:  ${CURRENT_SHA}`);
 // Aktuální JSON musí být validní.
 const currentModules = readModules(CURRENT_SHA);
 
-// Bez předchozího commitu nelze bezpečně porovnat ID.
+// Při prvním commitu není co porovnávat.
 if (!BEFORE_SHA || /^0+$/.test(BEFORE_SHA)) {
   console.log(
     "Není dostupná předchozí verze JSONu. E-mail se neposílá."
@@ -89,6 +86,7 @@ if (!BEFORE_SHA || /^0+$/.test(BEFORE_SHA)) {
   process.exit(0);
 }
 
+// Načti předchozí verzi.
 let previousModules;
 
 try {
@@ -96,6 +94,7 @@ try {
 } catch (error) {
   console.error("\nPředchozí modules.json nelze načíst.");
   console.error("Nelze bezpečně ověřit nová ID. E-mail se neposílá.");
+  console.error(error.message);
   process.exit(0);
 }
 
@@ -110,9 +109,7 @@ const addedModules = currentModules.filter(
 
 // Žádná nová ID = žádný e-mail.
 if (addedModules.length === 0) {
-  console.log(
-    "Nebyla přidána žádná nová ID. E-mail se neposílá."
-  );
+  console.log("Nebyla přidána žádná nová ID. E-mail se neposílá.");
   process.exit(0);
 }
 
@@ -121,7 +118,7 @@ console.log(
   addedModules.map(module => module.id).join(", ")
 );
 
-// E-mail obsahuje pouze nově přidané moduly.
+// E-mail bude obsahovat pouze nové moduly.
 const modulesToShow = addedModules;
 
 // Příjemci bez duplicit.
@@ -138,6 +135,7 @@ if (recipients.length === 0) {
   throw new Error("No email recipients configured.");
 }
 
+// Kontrola e-mailových adres.
 for (const recipient of recipients) {
   if (!/^[^\s@,]+@[^\s@,]+\.[^\s@,]+$/.test(recipient)) {
     throw new Error(`Invalid recipient email address: ${recipient}`);
@@ -155,7 +153,7 @@ function escapeHtml(value) {
   })[char]);
 }
 
-// Karty nových modulů.
+// Vytvoření karet nových modulů.
 const moduleList = modulesToShow.map(module => {
   const moduleId = String(module.id);
 
@@ -208,12 +206,11 @@ const subject = addedModules.length === 1
   ? `🚀 OPS | Nový modul: ${addedModules[0].title}`
   : `🚀 OPS | Přidáno ${addedModules.length} nových modulů`;
 
-// Nadpis e-mailu.
+// Nadpis a úvodní text.
 const heading = addedModules.length === 1
   ? "Přibyl nový modul!"
   : "Přibyly nové moduly!";
 
-// Úvodní text.
 const intro = addedModules.length === 1
   ? "Na OPS byl právě přidán nový modul. Vyber si ho níže a můžeš se pustit do práce."
   : "Na OPS byly právě přidány nové moduly. Vyber si jeden z nich níže.";
@@ -378,6 +375,7 @@ for (const recipient of recipients) {
   }
 }
 
+// Pokud se nepodařilo odeslat některý e-mail, označ běh jako neúspěšný.
 if (failures.length > 0) {
   throw new Error(
     `Failed to send email to ${failures.length} recipient(s): ` +
@@ -388,4 +386,3 @@ if (failures.length > 0) {
 console.log(
   `Successfully submitted notifications to all ${recipients.length} recipients.`
 );
-```
