@@ -78,8 +78,8 @@ Pro každé zařízení (VM) definované v modulu vytvořit v kořenové složce
 - Skript je interaktivní: vyzve uživatele k zadání čísla pracoviště `X` (výchozí 2), prověří veškerou konfiguraci daného modulu pro daný stroj, vypíše přehledné barevné stavy `[ OK ]` / `[CHYBA]` a celkové skóre.
 - V `tasks.js` zařadit na konec kontrolního seznamu každého stroje nepovinný krok:
   `title: "X. (Nepovinné) Rychlé ověření celého stroje"`
-  obsahující jednořádkový příkaz pro stažení a spuštění přes curl:
-  `curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat`
+  obsahující jednořádkový příkaz pro stažení a spuštění přes curl (spustitelný v PowerShellu, CMD i Terminálu, s vizuálním průběhem stahování a automatickým úklidem):
+  `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`
 
 ---
 
@@ -107,7 +107,8 @@ Pro každé zařízení (VM) definované v modulu vytvořit v kořenové složce
      `<link rel="icon" type="image/x-icon" href="../../img/bird.png">`
 8. **POVINNÝ KROK RYCHLÉHO OVĚŘENÍ PRO KAŽDÝ STROJ:**
    - Na konec úkolů každého stroje v `tasks.js` a v `_reseni.md` vždy zařadit krok `(Nepovinné) Rychlé ověření celého stroje`.
-   - V `how` uvést zkopírovatelný curl příkaz na skript v `skripty/XX_check_<VM>.bat`.
+   - V `how` uvést zkopírovatelný univerzální jednořádkový příkaz na skript v `skripty/XX_check_<VM>.bat` (spustitelný v PowerShellu, CMD i Terminálu):
+     `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`
    - V `verify` a `expected` ukázat spuštění skriptu a přehled `[ OK ]` výsledků.
 
 ---

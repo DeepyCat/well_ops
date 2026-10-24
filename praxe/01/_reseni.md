@@ -60,16 +60,10 @@ Get-ADUser -Identity Administrator | Select-Object SamAccountName, UserPrincipal
 Výstup je ve tvaru `PRIJMENI\Administrator` a účet má `Enabled: True`. Všechny služby Active Directory a DNS běží bez červených varování.
 
 ### 7. (Nepovinné) Rychlé ověření celého stroje
-Pro komplexní a automatické ověření celé konfigurace serveru **SRV1-DC** můžete spustit ověřovací skript přímo z repozitáře. Skript je **striktně read-only** (pouze čte stav, nic v systému nemění) a po použití se **neukládá na disk** (smaže se automaticky po dokončení běhu).
+Pro komplexní a automatické ověření celé konfigurace serveru **SRV1-DC** můžete spustit ověřovací skript přímo z repozitáře. Příkaz můžete spustit v **PowerShellu, CMD i Terminálu** – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je **striktně read-only** (pouze čte stav, nic nemění) a po použití se **neukládá na disk** (smaže se automaticky po dokončení běhu):
 
-Spuštění v PowerShellu jako Administrator:
 ```powershell
-curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue
-```
-
-Nebo přímé spuštění přímo v operační paměti RAM bez uložení souboru na disk:
-```powershell
-irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
 ```
 
 Po spuštění zadejte číslo vašeho pracoviště `X` (např. `2`). Skript provede veškeré kontroly a na konci zobrazí přehledný 3-úrovňový souhrn:
