@@ -22,7 +22,7 @@
 
 Všechno je na jednom místě, takže není potřeba hledat materiály v deseti různých složkách.
 
-🌐 **Web:** [kokot.fit](https://kokot.fit/)  
+🌐 **Web:** [kokot.fit](https://kokot.fit/)  /  [ops.peakdle.site](https://ops.peakdle.site/))
 📦 **GitHub:** [DeepyCat/well_ops](https://github.com/DeepyCat/well_ops)
 
 ## 🌐 Co tu najdeš
