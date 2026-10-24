@@ -1,95 +1,65 @@
-Struktura
 well_ops/
-│
-├── 📂 .agents/                              # Konfigurace a nástroje AI agentů
-│   └── 📂 skills/
-│       ├── 📂 hardening-windows-endpoint-with-cis-benchmark/
-│       │   ├── 📂 assets/
+├── .agents/                         # Konfigurace a nástroje AI agentů
+│   └── skills/
+│       ├── hardening-windows-endpoint-with-cis-benchmark/
+│       │   ├── assets/
 │       │   │   └── template.md
-│       │   ├── 📂 references/
+│       │   ├── references/
 │       │   │   ├── api-reference.md
 │       │   │   ├── standards.md
 │       │   │   └── workflows.md
-│       │   ├── 📂 scripts/
+│       │   ├── scripts/
 │       │   │   ├── agent.py
 │       │   │   └── process.py
 │       │   ├── LICENSE
 │       │   └── SKILL.md
-│       │
-│       ├── 📂 lab_gen/
-│       │   ├── 📂 references/
-│       │   │   ├── 📂 hardening-windows-endpoint-with-cis-benchmark/
-│       │   │   ├── 📂 sysadmin-toolbox/
-│       │   │   └── 📂 windows-hardening/
+│       ├── lab_gen/
+│       │   ├── references/
+│       │   │   ├── hardening-windows-endpoint-with-cis-benchmark/
+│       │   │   ├── sysadmin-toolbox/
+│       │   │   └── windows-hardening/
 │       │   └── SKILL.md
-│       │
-│       ├── 📂 powershell-master/
-│       │   ├── 📂 references/
+│       ├── powershell-master/
+│       │   ├── references/
 │       │   │   ├── cicd-integration.md
 │       │   │   ├── cross-platform-patterns.md
 │       │   │   ├── modules-and-gallery.md
 │       │   │   ├── security-2025.md
 │       │   │   └── syntax-reference.md
-│       │   └── SKILL.md
-│       │
-│       ├── 📂 powershell-windows/
-│       │   └── SKILL.md
-│       ├── 📂 sysadmin-toolbox/
-│       │   ├── 📂 references/
-│       │   ├── 📂 scripts/
+│       │   ├── SKILL.md
+│       │   └── powershell-windows/
+│       │       └── SKILL.md
+│       ├── sysadmin-toolbox/
+│       │   ├── references/
+│       │   ├── scripts/
 │       │   ├── _meta.json
 │       │   └── SKILL.md
-│       └── 📂 windows-hardening/
+│       └── windows-hardening/
 │           └── SKILL.md
-│
-├── 📂 .github/
-│   └── 📂 workflows/
-│       └── static.yml                      # Workflow pro statický web
-│
-├── 📂 clicker/                              # Samostatná klikací hra
-│   ├── 📂 assets/                           # Sestavené CSS, JS a obrázky
-│   │   ├── index-BZ_H0cX1.js
-│   │   └── index-CJY1JsmG.css
-│   ├── 📂 img/                              # Grafika hry
-│   │   ├── alchemylab.png
-│   │   ├── grandma.png
-│   │   ├── factory.png
-│   │   ├── farm.png
-│   │   ├── mine.png
-│   │   └── ...                              # Další herní obrázky
-│   ├── 📜 index.html
-│   ├── 📜 cookie.svg
-│   └── 🖼️ 02_.png
-│
-├── 📂 gd/                                   # Geometry Dash
-│   ├── 📂 assets/                           # Grafika, fonty a zvuky hry
-│   │   ├── GJ_GameSheet.png
-│   │   ├── GJ_GameSheet.json
-│   │   ├── GJ_GameSheet02.png
-│   │   ├── GJ_GameSheet03.png
-│   │   ├── GJ_GameSheet04.png
-│   │   ├── PixelSheet_01.png
-│   │   ├── FireSheet_01-hd.png
-│   │   ├── StereoMadness.mp3
-│   │   ├── BackOnTrack.mp3
-│   │   ├── DryOut.mp3
-│   │   ├── ...                              # Další assety a hudba
-│   │   └── ...
-│   ├── 📜 index.html
-│   ├── 📜 game.js
-│   ├── 📜 vendor.js
-│   ├── 📜 README.md
-│   └── 📜 LICENSE
-│
-├── 📂 hyperdrive/                            # Další samostatná hra
-│   ├── 📂 Build/                            # Sestavené herní soubory
-│   ├── 📂 TemplateData/                     # Šablona a UI hry
-│   ├── 📜 index.html
-│   ├── 🖼️ kokes_blue_1.jpg
-│   ├── 🖼️ kokes_blue_2.jpg
-│   └── 🖼️ kokes_race.gif
-│
-├── 📂 img/                                  # Obrázky a diagramy webu
+├── .github/
+│   └── workflows/
+│       └── static.yml                 # Workflow pro statický web
+├── clicker/                           # Klikací hra
+│   ├── assets/                        # Sestavené CSS a JavaScript
+│   ├── img/                           # Obrázky hry
+│   ├── index.html
+│   ├── cookie.svg
+│   └── 02_.png
+├── gd/                                # Geometry Dash
+│   ├── assets/                        # Herní grafika, fonty a zvuky
+│   ├── index.html
+│   ├── game.js
+│   ├── vendor.js
+│   ├── README.md
+│   └── LICENSE
+├── hyperdrive/                        # Samostatná hra
+│   ├── Build/                         # Sestavené herní soubory
+│   ├── TemplateData/                  # UI a šablona hry
+│   ├── index.html
+│   ├── kokes_blue_1.jpg
+│   ├── kokes_blue_2.jpg
+│   └── kokes_race.gif
+├── img/                               # Obrázky a diagramy webu
 │   ├── bird.png
 │   ├── bios-boot.svg
 │   ├── bios-layers.svg
@@ -115,34 +85,30 @@ well_ops/
 │   ├── ipc-models.svg
 │   ├── kernel-types.svg
 │   ├── main-memory.svg
-│   └── ...                                 # Další ilustrace a grafika
-│
-├── 📂 js/
-│   └── 📜 ops-stats.js                      # Statistiky a jejich logika
-│
-├── 📂 maturita/                             # Obsah maturitní části
-│   ├── 📂 _next/                            # Soubory generovaného webu
-│   ├── 📜 index.html
-│   ├── 📜 index.txt
-│   ├── 📜 404.html
-│   ├── 📜 icon.svg
-│   ├── 🖼️ barina_run.png
-│   └── ...                                 # Další generované soubory
-│
-├── 📂 mc/                                   # Minecraft v prohlížeči
-│   ├── 📂 v1_8/                             # Herní engine a herní zdroje
-│   │   ├── 📂 lang/                         # Lokalizační soubory
-│   │   └── ...                              # Další soubory hry
-│   ├── 📜 index.html
-│   ├── 📜 bootstrap.js
-│   ├── 📜 classes.js
-│   ├── 📜 classes.js.map
-│   ├── 📜 README.md
-│   ├── 📜 assets.epw
-│   ├── 🖼️ favicon.png
-│   └── 🖼️ juchelka_craft.png
-│
-├── 📂 md/                                   # Teoretické studijní materiály
+│   └── ...                            # Další obrázky a diagramy
+├── js/
+│   └── ops-stats.js                   # Logika statistik
+├── maturita/                          # Maturitní část webu
+│   ├── _next/                         # Generované soubory webu
+│   ├── index.html
+│   ├── index.txt
+│   ├── 404.html
+│   ├── icon.svg
+│   ├── barina_run.png
+│   └── ...                            # Další soubory
+├── mc/                                # Minecraft v prohlížeči
+│   ├── v1_8/                          # Herní engine a zdroje
+│   │   ├── lang/                      # Lokalizační soubory
+│   │   └── ...                        # Další soubory hry
+│   ├── index.html
+│   ├── bootstrap.js
+│   ├── classes.js
+│   ├── classes.js.map
+│   ├── README.md
+│   ├── assets.epw
+│   ├── favicon.png
+│   └── juchelka_craft.png
+├── md/                                # Teoretické studijní materiály
 │   ├── 01_Mass_Storage_Structure.md
 │   ├── 01_Process_Concept.md
 │   ├── 01_STRUKTURA_OPERAČNÍCH_SYSTÉMŮ (1).md
@@ -173,9 +139,8 @@ well_ops/
 │   ├── 06_File_System_Implementation.md
 │   ├── 06_Zakladni_datove_struktury.md
 │   └── 07_Multitasking_Multithreading.md
-│
-├── 📂 praxe/                                # Praktické úlohy a jejich řešení
-│   ├── 📂 00/
+├── praxe/                             # Praktická cvičení a řešení
+│   ├── 00/
 │   │   ├── __reseni.html
 │   │   ├── __reseni.md
 │   │   ├── __zadani.html
@@ -188,14 +153,13 @@ well_ops/
 │   │   ├── _zadani.md
 │   │   ├── tasks.js
 │   │   └── verified.json
-│   ├── 📂 01/                               # Stejný typ souborů pro další úlohy
+│   ├── 01/                            # Další úlohy stejného typu
 │   │   └── ...
-│   ├── 📂 02/
+│   ├── 02/
 │   │   └── ...
-│   ├── 📜 modules.js                        # Logika modulů
-│   └── 📜 modules.json                      # Definice modulů
-│
-├── 📂 skripty/                              # Kontrolní skripty pro Windows
+│   ├── modules.js                     # Logika modulů
+│   └── modules.json                   # Definice modulů
+├── skripty/                           # Kontrolní skripty pro Windows
 │   ├── 00_check_PC1-WIN.bat
 │   ├── 00_check_PC1-WIN.ps1
 │   ├── 00_check_SRV1-DC.bat
@@ -208,25 +172,23 @@ well_ops/
 │   ├── 02_check_PC1-WIN.ps1
 │   ├── 02_check_SRV1-DC.bat
 │   └── 02_check_SRV1-DC.ps1
-│
-├── 📂 stratagem/                            # Nástroj pro Helldivers 2
-│   ├── 📂 data/
-│   │   ├── 📂 Images/
-│   │   │   ├── 📂 Arrows/
-│   │   │   └── 📂 Stratagem Icons/
-│   │   │       └── 📂 hd2/
-│   │   └── 📂 Sounds/
-│   ├── 📜 index.html
-│   ├── 📜 script.js
-│   ├── 📜 links.csv
-│   └── 📜 .gitignore
-│
-├── 📜 404.html                              # Stránka nenalezeného obsahu
-├── 📜 index.html                            # Hlavní stránka webu
-├── 📜 games.html                            # Přehled her
-├── 📜 teorie.html                           # Teoretická část
-├── 📜 praxe.html                            # Praktická část
-├── 📜 statistika.html                       # Stránka statistik
-├── 📜 style.css                             # Hlavní CSS styly
-├── 📜 lab_gen.md                            # Dokumentace / poznámky k lab_gen
-└── 📜 skills-lock.json                      # Zámek verzí AI skills
+├── stratagem/                         # Pomůcka pro Helldivers 2
+│   ├── data/
+│   │   ├── Images/
+│   │   │   ├── Arrows/
+│   │   │   └── Stratagem Icons/
+│   │   │       └── hd2/
+│   │   └── Sounds/
+│   ├── index.html
+│   ├── script.js
+│   ├── links.csv
+│   └── .gitignore
+├── 404.html                           # Stránka nenalezeného obsahu
+├── index.html                         # Hlavní stránka webu
+├── games.html                         # Přehled her
+├── teorie.html                        # Teoretická část
+├── praxe.html                         # Praktická část
+├── statistika.html                    # Statistiky
+├── style.css                          # Hlavní styly webu
+├── lab_gen.md                         # Poznámky k lab_gen
+└── skills-lock.json                   # Zámek verzí AI skills
