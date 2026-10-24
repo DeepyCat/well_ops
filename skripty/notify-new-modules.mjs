@@ -82,13 +82,14 @@ function readModules(revision) {
   return modules;
 }
 
-console.log("=== Kontrola modulů OPS ===");
+console.log("=== Kontrola změn modulů OPS ===");
 console.log(`Předchozí commit: ${BEFORE_SHA}`);
 console.log(`Aktuální commit:  ${CURRENT_SHA}`);
 
 const previousModules = readModules(BEFORE_SHA);
 const currentModules = readModules(CURRENT_SHA);
 
+// Porovnání ID předchozích a aktuálních modulů
 const previousIds = new Set(
   previousModules.map(module => String(module.id))
 );
@@ -97,15 +98,16 @@ const addedModules = currentModules.filter(
   module => !previousIds.has(String(module.id))
 );
 
-if (addedModules.length === 0) {
-  console.log("No new modules. No email will be sent.");
-  process.exit(0);
-}
+// Při přidání ID zobrazíme nové moduly.
+// Při jiné změně JSONu zobrazíme aktuální moduly.
+const modulesToShow = addedModules.length > 0
+  ? addedModules
+  : currentModules;
 
 console.log(
-  `New modules detected: ${addedModules
-    .map(module => module.id)
-    .join(", ")}`
+  addedModules.length > 0
+    ? `Nová ID: ${addedModules.map(module => module.id).join(", ")}`
+    : "JSON byl změněn, ale žádné nové ID nebylo přidáno."
 );
 
 // Příjemci bez duplicit
@@ -139,8 +141,8 @@ function escapeHtml(value) {
   })[char]);
 }
 
-// Karta a odkaz pro každý nový modul
-const moduleList = addedModules.map(module => {
+// Karta a odkaz pro každý zobrazovaný modul
+const moduleList = modulesToShow.map(module => {
   const moduleId = String(module.id);
 
   const moduleUrl =
@@ -187,13 +189,14 @@ const moduleList = addedModules.map(module => {
   `;
 }).join("");
 
-const subject = addedModules.length === 1
-  ? `🚀 OPS | Nový modul: ${addedModules[0].title}`
-  : `🚀 OPS | Přidáno ${addedModules.length} nových modulů`;
+// Předmět e-mailu
+const subject = addedModules.length > 0
+  ? addedModules.length === 1
+    ? `🚀 OPS | Nový modul: ${addedModules[0].title}`
+    : `🚀 OPS | Přidáno ${addedModules.length} nových modulů`
+  : "OPS | Aktualizace modulů";
 
-const commitUrl =
-  `https://github.com/${REPOSITORY}/commit/${encodeURIComponent(CURRENT_SHA)}`;
-
+// HTML e-mailu
 const html = `
 <!DOCTYPE html>
 <html lang="cs">
@@ -262,9 +265,11 @@ const html = `
           line-height:1.3;
           margin:10px 0 12px;
         ">
-          ${addedModules.length === 1
-            ? "Přibyl nový modul!"
-            : "Přibyly nové moduly!"}
+          ${addedModules.length > 0
+            ? addedModules.length === 1
+              ? "Přibyl nový modul!"
+              : "Přibyly nové moduly!"
+            : "Moduly byly aktualizovány!"}
         </h2>
 
         <p style="
@@ -273,8 +278,9 @@ const html = `
           line-height:1.7;
           margin:0 0 22px;
         ">
-          Na OPS byl právě přidán nový obsah.
-          Vyber si modul níže a můžeš se pustit do práce.
+          ${addedModules.length > 0
+            ? "Na OPS byl právě přidán nový obsah. Vyber si modul níže a můžeš se pustit do práce."
+            : "Na OPS došlo ke změně seznamu modulů. Aktuální moduly najdeš níže."}
         </p>
 
         ${moduleList}
@@ -291,8 +297,6 @@ const html = `
           ">
             Nějaký problém? tvoje chyba
           </p>
-
-         
         </div>
       </div>
 
@@ -308,7 +312,7 @@ const html = `
           margin:0;
         ">
           Toto je automatické oznámení webu OPS.<br>
-          Bylo odesláno při přidání nového modulu.
+          Bylo odesláno při změně souboru modules.json.
         </p>
 
         <p style="
