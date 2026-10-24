@@ -1,3 +1,6 @@
+Tady máme fešáka jak říka že je to good
+![Fešák](https://raw.githubusercontent.com/DeepyCat/well_ops/refs/heads/main/img/praxe-bg.jpg)
+
 ```
 well_ops/
 ├── .agents/                         # Konfigurace a nástroje AI agentů
