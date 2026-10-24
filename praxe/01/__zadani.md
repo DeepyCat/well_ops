@@ -33,3 +33,14 @@ Server SRV1-DC bude mít nainstalovanou roli **Active Directory Domain Services 
 ## Ověření nástroji
 
 Na SRV1-DC jsou dostupné administrační nástroje pro správu domény — **Active Directory Users and Computers (ADUC)**, **DNS Manager**, **Active Directory Domains and Trusts** — přístupné přes Server Manager → Tools.
+
+### Rychlé automatické ověření stroje (nepovinné)
+
+Konfiguraci stroje SRV1-DC si můžete ověřit také interaktivním jednořádkovým skriptem v PowerShellu (skript je striktně read-only a po spuštění se neukládá na disk):
+```powershell
+curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue
+```
+nebo přímo v paměti RAM bez zápisu na disk:
+```powershell
+irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex
+```

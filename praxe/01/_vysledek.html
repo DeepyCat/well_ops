@@ -500,6 +500,30 @@ Get-ADDomainController -Filter * | Select-Object Name, Site</code></pre>
 Get-ADUser -Identity Administrator | Select-Object SamAccountName, UserPrincipalName, Enabled</code></pre>
       </div>
       <p>Výstup je ve tvaru <code>PRIJMENI\Administrator</code> a účet má <code>Enabled: True</code>. Všechny služby Active Directory i integrovaného DNS serveru běží bez červených chyb.</p>
+
+      <h3>7. (Nepovinné) Rychlé ověření celého stroje</h3>
+      <p>Pro komplexní a automatické ověření celé konfigurace serveru <strong>SRV1-DC</strong> můžete spustit ověřovací skript přímo z repozitáře. Skript je <strong>striktně read-only</strong> (pouze čte stav, nic nemění) a po použití se <strong>neukládá na disk</strong> (smaže se automaticky po dokončení běhu):</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue</code></pre>
+      </div>
+      <p>Nebo přímo v paměti RAM bez zápisu na disk:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit jako Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>irm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex</code></pre>
+      </div>
+      <p>Po spuštění zadejte číslo vašeho pracoviště <code>X</code> (např. <code>2</code>). Skript provede veškeré kontroly a na konci zobrazí přehledný 3-úrovňový souhrn:</p>
+      <ul>
+        <li><strong>Zeleně <code>[ OK ]</code></strong>: všechny úspěšně ověřené parametry (IP adresa, brána, DNS resolver, AD DS role, povýšení na DC, doména, FSMO role, Global Catalog, služby NTDS/DNS, sdílení SYSVOL/NETLOGON).</li>
+        <li><strong>Žlutě <code>[KONTROLA]</code></strong>: položky vyžadující vaši vizuální kontrolu (např. DSRM heslo <code>Pa55w.rd</code>, které z bezpečnostních důvodů nelze z AD přečíst, a správnost vašeho příjmení v názvu domény).</li>
+        <li><strong>Červeně <code>[CHYBA]</code></strong>: konfigurace, které neodpovídají zadání, doplněné o nápovědu pro rychlou nápravu.</li>
+      </ul>
     </article>
   </main>
 

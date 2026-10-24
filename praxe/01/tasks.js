@@ -155,5 +155,34 @@ window.OPS_MODULE_TASKS["01"] = [
     expected: () => {
       return `<PRIJMENI>\\administrator\n\nSamAccountName Enabled\n-------------- -------\nAdministrator     True`;
     }
+  },
+  {
+    id: "quick-verification",
+    title: "7. (Nepovinné) Rychlé ověření celého stroje",
+    forVMs: ["SRV1-DC"],
+    what: (vm, wsX) => {
+      const x = wsX || 2;
+      return `
+        <p>Pro rychlou a komplexní kontrolu celé konfigurace serveru <strong>SRV1-DC</strong> můžete spustit interaktivní ověřovací skript přímo z repozitáře.</p>
+        <div style="background: rgba(85, 255, 170, 0.08); border: 1px solid rgba(85, 255, 170, 0.3); border-left: 4px solid #55ffaa; border-radius: 6px; padding: 10px 14px; margin: 12px 0; font-size: 0.88rem;">
+          <strong>Vlastnosti skriptu:</strong>
+          <ul style="margin: 6px 0 0 18px; padding: 0;">
+            <li><strong>Striktně Read-Only:</strong> Pouze čte konfiguraci, žádná nastavení neupravuje.</li>
+            <li><strong>Neukládá se na disk:</strong> Po dokončení testu se automaticky smaže ze systému.</li>
+            <li><strong>3-úrovňový souhrn:</strong> Zeleně <code>[ OK ]</code> pro splněné body, žlutě <code>[KONTROLA]</code> pro položky vyžadující ruční kontrolu (DSRM heslo, tvar příjmení) a červeně <code>[CHYBA]</code> s nápovědou pro opravu.</li>
+          </ul>
+        </div>
+      `;
+    },
+    how: (vm, wsX) => {
+      return `# Spusťte v PowerShellu jako Administrator na SRV1-DC:\ncurl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue\n\n# Alternativně přímé spuštění v RAM bez zápisu na disk:\nirm https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.ps1 | iex`;
+    },
+    verify: (vm, wsX) => {
+      return `curl.exe -sL https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/01_check_SRV1-DC.bat -o check.bat; .\\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue`;
+    },
+    expected: (vm, wsX) => {
+      const x = wsX || 2;
+      return `============================================================\n  WELL_OPS :: Overeni konfigurace SRV1-DC (Modul 01)\n============================================================\nZadejte cislo vaseho pracoviste (X) [vychozi: ${x}]: ${x}\n\n--- 1. System a sitova konfigurace ---\n  [ OK ]       Hostname stroje je 'SRV1-DC'\n  [ OK ]       Sitovy adapter 'Ethernet1' existuje a je ve stavu Up\n  [ OK ]       IPv4 adresa na Ethernet1 je 192.168.${x}.10/24\n  [ OK ]       Vychozi brana je 192.168.${x}.1\n  [ OK ]       DNS klient na Ethernet1 ukazuje na lokalni resolver (127.0.0.1)\n\n--- 2. Windows Server role a komponenty ---\n  [ OK ]       Role 'Active Directory Domain Services' (AD-Domain-Services) je nainstalovana\n  [ OK ]       Administracni nastroje 'RSAT-ADDS' jsou nainstalovany\n\n--- 3. Stav radice domeny (Domain Controller) ---\n  [ OK ]       Server funguje jako radic domeny (Domain Controller, ProductType = 2)\n  [ OK ]       Active Directory domena je dostupna: <prijmeni>.cyberschool.internal\n  [ OK ]       NetBIOS nazev domeny: <PRIJMENI>\n  [ OK ]       Domena ma spravnou priponu: .cyberschool.internal\n  [KONTROLA]   Overte vizualne: Odpovida predpona '<prijmeni>' vasemu skutecnemu prijmeni bez diakritiky?\n  [ OK ]       Funkcni uroven domeny: Windows2025Domain\n  [ OK ]       Vsech 5 FSMO roli je umisteno na tomto radici (SRV1-DC)\n  [ OK ]       Server SRV1-DC je nastaven jako Global Catalog (GC = True)\n\n--- 4. Klicove sluzby a sdilene slozky ---\n  [ OK ]       Sluzba 'Active Directory Domain Services (NTDS)' bezi (Running)\n  [ OK ]       Sluzba 'Active Directory Web Services (ADWS)' bezi (Running)\n  [ OK ]       Sluzba 'Kerberos Key Distribution Center (Kdc)' bezi (Running)\n  [ OK ]       Sluzba 'Netlogon Service' bezi (Running)\n  [ OK ]       Sluzba 'DNS Server Service' bezi (Running)\n  [ OK ]       Domenove sdilene slozky SYSVOL a NETLOGON jsou aktivni\n\n--- 5. Integrovany DNS Server a preklad jmen ---\n  [ OK ]       AD-integrovana dopredna DNS zona '<prijmeni>.cyberschool.internal' existuje\n  [ OK ]       DNS zona pro sluzebni zaznamy domeny (_msdcs) je dostupna\n  [ OK ]       DNS preklad domeny '<prijmeni>.cyberschool.internal' uspesne vraci IP 192.168.${x}.10\n\n--- 6. Polozky vyzadujici rucni vizualni kontrolu ---\n  [KONTROLA]   DSRM heslo (SafeModeAdministratorPassword): Z bezpecnostnich duvodu nelze precist z AD\n               -> Overte, ze jste pri instalaci pouzili heslo 'Pa55w.rd'\n  [ OK ]       Aktualne jste prihlaseni pod domenovym uctem '<PRIJMENI>\\Administrator'\n\n============================================================\n                    VYSLEDNY SOUHRN                         \n============================================================\n  Pocet uspesnych kontrol [ OK ]:       17\n  Pocet k rucni kontrole  [KONTROLA]:    2\n  Pocet nalezenych chyb   [CHYBA]:       0\n------------------------------------------------------------\n\nVYSLEDEK: VSE V PORADKU! Stroj SRV1-DC splnuje pozadavky Modulu 01.\nMuzete pokracovat k dalsimu modulu.\n============================================================`;
+    }
   }
 ];
