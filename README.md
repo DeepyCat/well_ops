@@ -27,18 +27,27 @@ well_ops/
 │       │   │   ├── modules-and-gallery.md
 │       │   │   ├── security-2025.md
 │       │   │   └── syntax-reference.md
-│       │   ├── SKILL.md
-│       │   └── powershell-windows/
-│       │       └── SKILL.md
+│       │   └── SKILL.md
+│       ├── powershell-windows/
+│       │   └── SKILL.md
 │       ├── sysadmin-toolbox/
+│       │   ├── .clawhub/
+│       │   │   └── origin.json
 │       │   ├── references/
+│       │   │   ├── cli-tools.md
+│       │   │   ├── security-tools.md
+│       │   │   ├── shell-oneliners.md
+│       │   │   ├── shell-tricks.md
+│       │   │   └── web-tools.md
 │       │   ├── scripts/
+│       │   │   └── refresh.sh
 │       │   ├── _meta.json
 │       │   └── SKILL.md
 │       └── windows-hardening/
 │           └── SKILL.md
 ├── .github/
 │   └── workflows/
+│       ├── notify-new-modules.yml     # Workflow pro oznámení nových modulů
 │       └── static.yml                 # Workflow pro statický web
 ├── clicker/                           # Klikací hra
 │   ├── assets/                        # Sestavené CSS a JavaScript
@@ -61,6 +70,7 @@ well_ops/
 │   ├── kokes_blue_2.jpg
 │   └── kokes_race.gif
 ├── img/                               # Obrázky a diagramy webu
+│   ├── celebration/                   # Oslavné GIFy (proud-of-you*.gif)
 │   ├── bird.png
 │   ├── bios-boot.svg
 │   ├── bios-layers.svg
@@ -91,16 +101,24 @@ well_ops/
 │   └── ops-stats.js                   # Logika statistik
 ├── maturita/                          # Maturitní část webu
 │   ├── _next/                         # Generované soubory webu
+│   ├── _not-found/                    # Generovaná stránka nenalezeno
 │   ├── index.html
 │   ├── index.txt
 │   ├── 404.html
+│   ├── _not-found.html
 │   ├── icon.svg
 │   ├── barina_run.png
-│   └── ...                            # Další soubory
+│   └── ...                            # Další soubory (__next.*.txt)
 ├── mc/                                # Minecraft v prohlížeči
 │   ├── v1_8/                          # Herní engine a zdroje
 │   │   ├── lang/                      # Lokalizační soubory
-│   │   └── ...                        # Další soubory hry
+│   │   ├── index.html
+│   │   ├── classes.js
+│   │   ├── classes.js.map
+│   │   ├── assets.epk
+│   │   ├── favicon.png
+│   │   ├── README.md
+│   │   └── .gitignore
 │   ├── index.html
 │   ├── bootstrap.js
 │   ├── classes.js
@@ -172,9 +190,11 @@ well_ops/
 │   ├── 02_check_PC1-WIN.bat
 │   ├── 02_check_PC1-WIN.ps1
 │   ├── 02_check_SRV1-DC.bat
-│   └── 02_check_SRV1-DC.ps1
+│   ├── 02_check_SRV1-DC.ps1
+│   └── notify-new-modules.mjs         # Skript pro oznámení nových modulů
 ├── stratagem/                         # Pomůcka pro Helldivers 2
 │   ├── data/
+│   │   ├── HD2-Sequences.json         # Sekvence kláves stratagemů
 │   │   ├── Images/
 │   │   │   ├── Arrows/
 │   │   │   └── Stratagem Icons/
@@ -185,12 +205,13 @@ well_ops/
 │   ├── links.csv
 │   └── .gitignore
 ├── 404.html                           # Stránka nenalezeného obsahu
-├── index.html                         # Hlavní stránka webu
+├── README.md                          # Popis projektu a struktury repozitáře
 ├── games.html                         # Přehled her
-├── teorie.html                        # Teoretická část
+├── index.html                         # Hlavní stránka webu
+├── lab_gen.md                         # Poznámky k lab_gen
 ├── praxe.html                         # Praktická část
+├── skills-lock.json                   # Zámek verzí AI skills
 ├── statistika.html                    # Statistiky
 ├── style.css                          # Hlavní styly webu
-├── lab_gen.md                         # Poznámky k lab_gen
-└── skills-lock.json                   # Zámek verzí AI skills
+└── teorie.html                        # Teoretická část
 ```
