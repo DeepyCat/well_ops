@@ -8,9 +8,7 @@
   <i>„Tohle je velice dobrá stránka pro OPS!“</i> — Fešák
 </p>
 
-<p align="center">
-  <img src="https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif" width="300" alt="Funny coding GIF">
-</p>
+
 
 ---
 
@@ -216,6 +214,10 @@ U některých funkcí může být potřeba spustit web přes lokální HTTP serv
 
 <p align="center">
   <i>Funguje to? Tak na to radši nesahej.</i>
+</p>
+
+<p align="center">
+  <img src="https://media.giphy.com/media/LmNwrBhejkK9EFP504/giphy.gif" width="300" alt="Funny coding GIF">
 </p>
 
 <p align="center">
