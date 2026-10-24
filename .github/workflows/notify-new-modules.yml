@@ -30,7 +30,7 @@ jobs:
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM: ${{ secrets.RESEND_FROM }}
-          OPS_RECIPIENTS: ${{ secrets.OPS_RECIPIENTS }}
+          OPS_RECIPIENTS: ${{ vars.OPS_RECIPIENTS }}
           BEFORE_SHA: ${{ github.event.before }}
           CURRENT_SHA: ${{ github.sha }}
           REPOSITORY: ${{ github.repository }}
