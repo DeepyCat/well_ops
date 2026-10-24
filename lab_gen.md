@@ -113,14 +113,18 @@ V souboru [praxe.html](file:///D:/%21Documents/VSCode/well_ops/praxe.html) přid
 <script src="praxe/XX/tasks.js"></script>
 ```
 
-### Krok 6: Vytvoření interaktivních ověřovacích skriptů v `skripty/`
-Pro každé zařízení (VM) definované v modulu vytvořte v kořenové složce `skripty/` interaktivní ověřovací `.bat` skript:
-- Formát názvu: `skripty/XX_check_<VM>.bat` (např. `skripty/01_check_SRV1-DC.bat`, `skripty/02_check_PC1-WIN.bat`).
-- Skript je hybridní `.bat` spouštějící PowerShell s obcházením execution policy (`powershell -NoProfile -ExecutionPolicy Bypass ...`).
-- Skript je interaktivní: vyzve uživatele k zadání čísla pracoviště `X` (výchozí 2), prověří veškerou konfiguraci daného modulu pro daný stroj, vypíše přehledné barevné stavy `[ OK ]` / `[CHYBA]` a celkové skóre.
+### Krok 6: Vytvoření interaktivních ověřovacích skriptů v `skripty/` (POVINNÉ PRO KAŽDÝ STROJ)
+Pro každé zařízení (VM) definované v modulu vytvořte v kořenové složce `skripty/` dvojici interaktivních ověřovacích skriptů:
+- Formát názvů: `skripty/XX_check_<VM>.ps1` a `skripty/XX_check_<VM>.bat` (např. `skripty/01_check_SRV1-DC.bat`, `skripty/02_check_PC1-WIN.bat`).
+- Skript je **striktně READ-ONLY**: provádí pouze audit a čtení stavu (`Get-*`, `Test-*`, `Resolve-DnsName`), nikdy žádná systémová nastavení nemění ani nepřepisuje.
+- Skript je interaktivní: vyzve uživatele k zadání čísla pracoviště `X` (výchozí 2, s autodetekcí z IP adresy `Ethernet1`), prověří veškerou konfiguraci daného modulu pro daný stroj, vypíše přehledné barevné stavy ve třech úrovních:
+  - Zeleně `[ OK ]`: úspěšně zkontrolované parametry.
+  - Žlutě `[KONTROLA]`: položky vyžadující manuální vizuální kontrolu (např. hesla, shoda příjmení v názvu).
+  - Červeně `[CHYBA]`: neshody s konkrétní nápovědou pro opravu.
+- Skript je neperzistentní (efemérní): `.bat` soubor po sobě uklidí (`(goto) 2>nul & del "%~f0"`).
 - V `tasks.js` zařaďte na konec kontrolního seznamu každého stroje nepovinný krok:
-  `title: "X. (Nepovinné) Rychlé ověření celého stroje"`
-  obsahující jednořádkový příkaz pro stažení a spuštění přes curl (spustitelný v PowerShellu, CMD i Terminálu, s vizuálním průběhem stahování a automatickým úklidem):
+  `title: "X. (Nepovinné) Rychlé ověření stroje <VM>"` (resp. `celého stroje`)
+  obsahující univerzální jednořádkový příkaz pro stažení a spuštění přes curl (spustitelný v PowerShellu, CMD i Terminálu, s vizuálním průběhem stahování a automatickým úklidem):
   `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`
 
 ---

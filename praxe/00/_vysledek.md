@@ -124,6 +124,26 @@ Get-LocalUser | Select-Object Name, Enabled
 ```
 Výstup obsahuje aktivní `Administrator` a **neobsahuje** žádný dočasný účet (`Setup` byl odstraněn). V **Settings → Accounts → Your info** je typ účtu **"Local account"**, nikoli e-mailová adresa Microsoft účtu — přihlášení do Windows nevyžaduje žádné internetové ověření.
 
+### 13. (Nepovinné) Rychlé ověření celého stroje
+Pro komplexní a automatické ověření celé základní konfigurace Modulu 00 můžete spustit ověřovací skript přímo z repozitáře. Příkaz můžete spustit v **PowerShellu, CMD i Terminálu** – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je **striktně read-only** (pouze čte stav, nic nemění) a po použití se **neukládá na disk** (smaže se automaticky po dokončení běhu):
+
+**Pro SRV1-DC:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+**Pro SRV2-FS:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_SRV2-FS.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+**Pro PC1-WIN:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+Po spuštění zadejte číslo vašeho pracoviště `X` (např. `2`). Skripty provedou veškeré kontroly a na konci zobrazí přehledný 3-úrovňový souhrn stavů (`[ OK ]`, `[KONTROLA]`, `[CHYBA]`).
+
 Po úspěšném ověření pokračujte modulem, pro který jste stroj právě připravovali:
 - `SRV1-DC` → [[../Modul 1 Domain Controller/__zadani|Modul 1 — Domain Controller]]
 - `SRV2-FS` → [[../Modul 6 File Server a Storage/__zadani|Modul 6 — File Server a Storage]]

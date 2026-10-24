@@ -139,3 +139,22 @@ Instalace Windows Serveru **nenabízí přihlášení Microsoft účtem** — ve
 - `Get-TimeZone`, `Get-Culture` / `Get-WinSystemLocale` a `Get-WinHomeLocation` v PowerShellu vrací hodnoty odpovídající tabulce.
 - Datum a čas (nebo výstup `Get-Date`) je ve formátu `d.M.yyyy H:mm:ss`.
 - **Settings → System → Activation** ukazuje aktivovaný Windows na všech třech strojích.
+
+### Rychlé automatické ověření strojů (nepovinné)
+
+Pro každý stroj je k dispozici interaktivní jednořádkový skript spustitelný v **PowerShellu, CMD i Terminálu** (skript je striktně read-only a po spuštění se neukládá na disk):
+
+**Pro SRV1-DC:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+**Pro SRV2-FS:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_SRV2-FS.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```
+
+**Pro PC1-WIN:**
+```powershell
+powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/00_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"
+```

@@ -567,6 +567,27 @@ Resolve-DnsName -Name "srv1-dc.&lt;prijmeni&gt;.cyberschool.internal"</code></pr
         <li><strong>Address Leases</strong>: Zobrazuje aktivní zápůjčku klientského počítače <code>PC1-WIN</code>.</li>
       </ul>
 
+      <h2>Rychlé automatické ověření strojů (nepovinné)</h2>
+      <p>Pro oba stroje jsou k dispozici interaktivní skripty. Příkaz lze spustit v <strong>PowerShellu, CMD i Terminálu</strong> – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je striktně read-only a po dokončení se sám smaže z disku:</p>
+      
+      <p><strong>Na serveru SRV1-DC:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+
+      <p><strong>Na klientovi PC1-WIN:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+
       <h2>Co odevzdat</h2>
       <p>Až budete mít modul dokončený, odevzdává se jeden ZIP archiv s přesným názvem <code>Prijmeni_Jmeno_Modul2.zip</code>, ve kterém budou následující složky:</p>
       <ul>
