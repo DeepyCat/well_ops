@@ -34,4 +34,4 @@ jobs:
           BEFORE_SHA: ${{ github.event.before }}
           CURRENT_SHA: ${{ github.sha }}
           REPOSITORY: ${{ github.repository }}
-        run: node scripts/notify-new-modules.mjs
+        run: node skripty/notify-new-modules.mjs
