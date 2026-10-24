@@ -1,3 +1,4 @@
+```
 well_ops/
 ├── .agents/                         # Konfigurace a nástroje AI agentů
 │   └── skills/
@@ -192,3 +193,4 @@ well_ops/
 ├── style.css                          # Hlavní styly webu
 ├── lab_gen.md                         # Poznámky k lab_gen
 └── skills-lock.json                   # Zámek verzí AI skills
+```
