@@ -424,7 +424,10 @@
     const zCount = results.filter(r => r.rank === "Z").length;
     const sCount = results.filter(r => r.rank === "S").length;
     let title = "VÝSLEDKY ZÁPISU";
-    if (zCount) title = "Z-RANK – ŘEDITEL NASTOUPIL!";
+    if (zCount) {
+      const zr = results.find(r => r.rank === "Z");
+      title = `Z-RANK – ${agentById(zr.id).name.toUpperCase()} NASTOUPIL!`;
+    }
     else if (sCount) title = sCount === 1 ? "S-RANK UČITEL!" : `${sCount}× S-RANK UČITEL!`;
     $("resultTitle").textContent = title;
     $("overlay").classList.toggle("zwin", zCount > 0);
@@ -509,7 +512,11 @@
   }
 
   $("shopBuy1").addEventListener("click", () => buyWithCookies(1000, 160));
-  $("shopBuy2").addEventListener("click", () => buyWithCookies(10000, 1600));
+    $("shopBuy2").addEventListener("click", () => {
+    const c = readCookies();
+    if (c.available >= 10000 && !confirm("Opravdu utratit 10 000 sušenek za 1 600 bodů?")) return;
+    buyWithCookies(10000, 1600);
+  });
   $("shopBuy3").addEventListener("click", () => {
     addTokens(1600, 0);
     sfx.jingle();

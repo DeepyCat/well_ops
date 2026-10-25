@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11131c">
+<title>OPS · Blackjack</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%A0%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a;--cw:96px;--ov:-30px}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 75% 5%,#32202d 0,transparent 36%),var(--bg);color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.hide{display:none!important}
+.topbar{height:68px;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff14;background:#10121add;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
+.brand{font-weight:900;letter-spacing:.12em}.brand span{color:var(--red)}
+.top-right{display:flex;align-items:center;gap:10px}
+.mute-btn{background:#ffffff09;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:1rem}.mute-btn:hover{border-color:var(--red)}
+.back{color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:10px}.back:hover{color:white;border-color:var(--red)}
+main{width:min(1180px,94vw);margin:30px auto 70px}
+h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
+.layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(260px,.7fr);gap:20px;align-items:start}
+
+/* stůl */
+.table{position:relative;border:10px solid #4a3220;border-radius:22px;background:radial-gradient(ellipse at 50% 30%,#1f5143 0,#12322a 55%,#0b211b 100%);box-shadow:inset 0 0 60px #0009,0 18px 50px #0007;padding:22px 20px 0;min-height:620px;display:flex;flex-direction:column;overflow:hidden}
+.rules{text-align:center;color:#ffffff4d;font-family:Georgia,serif;font-style:italic;font-size:.9rem;letter-spacing:.04em;margin-bottom:8px}
+.zone{display:flex;flex-direction:column;align-items:center;gap:10px;min-height:calc(var(--cw)*1.4 + 54px)}
+.label{display:flex;align-items:center;gap:10px;font-size:.95rem;color:#e6efe9;font-weight:700}
+.total{background:#0b0c12cc;border:1px solid #ffffff2a;border-radius:8px;padding:2px 10px;font-variant-numeric:tabular-nums;min-width:34px;text-align:center}
+.total.bust{border-color:var(--red);color:var(--red)}.total.good{border-color:var(--green);color:var(--green)}
+.betchip{background:var(--gold);color:#241a00;border-radius:999px;padding:2px 11px;font-weight:900;font-size:.82rem}
+.hand{display:flex;justify-content:center;min-height:calc(var(--cw)*1.4);padding-left:calc(-1*var(--ov))}
+.hand .card+.card{margin-left:var(--ov)}
+
+/* karty */
+.card{position:relative;width:var(--cw);aspect-ratio:5/7;border-radius:10px;background:#f7f4ec;color:#1b1c24;box-shadow:0 6px 16px #0008,inset 0 0 0 1px #0002;font-family:Georgia,"Times New Roman",serif;flex:none}
+.card.red{color:#cf2740}
+.cn{position:absolute;top:6px;left:8px;display:flex;flex-direction:column;align-items:center;line-height:1}
+.cn b{font-size:calc(var(--cw)*.24)}.cn i{font-style:normal;font-size:calc(var(--cw)*.2)}
+.cn.bot{top:auto;left:auto;right:8px;bottom:6px;transform:rotate(180deg)}
+.pip{position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--cw)*.5);opacity:.9}
+.card.back{background:repeating-linear-gradient(45deg,#b3263a 0 7px,#8c1a2b 7px 14px);border:4px solid #f7f4ec}
+.card.back:after{content:"OPS";position:absolute;inset:0;display:grid;place-items:center;color:#f7f4ecaa;font:900 calc(var(--cw)*.22)/1 Inter,system-ui,sans-serif;letter-spacing:.1em}
+.card.deal{animation:dealIn .32s cubic-bezier(.2,.9,.3,1) both}
+.card.flip{animation:flipIn .38s ease-out both}
+@keyframes dealIn{from{opacity:0;transform:translate(70px,-90px) rotate(14deg) scale(.85)}to{opacity:1;transform:none}}
+@keyframes flipIn{from{transform:rotateY(90deg)}to{transform:none}}
+
+/* výsledek */
+.result{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);z-index:5;text-align:center;padding:12px 26px;border-radius:16px;background:#0b0c12ec;border:2px solid var(--line);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.result.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.result b{display:block;font-size:clamp(1.3rem,3.4vw,2rem);font-style:italic;text-transform:uppercase}
+.result span{font-size:1.15rem;font-weight:800;font-variant-numeric:tabular-nums}
+.result.win{border-color:var(--green)}.result.win b,.result.win span{color:var(--green)}
+.result.bj{border-color:var(--gold);box-shadow:0 0 40px #ffd47755}.result.bj b,.result.bj span{color:var(--gold)}
+.result.lose{border-color:var(--red)}.result.lose b,.result.lose span{color:var(--red)}
+.result.push{border-color:var(--muted)}.result.push b,.result.push span{color:#dfe3f0}
+
+/* ovládání */
+.dock{margin:auto -20px 0;padding:16px 20px 18px;background:#0a0b12d9;border-top:1px solid #ffffff1a}
+.chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.chip{--c:#3b82f6;width:54px;height:54px;border-radius:50%;border:3px dashed #ffffffcc;background:var(--c);box-shadow:inset 0 0 0 4px var(--c),0 4px 10px #0007;font-weight:900;font-size:.85rem;color:#fff;transition:transform .12s}
+.chip:hover:not(:disabled){transform:translateY(-3px)}.chip:disabled{opacity:.4;cursor:not-allowed}
+.chip[data-v="50"]{--c:#16a34a}.chip[data-v="160"]{--c:#dc2626}.chip[data-v="500"]{--c:#7c3aed}.chip[data-v="1600"]{--c:#d4a017;color:#241a00}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center}
+.bet-line{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:12px;color:var(--muted)}
+.bet-line strong{color:var(--gold);font-size:1.4rem;font-variant-numeric:tabular-nums}
+.btn{border:1px solid var(--line);border-radius:12px;padding:12px 20px;font-weight:850;background:#ffffff0d;transition:transform .15s,border-color .15s}
+.btn:hover:not(:disabled){transform:translateY(-2px);border-color:#ffffff66}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:linear-gradient(110deg,#ff435c,#d92750);border-color:#ff697a;box-shadow:0 8px 26px #ff335022}
+.btn.hit{background:linear-gradient(110deg,#16a34a,#15803d);border-color:#5be08a}
+.btn.stand{background:linear-gradient(110deg,#dc2626,#b91c1c);border-color:#ff8a8a}
+.btn.dbl{background:linear-gradient(110deg,#d4a017,#b07d00);border-color:#ffd477;color:#241a00}
+.btn.small{padding:8px 13px;font-size:.85rem}
+kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid currentColor;border-radius:4px;padding:0 5px}
+.broke{text-align:center;color:#ffb3bb;margin:0 0 10px;font-size:.92rem}
+.broke a{color:var(--gold);font-weight:800}
+
+/* panel */
+.panel{background:linear-gradient(160deg,#1b1e2a,#151722);border:1px solid var(--line);border-radius:20px;padding:20px}
+.panel+.panel{margin-top:16px}
+.panel h2{margin:0 0 14px;font-size:1rem}
+.currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}
+.currency strong{color:var(--gold);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.who{color:var(--muted);font-size:.82rem;margin:10px 0 0;line-height:1.5}
+.who button{background:none;border:0;color:var(--red);font-weight:700;padding:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#ffffff06;border:1px solid #ffffff0e;border-radius:12px;padding:11px 12px}
+.stat small{display:block;color:var(--muted);font-size:.72rem;margin-bottom:5px}.stat strong{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.stat.wide{grid-column:1/-1}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.notice{font-size:.78rem;color:var(--muted);line-height:1.55;margin:12px 0 0}
+.link-btn{background:none;border:0;color:var(--red);font-weight:700;padding:0;margin-top:10px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}
+.section-head h2{margin:0}
+.pill{border:1px solid #ffffff22;border-radius:999px;padding:5px 11px;font-size:.8rem;color:#d9dbea;background:#ffffff08;font-variant-numeric:tabular-nums}
+.shop{display:flex;flex-direction:column;gap:10px}
+.shop-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#ffffff06;border:1px solid #ffffff12;border-radius:13px}
+.shop-info b{display:block;color:var(--gold);font-size:1rem}
+.shop-info small{color:var(--muted);font-size:.72rem}
+.shop-btn{white-space:nowrap;background:linear-gradient(110deg,#0284c7,#2563eb);border-color:#38bdf8}
+.lb{display:flex;flex-direction:column;gap:7px}
+.lb-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;background:#ffffff05;border:1px solid #ffffff0d;border-radius:11px;font-size:.88rem}
+.lb-row.me{border-color:#7ff0ff88;background:#7ff0ff10}
+.lb-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-net{font-weight:900;font-variant-numeric:tabular-nums}
+.lb-sub{grid-column:2/-1;color:var(--muted);font-size:.72rem;margin-top:-4px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252938;border:1px solid #4a5065;border-radius:12px;padding:12px 18px;z-index:80;display:none;max-width:90vw;box-shadow:0 10px 40px #0008}
+.toast.show{display:block}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+@media(max-width:560px){:root{--cw:70px;--ov:-22px}.table{padding:16px 10px 0;border-width:7px;min-height:560px}.dock{margin:auto -10px 0;padding:14px 10px 16px}.btn{padding:11px 14px}.chip{width:48px;height:48px}.topbar{height:60px}}
+@media(prefers-reduced-motion:reduce){.card.deal,.card.flip{animation:none}.result{transition:none}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">OPS <span>///</span> BLACKJACK</div>
+  <div class="top-right">
+    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky">🔊</button>
+    <a class="back" href="games.html">← Zpět na hry</a>
+  </div>
+</header>
+
+<main>
+  <h1>Blackjack</h1>
+  <p class="sub">Dej se do 21 dřív než krupiér, ale nepřekroč ji. Sázíš školní body z gachy, takže co vyhraješ, můžeš hned utratit v náboru učitelů.</p>
+
+  <div class="layout">
+    <section class="table" id="table" aria-label="Herní stůl">
+      <div class="rules">Blackjack vyplácí 3 : 2 · krupiér stojí na 17 · zdvojení na prvních dvou kartách</div>
+
+      <div class="zone">
+        <div class="label">Krupiér <span class="total" id="dTotal">–</span></div>
+        <div class="hand" id="dealerHand" aria-live="polite"></div>
+      </div>
+
+      <div class="result" id="result" role="status"><b id="resTitle"></b><span id="resAmt"></span></div>
+
+      <div class="zone" style="margin-top:12px">
+        <div class="hand" id="playerHand" aria-live="polite"></div>
+        <div class="label">Ty <span class="total" id="pTotal">–</span><span class="betchip hide" id="betShown"></span></div>
+      </div>
+
+      <div class="dock">
+        <p class="broke hide" id="broke">Došly ti body. Kup si další za sušenky v obchodě, nebo je získej v <a href="/gacha">náboru učitelů</a>.</p>
+
+        <div id="betPanel">
+          <div class="chips" id="chips">
+            <button class="chip" data-v="10" type="button" aria-label="Přidat 10">10</button>
+            <button class="chip" data-v="50" type="button" aria-label="Přidat 50">50</button>
+            <button class="chip" data-v="160" type="button" aria-label="Přidat 160">160</button>
+            <button class="chip" data-v="500" type="button" aria-label="Přidat 500">500</button>
+            <button class="chip" data-v="1600" type="button" aria-label="Přidat 1600">1600</button>
+          </div>
+          <div class="bet-line"><span>Sázka</span><strong id="betAmt">0</strong></div>
+          <div class="row">
+            <button class="btn small" id="clearBet" type="button">Vymazat</button>
+            <button class="btn small" id="maxBet" type="button">Vsadit vše</button>
+            <button class="btn primary" id="dealBtn" type="button">Rozdat <kbd>Enter</kbd></button>
+          </div>
+        </div>
+
+        <div class="row hide" id="actions">
+          <button class="btn hit" id="hitBtn" type="button">Hit <kbd>H</kbd></button>
+          <button class="btn stand" id="standBtn" type="button">Stand <kbd>S</kbd></button>
+          <button class="btn dbl" id="dblBtn" type="button">Double <kbd>D</kbd></button>
+        </div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="panel">
+        <div class="currency"><span>Školní body</span><strong>◆ <span id="tokens">0</span></strong></div>
+        <p class="who" id="who"></p>
+      </div>
+      <div class="panel">
+        <div class="section-head"><h2>🛒 Obchod</h2><span class="pill" id="shopCookies">🍪 0</span></div>
+        <div class="shop">
+          <div class="shop-item">
+            <div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div>
+            <button class="btn small shop-btn" id="shopBuy1" type="button">🍪 1 000</button>
+          </div>
+          <div class="shop-item">
+            <div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček</small></div>
+            <button class="btn small shop-btn" id="shopBuy2" type="button">🍪 10 000</button>
+          </div>
+        </div>
+        <p class="notice">Sušenky se berou z Clickeru. Nakupovat jde mezi koly a Clicker měj při nákupu zavřený.</p>
+      </div>
+      <div class="panel">
+        <h2>Tvoje statistiky</h2>
+        <div class="stats">
+          <div class="stat"><small>Rozdaných kol</small><strong id="stHands">0</strong></div>
+          <div class="stat"><small>Výher</small><strong id="stWins">0</strong></div>
+          <div class="stat"><small>Proher</small><strong id="stLosses">0</strong></div>
+          <div class="stat"><small>Remíz</small><strong id="stPushes">0</strong></div>
+          <div class="stat"><small>Blackjacků</small><strong id="stBj">0</strong></div>
+          <div class="stat"><small>Největší výhra</small><strong id="stBest">0</strong></div>
+          <div class="stat wide"><small>Čistý zisk celkem</small><strong id="stNet">0</strong></div>
+        </div>
+        <button class="link-btn" id="resetStats" type="button">Vynulovat statistiky</button>
+        <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
+      </div>
+      <div class="panel">
+        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+      </div>
+    </aside>
+  </div>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/js/ops-stats.js"></script>
+<script>
+(() => {
+  "use strict";
+  const MIN_BET = 10;
+  const SUITS = ["♠","♥","♦","♣"];
+  const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+  const DECKS = 6, RESHUFFLE_AT = 78;
+  const STATS_KEY = "ops_blackjack_stats";
+  const REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = id => document.getElementById(id);
+  const sleep = ms => new Promise(r => setTimeout(r, REDUCE ? Math.min(ms, 60) : ms));
+
+  /* ---------- body (sdílené s gachou) ---------- */
+  let fallbackTokens = 1600;
+  function getTokens() {
+    if (!window.OPS_STATS) return fallbackTokens;
+    const s = window.OPS_STATS.getStats();
+    return s && s.gacha && typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600;
+  }
+  function addTokens(delta) {
+    if (!window.OPS_STATS) { fallbackTokens += delta; return; }
+    const s = window.OPS_STATS.getStats();
+    s.gacha = s.gacha || {};
+    s.gacha.tokens = Math.max(0, (typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600) + delta);
+    window.OPS_STATS.saveStats(s);
+  }
+
+  /* ---------- statistiky (jen lokálně) ---------- */
+  const emptyStats = () => ({hands:0, wins:0, losses:0, pushes:0, blackjacks:0, best:0, net:0});
+  function loadStats() {
+    try { return { ...emptyStats(), ...(JSON.parse(localStorage.getItem(STATS_KEY)) || {}) }; }
+    catch (e) { return emptyStats(); }
+  }
+  function saveStats(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {} }
+
+  /* ---------- zvuky ---------- */
+  const sfx = (() => {
+    let ctx = null, muted = false;
+    try { muted = localStorage.getItem("ops_gacha_muted") === "1"; } catch (e) {}
+    function ac() {
+      if (muted) return null;
+      try {
+        if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ctx = new AC(); }
+        if (ctx.state === "suspended") ctx.resume();
+        return ctx;
+      } catch (e) { return null; }
+    }
+    function tone(f, t0, dur, type = "sine", vol = .1, f2) {
+      const c = ac(); if (!c) return;
+      const t = c.currentTime + t0, o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + .012);
+      g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .05);
+    }
+    function noise(t0, dur, vol = .15, freq = 2500) {
+      const c = ac(); if (!c) return;
+      const t = c.currentTime + t0, len = Math.floor(c.sampleRate * dur);
+      const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      const src = c.createBufferSource(); src.buffer = buf;
+      const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = freq;
+      const g = c.createGain(); g.gain.value = vol;
+      src.connect(bp); bp.connect(g); g.connect(c.destination); src.start(t);
+    }
+    const arp = (notes, step, type, vol, dur) => notes.forEach((n, i) => tone(n, i * step, dur, type, vol));
+    return {
+      isMuted: () => muted,
+      setMuted(v) { muted = !!v; try { localStorage.setItem("ops_gacha_muted", muted ? "1" : "0"); } catch (e) {} },
+      chip()  { tone(1200, 0, .05, "square", .035); noise(0, .04, .08, 4000); },
+      deal()  { noise(0, .08, .16, 2200); },
+      flip()  { noise(0, .1, .14, 1500); tone(300, 0, .08, "triangle", .05); },
+      error() { tone(180, 0, .2, "sawtooth", .06, 110); },
+      win()   { arp([523, 659, 784], .08, "triangle", .09, .3); },
+      bj()    { arp([523, 659, 784, 1047, 1319], .08, "triangle", .1, .45); },
+      lose()  { tone(300, 0, .4, "sawtooth", .06, 120); },
+      push()  { tone(440, 0, .18, "triangle", .07); tone(440, .2, .18, "triangle", .07); }
+    };
+  })();
+
+  /* ---------- pomocné ---------- */
+  function toast(m) {
+    const el = $("toast"); el.textContent = m; el.classList.add("show");
+    clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+  const fmt = n => Math.round(n).toLocaleString("cs-CZ");
+  const signed = n => (n > 0 ? "+" : n < 0 ? "−" : "") + fmt(Math.abs(n));
+  const isRed = c => c.s === "♥" || c.s === "♦";
+
+  function newShoe() {
+    const shoe = [];
+    for (let d = 0; d < DECKS; d++) for (const s of SUITS) for (const r of RANKS) shoe.push({r, s});
+    for (let i = shoe.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shoe[i], shoe[j]] = [shoe[j], shoe[i]];
+    }
+    return shoe;
+  }
+  function value(hand) {
+    let total = 0, aces = 0;
+    for (const c of hand) {
+      if (c.r === "A") { aces++; total += 1; }
+      else if (["J","Q","K"].includes(c.r)) total += 10;
+      else total += Number(c.r);
+    }
+    let soft = false;
+    if (aces && total + 10 <= 21) { total += 10; soft = true; }
+    return { total, soft };
+  }
+  const isBJ = hand => hand.length === 2 && value(hand).total === 21;
+
+  /* ---------- stav hry ---------- */
+  let shoe = newShoe();
+  let player = [], dealer = [];
+  let bet = 0, roundBet = 0;
+  let phase = "bet";           // "bet" | "play"
+  let busy = false;
+  let holeEl = null;
+
+  function cardEl(c, hidden) {
+    const d = document.createElement("div");
+    d.className = "card deal" + (hidden ? " back" : isRed(c) ? " red" : "");
+    if (!hidden) d.innerHTML = `<span class="cn"><b>${c.r}</b><i>${c.s}</i></span><span class="pip">${c.s}</span><span class="cn bot"><b>${c.r}</b><i>${c.s}</i></span>`;
+    return d;
+  }
+  function draw() { return shoe.pop(); }
+
+  async function give(who, hidden = false) {
+    const c = draw();
+    const el = cardEl(c, hidden);
+    if (who === "player") { player.push(c); $("playerHand").appendChild(el); }
+    else { dealer.push(c); $("dealerHand").appendChild(el); if (hidden) holeEl = el; }
+    sfx.deal();
+    updateTotals();
+    await sleep(300);
+  }
+
+  async function revealHole() {
+    if (!holeEl) return;
+    const c = dealer[1];
+    const el = cardEl(c, false);
+    el.classList.replace("deal", "flip");
+    holeEl.replaceWith(el);
+    holeEl = null;
+    sfx.flip();
+    updateTotals();
+    await sleep(450);
+  }
+
+  function setTotal(el, hand, hideHole) {
+    if (!hand.length) { el.textContent = "–"; el.className = "total"; return; }
+    const shown = hideHole ? [hand[0]] : hand;
+    const v = value(shown);
+    el.textContent = v.total + (v.soft && v.total < 21 ? " soft" : "");
+    el.className = "total" + (v.total > 21 ? " bust" : v.total === 21 ? " good" : "");
+  }
+  function updateTotals() {
+    setTotal($("pTotal"), player, false);
+    setTotal($("dTotal"), dealer, !!holeEl);
+  }
+
+  function maxAffordable() { return Math.floor(getTokens() / MIN_BET) * MIN_BET; }
+  function clampBet() { bet = Math.max(0, Math.min(bet, maxAffordable())); }
+
+  function updateUI() {
+    const tokens = getTokens();
+    $("tokens").textContent = fmt(tokens);
+    const inBet = phase === "bet";
+    $("betPanel").classList.toggle("hide", !inBet);
+    $("actions").classList.toggle("hide", inBet);
+    $("betAmt").textContent = fmt(bet);
+    const shown = inBet ? 0 : roundBet;
+    $("betShown").textContent = "Sázka " + fmt(shown);
+    $("betShown").classList.toggle("hide", inBet);
+    $("dealBtn").disabled = busy || bet < MIN_BET;
+    $("clearBet").disabled = busy || bet === 0;
+    $("maxBet").disabled = busy || maxAffordable() < MIN_BET;
+    document.querySelectorAll(".chip").forEach(ch => ch.disabled = busy);
+    $("hitBtn").disabled = busy || phase !== "play";
+    $("standBtn").disabled = busy || phase !== "play";
+    $("dblBtn").disabled = busy || phase !== "play" || player.length !== 2 || tokens < roundBet;
+    $("broke").classList.toggle("hide", !(inBet && tokens < MIN_BET));
+    $("shopCookies").textContent = "🍪 " + fmt(readCookies().available);
+    $("shopBuy1").disabled = busy || !inBet;
+    $("shopBuy2").disabled = busy || !inBet;
+
+    const user = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
+    if (user && !user.startsWith("Host")) {
+      $("who").innerHTML = `Hraješ jako <b>${user.replace(/[<>&"]/g, "")}</b>. Body se ukládají do cloudu.`;
+    } else {
+      $("who").innerHTML = `Hraješ bez přezdívky, body se ukládají jen v tomto prohlížeči. <button type="button" id="setName">Zadat přezdívku</button>`;
+      const b = $("setName");
+      if (b) b.addEventListener("click", () => window.OPS_STATS && window.OPS_STATS.promptUsernameModal());
+    }
+  }
+
+  function renderStats() {
+    const s = loadStats();
+    $("stHands").textContent = fmt(s.hands);
+    $("stWins").textContent = fmt(s.wins);
+    $("stLosses").textContent = fmt(s.losses);
+    $("stPushes").textContent = fmt(s.pushes);
+    $("stBj").textContent = fmt(s.blackjacks);
+    $("stBest").textContent = fmt(s.best);
+    const n = $("stNet");
+    n.textContent = signed(s.net);
+    n.className = s.net > 0 ? "pos" : s.net < 0 ? "neg" : "";
+  }
+
+  /* ---------- kolo ---------- */
+  function showResult(kind, title, amount) {
+    const r = $("result");
+    r.className = "result show " + kind;
+    $("resTitle").textContent = title;
+    $("resAmt").textContent = amount;
+  }
+  function hideResult() { $("result").className = "result"; }
+
+  function finish(outcome) {
+    let payout = 0, title = "", kind = "lose";
+    switch (outcome) {
+      case "blackjack": payout = Math.floor(roundBet * 2.5); title = "Blackjack!"; kind = "bj"; break;
+      case "win":       payout = roundBet * 2; title = "Výhra"; kind = "win"; break;
+      case "dealerBust":payout = roundBet * 2; title = "Krupiér přetáhl"; kind = "win"; break;
+      case "push":      payout = roundBet; title = "Remíza"; kind = "push"; break;
+      case "bust":      title = "Přetáhl jsi"; break;
+      case "dealerBJ":  title = "Krupiér má blackjack"; break;
+      default:          title = "Prohra";
+    }
+    const net = payout - roundBet;
+    if (payout > 0) addTokens(payout);
+
+    const st = loadStats();
+    st.hands++; st.net += net;
+    if (net > 0) { st.wins++; st.best = Math.max(st.best, net); }
+    else if (net < 0) st.losses++;
+    else st.pushes++;
+    if (outcome === "blackjack") st.blackjacks++;
+    saveStats(st);
+    schedulePush();
+
+    showResult(kind, title, net === 0 ? "sázka vrácena" : signed(net));
+    if (kind === "bj") sfx.bj(); else if (kind === "win") sfx.win(); else if (kind === "push") sfx.push(); else sfx.lose();
+
+    phase = "bet"; busy = false; clampBet();
+    updateUI(); renderStats();
+  }
+
+  async function deal() {
+    if (busy || phase !== "bet") return;
+    if (bet < MIN_BET) { sfx.error(); toast(`Nasázej aspoň ${MIN_BET} bodů.`); return; }
+    if (getTokens() < bet) { sfx.error(); clampBet(); updateUI(); toast("Na tuhle sázku nemáš dost bodů."); return; }
+
+    busy = true; phase = "play"; roundBet = bet;
+    addTokens(-roundBet);
+    hideResult();
+    $("playerHand").innerHTML = ""; $("dealerHand").innerHTML = "";
+    player = []; dealer = []; holeEl = null;
+    if (shoe.length < RESHUFFLE_AT) { shoe = newShoe(); toast("Krupiér zamíchal nový balíček."); }
+    updateTotals(); updateUI();
+
+    await give("player"); await give("dealer"); await give("player"); await give("dealer", true);
+
+    const pBJ = isBJ(player), dBJ = isBJ(dealer);
+    if (pBJ || dBJ) {
+      await revealHole();
+      finish(pBJ && dBJ ? "push" : pBJ ? "blackjack" : "dealerBJ");
+      return;
+    }
+    busy = false; updateUI();
+  }
+
+  async function dealerPlay() {
+    await revealHole();
+    while (value(dealer).total < 17) { await sleep(350); await give("dealer"); }
+    const p = value(player).total, d = value(dealer).total;
+    finish(d > 21 ? "dealerBust" : p > d ? "win" : p === d ? "push" : "lose");
+  }
+
+  async function hit() {
+    if (busy || phase !== "play") return;
+    busy = true; updateUI();
+    await give("player");
+    const v = value(player).total;
+    if (v > 21) { await revealHole(); finish("bust"); }
+    else if (v === 21) { await dealerPlay(); }
+    else { busy = false; updateUI(); }
+  }
+
+  async function stand() {
+    if (busy || phase !== "play") return;
+    busy = true; updateUI();
+    await dealerPlay();
+  }
+
+  async function doubleDown() {
+    if (busy || phase !== "play" || player.length !== 2) return;
+    if (getTokens() < roundBet) { sfx.error(); toast("Na zdvojení nemáš dost bodů."); return; }
+    busy = true;
+    addTokens(-roundBet); roundBet *= 2;
+    sfx.chip(); updateUI();
+    await give("player");
+    if (value(player).total > 21) { await revealHole(); finish("bust"); }
+    else await dealerPlay();
+  }
+
+  /* ---------- sušenky (obchod) ---------- */
+  function readCookies() {
+    let save = null;
+    try { save = JSON.parse(localStorage.getItem("cookieClickerSave")); } catch (e) {}
+    const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
+    const saveCookies = save ? (Number(save.cookies) || 0) : 0;
+    const statCookies = stats && stats.clicker ? (Number(stats.clicker.cookies) || 0) : 0;
+    return { save, saveCookies, statCookies, available: Math.max(saveCookies, statCookies) };
+  }
+
+  function buyWithCookies(cost, gain) {
+    if (busy || phase !== "bet") { toast("Nakupovat můžeš mezi koly."); return; }
+    const c = readCookies();
+    if (c.available < cost) {
+      sfx.error();
+      toast(`Nemáš dost sušenek (vidím ${fmt(c.available)}, potřeba ${fmt(cost)}).`);
+      return;
+    }
+    if (cost >= 10000 && !confirm(`Opravdu utratit ${fmt(cost)} sušenek za ${fmt(gain)} bodů?`)) return;
+
+    if (c.save) {
+      c.save.cookies = Math.max(0, c.saveCookies - cost);
+      localStorage.setItem("cookieClickerSave", JSON.stringify(c.save));
+      addTokens(gain);
+    } else if (window.OPS_STATS) {
+      const s = window.OPS_STATS.getStats();
+      if (s.clicker) s.clicker.cookies = Math.max(0, c.statCookies - cost);
+      s.gacha = s.gacha || {};
+      s.gacha.tokens = (typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600) + gain;
+      window.OPS_STATS.saveStats(s);
+    } else { addTokens(gain); }
+
+    sfx.chip(); setTimeout(() => sfx.chip(), 90);
+    updateUI();
+    toast(`Nakoupeno ${fmt(gain)} bodů za ${fmt(cost)} sušenek! Zbývá: ${fmt(c.available - cost)}`);
+  }
+
+  /* ---------- Supabase (sloupec "blackjack" v tabulce hráčů) ---------- */
+  const esc = v => String(v).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const cloud = { timer: null, retried: false };
+  const cloudCfg = () => (window.OPS_STATS && window.OPS_STATS.config) || null;
+  function cloudUser() {
+    const u = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
+    return u && !u.startsWith("Host") ? u : "";
+  }
+  function cloudHeaders(extra) {
+    const cfg = cloudCfg();
+    return { apikey: cfg.anonKey, Authorization: "Bearer " + cfg.anonKey, "Content-Type": "application/json", ...(extra || {}) };
+  }
+  function setCloudNote(text, ok) {
+    const el = $("cloudNote");
+    el.textContent = text;
+    el.style.color = ok ? "" : "var(--red)";
+  }
+  function missingColumn(txt) { return /blackjack/i.test(txt) && /(column|PGRST)/i.test(txt); }
+
+  async function pushStats() {
+    const cfg = cloudCfg(), user = cloudUser();
+    if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen v tomto prohlížeči.", true); return; }
+    try {
+      const res = await fetch(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}`, {
+        method: "PATCH",
+        headers: cloudHeaders({ Prefer: "return=representation" }),
+        body: JSON.stringify({ blackjack: loadStats() }),
+        keepalive: true
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        console.warn("[Blackjack] Uložení do cloudu selhalo:", res.status, t);
+        setCloudNote(missingColumn(t) ? "Cloud: ve Supabase chybí sloupec „blackjack“." : `Cloud: uložení selhalo (${res.status}).`, false);
+        return;
+      }
+      const rows = await res.json();
+      if (!rows.length) {
+        if (!cloud.retried) { cloud.retried = true; setTimeout(pushStats, 2500); }
+        else setCloudNote("Cloud: tvůj záznam ještě neexistuje, zkus to po dalším kole.", false);
+        return;
+      }
+      cloud.retried = false;
+      setCloudNote("Cloud: statistiky uloženy.", true);
+      loadLeaderboard();
+    } catch (e) {
+      console.warn("[Blackjack] Síťová chyba:", e);
+      setCloudNote("Cloud: chyba spojení.", false);
+    }
+  }
+  function schedulePush() { clearTimeout(cloud.timer); cloud.timer = setTimeout(pushStats, 800); }
+
+  async function pullStats() {
+    const cfg = cloudCfg(), user = cloudUser();
+    if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen v tomto prohlížeči.", true); return; }
+    try {
+      const res = await fetch(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}&select=blackjack`, { headers: cloudHeaders() });
+      if (!res.ok) {
+        const t = await res.text();
+        setCloudNote(missingColumn(t) ? "Cloud: ve Supabase chybí sloupec „blackjack“." : `Cloud: načtení selhalo (${res.status}).`, false);
+        return;
+      }
+      const rows = await res.json();
+      const remote = rows[0] && rows[0].blackjack && typeof rows[0].blackjack === "object" ? rows[0].blackjack : null;
+      const local = loadStats();
+      if (remote && (Number(remote.hands) || 0) > local.hands) {
+        saveStats({ ...emptyStats(), ...remote });
+        renderStats();
+        setCloudNote("Cloud: statistiky načteny.", true);
+      } else if (local.hands > ((remote && Number(remote.hands)) || 0)) {
+        pushStats();
+      } else {
+        setCloudNote("Cloud: statistiky jsou synchronizované.", true);
+      }
+    } catch (e) { setCloudNote("Cloud: chyba spojení.", false); }
+  }
+
+  async function loadLeaderboard() {
+    const box = $("lbList"), cfg = cloudCfg();
+    if (!cfg) { box.innerHTML = '<div class="notice">Žebříček není dostupný.</div>'; return; }
+    try {
+      const url = `${cfg.url}/rest/v1/${cfg.table}?select=username,blackjack&blackjack=not.is.null&order=blackjack->net.desc.nullslast&limit=10`;
+      const res = await fetch(url, { headers: cloudHeaders() });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const rows = (await res.json()).filter(r => r.blackjack && (Number(r.blackjack.hands) || 0) > 0);
+      if (!rows.length) { box.innerHTML = '<div class="notice">Zatím nikdo nehrál. Buď první!</div>'; return; }
+      const me = cloudUser();
+      const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+      box.innerHTML = rows.map((r, i) => {
+        const b = r.blackjack, net = Number(b.net) || 0;
+        return `<div class="lb-row${r.username === me ? " me" : ""}"><span>${medal(i)}</span><span class="lb-name">${esc(r.username)}</span><span class="lb-net ${net > 0 ? "pos" : net < 0 ? "neg" : ""}">${signed(net)}</span><span class="lb-sub">${fmt(b.hands)} kol · ${fmt(b.wins)} výher · ${fmt(b.blackjacks)}× blackjack · max ${fmt(b.best)}</span></div>`;
+      }).join("");
+    } catch (e) {
+      console.warn("[Blackjack] Žebříček selhal:", e);
+      box.innerHTML = '<div class="notice">Žebříček se nepodařilo načíst.</div>';
+    }
+  }
+
+  /* ---------- události ---------- */
+  document.querySelectorAll(".chip").forEach(ch => ch.addEventListener("click", () => {
+    if (busy || phase !== "bet") return;
+    const v = Number(ch.dataset.v);
+    if (bet + v > maxAffordable()) { sfx.error(); toast("Na tuhle sázku nemáš dost bodů."); return; }
+    bet += v; sfx.chip(); updateUI();
+  }));
+  $("clearBet").addEventListener("click", () => { bet = 0; sfx.chip(); updateUI(); });
+  $("maxBet").addEventListener("click", () => { bet = maxAffordable(); sfx.chip(); updateUI(); });
+  $("dealBtn").addEventListener("click", deal);
+  $("shopBuy1").addEventListener("click", () => buyWithCookies(1000, 160));
+  $("shopBuy2").addEventListener("click", () => buyWithCookies(10000, 1600));
+  $("lbRefresh").addEventListener("click", () => { sfx.chip(); loadLeaderboard(); });
+  $("hitBtn").addEventListener("click", hit);
+  $("standBtn").addEventListener("click", stand);
+  $("dblBtn").addEventListener("click", doubleDown);
+
+  $("resetStats").addEventListener("click", () => {
+    if (!confirm("Opravdu vynulovat statistiky Blackjacku? Školní body zůstanou.")) return;
+    saveStats(emptyStats()); renderStats(); schedulePush();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea") return;
+    const k = e.key.toLowerCase();
+    if (k === "h") { e.preventDefault(); hit(); }
+    else if (k === "s") { e.preventDefault(); stand(); }
+    else if (k === "d") { e.preventDefault(); doubleDown(); }
+    else if (k === "enter" && phase === "bet" && tag !== "button") { e.preventDefault(); deal(); }
+  });
+
+  function updateMuteBtn() {
+    $("muteBtn").textContent = sfx.isMuted() ? "🔇" : "🔊";
+    $("muteBtn").title = sfx.isMuted() ? "Zapnout zvuky" : "Ztlumit zvuky";
+  }
+  $("muteBtn").addEventListener("click", () => {
+    sfx.setMuted(!sfx.isMuted()); updateMuteBtn();
+    if (!sfx.isMuted()) sfx.chip();
+  });
+
+  // Po načtení se z cloudu může změnit počet bodů, proto přepočítáme zobrazení
+  window.addEventListener("load", () => setTimeout(() => { clampBet(); if (!busy) updateUI(); }, 1200));
+  window.addEventListener("focus", () => { if (!busy) { clampBet(); updateUI(); } });
+
+  updateMuteBtn();
+  bet = Math.min(160, maxAffordable());
+  updateUI();
+  renderStats();
+  pullStats();
+  loadLeaderboard();
+})();
+</script>
+</body>
+</html>
