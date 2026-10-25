@@ -14,6 +14,22 @@
 #opsShopModal.open > div {
   transform: scale(1) !important;
 }
+
+/* Kiosk / Směnárna CSS */
+.station.kiosk {--beam:#38bdf8}
+.kiosk-machine {height:94%;width:65%;max-width:210px;background:linear-gradient(100deg,#1e293b,#334155 18%,#1e293b 70%,#0f172a);border:6px ridge #38bdf8;border-radius:16px 16px 8px 8px;position:relative;box-shadow:inset 0 0 0 3px #0f172a,0 10px 0 #090d16;display:flex;flex-direction:column;align-items:center;padding:12px;transition:transform 0.25s ease}
+.station.kiosk:hover .kiosk-machine {transform:translateY(-5px)}
+.kiosk-bulbs {position:absolute;top:6px;left:10%;right:10%;display:flex;justify-content:space-between}
+.kiosk-bulbs i {width:6px;height:6px;border-radius:50%;background:#38bdf8;box-shadow:0 0 8px #38bdf8;animation:bulb 1.5s linear infinite}
+.kiosk-bulbs i:nth-child(2n) {animation-delay:-0.4s}
+.kiosk-bulbs i:nth-child(3n) {animation-delay:-0.8s}
+.kiosk-screen {width:88%;height:52px;margin-top:14px;background:radial-gradient(ellipse,#082f49,#030712);border:2px solid #38bdf8;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#38bdf8;font-family:monospace;box-shadow:inset 0 0 10px rgba(56,189,248,0.4)}
+.kiosk-screen-title {font-size:10px;font-weight:bold;letter-spacing:0.08em;color:#7dd3fc}
+.kiosk-screen-rates {font-size:14px;font-weight:900;color:#f8fafc;margin-top:2px}
+.kiosk-slot-anim {width:36px;height:8px;background:#020617;border:2px solid #64748b;border-radius:4px;margin-top:18px;position:relative;overflow:hidden}
+.kiosk-slot-anim:after {content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,#38bdf8,transparent);animation:coinSlide 2s linear infinite}
+.kiosk-base {position:absolute;bottom:4px;left:10%;right:10%;height:10px;background:#090d16;border:2px solid #38bdf8;border-radius:4px}
+@keyframes coinSlide {0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
 </style></head>
 <body>
 <header class="topbar"><div class="brand">OPS <span>///</span> KASINO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
@@ -22,9 +38,27 @@
 <a class="station slot" href="/kasino/slot.html" aria-label="Otevřít výherní automat, klávesa 2"><span class="beam"></span><div class="station-art"><div class="machine"><div class="bulbs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="machine-label">AUTOMAT</div><div class="reels"><div class="reel"><span>📚</span></div><div class="reel"><span>🔔</span></div><div class="reel"><span>♛</span></div></div><div class="lever"></div><div class="slotbase"></div><div class="coin"></div></div></div><div class="plaque"><h2>✦ Výherní automat</h2><p>Roztoč válce a zkus štěstí.</p><span class="stat" id="slot-stat">Ještě nehráno</span></div></a>
 <a class="station pc" href="/kasino/gacha.html" aria-label="Otevřít nábor učitelů, klávesa 3"><span class="beam"></span><div class="station-art"><div class="computer"><div class="crt"><div class="screen"><strong>NÁBOR UČITELŮ</strong><div>&gt; inicializace sběrnice...</div><div>&gt; hledám kandidáty_</div><span class="cursor"></span><div class="teacher-cards"><i>Z</i><i>S</i><i>A</i><i>B</i></div></div></div><div class="keyboard"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><div class="plaque"><h2>▣ Nábor učitelů</h2><p>Vyvolej nové členy školního sboru.</p><span class="stat" id="gacha-stat">Načítám statistiky…</span></div></a>
 </div>
-<!-- OPS OBCHOD (Směna měn) umístěný dole na ploše -->
-<div class="ops-shop-section" style="position:relative;z-index:10;max-width:400px;margin:25px auto 5px;text-align:center;pointer-events:auto;">
-    <button type="button" id="openOpsShopBtn" style="background:linear-gradient(135deg,#ffd477,#f59e0b);color:#241a00;border:2px solid #ffd477;border-radius:14px;padding:14px 34px;font-size:1.15rem;font-weight:900;cursor:pointer;box-shadow:0 8px 25px rgba(255,212,119,0.35);transition:transform 0.2s,filter 0.2s;pointer-events:auto;">🛒 Obchod OPS</button>
+<!-- OPS OBCHOD (Směnný automat / Kiosk) umístěný dole na ploše -->
+<div class="ops-shop-section" style="position:relative;z-index:10;max-width:320px;margin:25px auto 5px;text-align:center;pointer-events:auto;">
+  <div class="station kiosk" id="openOpsShopBtn" role="button" aria-label="Otevřít Obchod OPS - Směna měn" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;cursor:pointer;">
+    <span class="beam" style="--beam:#38bdf8;"></span>
+    <div class="station-art" style="height:170px;">
+      <div class="kiosk-machine">
+        <div class="kiosk-bulbs"><i></i><i></i><i></i><i></i></div>
+        <div class="kiosk-screen">
+          <div class="kiosk-screen-title">SMĚNA MĚN</div>
+          <div class="kiosk-screen-rates">🍪 ⇄ ◆</div>
+        </div>
+        <div class="kiosk-slot-anim"></div>
+        <div class="kiosk-base"></div>
+      </div>
+    </div>
+    <div class="plaque" style="margin-top:-10px;">
+      <h2>🛒 Obchod OPS</h2>
+      <p>Kupuj tokeny za sušenky nebo měň zpět.</p>
+      <span class="stat" style="color:var(--cyan);">Otevřít směnárnu</span>
+    </div>
+  </div>
 </div>
 <div class="floor"></div></main>
 
@@ -328,11 +362,11 @@
           presetsGrid.innerHTML = `
             <button type="button" class="ops-preset-btn" data-spend="160" data-get="800" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
               <div style="color:#ffd477;">160 tokenů</div>
-              <div style="font-size:0.8rem;color:#5be08a;">➔ 800 sušenek (ztrátový kurz)</div>
+              <div style="font-size:0.8rem;color:#5be08a;">➔ 800 sušenek</div>
             </button>
             <button type="button" class="ops-preset-btn" data-spend="1600" data-get="8000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
               <div style="color:#ffd477;">1 600 tokenů</div>
-              <div style="font-size:0.8rem;color:#5be08a;">➔ 8 000 sušenek (ztrátový kurz)</div>
+              <div style="font-size:0.8rem;color:#5be08a;">➔ 8 000 sušenek</div>
             </button>
           `;
         }
@@ -391,7 +425,7 @@
       if (exchangeDirection === "cookies_to_tokens") {
         extraNote = `<br><small style="color:#ffd477;">Nákup tokenů za sušenky (1 000 sušenek = 160 tokenů). Získáš ${Number(getVal).toLocaleString("cs-CZ")} tokenů.</small>`;
       } else {
-        extraNote = `<br><small style="color:#ef4444;">Zpětná směna je znevýhodněná (ztrácíš sušenky, kurz 160 tokenů = 800 sušenek místo 1 000).</small>`;
+        extraNote = `<br><small style="color:#7dd3fc;">Zpětná směna tokenů zpět na sušenky (kurz: 160 tokenů = 800 sušenek).</small>`;
       }
 
       if (!hasEnough) {
