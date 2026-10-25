@@ -17,6 +17,24 @@
     const STORAGE_KEY_USER = "ops_username";
     const STORAGE_KEY_STATS = "ops_game_stats";
 
+    // Seznam dostupných agentů/postav (školní sbor / NPC)
+    const AGENTS_LIST = [
+        {id:"reditel",name:"Ředitel",file:"Reditel",rank:"Z",symbol:"♛",type:"Ředitel školy"},
+        {id:"rybar",name:"Rybář",file:"Rybar",rank:"Z",symbol:"♛",type:"Zástupce ředitele"},
+        {id:"nova",name:"Chobot",file:"Nova",rank:"S",symbol:"✦",type:"Třídní · Featured"},
+        {id:"riven",name:"Juchelka",file:"Riven",rank:"S",symbol:"∑",type:"Matikář/OPS"},
+        {id:"vesper",name:"Jašík",file:"Vesper",rank:"S",symbol:"⚗",type:"POS"},
+        {id:"mira",name:"Bařina",file:"Mira",rank:"A",symbol:"🌍",type:"Češtinář"},
+        {id:"kairo",name:"Bizoň",file:"Kairo",rank:"A",symbol:"⚽",type:"Tělocvik"},
+        {id:"lyra",name:"Otahalík",file:"Lyra",rank:"A",symbol:"♫",type:"MIT"},
+        {id:"rook",name:"Kytková",file:"Rook",rank:"A",symbol:"⌛",type:"PRV/DBS"},
+        {id:"echo",name:"Kubačáková",file:"Echo",rank:"A",symbol:"Aa",type:"Angličtina"},
+        {id:"pixel",name:"Petrová",file:"Pixel",rank:"B",symbol:"⌨",type:"Angličtina"},
+        {id:"drift",name:"Romanovský",file:"Drift",rank:"B",symbol:"✎",type:"DBS"},
+        {id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"B",symbol:"✎",type:"Robotika"},
+        {id:"Huvarova",name:"Huvarová",file:"Huvarova",rank:"B",symbol:"✎",type:"Elektronika"}
+    ];
+
     const DEFAULT_STATS = {
         gd: {
             attempts: 0,
@@ -76,8 +94,7 @@
             aPity: 0,
             guaranteed: false,
             totalPulls: 0,
-            inventory: {},
-            history: []
+            inventory: {} // Klíč = Jméno postavy, Hodnota = kolikrát jsi ji dostal
         },
         meta: {
             totalPlayTime: 0,
@@ -338,7 +355,7 @@
                 maturita: { ...DEFAULT_STATS.maturita, ...(parsed.maturita || {}) },
                 runner404: { ...DEFAULT_STATS.runner404, ...(parsed.runner404 || {}) },
                 clicker: clickerState,
-                gacha: { ...DEFAULT_STATS.gacha, ...(parsed.gacha || {}) },
+                gacha: { ...DEFAULT_STATS.gacha, ...(parsed.gacha || {}), inventory: { ...(parsed.gacha?.inventory || {}) } },
                 meta: { ...DEFAULT_STATS.meta, ...(parsed.meta || {}) }
             };
         } catch (e) {
@@ -585,6 +602,11 @@
                     }
                 }
 
+                // Gacha inventář merge (kombinace místního a cloudového stavu)
+                const mergedGachaInventory = { ...(cloudStats.gacha?.inventory || {}), ...(local.gacha?.inventory || {}) };
+                // Pro jistotu vezmeme max z celkových pullů
+                const mergedTotalPulls = Math.max(local.gacha?.totalPulls || 0, cloudStats.gacha?.totalPulls || 0);
+
                 const merged = {
                     gd: {
                         attempts: Math.max(local.gd.attempts, cloudStats.gd?.attempts || 0),
@@ -628,9 +650,8 @@
                         sPity: Math.max(local.gacha?.sPity || 0, cloudStats.gacha?.sPity || 0),
                         aPity: Math.max(local.gacha?.aPity || 0, cloudStats.gacha?.aPity || 0),
                         guaranteed: local.gacha?.guaranteed ?? cloudStats.gacha?.guaranteed ?? false,
-                        totalPulls: Math.max(local.gacha?.totalPulls || 0, cloudStats.gacha?.totalPulls || 0),
-                        inventory: { ...(cloudStats.gacha?.inventory || {}), ...(local.gacha?.inventory || {}) },
-                        history: local.gacha?.history?.length >= (cloudStats.gacha?.history?.length || 0) ? local.gacha.history : (cloudStats.gacha?.history || [])
+                        totalPulls: mergedTotalPulls,
+                        inventory: mergedGachaInventory
                     },
                     meta: {
                         totalPlayTime: Math.max(local.meta.totalPlayTime, cloudStats.meta?.totalPlayTime || 0),
@@ -1349,6 +1370,7 @@
     // -------------------------------------------------------------------------
     const OPS_STATS = {
         config: SUPABASE_CONFIG,
+        agents: AGENTS_LIST,
 
         getUsername: function() {
             return localStorage.getItem(STORAGE_KEY_USER) || "";
@@ -1403,7 +1425,7 @@
                 }
             } else if (gameId === 'gd') {
                 if (extraData.attempts) stats.gd.attempts = (stats.gd.attempts || 0) + extraData.attempts;
-                if (extraData.jumps) stats.gd.jumps = (stats.gd.juniform || stats.gd.jumps || 0) + extraData.jumps;
+                if (extraData.jumps) stats.gd.jumps = (stats.gd.jumps || 0) + extraData.jumps;
                 if (extraData.levelId) {
                     const lvl = String(extraData.levelId);
                     const currentBest = stats.gd.bestPercent[lvl] || 0;
@@ -1457,6 +1479,25 @@
             } else if (gameId === 'mc') {
                 stats.mc.sessions = (stats.mc.sessions || 0) + 1;
             }
+            saveLocalStats(stats);
+            syncToCloud();
+        },
+
+        // Gacha metoda - inkrementuje celkový počet pullů a počty pro jednotlivé postavy v inventáři
+        recordGachaPull: function(pulledCharacters = []) {
+            const stats = loadLocalStats();
+            if (!stats.gacha) {
+                stats.gacha = { tokens: 2000, zPity: 0, sPity: 0, aPity: 0, guaranteed: false, totalPulls: 0, inventory: {} };
+            }
+            if (!stats.gacha.inventory) {
+                stats.gacha.inventory = {};
+            }
+
+            for (const charName of pulledCharacters) {
+                stats.gacha.totalPulls = (stats.gacha.totalPulls || 0) + 1;
+                stats.gacha.inventory[charName] = (stats.gacha.inventory[charName] || 0) + 1;
+            }
+
             saveLocalStats(stats);
             syncToCloud();
         },
