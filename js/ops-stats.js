@@ -94,7 +94,7 @@
             aPity: 0,
             guaranteed: false,
             totalPulls: 0,
-            inventory: {} // Klíč = Jméno postavy, Hodnota = kolikrát jsi ji dostal
+            inventory: {} // Žádná "history", pouze čistý inventář
         },
         meta: {
             totalPlayTime: 0,
@@ -347,6 +347,13 @@
 
             populateClickerFromStorage(clickerState);
 
+            // Zajištění, že ignorujeme staré pole "history" a vytáhneme čistě inventory a totalPulls
+            const gachaParsed = parsed.gacha || {};
+            const cleanInventory = { ...(gachaParsed.inventory || {}) };
+            
+            // Pokud by v localStorage náhodou ještě viselo staré pole history, můžeme ho případně jednorázově slít do inventory,
+            // nebo ho prostě úplně ignorovat a vyčistit. Tady ho ignorujeme.
+
             return {
                 gd: { ...DEFAULT_STATS.gd, ...(parsed.gd || {}) },
                 stratagem: { ...DEFAULT_STATS.stratagem, ...(parsed.stratagem || {}) },
@@ -355,7 +362,15 @@
                 maturita: { ...DEFAULT_STATS.maturita, ...(parsed.maturita || {}) },
                 runner404: { ...DEFAULT_STATS.runner404, ...(parsed.runner404 || {}) },
                 clicker: clickerState,
-                gacha: { ...DEFAULT_STATS.gacha, ...(parsed.gacha || {}), inventory: { ...(parsed.gacha?.inventory || {}) } },
+                gacha: {
+                    tokens: gachaParsed.tokens ?? DEFAULT_STATS.gacha.tokens,
+                    zPity: gachaParsed.zPity ?? 0,
+                    sPity: gachaParsed.sPity ?? 0,
+                    aPity: gachaParsed.aPity ?? 0,
+                    guaranteed: gachaParsed.guaranteed ?? false,
+                    totalPulls: gachaParsed.totalPulls || 0,
+                    inventory: cleanInventory
+                },
                 meta: { ...DEFAULT_STATS.meta, ...(parsed.meta || {}) }
             };
         } catch (e) {
@@ -368,6 +383,10 @@
 
     function saveLocalStats(stats) {
         try {
+            // Bezpečnostní pojistka: odstranění klíče history, pokud by se tam odněkud zvenku připletl
+            if (stats.gacha && stats.gacha.history) {
+                delete stats.gacha.history;
+            }
             stats.meta.lastActive = Date.now();
             localStorage.setItem(STORAGE_KEY_STATS, JSON.stringify(stats));
         } catch (e) {
@@ -422,6 +441,8 @@
 
         updateCloudSyncBadge("syncing", "Cloud: Ukladam...");
         const stats = loadLocalStats();
+        if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
+
         const payload = {
             username: username,
             updated_at: new Date().toISOString(),
@@ -476,6 +497,8 @@
             const rows = await res.json();
             if (rows && rows.length > 0 && rows[0].stats) {
                 const cloudStats = rows[0].stats;
+                if (cloudStats.gacha && cloudStats.gacha.history) delete cloudStats.gacha.history;
+
                 const local = loadLocalStats();
 
                 let mergedClicker = { ...local.clicker };
@@ -602,9 +625,12 @@
                     }
                 }
 
-                // Gacha inventář merge (kombinace místního a cloudového stavu)
-                const mergedGachaInventory = { ...(cloudStats.gacha?.inventory || {}), ...(local.gacha?.inventory || {}) };
-                // Pro jistotu vezmeme max z celkových pullů
+                // Gacha inventář merge
+                const keys = new Set([...Object.keys(local.gacha?.inventory || {}), ...Object.keys(cloudStats.gacha?.inventory || {})]);
+                const mergedGachaInventory = {};
+                for (const k of keys) {
+                    mergedGachaInventory[k] = Math.max(local.gacha?.inventory?.[k] || 0, cloudStats.gacha?.inventory?.[k] || 0);
+                }
                 const mergedTotalPulls = Math.max(local.gacha?.totalPulls || 0, cloudStats.gacha?.totalPulls || 0);
 
                 const merged = {
@@ -1409,12 +1435,14 @@
         },
 
         saveStats: function(stats) {
+            if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
             saveLocalStats(stats);
             syncToCloud();
         },
 
         recordScore: function(gameId, score, extraData = {}) {
             const stats = loadLocalStats();
+            if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
             stats.meta.lastPlayedGame = gameId;
 
             if (gameId === 'stratagem') {
@@ -1461,6 +1489,7 @@
         recordPlayTime: function(gameId, seconds) {
             if (!seconds || seconds <= 0) return;
             const stats = loadLocalStats();
+            if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
             stats.meta.totalPlayTime = (stats.meta.totalPlayTime || 0) + seconds;
             stats.meta.lastPlayedGame = gameId;
 
@@ -1473,6 +1502,7 @@
 
         recordSession: function(gameId) {
             const stats = loadLocalStats();
+            if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
             stats.meta.lastPlayedGame = gameId;
             if (gameId === 'hyperdrive') {
                 stats.hyperdrive.sessions = (stats.hyperdrive.sessions || 0) + 1;
@@ -1483,12 +1513,13 @@
             syncToCloud();
         },
 
-        // Gacha metoda - inkrementuje celkový počet pullů a počty pro jednotlivé postavy v inventáři
+        // Gacha metoda - inkrementuje celkový počet pullů a počty pro jednotlivé postavy v inventáři (bez ukládání historie)
         recordGachaPull: function(pulledCharacters = []) {
             const stats = loadLocalStats();
             if (!stats.gacha) {
                 stats.gacha = { tokens: 2000, zPity: 0, sPity: 0, aPity: 0, guaranteed: false, totalPulls: 0, inventory: {} };
             }
+            if (stats.gacha.history) delete stats.gacha.history; // pro jistotu smažeme, kdyby tam zbyla
             if (!stats.gacha.inventory) {
                 stats.gacha.inventory = {};
             }
@@ -1523,9 +1554,11 @@
         },
 
         exportStatsJSON: function() {
+            const stats = loadLocalStats();
+            if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
             const data = {
                 username: OPS_STATS.getUsername(),
-                stats: loadLocalStats(),
+                stats: stats,
                 exportedAt: new Date().toISOString()
             };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
