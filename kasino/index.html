@@ -5,6 +5,15 @@
 <meta name="theme-color" content="#10121a"><title>OPS /// Kasino</title>
 <style>
 :root{color-scheme:dark;--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a;--wine:#2a0f1a;--felt:#1f5143;--wood:#4a3220}*{box-sizing:border-box}html{min-width:360px;overflow-x:hidden}body{margin:0;min-width:360px;overflow-x:hidden;color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;background:#10121a}a{color:inherit}.topbar{min-height:62px;padding:12px clamp(12px,3vw,34px);display:flex;align-items:center;justify-content:space-between;gap:14px;background:#141620;border-bottom:1px solid var(--line);position:relative;z-index:5}.brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}.right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}.tokens{color:var(--gold);font-weight:800}.topbar a{color:var(--text);text-decoration:none}.topbar a:hover{color:var(--cyan)}button{font:inherit;cursor:pointer}.sound{border:1px solid var(--line);border-radius:8px;background:#202330;color:var(--text);padding:5px 9px}.wall{min-height:calc(100vh - 62px);position:relative;isolation:isolate;overflow:hidden;padding:30px clamp(10px,3vw,34px) 50px;background:radial-gradient(ellipse at 50% 25%,#421725 0,#2a0f1a 42%,#170a12 100%)}.wall:before{content:"";position:absolute;inset:0;z-index:-2;opacity:.15;background:repeating-linear-gradient(45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px),repeating-linear-gradient(-45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px);mask-image:linear-gradient(#000,transparent 90%)}.sign{width:max-content;max-width:100%;margin:0 auto 14px;padding:10px 25px 12px;border:2px solid #9d414a;border-radius:10px;background:linear-gradient(#39131f,#200b13);color:var(--gold);font-size:clamp(1.65rem,4vw,3.1rem);font-weight:1000;font-style:italic;letter-spacing:.14em;text-align:center;text-shadow:0 0 5px var(--gold),0 0 14px var(--red),0 0 32px #ff304f;box-shadow:0 0 18px #ff526355,inset 0 0 18px #ff526322;animation:signFlash 1.5s steps(1,end) 1}.intro{text-align:center;color:#f3c5cc;margin:0 auto 28px;max-width:650px;font-size:.96rem}.floor{position:absolute;z-index:-1;left:-15%;right:-15%;bottom:-20px;height:42%;transform:perspective(450px) rotateX(24deg);transform-origin:bottom;background:radial-gradient(ellipse at center,#681c2c 0,#391321 48%,#100b10 85%);border-top:2px solid #94613b;opacity:.95}.floor:after{content:"◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇";position:absolute;inset:15% 0;color:#d8a64a28;font-size:clamp(20px,4vw,48px);letter-spacing:.3em;text-align:center;background:repeating-linear-gradient(90deg,transparent 0 80px,#d7a64810 81px 83px,transparent 84px 160px)}.stations{max-width:1250px;margin:0 auto;display:grid;grid-template-columns:1fr 1.12fr 1fr;align-items:end;gap:clamp(10px,2vw,28px)}.station{position:relative;display:flex;flex-direction:column;align-items:center;text-decoration:none;min-width:0;transition:transform .22s ease;isolation:isolate}.station:focus-visible{outline:3px solid var(--cyan);outline-offset:7px;border-radius:12px}.beam{position:absolute;z-index:-1;top:-18px;left:0;right:0;height:65%;pointer-events:none;opacity:.27;mix-blend-mode:screen;background:linear-gradient(180deg,var(--beam),transparent 90%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);transition:opacity .22s}.station:hover,.station:focus-visible{transform:translateY(-6px)}.station:hover .beam,.station:focus-visible .beam{opacity:.62}.station-art{width:100%;height:clamp(220px,27vw,315px);display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 18px 16px #0009)}.station.slot{--beam:#ffd477}.station.bj{--beam:#5be08a}.station.pc{--beam:#7ff0ff}.slot .station-art{height:clamp(310px,35vw,405px)}.plaque{width:100%;padding:12px 13px 13px;background:linear-gradient(135deg,#21151a,#11131b);border:1px solid #9b713a;border-radius:8px;text-align:center;box-shadow:0 7px 0 #12090d,0 12px 22px #0007}.plaque h2{margin:0 0 4px;color:var(--gold);font-size:1.08rem;font-style:italic;text-transform:uppercase;letter-spacing:.05em}.plaque p{margin:0 0 8px;font-size:.82rem;color:#d0c5c6}.stat{display:block;color:var(--green);font-size:.79rem;font-weight:700}.felt-table{width:94%;height:64%;position:relative;border:10px solid var(--wood);border-radius:48% 48% 16% 16% / 48% 48% 18% 18%;background:linear-gradient(145deg,#1f5143,#0b211b);box-shadow:inset 0 0 0 3px #8b6a43,0 10px 0 #2a1a13;transform:perspective(300px) rotateX(8deg)}.felt-table:before{content:"♠  BLACKJACK  ♥";position:absolute;top:14%;left:0;right:0;text-align:center;color:#d9c89a;font-size:clamp(10px,1.2vw,14px);letter-spacing:.1em}.card{position:absolute;width:22%;height:43%;top:34%;background:#fffdf5;border-radius:6px;color:#171923;box-shadow:0 3px 7px #0007;display:flex;flex-direction:column;justify-content:space-between;padding:5px;font-family:Georgia,serif;font-size:clamp(15px,2vw,25px);font-weight:bold;transition:transform .25s}.card.a{left:37%;transform:rotate(-10deg)}.card.k{left:53%;color:#d82943;transform:rotate(8deg)}.station.bj:hover .card.a{transform:translateX(-12px) rotate(-16deg)}.station.bj:hover .card.k{transform:translateX(12px) rotate(15deg)}.card small{font-size:.65em}.chips{position:absolute;bottom:10%;left:45%;width:25px;height:25px;border-radius:50%;border:5px dashed #e8e8e8;background:#3386d8;box-shadow:0 5px 0 #20538a,0 10px 0 #e34252,0 15px 0 #a62b3c,0 20px 0 #e6b84d,0 25px 0 #9c772b;transition:transform .2s}.station.bj:hover .chips{transform:translateY(-5px)}.mini-sign{position:absolute;left:0;top:44%;background:#17131a;border:1px solid var(--gold);padding:5px 6px;color:var(--gold);font-size:clamp(8px,.8vw,11px);border-radius:4px}.machine{height:91%;width:67%;max-width:245px;background:linear-gradient(100deg,#8d1729,#d73547 18%,#a51c30 70%,#6e1322);border:7px ridge #e6b64c;border-radius:17px 17px 9px 9px;position:relative;box-shadow:inset 0 0 0 3px #641323,0 12px 0 #42111b}.machine:before{content:"";position:absolute;left:7%;right:7%;top:6%;height:10%;border:2px solid var(--gold);background:#230b12;border-radius:7px;box-shadow:0 0 12px #ffd47788}.machine-label{position:absolute;top:7.3%;left:0;right:0;text-align:center;font-size:clamp(12px,1.7vw,19px);font-weight:1000;font-style:italic;color:var(--gold);text-shadow:0 0 8px #ffd477;letter-spacing:.1em}.bulbs{position:absolute;top:2%;left:9%;right:9%;display:flex;justify-content:space-between}.bulbs i{width:7px;height:7px;border-radius:50%;background:#fff0a1;box-shadow:0 0 6px #ffe878;animation:bulb 1.8s linear infinite}.bulbs i:nth-child(2n){animation-delay:-.3s}.bulbs i:nth-child(3n){animation-delay:-.6s}.reels{position:absolute;top:23%;left:9%;right:9%;height:37%;display:flex;gap:4px;padding:5px;background:#130e18;border:3px solid #f5cf70;border-radius:7px;box-shadow:inset 0 0 15px #000}.reel{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(#f9f0d8,#fffdf3,#d8c9a5);color:#9d2033;font-size:clamp(23px,3.4vw,43px);text-shadow:0 2px #fff;overflow:hidden}.reel span{display:block;animation:reelStop 3.8s ease-out 1}.lever{position:absolute;right:-16%;top:28%;width:13%;height:30%;transform-origin:top center;transition:transform .25s}.lever:before{content:"";position:absolute;left:40%;top:10%;height:80%;width:7px;background:linear-gradient(90deg,#999,#fff,#666);border-radius:5px}.lever:after{content:"";position:absolute;left:-5px;top:0;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#ffb2b5,#e22d43 45%,#760e20);box-shadow:0 0 10px #ff526388}.station.slot:hover .lever{transform:rotate(25deg)}.slotbase{position:absolute;bottom:8%;left:13%;right:13%;height:12%;border:3px solid #f6d578;background:linear-gradient(#21121a,#08090e);border-radius:4px}.coin{position:absolute;bottom:4%;left:29%;width:17px;height:17px;border:3px solid #f8d36e;border-radius:50%;background:#a87c26;box-shadow:17px 0 0 -2px #e5b54d,30px 2px 0 -4px #f5d477}.computer{width:91%;position:relative;display:flex;flex-direction:column;align-items:center;transform:translateY(-5%)}.crt{width:91%;height:65%;min-height:145px;background:linear-gradient(135deg,#d8d5ca,#a9a69d);border:6px solid #77766e;border-radius:14px 14px 20px 20px;padding:10px;box-shadow:inset 0 0 0 3px #eee9da,0 8px 0 #77736b}.screen{height:100%;min-height:125px;border:4px solid #3a3c37;border-radius:25px;background:radial-gradient(ellipse,#123c3b,#071c20);padding:13px 9px;color:#7ff0c9;box-shadow:inset 0 0 22px #00f5bf44;overflow:hidden;font-family:monospace;font-size:clamp(9px,1.1vw,13px);text-shadow:0 0 7px #41ffca}.screen strong{display:block;color:#a6ffe5;font-size:1.08em;letter-spacing:.04em}.cursor{display:inline-block;width:7px;height:12px;background:#7ff0c9;vertical-align:middle;animation:cursor 1s steps(1) infinite}.teacher-cards{display:flex;gap:4px;margin-top:9px}.teacher-cards i{height:36px;flex:1;min-width:0;border:2px solid #6ad7b3;background:linear-gradient(135deg,#163f3c,#101c28);display:grid;place-items:center;color:#d8fff4;font-style:normal;font-weight:bold;font-size:12px}.teacher-cards i:nth-child(2){border-color:#d6bbff;color:#e2d1ff}.teacher-cards i:nth-child(3){border-color:#ffd477;color:#ffd477}.teacher-cards i:nth-child(4){border-color:#a4a9bc;color:#d5d9e6}.keyboard{width:100%;height:37px;margin-top:8px;border:2px solid #8e8b82;border-radius:5px;background:#c9c6bd;transform:perspective(100px) rotateX(12deg);display:flex;gap:3px;padding:5px}.keyboard i{flex:1;background:#77786f;border-radius:2px;box-shadow:0 1px #efeadb}.station.pc:hover .screen{box-shadow:inset 0 0 28px #00ffd966,0 0 16px #7ff0ff55}.station.pc:hover .cursor{animation-duration:.25s}.station.pc:hover .screen:after{content:"";position:absolute;left:8%;right:8%;height:2px;background:#7ff0ff99;animation:scan .9s linear 1;pointer-events:none}.station.pc .station-art{height:clamp(220px,27vw,315px)}@keyframes signFlash{0%,12%,24%,36%{opacity:.3;text-shadow:none;box-shadow:none}6%,18%,30%,100%{opacity:1}}@keyframes bulb{0%,100%{opacity:.35}50%{opacity:1}}@keyframes cursor{50%{opacity:0}}@keyframes scan{from{top:18%}to{top:75%}}@keyframes reelStop{0%{transform:translateY(-110%)}70%{transform:translateY(100%)}100%{transform:translateY(0)}}@media(max-width:900px) and (min-width:560px){.stations{gap:10px}.station-art{height:230px}.slot .station-art{height:300px}.plaque{padding:10px 7px}.plaque h2{font-size:.95rem}.plaque p,.stat{font-size:.72rem}.machine{width:72%}.mini-sign{font-size:8px}}@media(max-width:559px){.topbar{align-items:flex-start}.right{gap:8px;font-size:.78rem}.wall{padding-top:22px}.intro{font-size:.9rem;margin-bottom:24px}.stations{grid-template-columns:1fr;gap:26px;max-width:420px}.station.slot{order:0}.station.bj{order:1}.station.pc{order:2}.station-art,.station.pc .station-art{height:245px}.slot .station-art{height:310px}.machine{width:56%;max-width:230px}.plaque{padding:12px}.plaque h2{font-size:1.08rem}.plaque p,.stat{font-size:.82rem}.beam{top:-8px;height:80%}.sign{letter-spacing:.08em;padding:9px 12px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}.station:hover,.station:focus-visible{transform:none}.station:hover .beam,.station:focus-visible .beam{opacity:.5}.station.bj:hover .card.a{transform:rotate(-10deg)}.station.bj:hover .card.k{transform:rotate(8deg)}.station.bj:hover .chips{transform:none}.station.slot:hover .lever{transform:none}}
+
+/* OPS Shop Modal Open Fix */
+#opsShopModal.open {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+#opsShopModal.open > div {
+  transform: scale(1) !important;
+}
 </style></head>
 <body>
 <header class="topbar"><div class="brand">OPS <span>///</span> KASINO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
@@ -18,6 +27,7 @@
     <button type="button" id="openOpsShopBtn" style="background:linear-gradient(135deg,#ffd477,#f59e0b);color:#241a00;border:2px solid #ffd477;border-radius:14px;padding:14px 34px;font-size:1.15rem;font-weight:900;cursor:pointer;box-shadow:0 8px 25px rgba(255,212,119,0.35);transition:transform 0.2s,filter 0.2s;pointer-events:auto;">🛒 Obchod OPS</button>
 </div>
 <div class="floor"></div></main>
+
 <!-- Modální okno obchodu -->
 <div id="opsShopModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity 0.25s ease;">
   <div style="background:linear-gradient(135deg,#151929 0,#0f1322 100%);border:2px solid rgba(255,212,119,0.4);border-radius:20px;max-width:540px;width:100%;padding:28px;color:#f8fafc;font-family:Inter,sans-serif;box-shadow:0 25px 60px rgba(0,0,0,0.8),0 0 40px rgba(255,212,119,0.15);transform:scale(0.95);transition:transform 0.25s ease;max-height:90vh;overflow-y:auto;" id="opsShopCard">
@@ -80,6 +90,11 @@
     </div>
   </div>
 </div>
+
+<script src="/js/ops-stats.js"></script>
+<script>
+(()=>{'use strict';const $=id=>document.getElementById(id);let ctx=null;let muted=localStorage.getItem('ops_gacha_muted')==='1';const paintSound=()=>{$('sound').textContent=muted?'🔇':'🔊';$('sound').setAttribute('aria-label',muted?'Zapnout zvuky':'Vypnout zvuky')};paintSound();function tone(freq=650,duration=.045,volume=.025){if(muted)return;try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(volume,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+duration);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+duration)}catch(_){}}$('sound').addEventListener('click',()=>{muted=!muted;localStorage.setItem('ops_gacha_muted',muted?'1':'0');paintSound();if(!muted)tone(850,.08)});document.querySelectorAll('.station').forEach(a=>{a.addEventListener('pointerenter',()=>tone(540,.025,.012));a.addEventListener('click',()=>tone(900,.09,.03))});document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey||e.repeat)return;const a={'1':'/kasino/blackjack.html','2':'/kasino/slot.html','3':'/kasino/gacha.html'}[e.key];if(a&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))location.href=a});function money(n){n=Number(n)||0;return(n>0?'+':'')+n.toLocaleString('cs-CZ')}function readNet(key){try{const v=JSON.parse(localStorage.getItem(key)||'null');return v&&Number.isFinite(Number(v.net))?Number(v.net):null}catch(_){return null}}const b=readNet('ops_blackjack_stats'),s=readNet('ops_slots_stats');$('bj-stat').textContent=b===null?'Ještě nehráno':'Čistý zisk: '+money(b);$('slot-stat').textContent=s===null?'Ještě nehráno':'Čistý zisk: '+money(s);try{const stats=window.OPS_STATS&&OPS_STATS.getStats?OPS_STATS.getStats():{};const g=stats.gacha||{};$('tokens').textContent=Number(g.tokens??stats.tokens??0).toLocaleString('cs-CZ');const user=OPS_STATS&&OPS_STATS.getUsername?OPS_STATS.getUsername():'';$('username').textContent=user||'Bez přezdívky';$('username').title=user?'Přezdívka hráče':'Kliknutím nastav přezdívku';if(!user){$('username').style.cursor='pointer';$('username').addEventListener('click',()=>OPS_STATS&&OPS_STATS.promptUsernameModal&&OPS_STATS.OPS_STATS.promptUsernameModal())}const inv=g.inventory;const count=Array.isArray(inv)?inv.length:inv&&typeof inv==='object'?Object.keys(inv).length:Number(g.inventoryCount||g.uniqueCharacters||0);$('gacha-stat').textContent='Zápisů: '+Number(g.totalPulls||0).toLocaleString('cs-CZ')+' · Sbor: '+count+'/'+(g.characterCount||g.totalCharacters||'?')}catch(e){$('gacha-stat').textContent='Statistiky nejsou dostupné';console.warn('OPS stats:',e)}})();
+</script>
 
 <script>
 (() => {
@@ -153,209 +168,204 @@
   const msgEl = document.getElementById("opsShopMsg");
   const spendLabel = document.getElementById("spendCurrencyLabel");
 
-  if (!openBtn || !modal) return;
-
-  function openModal() {
-    updateModalBalances();
-    modal.style.display = "flex";
-    setTimeout(() => modal.classList.add("open"), 10);
-    setDirection("tokens_to_cookies");
-    customInput.value = "";
-    activeSpendAmount = 0;
-    updateCalculation();
-    msgEl.style.display = "none";
-  }
-
-  function closeModal() {
-    modal.classList.remove("open");
-    setTimeout(() => modal.style.display = "none", 250);
-  }
-
-  function updateModalBalances() {
-    const t = getTokens();
-    const c = readCookiesData().available;
-    const tEl = document.getElementById("shopModalTokens");
-    const cEl = document.getElementById("shopModalCookies");
-    if (tEl) tEl.textContent = Math.round(t).toLocaleString("cs-CZ");
-    if (cEl) cEl.textContent = Math.round(c).toLocaleString("cs-CZ");
-  }
-
-  function setDirection(dir) {
-    exchangeDirection = dir;
-    customInput.value = "";
-    activeSpendAmount = 0;
-    msgEl.style.display = "none";
-
-    if (dir === "tokens_to_cookies") {
-      dirTokensBtn.style.background = "#252a3d";
-      dirTokensBtn.style.borderColor = "#38bdf8";
-      dirTokensBtn.style.color = "#fff";
-      dirCookiesBtn.style.background = "#191c27";
-      dirCookiesBtn.style.borderColor = "#34394b";
-      dirCookiesBtn.style.color = "#a4a9bc";
-      spendLabel.textContent = "tokenů";
-      presetsGrid.innerHTML = `
-        <button type="button" class="ops-preset-btn" data-spend="160" data-get="1000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
-          <div style="color:#ffd477;">160 tokenů</div>
-          <div style="font-size:0.8rem;color:#5be08a;">➔ 1 000 sušenek</div>
-        </button>
-        <button type="button" class="ops-preset-btn" data-spend="1600" data-get="10000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
-          <div style="color:#ffd477;">1 600 tokenů</div>
-          <div style="font-size:0.8rem;color:#5be08a;">➔ 10 000 sušenek</div>
-        </button>
-      `;
-    } else {
-      dirCookiesBtn.style.background = "#252a3d";
-      dirCookiesBtn.style.borderColor = "#38bdf8";
-      dirCookiesBtn.style.color = "#fff";
-      dirTokensBtn.style.background = "#191c27";
-      dirTokensBtn.style.borderColor = "#34394b";
-      dirTokensBtn.style.color = "#a4a9bc";
-      spendLabel.textContent = "sušenek";
-      presetsGrid.innerHTML = `
-        <button type="button" class="ops-preset-btn" data-spend="500" data-get="100" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;grid-column:1/-1;">
-          <div style="color:#5be08a;">500 sušenek</div>
-          <div style="font-size:0.8rem;color:#ffd477;">➔ 100 tokenů (zpětný kurz)</div>
-        </button>
-      `;
-    }
-    attachPresetListeners();
-    updateCalculation();
-  }
-
-  function attachPresetListeners() {
-    document.querySelectorAll(".ops-preset-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const spend = Number(btn.dataset.spend);
-        customInput.value = spend;
-        activeSpendAmount = spend;
-        updateCalculation();
-      });
-    });
-  }
-
-  function updateCalculation() {
-    updateModalBalances();
-    const rawVal = parseInt(customInput.value, 10);
-    if (isNaN(rawVal) || rawVal <= 0) {
+  if (openBtn && modal) {
+    function openModal() {
+      updateModalBalances();
+      modal.style.display = "flex";
+      setTimeout(() => modal.classList.add("open"), 10);
+      setDirection("tokens_to_cookies");
+      customInput.value = "";
       activeSpendAmount = 0;
-      summaryEl.innerHTML = "Zadej platné kladné celé číslo nebo vyber předvolbu.";
-      confirmBtn.disabled = true;
-      confirmBtn.style.opacity = "0.5";
-      return;
-    }
-    activeSpendAmount = rawVal;
-
-    let spendName = "", getVal = 0, getName = "";
-    const currentTokens = getTokens();
-    const currentCookies = readCookiesData().available;
-
-    if (exchangeDirection === "tokens_to_cookies") {
-      spendName = "tokenů";
-      getName = "sušenek";
-      getVal = Math.floor(activeSpendAmount * (1000 / 160));
-    } else {
-      spendName = "sušenek";
-      getName = "tokenů";
-      getVal = Math.floor(activeSpendAmount * (100 / 500));
+      updateCalculation();
+      msgEl.style.display = "none";
     }
 
-    let hasEnough = true;
-    if (exchangeDirection === "tokens_to_cookies") {
-      if (activeSpendAmount > currentTokens) hasEnough = false;
-    } else {
-      if (activeSpendAmount > currentCookies) hasEnough = false;
+    function closeModal() {
+      modal.classList.remove("open");
+      setTimeout(() => modal.style.display = "none", 250);
     }
 
-    let extraNote = "";
-    if (exchangeDirection === "tokens_to_cookies") {
-      if (activeSpendAmount % 160 !== 0) {
-        extraNote = `<br><small style="color:#ffd477;">Kurz je přesně nastaven na základy 160 tokenů = 1 000 sušenek. Získáš plných ${Number(getVal).toLocaleString("cs-CZ")} sušenek.</small>`;
+    function updateModalBalances() {
+      const t = getTokens();
+      const c = readCookiesData().available;
+      const tEl = document.getElementById("shopModalTokens");
+      const cEl = document.getElementById("shopModalCookies");
+      if (tEl) tEl.textContent = Math.round(t).toLocaleString("cs-CZ");
+      if (cEl) cEl.textContent = Math.round(c).toLocaleString("cs-CZ");
+    }
+
+    function setDirection(dir) {
+      exchangeDirection = dir;
+      customInput.value = "";
+      activeSpendAmount = 0;
+      msgEl.style.display = "none";
+
+      if (dir === "tokens_to_cookies") {
+        dirTokensBtn.style.background = "#252a3d";
+        dirTokensBtn.style.borderColor = "#38bdf8";
+        dirTokensBtn.style.color = "#fff";
+        dirCookiesBtn.style.background = "#191c27";
+        dirCookiesBtn.style.borderColor = "#34394b";
+        dirCookiesBtn.style.color = "#a4a9bc";
+        spendLabel.textContent = "tokenů";
+        presetsGrid.innerHTML = `
+          <button type="button" class="ops-preset-btn" data-spend="160" data-get="1000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
+            <div style="color:#ffd477;">160 tokenů</div>
+            <div style="font-size:0.8rem;color:#5be08a;">➔ 1 000 sušenek</div>
+          </button>
+          <button type="button" class="ops-preset-btn" data-spend="1600" data-get="10000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
+            <div style="color:#ffd477;">1 600 tokenů</div>
+            <div style="font-size:0.8rem;color:#5be08a;">➔ 10 000 sušenek</div>
+          </button>
+        `;
+      } else {
+        dirCookiesBtn.style.background = "#252a3d";
+        dirCookiesBtn.style.borderColor = "#38bdf8";
+        dirCookiesBtn.style.color = "#fff";
+        dirTokensBtn.style.background = "#191c27";
+        dirTokensBtn.style.borderColor = "#34394b";
+        dirTokensBtn.style.color = "#a4a9bc";
+        spendLabel.textContent = "sušenek";
+        presetsGrid.innerHTML = `
+          <button type="button" class="ops-preset-btn" data-spend="500" data-get="100" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;grid-column:1/-1;">
+            <div style="color:#5be08a;">500 sušenek</div>
+            <div style="font-size:0.8rem;color:#ffd477;">➔ 100 tokenů (zpětný kurz)</div>
+          </button>
+        `;
       }
-    } else {
-      const remainder = activeSpendAmount % 500;
-      if (remainder !== 0) {
-        extraNote = `<br><small style="color:#ffd477;">Vzhledem ke kurzu 500 sušenek = 100 tokenů zůstane v tvojí peněžence zbytek ${remainder} sušenek (zaokrouhleno dolů).</small>`;
-      }
+      attachPresetListeners();
+      updateCalculation();
     }
 
-    if (!hasEnough) {
-      summaryEl.innerHTML = `<span style="color:#ef4444;font-weight:700;">Nedostatek prostředků!</span> Utrácíš ${Number(activeSpendAmount).toLocaleString("cs-CZ")} ${spendName}, ale máš k dispozici pouze ${Number(exchangeDirection === "tokens_to_cookies" ? currentTokens : currentCookies).toLocaleString("cs-CZ")}.`;
-      confirmBtn.disabled = true;
-      confirmBtn.style.opacity = "0.5";
-      return;
+    function attachPresetListeners() {
+      document.querySelectorAll(".ops-preset-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const spend = Number(btn.dataset.spend);
+          customInput.value = spend;
+          activeSpendAmount = spend;
+          updateCalculation();
+        });
+      });
     }
 
-    summaryEl.innerHTML = `Utratíš <b>${Number(activeSpendAmount).toLocaleString("cs-CZ")}</b> ${spendName} a získáš <b>${Number(getVal).toLocaleString("cs-CZ")}</b> ${getName}.${extraNote}`;
-    confirmBtn.disabled = false;
-    confirmBtn.style.opacity = "1";
-  }
-
-  function executeExchange() {
-    if (activeSpendAmount <= 0) return;
-    const currentTokens = getTokens();
-    const currentCookies = readCookiesData().available;
-
-    if (exchangeDirection === "tokens_to_cookies") {
-      if (activeSpendAmount > currentTokens) {
-        showMsg("Nemáš dostatek tokenů!", false);
+    function updateCalculation() {
+      updateModalBalances();
+      const rawVal = parseInt(customInput.value, 10);
+      if (isNaN(rawVal) || rawVal <= 0) {
+        activeSpendAmount = 0;
+        summaryEl.innerHTML = "Zadej platné kladné celé číslo nebo vyber předvolbu.";
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = "0.5";
         return;
       }
-      const getCookies = Math.floor(activeSpendAmount * (1000 / 160));
-      addTokens(-activeSpendAmount);
-      addCookies(getCookies);
-      showMsg(`Úspěšně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} tokenů za ${Number(getCookies).toLocaleString("cs-CZ")} sušenek!`, true);
-    } else {
-      if (activeSpendAmount > currentCookies) {
-        showMsg("Nemáš dostatek sušenek!", false);
+      activeSpendAmount = rawVal;
+
+      let spendName = "", getVal = 0, getName = "";
+      const currentTokens = getTokens();
+      const currentCookies = readCookiesData().available;
+
+      if (exchangeDirection === "tokens_to_cookies") {
+        spendName = "tokenů";
+        getName = "sušenek";
+        getVal = Math.floor(activeSpendAmount * (1000 / 160));
+      } else {
+        spendName = "sušenek";
+        getName = "tokenů";
+        getVal = Math.floor(activeSpendAmount * (100 / 500));
+      }
+
+      let hasEnough = true;
+      if (exchangeDirection === "tokens_to_cookies") {
+        if (activeSpendAmount > currentTokens) hasEnough = false;
+      } else {
+        if (activeSpendAmount > currentCookies) hasEnough = false;
+      }
+
+      let extraNote = "";
+      if (exchangeDirection === "tokens_to_cookies") {
+        if (activeSpendAmount % 160 !== 0) {
+          extraNote = `<br><small style="color:#ffd477;">Kurz je přesně nastaven na základy 160 tokenů = 1 000 sušenek. Získáš plných ${Number(getVal).toLocaleString("cs-CZ")} sušenek.</small>`;
+        }
+      } else {
+        const remainder = activeSpendAmount % 500;
+        if (remainder !== 0) {
+          extraNote = `<br><small style="color:#ffd477;">Vzhledem ke kurzu 500 sušenek = 100 tokenů zůstane v tvojí peněžence zbytek ${remainder} sušenek (zaokrouhleno dolů).</small>`;
+        }
+      }
+
+      if (!hasEnough) {
+        summaryEl.innerHTML = `<span style="color:#ef4444;font-weight:700;">Nedostatek prostředků!</span> Utrácíš ${Number(activeSpendAmount).toLocaleString("cs-CZ")} ${spendName}, ale máš k dispozici pouze ${Number(exchangeDirection === "tokens_to_cookies" ? currentTokens : currentCookies).toLocaleString("cs-CZ")}.`;
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = "0.5";
         return;
       }
-      const getTokensVal = Math.floor(activeSpendAmount * (100 / 500));
-      deductCookies(activeSpendAmount);
-      addTokens(getTokensVal);
-      showMsg(`Úspěšně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} sušenek za ${Number(getTokensVal).toLocaleString("cs-CZ")} tokenů!`, true);
+
+      summaryEl.innerHTML = `Utratíš <b>${Number(activeSpendAmount).toLocaleString("cs-CZ")}</b> ${spendName} a získáš <b>${Number(getVal).toLocaleString("cs-CZ")}</b> ${getName}.${extraNote}`;
+      confirmBtn.disabled = false;
+      confirmBtn.style.opacity = "1";
     }
 
-    updateModalBalances();
-    const mainTokensEl = document.getElementById("tokens");
-    if (mainTokensEl && window.OPS_STATS) {
-      mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
+    function executeExchange() {
+      if (activeSpendAmount <= 0) return;
+      const currentTokens = getTokens();
+      const currentCookies = readCookiesData().available;
+
+      if (exchangeDirection === "tokens_to_cookies") {
+        if (activeSpendAmount > currentTokens) {
+          showMsg("Nemáš dostatek tokenů!", false);
+          return;
+        }
+        const getCookies = Math.floor(activeSpendAmount * (1000 / 160));
+        addTokens(-activeSpendAmount);
+        addCookies(getCookies);
+        showMsg(`Úspěšně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} tokenů za ${Number(getCookies).toLocaleString("cs-CZ")} sušenek!`, true);
+      } else {
+        if (activeSpendAmount > currentCookies) {
+          showMsg("Nemáš dostatek sušenek!", false);
+          return;
+        }
+        const getTokensVal = Math.floor(activeSpendAmount * (100 / 500));
+        deductCookies(activeSpendAmount);
+        addTokens(getTokensVal);
+        showMsg(`Úspěšně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} sušenek za ${Number(getTokensVal).toLocaleString("cs-CZ")} tokenů!`, true);
+      }
+
+      updateModalBalances();
+      const mainTokensEl = document.getElementById("tokens");
+      if (mainTokensEl && window.OPS_STATS) {
+        mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
+      }
+
+      customInput.value = "";
+      activeSpendAmount = 0;
+      updateCalculation();
+      setTimeout(() => {
+        closeModal();
+        window.location.reload();
+      }, 1200);
     }
 
+    function showMsg(text, isSuccess) {
+      msgEl.style.display = "block";
+      msgEl.style.background = isSuccess ? "rgba(34, 197, 94, 0.18)" : "rgba(239, 68, 68, 0.18)";
+      msgEl.style.border = isSuccess ? "1px solid rgba(34, 197, 94, 0.5)" : "1px solid rgba(239, 68, 68, 0.5)";
+      msgEl.style.color = isSuccess ? "#86efac" : "#fca5a5";
+      msgEl.textContent = text;
+    }
+
+    openBtn.addEventListener("click", openModal);
+    closeBtn.addEventListener("click", closeModal);
+    cancelBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+    dirTokensBtn.addEventListener("click", () => setDirection("tokens_to_cookies"));
+    dirCookiesBtn.addEventListener("click", () => setDirection("cookies_to_tokens"));
     customInput.value = "";
-    activeSpendAmount = 0;
-    updateCalculation();
-    setTimeout(() => {
-      closeModal();
-      window.location.reload();
-    }, 1200);
+    customInput.addEventListener("input", updateCalculation);
+    confirmBtn.addEventListener("click", executeExchange);
+
+    attachPresetListeners();
   }
-
-  function showMsg(text, isSuccess) {
-    msgEl.style.display = "block";
-    msgEl.style.background = isSuccess ? "rgba(34, 197, 94, 0.18)" : "rgba(239, 68, 68, 0.18)";
-    msgEl.style.border = isSuccess ? "1px solid rgba(34, 197, 94, 0.5)" : "1px solid rgba(239, 68, 68, 0.5)";
-    msgEl.style.color = isSuccess ? "#86efac" : "#fca5a5";
-    msgEl.textContent = text;
-  }
-
-  openBtn.addEventListener("click", openModal);
-  closeBtn.addEventListener("click", closeModal);
-  cancelBtn.addEventListener("click", closeModal);
-  modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-
-  dirTokensBtn.addEventListener("click", () => setDirection("tokens_to_cookies"));
-  dirCookiesBtn.addEventListener("click", () => setDirection("cookies_to_tokens"));
-  customInput.addEventListener("input", updateCalculation);
-  confirmBtn.addEventListener("click", executeExchange);
-
-  attachPresetListeners();
 })();
 </script>
-
-
-</div><div class="floor"></div></main>
-<script src="/js/ops-stats.js"></script>
-<script>
-(()=>{'use strict';const $=id=>document.getElementById(id);let ctx=null;let muted=localStorage.getItem('ops_gacha_muted')==='1';const paintSound=()=>{$('sound').textContent=muted?'🔇':'🔊';$('sound').setAttribute('aria-label',muted?'Zapnout zvuky':'Vypnout zvuky')};paintSound();function tone(freq=650,duration=.045,volume=.025){if(muted)return;try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(volume,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+duration);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+duration)}catch(_){}}$('sound').addEventListener('click',()=>{muted=!muted;localStorage.setItem('ops_gacha_muted',muted?'1':'0');paintSound();if(!muted)tone(850,.08)});document.querySelectorAll('.station').forEach(a=>{a.addEventListener('pointerenter',()=>tone(540,.025,.012));a.addEventListener('click',()=>tone(900,.09,.03))});document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey||e.repeat)return;const a={'1':'/kasino/blackjack.html','2':'/kasino/slot.html','3':'/kasino/gacha.html'}[e.key];if(a&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))location.href=a});function money(n){n=Number(n)||0;return(n>0?'+':'')+n.toLocaleString('cs-CZ')}function readNet(key){try{const v=JSON.parse(localStorage.getItem(key)||'null');return v&&Number.isFinite(Number(v.net))?Number(v.net):null}catch(_){return null}}const b=readNet('ops_blackjack_stats'),s=readNet('ops_slots_stats');$('bj-stat').textContent=b===null?'Ještě nehráno':'Čistý zisk: '+money(b);$('slot-stat').textContent=s===null?'Ještě nehráno':'Čistý zisk: '+money(s);try{const stats=window.OPS_STATS&&OPS_STATS.getStats?OPS_STATS.getStats():{};const g=stats.gacha||{};$('tokens').textContent=Number(g.tokens??stats.tokens??0).toLocaleString('cs-CZ');const user=OPS_STATS&&OPS_STATS.getUsername?OPS_STATS.getUsername():'';$('username').textContent=user||'Bez přezdívky';$('username').title=user?'Přezdívka hráče':'Kliknutím nastav přezdívku';if(!user){$('username').style.cursor='pointer';$('username').addEventListener('click',()=>OPS_STATS&&OPS_STATS.promptUsernameModal&&OPS_STATS.promptUsernameModal())}const inv=g.inventory;const count=Array.isArray(inv)?inv.length:inv&&typeof inv==='object'?Object.keys(inv).length:Number(g.inventoryCount||g.uniqueCharacters||0);$('gacha-stat').textContent='Zápisů: '+Number(g.totalPulls||0).toLocaleString('cs-CZ')+' · Sbor: '+count+'/'+(g.characterCount||g.totalCharacters||'?')}catch(e){$('gacha-stat').textContent='Statistiky nejsou dostupné';console.warn('OPS stats:',e)}})();
-</script></body></html>
+</body></html>
