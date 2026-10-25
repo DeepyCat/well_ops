@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#11131c">
+<title>OPS · Výherní automat</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%B0%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--blue:#8cbbff;--cyan:#7ff0ff;--green:#5be08a}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 75% 5%,#32202d 0,transparent 36%),var(--bg);color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.hide{display:none!important}
+.topbar{height:68px;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff14;background:#10121add;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
+.brand{font-weight:900;letter-spacing:.12em}.brand span{color:var(--red)}
+.top-right{display:flex;align-items:center;gap:10px}
+.mute-btn{background:#ffffff09;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:1rem}.mute-btn:hover{border-color:var(--red)}
+.back{color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:10px}.back:hover{color:white;border-color:var(--red)}
+main{width:min(1180px,94vw);margin:30px auto 70px}
+h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
+.layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(260px,.7fr);gap:20px;align-items:start}
+
+.machine-table{position:relative;border:10px solid #2a2d3d;border-radius:22px;background:radial-gradient(ellipse at 50% 30%,#241f33 0,#141622 55%,#0d0e15 100%);box-shadow:inset 0 0 60px #0009,0 18px 50px #0007;padding:24px;min-height:600px;display:flex;flex-direction:column;justify-content:space-between}
+.slot-screen{background:#0a0b10;border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:inset 0 0 30px #000a;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;position:relative;overflow:hidden}
+.reel-col{background:#121520;border:1px solid #ffffff14;border-radius:10px;height:270px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center}
+.reel-strip{position:absolute;width:100%;display:flex;flex-direction:column;transition:transform .4s cubic-bezier(.15,.85,.25,1)}
+.reel-symbol{height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:2.4rem;user-select:none;border-bottom:1px dashed #ffffff08}
+.reel-symbol small{font-size:.65rem;color:var(--muted);font-weight:700;margin-top:2px}
+.reel-symbol.win-glow{background:#ffd47722;color:var(--gold);text-shadow:0 0 12px var(--gold)}
+
+.big-win-overlay{position:fixed;inset:0;z-index:50;background:#080910eb;backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;text-align:center;padding:20px}
+.big-win-overlay.show{display:flex;animation:fade .25s ease}
+.big-win-box h2{font-size:clamp(2.5rem,7vw,5rem);font-style:italic;color:var(--gold);margin:0 0 10px;text-transform:uppercase;text-shadow:0 0 30px #ffd47766}
+.big-win-box p{font-size:1.8rem;color:white;margin:0 0 24px}
+
+.controls-dock{display:flex;flex-direction:column;gap:14px;background:#0a0b12d9;border:1px solid #ffffff1a;border-radius:16px;padding:16px;margin-top:16px}
+.control-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.bet-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip-btn{background:#ffffff0d;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-weight:800;font-size:.85rem;transition:.15s}
+.chip-btn:hover:not(:disabled){border-color:var(--cyan);background:#7ff0ff11}
+.chip-btn.active{background:var(--cyan);color:#0a0b10;border-color:var(--cyan)}
+.btn{border:1px solid var(--line);border-radius:12px;padding:12px 20px;font-weight:850;background:#ffffff0d;transition:transform .15s,border-color .15s}
+.btn:hover:not(:disabled){transform:translateY(-2px);border-color:#ffffff66}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:linear-gradient(110deg,#ff435c,#d92750);border-color:#ff697a;box-shadow:0 8px 26px #ff335022}
+.btn.spin{font-size:1.1rem;padding:12px 28px}
+.toggles{display:flex;gap:10px}
+.toggle-btn{background:#ffffff08;border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:.82rem;font-weight:700}
+.toggle-btn.active{background:#ff526333;border-color:var(--red);color:#ff9da7}
+
+.panel{background:linear-gradient(160deg,#1b1e2a,#151722);border:1px solid var(--line);border-radius:20px;padding:20px}
+.panel+.panel{margin-top:16px}
+.panel h2{margin:0 0 14px;font-size:1rem}
+.currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}
+.currency strong{color:var(--gold);font-size:1.5rem;font-variant-numeric:tabular-nums}
+.who{color:var(--muted);font-size:.82rem;margin:10px 0 0;line-height:1.5}
+.who button{background:none;border:0;color:var(--red);font-weight:700;padding:0}
+.paytable-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.82rem}
+.paytable-item{background:#ffffff05;border:1px solid #ffffff0d;border-radius:10px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#ffffff06;border:1px solid #ffffff0e;border-radius:12px;padding:11px 12px}
+.stat small{display:block;color:var(--muted);font-size:.72rem;margin-bottom:5px}.stat strong{font-size:1.1rem;font-variant-numeric:tabular-nums}
+.stat.wide{grid-column:1/-1}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.notice{font-size:.78rem;color:var(--muted);line-height:1.55;margin:12px 0 0}
+.link-btn{background:none;border:0;color:var(--red);font-weight:700;padding:0;margin-top:10px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}
+.section-head h2{margin:0}
+.pill{border:1px solid #ffffff22;border-radius:999px;padding:5px 11px;font-size:.8rem;color:#d9dbea;background:#ffffff08;font-variant-numeric:tabular-nums}
+.shop{display:flex;flex-direction:column;gap:10px}
+.shop-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#ffffff06;border:1px solid #ffffff12;border-radius:13px}
+.shop-info b{display:block;color:var(--gold);font-size:1rem}
+.shop-info small{color:var(--muted);font-size:.72rem}
+.shop-btn{white-space:nowrap;background:linear-gradient(110deg,#0284c7,#2563eb);border-color:#38bdf8}
+.lb{display:flex;flex-direction:column;gap:7px}
+.lb-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;background:#ffffff05;border:1px solid #ffffff0d;border-radius:11px;font-size:.88rem}
+.lb-row.me{border-color:#7ff0ff88;background:#7ff0ff10}
+.lb-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-net{font-weight:900;font-variant-numeric:tabular-nums}
+.lb-sub{grid-column:2/-1;color:var(--muted);font-size:.72rem;margin-top:-4px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252938;border:1px solid #4a5065;border-radius:12px;padding:12px 18px;z-index:80;display:none;max-width:90vw;box-shadow:0 10px 40px #0008}
+.toast.show{display:block}
+
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+@media(max-width:560px){.machine-table{padding:14px;min-height:500px}.reel-col{height:210px}.reel-symbol{height:70px;font-size:1.8rem}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">OPS <span>///</span> AUTOMAT</div>
+  <div class="top-right">
+    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky">🔊</button>
+    <a class="back" href="games.html">← Zpět na hry</a>
+  </div>
+</header>
+
+<main>
+  <h1>Výherní automat</h1>
+  <p class="sub">Toč válci s tematickými školními symboly, skládej výherní linie a sbírej školní body sdílené s gachou i blackjackem.</p>
+
+  <div class="layout">
+    <section class="machine-table" aria-label="Výherní automat">
+      <div class="slot-screen" id="slotScreen">
+        <div class="reel-col" data-col="0"><div class="reel-strip" id="strip0"></div></div>
+        <div class="reel-col" data-col="1"><div class="reel-strip" id="strip1"></div></div>
+        <div class="reel-col" data-col="2"><div class="reel-strip" id="strip2"></div></div>
+        <div class="reel-col" data-col="3"><div class="reel-strip" id="strip3"></div></div>
+        <div class="reel-col" data-col="4"><div class="reel-strip" id="strip4"></div></div>
+      </div>
+
+      <div class="controls-dock">
+        <div class="control-row">
+          <div class="bet-chips" id="betChips">
+            <button class="chip-btn" data-v="10" type="button">10</button>
+            <button class="chip-btn" data-v="50" type="button">50</button>
+            <button class="chip-btn" data-v="160" type="button">160</button>
+            <button class="chip-btn" data-v="500" type="button">500</button>
+            <button class="chip-btn" data-v="1600" type="button">1600</button>
+            <button class="chip-btn" id="clearBet" type="button">Vymazat</button>
+            <button class="chip-btn" id="maxBet" type="button">Vsadit vše</button>
+          </div>
+          <div>Sázka: <strong id="betAmt" style="color:var(--gold)">10</strong></div>
+        </div>
+        <div class="control-row" style="justify-content:space-between">
+          <div class="toggles">
+            <button class="toggle-btn" id="turboBtn" type="button">⚡ Turbo</button>
+            <button class="toggle-btn" id="autoBtn" type="button">🔄 Auto-spin</button>
+          </div>
+          <button class="btn primary spin" id="spinBtn" type="button">TOČIT <kbd style="margin-left:8px;font-size:.8rem;opacity:.7">Space</kbd></button>
+        </div>
+      </div>
+    </section>
+
+    <aside>
+      <div class="panel">
+        <div class="currency"><span>Školní body</span><strong>◆ <span id="tokens">0</span></strong></div>
+        <p class="who" id="who"></p>
+        <p class="notice hide" id="broke" style="color:var(--red);margin-top:10px">Došly ti body! Kup si další v obchodu nebo v <a href="/gacha" style="color:var(--gold);font-weight:700">náboru učitelů</a>.</p>
+      </div>
+
+      <div class="panel">
+        <h2>🛒 Obchod se sušenkami</h2>
+        <div class="section-head" style="margin:0 0 10px"><span class="pill" id="shopCookies">🍪 0</span></div>
+        <div class="shop">
+          <div class="shop-item">
+            <div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div>
+            <button class="btn small shop-btn" id="shopBuy1" type="button">🍪 1 000</button>
+          </div>
+          <div class="shop-item">
+            <div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček (10×)</small></div>
+            <button class="btn small shop-btn" id="shopBuy2" type="button">🍪 10 000</button>
+          </div>
+        </div>
+        <p class="notice">Sušenky se berou z Clickeru. Nakupovat lze pouze mezi točeními.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Výplatní tabulka (Paytable)</h2>
+        <div class="paytable-grid">
+          <div class="paytable-item"><span>♛ Ředitel (Wild)</span><span>5× = 500×</span></div>
+          <div class="paytable-item"><span>🔔 Zvonek</span><span>5× = 200×</span></div>
+          <div class="paytable-item"><span>📚 Kniha</span><span>5× = 100×</span></div>
+          <div class="paytable-item"><span>✏️ Tužka</span><span>5× = 50×</span></div>
+          <div class="paytable-item"><span>🍎 Jablko</span><span>5× = 20×</span></div>
+          <div class="paytable-item"><span>⭐ Známka</span><span>5× = 10×</span></div>
+        </div>
+        <p class="notice" style="margin-top:10px">RTP 93.37%. Výherních je 5 pevných linií (střed, horní, dolní a 2 diagonály).</p>
+      </div>
+
+      <div class="panel">
+        <h2>Statistiky automatu</h2>
+        <div class="stats">
+          <div class="stat"><small>Toček</small><strong id="stSpins">0</strong></div>
+          <div class="stat"><small>Výher</small><strong id="stWins">0</strong></div>
+          <div class="stat"><small>Největší výhra</small><strong id="stBiggest">0</strong></div>
+          <div class="stat"><small>Jackpoty ♛</small><strong id="stJackpots">0</strong></div>
+          <div class="stat"><small>Celkem vsazeno</small><strong id="stWagered">0</strong></div>
+          <div class="stat"><small>Celkem vyhráno</small><strong id="stWon">0</strong></div>
+          <div class="stat wide"><small>Čistý zisk</small><strong id="stNet">0</strong></div>
+        </div>
+        <p class="notice" id="cloudNote" style="margin-top:10px">Cloud: zjišťuji…</p>
+      </div>
+
+      <div class="panel">
+        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div class="big-win-overlay" id="bigWinOverlay">
+  <div class="big-win-box">
+    <div class="eyebrow" style="color:var(--gold);font-weight:800;letter-spacing:.2em;margin-bottom:8px">VELKÁ VÝHRA</div>
+    <h2 id="bigWinTitle">SKVĚLÉ!</h2>
+    <p id="bigWinAmount">+0 ◆</p>
+    <button class="btn primary" id="closeBigWin" type="button">Pokračovat</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/js/ops-stats.js"></script>
+<script>
+(() => {
+  "use strict";
+  const MIN_BET = 10;
+  const STATS_KEY = "ops_slots_stats";
+  const REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = id => document.getElementById(id);
+  const sleep = ms => new Promise(r => setTimeout(r, REDUCE ? Math.min(ms, 30) : ms));
+
+  const SYMBOLS = [
+    { name: "Ředitel", icon: "♛", rank: "Z" },
+    { name: "Zvonek", icon: "🔔", rank: "S" },
+    { name: "Kniha", icon: "📚", rank: "A" },
+    { name: "Tužka", icon: "✏️", rank: "B" },
+    { name: "Jablko", icon: "🍎", rank: "C" },
+    { name: "Známka", icon: "⭐", rank: "D" }
+  ];
+  const WEIGHTS = [2, 12, 35, 90, 220, 450];
+  const PAYOUTS = {
+    "Ředitel": {5: 500, 4: 120, 3: 25},
+    "Zvonek":  {5: 240, 4: 58,  3: 11.5},
+    "Kniha":   {5: 115, 4: 29,  3: 5.8},
+    "Tužka":   {5: 58,  4: 14.5,3: 3.1},
+    "Jablko":  {5: 25,  4: 5.8,  3: 1.05},
+    "Známka":  {5: 12.5,4: 2.9,  3: 0.52}
+  };
+  const PAYLINES = [
+    [1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0],
+    [2, 2, 2, 2, 2],
+    [0, 1, 2, 1, 0],
+    [2, 1, 0, 1, 2]
+  ];
+
+  let fallbackTokens = 1600;
+  function getTokens() {
+    if (!window.OPS_STATS) return fallbackTokens;
+    const s = window.OPS_STATS.getStats();
+    return s && s.gacha && typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600;
+  }
+  function addTokens(delta) {
+    if (!window.OPS_STATS) { fallbackTokens += delta; return; }
+    const s = window.OPS_STATS.getStats();
+    s.gacha = s.gacha || {};
+    s.gacha.tokens = Math.max(0, (typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600) + delta);
+    window.OPS_STATS.saveStats(s);
+  }
+
+  const emptyStats = () => ({ spins: 0, wins: 0, biggest: 0, net: 0, jackpots: 0, totalWagered: 0, totalWon: 0 });
+  function loadStats() {
+    try { return { ...emptyStats(), ...(JSON.parse(localStorage.getItem(STATS_KEY)) || {}) }; }
+    catch (e) { return emptyStats(); }
+  }
+  function saveStats(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {} }
+
+  const sfx = (() => {
+    let ctx = null, muted = false;
+    try { muted = localStorage.getItem("ops_gacha_muted") === "1"; } catch (e) {}
+    function ac() {
+      if (muted) return null;
+      try {
+        if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ctx = new AC(); }
+        if (ctx.state === "suspended") ctx.resume();
+        return ctx;
+      } catch (e) { return null; }
+    }
+    function tone(f, t0, dur, type = "sine", vol = .1, f2) {
+      const c = ac(); if (!c) return;
+      const t = c.currentTime + t0, o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + .012);
+      g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .05);
+    }
+    function noise(t0, dur, vol = .15, freq = 2500) {
+      const c = ac(); if (!c) return;
+      const t = c.currentTime + t0, len = Math.floor(c.sampleRate * dur);
+      const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      const src = c.createBufferSource(); src.buffer = buf;
+      const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = freq;
+      const g = c.createGain(); g.gain.value = vol;
+      src.connect(bp); bp.connect(g); g.connect(c.destination); src.start(t);
+    }
+    const arp = (notes, step, type, vol, dur) => notes.forEach((n, i) => tone(n, i * step, dur, type, vol));
+    return {
+      isMuted: () => muted,
+      setMuted(v) { muted = !!v; try { localStorage.setItem("ops_gacha_muted", muted ? "1" : "0"); } catch (e) {} },
+      click() { tone(800, 0, .04, "square", .02); },
+      spin()  { noise(0, .05, .08, 1200); },
+      stop()  { tone(400, 0, .06, "triangle", .05); },
+      win()   { arp([523, 659, 784, 1047], .08, "triangle", .08, .35); },
+      jackpot(){ arp([523, 659, 784, 1047, 1319, 1568], .08, "triangle", .1, .5); },
+      error() { tone(180, 0, .2, "sawtooth", .06, 110); }
+    };
+  })();
+
+  function toast(m) {
+    const el = $("toast"); el.textContent = m; el.classList.add("show");
+    clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove("show"), 2600);
+  }
+  const fmt = n => Math.round(n).toLocaleString("cs-CZ");
+  const signed = n => (n > 0 ? "+" : n < 0 ? "−" : "") + fmt(Math.abs(n));
+
+  let bet = 10;
+  let busy = false;
+  let turbo = false;
+  let autoRunning = false;
+  let autoCount = 0;
+
+  function maxAffordable() { return Math.floor(getTokens() / MIN_BET) * MIN_BET; }
+  function clampBet() { bet = Math.max(MIN_BET, Math.min(bet, maxAffordable() || MIN_BET)); }
+
+  function updateUI() {
+    const tokens = getTokens();
+    $("tokens").textContent = fmt(tokens);
+    $("betAmt").textContent = fmt(bet);
+    $("spinBtn").disabled = busy || tokens < bet;
+    $("turboBtn").classList.toggle("active", turbo);
+    $("autoBtn").classList.toggle("active", autoRunning);
+    $("autoBtn").textContent = autoRunning ? `⏹ Zastavit (${autoCount})` : "🔄 Auto-spin";
+    $("broke").classList.toggle("hide", tokens >= MIN_BET);
+    $("shopCookies").textContent = "🍪 " + fmt(readCookies().available);
+    $("shopBuy1").disabled = busy || autoRunning;
+    $("shopBuy2").disabled = busy || autoRunning;
+
+    const user = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
+    if (user && !user.startsWith("Host")) {
+      $("who").innerHTML = `Hraješ jako <b>${user.replace(/[<>&"]/g, "")}</b>. Body se synchronizují do cloudu.`;
+    } else {
+      $("who").innerHTML = `Hraješ bez přezdívky, body se ukládají lokálně. <button type="button" id="setName">Zadat přezdívku</button>`;
+      const b = $("setName");
+      if (b) b.addEventListener("click", () => window.OPS_STATS && window.OPS_STATS.promptUsernameModal());
+    }
+
+    document.querySelectorAll(".chip-btn").forEach(btn => {
+      if (btn.id === "clearBet" || btn.id === "maxBet") return;
+      const v = Number(btn.dataset.v);
+      btn.classList.toggle("active", bet === v);
+      btn.disabled = busy || autoRunning;
+    });
+  }
+
+  function renderStats() {
+    const st = loadStats();
+    $("stSpins").textContent = fmt(st.spins);
+    $("stWins").textContent = fmt(st.wins);
+    $("stBiggest").textContent = fmt(st.biggest);
+    $("stJackpots").textContent = fmt(st.jackpots);
+    $("stWagered").textContent = fmt(st.totalWagered);
+    $("stWon").textContent = fmt(st.totalWon);
+    const n = $("stNet");
+    n.textContent = signed(st.net);
+    n.className = st.net > 0 ? "pos" : st.net < 0 ? "neg" : "";
+  }
+
+  function getRandomSymbol() {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    const rand = arr[0] / 4294967296;
+    let sum = 0;
+    const totalWeight = WEIGHTS.reduce((a, b) => a + b, 0);
+    const target = rand * totalWeight;
+    for (let i = 0; i < WEIGHTS.length; i++) {
+      sum += WEIGHTS[i];
+      if (target <= sum) return SYMBOLS[i];
+    }
+    return SYMBOLS[SYMBOLS.length - 1];
+  }
+
+  function initScreen() {
+    for (let c = 0; c < 5; c++) {
+      const strip = $("strip" + c);
+      strip.innerHTML = "";
+      for (let r = 0; r < 3; r++) {
+        const sym = getRandomSymbol();
+        const div = document.createElement("div");
+        div.className = "reel-symbol";
+        div.innerHTML = `<span>${sym.icon}</span><small>${sym.name}</small>`;
+        div.dataset.symbol = sym.name;
+        strip.appendChild(div);
+      }
+      strip.style.transform = "translateY(0)";
+    }
+  }
+
+  async function spin() {
+    if (busy) return;
+    clampBet();
+    if (getTokens() < bet) {
+      sfx.error();
+      toast("Nemáš dost školních bodů na sázku.");
+      stopAuto();
+      return;
+    }
+
+    busy = true;
+    updateUI();
+
+    addTokens(-bet);
+    const st = loadStats();
+    st.spins++;
+    st.totalWagered += bet;
+
+    const outcomeMatrix = [];
+    for (let c = 0; c < 5; c++) {
+      const colSymbols = [];
+      for (let r = 0; r < 3; r++) {
+        colSymbols.push(getRandomSymbol());
+      }
+      outcomeMatrix.push(colSymbols);
+    }
+
+    let totalWin = 0;
+    const winningSymbolsSet = new Set();
+    for (let li = 0; li < PAYLINES.length; li++) {
+      const line = PAYLINES[li];
+      const lineSyms = line.map((row, col) => outcomeMatrix[col][row]);
+      let first = lineSyms[0].name;
+      let count = 1;
+      for (let i = 1; i < lineSyms.length; i++) {
+        const sName = lineSyms[i].name;
+        if (sName === first || sName === "Ředitel" || first === "Ředitel") {
+          if (first === "Ředitel" && sName !== "Ředitel") {
+            first = sName;
+          }
+          count++;
+        } else {
+          break;
+        }
+      }
+      if (count >= 3) {
+        const symToPay = first !== "Ředitel" ? first : "Ředitel";
+        const mult = PAYOUTS[symToPay][count] || 0;
+        const lineWin = Math.floor((bet / PAYLINES.length) * mult);
+        totalWin += lineWin;
+        for (let c = 0; c < count; c++) {
+          winningSymbolsSet.add(`${c}-${PAYLINES[li][c]}`);
+        }
+      }
+    }
+
+    if (totalWin > 0) {
+      addTokens(totalWin);
+      st.wins++;
+      st.totalWon += totalWin;
+      st.biggest = Math.max(st.biggest, totalWin);
+      if (outcomeMatrix.flat().some(s => s.name === "Ředitel")) {
+        st.jackpots++;
+      }
+    }
+    st.net = st.totalWon - st.totalWagered;
+    saveStats(st);
+    schedulePush();
+
+    const spinDur = turbo ? 180 : 450;
+    const colDelay = turbo ? 50 : 120;
+
+    for (let c = 0; c < 5; c++) {
+      const strip = $("strip" + c);
+      strip.innerHTML = "";
+      const tempSymbols = [];
+      for (let i = 0; i < 8; i++) tempSymbols.push(getRandomSymbol());
+      tempSymbols.push(outcomeMatrix[c][0], outcomeMatrix[c][1], outcomeMatrix[c][2]);
+
+      for (const sym of tempSymbols) {
+        const div = document.createElement("div");
+        div.className = "reel-symbol";
+        div.innerHTML = `<span>${sym.icon}</span><small>${sym.name}</small>`;
+        div.dataset.symbol = sym.name;
+        strip.appendChild(div);
+      }
+
+      const totalH = tempSymbols.length * 90;
+      const viewH = 270;
+      strip.style.transition = "none";
+      strip.style.transform = `translateY(-${totalH - viewH}px)`;
+      void strip.offsetWidth;
+
+      sfx.spin();
+      strip.style.transition = `transform ${spinDur + c * colDelay}ms cubic-bezier(.15,.85,.25,1)`;
+      strip.style.transform = "translateY(0)";
+
+      await sleep(spinDur + c * colDelay);
+      sfx.stop();
+
+      strip.style.transition = "none";
+      strip.style.transform = "translateY(0)";
+      strip.innerHTML = "";
+      for (let r = 0; r < 3; r++) {
+        const sym = outcomeMatrix[c][r];
+        const div = document.createElement("div");
+        div.className = "reel-symbol";
+        if (winningSymbolsSet.has(`${c}-${r}`)) {
+          div.classList.add("win-glow");
+        }
+        div.innerHTML = `<span>${sym.icon}</span><small>${sym.name}</small>`;
+        strip.appendChild(div);
+      }
+    }
+
+    busy = false;
+    updateUI();
+    renderStats();
+
+    if (totalWin > 0) {
+      if (totalWin >= bet * 20) {
+        showBigWin(totalWin);
+      } else {
+        if (outcomeMatrix.flat().some(s => s.name === "Ředitel")) sfx.jackpot();
+        else sfx.win();
+        toast(`Výhra: +${fmt(totalWin)} ◆`);
+      }
+    }
+
+    if (autoRunning) {
+      autoCount--;
+      if (autoCount <= 0 || getTokens() < bet || totalWin >= bet * 20) {
+        stopAuto();
+      } else {
+        setTimeout(spin, turbo ? 200 : 400);
+      }
+    }
+  }
+
+  function showBigWin(amount) {
+    sfx.jackpot();
+    $("bigWinTitle").textContent = amount >= bet * 50 ? "EPICKÝ JACKPOT!" : "VELKÁ VÝHRA!";
+    $("bigWinAmount").textContent = `+${fmt(amount)} ◆`;
+    $("bigWinOverlay").classList.add("show");
+  }
+
+  $("closeBigWin").addEventListener("click", () => {
+    $("bigWinOverlay").classList.remove("show");
+  });
+
+  function startAuto(count) {
+    if (autoRunning) { stopAuto(); return; }
+    if (getTokens() < bet) { toast("Nedostatek bodů pro auto-spin."); return; }
+    autoRunning = true;
+    autoCount = count;
+    updateUI();
+    spin();
+  }
+  function stopAuto() {
+    autoRunning = false;
+    autoCount = 0;
+    updateUI();
+  }
+
+  function readCookies() {
+    let save = null;
+    try { save = JSON.parse(localStorage.getItem("cookieClickerSave")); } catch (e) {}
+    const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
+    const saveCookies = save ? (Number(save.cookies) || 0) : 0;
+    const statCookies = stats && stats.clicker ? (Number(stats.clicker.cookies) || 0) : 0;
+    return { save, saveCookies, statCookies, available: Math.max(saveCookies, statCookies) };
+  }
+
+  function buyWithCookies(cost, gain) {
+    if (busy || autoRunning) { toast("Nyní nelze nakupovat."); return; }
+    const c = readCookies();
+    if (c.available < cost) {
+      sfx.error();
+      toast(`Nemáš dost sušenek (vidím ${fmt(c.available)}, potřeba ${fmt(cost)}).`);
+      return;
+    }
+    if (cost >= 10000 && !confirm(`Opravdu utratit ${fmt(cost)} sušenek za ${fmt(gain)} bodů?`)) return;
+
+    if (c.save) {
+      c.save.cookies = Math.max(0, c.saveCookies - cost);
+      localStorage.setItem("cookieClickerSave", JSON.stringify(c.save));
+      addTokens(gain);
+    } else if (window.OPS_STATS) {
+      const s = window.OPS_STATS.getStats();
+      if (s.clicker) s.clicker.cookies = Math.max(0, c.statCookies - cost);
+      s.gacha = s.gacha || {};
+      s.gacha.tokens = (typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600) + gain;
+      window.OPS_STATS.saveStats(s);
+    } else { addTokens(gain); }
+
+    sfx.click();
+    updateUI();
+    toast(`Nakoupeno ${fmt(gain)} bodů za ${fmt(cost)} sušenek!`);
+  }
+
+  const cloud = { timer: null, retried: false };
+  const cloudCfg = () => (window.OPS_STATS && window.OPS_STATS.config) || null;
+  function cloudUser() {
+    const u = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
+    return u && !u.startsWith("Host") ? u : "";
+  }
+  function cloudHeaders(extra) {
+    const cfg = cloudCfg();
+    return { apikey: cfg.anonKey, Authorization: "Bearer " + cfg.anonKey, "Content-Type": "application/json", ...(extra || {}) };
+  }
+  function setCloudNote(text, ok) {
+    const el = $("cloudNote");
+    el.textContent = text;
+    el.style.color = ok ? "" : "var(--red)";
+  }
+  function missingColumn(txt) { return /slots/i.test(txt) && /(column|PGRST)/i.test(txt); }
+
+  async function pushStats() {
+    const cfg = cloudCfg(), user = cloudUser();
+    if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen lokálně.", true); return; }
+    try {
+      const res = await fetch(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}`, {
+        method: "PATCH",
+        headers: cloudHeaders({ Prefer: "return=representation" }),
+        body: JSON.stringify({ slots: loadStats() }),
+        keepalive: true
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        setCloudNote(missingColumn(t) ? "Cloud: ve Supabase chybí sloupec „slots“." : `Cloud: uložení selhalo (${res.status}).`, false);
+        return;
+      }
+      const rows = await res.json();
+      if (!rows.length) {
+        if (!cloud.retried) { cloud.retried = true; setTimeout(pushStats, 2500); }
+        else setCloudNote("Cloud: záznam ještě neexistuje.", false);
+        return;
+      }
+      cloud.retried = false;
+      setCloudNote("Cloud: statistiky uloženy.", true);
+      loadLeaderboard();
+    } catch (e) {
+      setCloudNote("Cloud: chyba spojení.", false);
+    }
+  }
+  function schedulePush() { clearTimeout(cloud.timer); cloud.timer = setTimeout(pushStats, 800); }
+
+  async function pullStats() {
+    const cfg = cloudCfg(), user = cloudUser();
+    if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen lokálně.", true); return; }
+    try {
+      const res = await fetch(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}&select=slots`, { headers: cloudHeaders() });
+      if (!res.ok) {
+        const t = await res.text();
+        setCloudNote(missingColumn(t) ? "Cloud: ve Supabase chybí sloupec „slots“." : `Cloud: načtení selhalo (${res.status}).`, false);
+        return;
+      }
+      const rows = await res.json();
+      const remote = rows[0] && rows[0].slots && typeof rows[0].slots === "object" ? rows[0].slots : null;
+      const local = loadStats();
+      if (remote && (Number(remote.spins) || 0) > local.spins) {
+        saveStats({ ...emptyStats(), ...remote });
+        renderStats();
+        setCloudNote("Cloud: statistiky načteny.", true);
+      } else if (local.spins > ((remote && Number(remote.spins)) || 0)) {
+        pushStats();
+      } else {
+        setCloudNote("Cloud: statistiky jsou synchronizované.", true);
+      }
+    } catch (e) { setCloudNote("Cloud: chyba spojení.", false); }
+  }
+
+  const esc = v => String(v).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  async function loadLeaderboard() {
+    const box = $("lbList"), cfg = cloudCfg();
+    if (!cfg) { box.innerHTML = '<div class="notice">Žebříček není dostupný.</div>'; return; }
+    try {
+      const url = `${cfg.url}/rest/v1/${cfg.table}?select=username,slots&slots=not.is.null&order=slots->net.desc.nullslast&limit=10`;
+      const res = await fetch(url, { headers: cloudHeaders() });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const rows = (await res.json()).filter(r => r.slots && (Number(r.slots.spins) || 0) > 0);
+      if (!rows.length) { box.innerHTML = '<div class="notice">Zatím nikdo nehrál automat. Buď první!</div>'; return; }
+      const me = cloudUser();
+      const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+      box.innerHTML = rows.map((r, i) => {
+        const s = r.slots, net = Number(s.net) || 0;
+        return `<div class="lb-row${r.username === me ? " me" : ""}"><span>${medal(i)}</span><span class="lb-name">${esc(r.username)}</span><span class="lb-net ${net > 0 ? "pos" : net < 0 ? "neg" : ""}">${signed(net)}</span><span class="lb-sub">${fmt(s.spins)} toček · max výhra ${fmt(s.biggest)} ◆</span></div>`;
+      }).join("");
+    } catch (e) {
+      box.innerHTML = '<div class="notice">Žebříček se nepodařilo načíst.</div>';
+    }
+  }
+
+  document.querySelectorAll(".chip-btn").forEach(btn => {
+    if (btn.id === "clearBet" || btn.id === "maxBet") return;
+    btn.addEventListener("click", () => {
+      if (busy || autoRunning) return;
+      bet = Number(btn.dataset.v);
+      clampBet();
+      sfx.click();
+      updateUI();
+    });
+  });
+  $("clearBet").addEventListener("click", () => {
+    if (busy || autoRunning) return;
+    bet = MIN_BET;
+    sfx.click();
+    updateUI();
+  });
+  $("maxBet").addEventListener("click", () => {
+    if (busy || autoRunning) return;
+    bet = maxAffordable();
+    clampBet();
+    sfx.click();
+    updateUI();
+  });
+
+  $("spinBtn").addEventListener("click", spin);
+  $("turboBtn").addEventListener("click", () => { turbo = !turbo; sfx.click(); updateUI(); });
+  $("autoBtn").addEventListener("click", () => { startAuto(25); });
+
+  $("shopBuy1").addEventListener("click", () => buyWithCookies(1000, 160));
+  $("shopBuy2").addEventListener("click", () => buyWithCookies(10000, 1600));
+  $("lbRefresh").addEventListener("click", () => { sfx.click(); loadLeaderboard(); });
+
+  document.addEventListener("keydown", e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "input" || tag === "textarea") return;
+    if (e.code === "Space") {
+      e.preventDefault();
+      if (autoRunning) stopAuto();
+      else spin();
+    }
+  });
+
+  function updateMuteBtn() {
+    $("muteBtn").textContent = sfx.isMuted() ? "🔇" : "🔊";
+    $("muteBtn").title = sfx.isMuted() ? "Zapnout zvuky" : "Ztlumit zvuky";
+  }
+  $("muteBtn").addEventListener("click", () => {
+    sfx.setMuted(!sfx.isMuted());
+    updateMuteBtn();
+    if (!sfx.isMuted()) sfx.click();
+  });
+
+  window.addEventListener("load", () => setTimeout(() => { clampBet(); initScreen(); updateUI(); }, 1200));
+  window.addEventListener("focus", () => { if (!busy) { clampBet(); updateUI(); } });
+
+  updateMuteBtn();
+  initScreen();
+  bet = 10;
+  updateUI();
+  renderStats();
+  pullStats();
+  loadLeaderboard();
+})();
+</script>
+</body>
+</html>
