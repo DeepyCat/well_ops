@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const IMG_DIR = "img/";
+  const IMG_DIR = "/gacha/img/";
   const COST = 160, Z_HARD = 200, Z_SOFT = 150, S_HARD = 90, S_SOFT = 75, A_HARD = 10, HISTORY_MAX = 200;
   const agents = [
     {id:"reditel",name:"Ředitel",file:"Reditel",rank:"Z",symbol:"♛",type:"Ředitel školy"},
