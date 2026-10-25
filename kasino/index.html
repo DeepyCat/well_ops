@@ -12,13 +12,12 @@
 <a class="station bj" href="/kasino/blackjack.html" aria-label="Otevřít Blackjack, klávesa 1"><span class="beam"></span><div class="station-art"><div class="felt-table"><div class="mini-sign">Blackjack<br>výplata 3:2</div><div class="card a"><span>A<small>♠</small></span><span style="align-self:flex-end">♠</span></div><div class="card k"><span>K<small>♥</small></span><span style="align-self:flex-end">♥</span></div><div class="chips"></div></div></div><div class="plaque"><h2>♠ Blackjack</h2><p>Poraz dealera. Přirozený blackjack platí 3:2.</p><span class="stat" id="bj-stat">Ještě nehráno</span></div></a>
 <a class="station slot" href="/kasino/slot.html" aria-label="Otevřít výherní automat, klávesa 2"><span class="beam"></span><div class="station-art"><div class="machine"><div class="bulbs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="machine-label">AUTOMAT</div><div class="reels"><div class="reel"><span>📚</span></div><div class="reel"><span>🔔</span></div><div class="reel"><span>♛</span></div></div><div class="lever"></div><div class="slotbase"></div><div class="coin"></div></div></div><div class="plaque"><h2>✦ Výherní automat</h2><p>Roztoč válce a zkus štěstí.</p><span class="stat" id="slot-stat">Ještě nehráno</span></div></a>
 <a class="station pc" href="/kasino/gacha.html" aria-label="Otevřít nábor učitelů, klávesa 3"><span class="beam"></span><div class="station-art"><div class="computer"><div class="crt"><div class="screen"><strong>NÁBOR UČITELŮ</strong><div>&gt; inicializace sběrnice...</div><div>&gt; hledám kandidáty_</div><span class="cursor"></span><div class="teacher-cards"><i>Z</i><i>S</i><i>A</i><i>B</i></div></div></div><div class="keyboard"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><div class="plaque"><h2>▣ Nábor učitelů</h2><p>Vyvolej nové členy školního sboru.</p><span class="stat" id="gacha-stat">Načítám statistiky…</span></div></a>
-</div><div class="floor"></div></main>
-
-<!-- OPS OBCHOD (Směna měn) -->
-<div class="ops-shop-section" style="max-width:1250px;margin:50px auto 20px;text-align:center;">
-    <button type="button" id="openOpsShopBtn" style="background:linear-gradient(135deg,#ffd477,#f59e0b);color:#241a00;border:2px solid #ffd477;border-radius:14px;padding:16px 36px;font-size:1.25rem;font-weight:900;cursor:pointer;box-shadow:0 8px 25px rgba(255,212,119,0.35);transition:transform 0.2s,filter 0.2s;">🛒 Obchod OPS</button>
 </div>
-
+<!-- OPS OBCHOD (Směna měn) umístěný dole na ploše -->
+<div class="ops-shop-section" style="position:relative;z-index:10;max-width:400px;margin:25px auto 5px;text-align:center;pointer-events:auto;">
+    <button type="button" id="openOpsShopBtn" style="background:linear-gradient(135deg,#ffd477,#f59e0b);color:#241a00;border:2px solid #ffd477;border-radius:14px;padding:14px 34px;font-size:1.15rem;font-weight:900;cursor:pointer;box-shadow:0 8px 25px rgba(255,212,119,0.35);transition:transform 0.2s,filter 0.2s;pointer-events:auto;">🛒 Obchod OPS</button>
+</div>
+<div class="floor"></div></main>
 <!-- Modální okno obchodu -->
 <div id="opsShopModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity 0.25s ease;">
   <div style="background:linear-gradient(135deg,#151929 0,#0f1322 100%);border:2px solid rgba(255,212,119,0.4);border-radius:20px;max-width:540px;width:100%;padding:28px;color:#f8fafc;font-family:Inter,sans-serif;box-shadow:0 25px 60px rgba(0,0,0,0.8),0 0 40px rgba(255,212,119,0.15);transform:scale(0.95);transition:transform 0.25s ease;max-height:90vh;overflow-y:auto;" id="opsShopCard">
@@ -42,7 +41,7 @@
     <div style="margin-bottom:18px;">
       <label style="display:block;font-size:0.85rem;color:#a4a9bc;margin-bottom:8px;font-weight:700;">Směr směny</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <button type="button" id="dirTokensToCookies" style="background:#252a3d;border:2px solid #38bdf8;color:#fff;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;">Tokeny ➔ Sušenki</button>
+        <button type="button" id="dirTokensToCookies" style="background:#252a3d;border:2px solid #38bdf8;color:#fff;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;">Tokeny ➔ Sušenky</button>
         <button type="button" id="dirCookiesToTokens" style="background:#191c27;border:2px solid #34394b;color:#a4a9bc;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;">Sušenky ➔ Tokeny</button>
       </div>
     </div>
@@ -69,7 +68,7 @@
     </div>
 
     <!-- Výsledek / Přehled -->
-    <div id="opsExchangeSummary" style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:14px;margin-bottom:20px;font-size:0.95kr;line-height:1.5;">
+    <div id="opsExchangeSummary" style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:14px;margin-bottom:20px;font-size:0.95rem;line-height:1.5;">
       Zadej množství nebo vyber předvolbu.
     </div>
 
@@ -86,7 +85,6 @@
 (() => {
   'use strict';
 
-  // Helper functions for reading/writing currencies
   function getTokens() {
     if (!window.OPS_STATS) return 1600;
     const s = window.OPS_STATS.getStats();
@@ -139,11 +137,10 @@
     }
   }
 
-  let exchangeDirection = "tokens_to_cookies"; // "tokens_to_cookies" or "cookies_to_tokens"
+  let exchangeDirection = "tokens_to_cookies";
   let activeSpendAmount = 0;
 
   const modal = document.getElementById("opsShopModal");
-  const card = document.getElementById("opsShopCard");
   const openBtn = document.getElementById("openOpsShopBtn");
   const closeBtn = document.getElementById("closeOpsShopBtn");
   const cancelBtn = document.getElementById("opsShopCancelBtn");
@@ -155,6 +152,8 @@
   const summaryEl = document.getElementById("opsExchangeSummary");
   const msgEl = document.getElementById("opsShopMsg");
   const spendLabel = document.getElementById("spendCurrencyLabel");
+
+  if (!openBtn || !modal) return;
 
   function openModal() {
     updateModalBalances();
@@ -175,8 +174,10 @@
   function updateModalBalances() {
     const t = getTokens();
     const c = readCookiesData().available;
-    document.getElementById("shopModalTokens").textContent = Math.round(t).toLocaleString("cs-CZ");
-    document.getElementById("shopModalCookies").textContent = Math.round(c).toLocaleString("cs-CZ");
+    const tEl = document.getElementById("shopModalTokens");
+    const cEl = document.getElementById("shopModalCookies");
+    if (tEl) tEl.textContent = Math.round(t).toLocaleString("cs-CZ");
+    if (cEl) cEl.textContent = Math.round(c).toLocaleString("cs-CZ");
   }
 
   function setDirection(dir) {
@@ -252,12 +253,10 @@
     if (exchangeDirection === "tokens_to_cookies") {
       spendName = "tokenů";
       getName = "sušenek";
-      // Rates: 160 -> 1000, 1600 -> 10000 (rate is 1000/160 = 6.25 sušenek za 1 token)
       getVal = Math.floor(activeSpendAmount * (1000 / 160));
     } else {
       spendName = "sušenek";
       getName = "tokenů";
-      // Rate: 500 cookies -> 100 tokens (rate is 100/500 = 0.2 tokens per cookie, i.e. spend / 5)
       getVal = Math.floor(activeSpendAmount * (100 / 500));
     }
 
@@ -270,7 +269,6 @@
 
     let extraNote = "";
     if (exchangeDirection === "tokens_to_cookies") {
-      // Check if remainder in preset or ratio
       if (activeSpendAmount % 160 !== 0) {
         extraNote = `<br><small style="color:#ffd477;">Kurz je přesně nastaven na základy 160 tokenů = 1 000 sušenek. Získáš plných ${Number(getVal).toLocaleString("cs-CZ")} sušenek.</small>`;
       }
@@ -304,7 +302,6 @@
         return;
       }
       const getCookies = Math.floor(activeSpendAmount * (1000 / 160));
-      // Deduct tokens, add cookies safely
       addTokens(-activeSpendAmount);
       addCookies(getCookies);
       showMsg(`Úspěšně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} tokenů za ${Number(getCookies).toLocaleString("cs-CZ")} sušenek!`, true);
@@ -314,14 +311,12 @@
         return;
       }
       const getTokensVal = Math.floor(activeSpendAmount * (100 / 500));
-      // Deduct cookies, add tokens safely
       deductCookies(activeSpendAmount);
       addTokens(getTokensVal);
       showMsg(`Úspěšně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} sušenek za ${Number(getTokensVal).toLocaleString("cs-CZ")} tokenů!`, true);
     }
 
     updateModalBalances();
-    // Update main page token display if exists
     const mainTokensEl = document.getElementById("tokens");
     if (mainTokensEl && window.OPS_STATS) {
       mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
@@ -332,7 +327,7 @@
     updateCalculation();
     setTimeout(() => {
       closeModal();
-      window.location.reload(); // Refresh to sync all page state & stats
+      window.location.reload();
     }, 1200);
   }
 
@@ -344,7 +339,6 @@
     msgEl.textContent = text;
   }
 
-  // Event listeners
   openBtn.addEventListener("click", openModal);
   closeBtn.addEventListener("click", closeModal);
   cancelBtn.addEventListener("click", closeModal);
@@ -355,11 +349,12 @@
   customInput.addEventListener("input", updateCalculation);
   confirmBtn.addEventListener("click", executeExchange);
 
-  // Initial preset attach
   attachPresetListeners();
 })();
 </script>
 
+
+</div><div class="floor"></div></main>
 <script src="/js/ops-stats.js"></script>
 <script>
 (()=>{'use strict';const $=id=>document.getElementById(id);let ctx=null;let muted=localStorage.getItem('ops_gacha_muted')==='1';const paintSound=()=>{$('sound').textContent=muted?'🔇':'🔊';$('sound').setAttribute('aria-label',muted?'Zapnout zvuky':'Vypnout zvuky')};paintSound();function tone(freq=650,duration=.045,volume=.025){if(muted)return;try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(volume,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+duration);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+duration)}catch(_){}}$('sound').addEventListener('click',()=>{muted=!muted;localStorage.setItem('ops_gacha_muted',muted?'1':'0');paintSound();if(!muted)tone(850,.08)});document.querySelectorAll('.station').forEach(a=>{a.addEventListener('pointerenter',()=>tone(540,.025,.012));a.addEventListener('click',()=>tone(900,.09,.03))});document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey||e.repeat)return;const a={'1':'/kasino/blackjack.html','2':'/kasino/slot.html','3':'/kasino/gacha.html'}[e.key];if(a&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))location.href=a});function money(n){n=Number(n)||0;return(n>0?'+':'')+n.toLocaleString('cs-CZ')}function readNet(key){try{const v=JSON.parse(localStorage.getItem(key)||'null');return v&&Number.isFinite(Number(v.net))?Number(v.net):null}catch(_){return null}}const b=readNet('ops_blackjack_stats'),s=readNet('ops_slots_stats');$('bj-stat').textContent=b===null?'Ještě nehráno':'Čistý zisk: '+money(b);$('slot-stat').textContent=s===null?'Ještě nehráno':'Čistý zisk: '+money(s);try{const stats=window.OPS_STATS&&OPS_STATS.getStats?OPS_STATS.getStats():{};const g=stats.gacha||{};$('tokens').textContent=Number(g.tokens??stats.tokens??0).toLocaleString('cs-CZ');const user=OPS_STATS&&OPS_STATS.getUsername?OPS_STATS.getUsername():'';$('username').textContent=user||'Bez přezdívky';$('username').title=user?'Přezdívka hráče':'Kliknutím nastav přezdívku';if(!user){$('username').style.cursor='pointer';$('username').addEventListener('click',()=>OPS_STATS&&OPS_STATS.promptUsernameModal&&OPS_STATS.promptUsernameModal())}const inv=g.inventory;const count=Array.isArray(inv)?inv.length:inv&&typeof inv==='object'?Object.keys(inv).length:Number(g.inventoryCount||g.uniqueCharacters||0);$('gacha-stat').textContent='Zápisů: '+Number(g.totalPulls||0).toLocaleString('cs-CZ')+' · Sbor: '+count+'/'+(g.characterCount||g.totalCharacters||'?')}catch(e){$('gacha-stat').textContent='Statistiky nejsou dostupné';console.warn('OPS stats:',e)}})();
