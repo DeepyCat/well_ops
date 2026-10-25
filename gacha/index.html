@@ -14,6 +14,8 @@ button{font:inherit;cursor:pointer}
 a{color:inherit}
 .topbar{height:68px;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff14;background:#10121add;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
 .brand{font-weight:900;letter-spacing:.12em}.brand span{color:var(--red)}
+.top-right{display:flex;align-items:center;gap:10px}
+.mute-btn{background:#ffffff09;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:1rem;color:white}.mute-btn:hover{border-color:var(--red)}
 .back{color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:10px}.back:hover{color:white;border-color:var(--red)}
 main{width:min(1180px,94vw);margin:30px auto 70px}
 .eyebrow{font-size:.72rem;letter-spacing:.22em;color:var(--red);font-weight:800}
@@ -41,6 +43,27 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
 .btn{border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-weight:850;color:white;background:#ffffff09;transition:transform .15s,border-color .15s,filter .15s}
 .btn:hover:not(:disabled){transform:translateY(-2px);border-color:#ffffff55}.btn:disabled{opacity:.4;cursor:not-allowed}
 .btn.primary{background:linear-gradient(110deg,#ff435c,#d92750);border-color:#ff697a;box-shadow:0 8px 26px #ff335022}
+.shop{display:flex;flex-direction:column;gap:10px}
+.shop-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#ffffff06;border:1px solid #ffffff12;border-radius:13px}
+.shop-item.special{border-color:#ffd47766;background:#ffd47710}
+.shop-info b{display:block;color:var(--gold);font-size:1.05rem}
+.shop-info small{color:var(--muted);font-size:.74rem}
+.shop-btn{white-space:nowrap;padding:10px 14px;background:linear-gradient(110deg,#0284c7,#2563eb);border-color:#38bdf8}
+.shop-item.special .shop-btn{background:linear-gradient(110deg,#f59e0b,#ef4444);border-color:#ffd477}
+.lb-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:28px 0 14px}
+.lb-head h2{margin:0;font-size:1.25rem}
+.lb-tools{display:flex;gap:8px;align-items:center}
+.lb-tab{background:#ffffff08;border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:.8rem;font-weight:700;color:var(--muted)}
+.lb-tab.active{color:white;border-color:var(--red);background:#ff526322}
+.lb-list{display:flex;flex-direction:column;gap:8px}
+.lb-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 14px;background:#ffffff05;border:1px solid #ffffff0d;border-radius:12px}
+.lb-row.me{border-color:#7ff0ff88;background:#7ff0ff10}
+.lb-pos{font-weight:900;font-size:1.05rem;text-align:center}
+.lb-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-stats{color:var(--muted);font-size:.78rem;text-align:right}.lb-stats b{color:var(--gold)}
+.lb-stats .lz{color:var(--cyan)}.lb-stats .ls{color:var(--gold)}
+.lb-gap{text-align:center;color:var(--muted);letter-spacing:.3em}
+@media(max-width:520px){.lb-row{grid-template-columns:40px minmax(0,1fr)}.lb-stats{grid-column:1/-1;text-align:left}}
 .currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.9rem;margin-bottom:15px}
 .currency strong{color:var(--gold);font-size:1.2rem}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 14px}
@@ -204,7 +227,7 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
 <body>
 <header class="topbar">
   <div class="brand">OPS <span>///</span> SBOROVNA</div>
-  <a class="back" href="games.html">← Zpět na hry</a>
+  <div class="top-right"><button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky">🔊</button><a class="back" href="games.html">← Zpět na hry</a></div>
 </header>
 <main>
   <div class="eyebrow">ŠKOLNÍ ROK · LIMITED NÁBOR</div>
@@ -220,6 +243,15 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
       </div>
       <div class="section-head"><h2>Pedagogický sbor</h2><span class="pill" id="rosterCount">0 / 0 získáno</span></div>
       <div class="roster" id="roster"></div>
+      <div class="lb-head">
+        <h2>🏆 Žebříček sborovny</h2>
+        <div class="lb-tools">
+          <button class="lb-tab active" data-mode="pulls" type="button">Podle zápisů</button>
+          <button class="lb-tab" data-mode="collection" type="button">Podle sbírky</button>
+          <button class="small-btn" id="lbRefresh" type="button">↻</button>
+        </div>
+      </div>
+      <div class="lb-list" id="lbList"><div class="empty">Načítám žebříček…</div></div>
       <p class="footer-note">Učitelé a jejich jména jsou smyšlení placeholdery. Obrázky se načítají ze složky <code>img/</code> ve tvaru <code>Rank-Jméno.png</code>.</p>
     </section>
     <aside>
@@ -236,11 +268,26 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
         <div class="actions">
           <button class="btn primary" id="singleBtn">1× ZÁPIS · 160</button>
           <button class="btn primary" id="tenBtn">10× ZÁPIS · 1600</button>
-          <button class="btn" id="dailyBtn">+1600 bodů</button>
-          <button class="btn" id="buyTokensBtn" style="background:#0284c7;color:#fff;">Koupit za sušenky</button>
           <button class="btn wide" id="resetBtn" style="grid-column:1/-1;">Resetovat účet</button>
         </div>
-        <p class="notice">Tlačítko „Koupit za sušenky“ promění 1 000 nasbíraných sušenek z Clickeru za 160 školních bodů!</p>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <div class="section-head" style="margin:0 0 14px"><h3>🛒 Obchod</h3><span class="pill" id="shopCookies">🍪 0</span></div>
+        <div class="shop">
+          <div class="shop-item">
+            <div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div>
+            <button class="btn shop-btn" id="shopBuy1">🍪 1 000</button>
+          </div>
+          <div class="shop-item">
+            <div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček · 10× zápis</small></div>
+            <button class="btn shop-btn" id="shopBuy2">🍪 10 000</button>
+          </div>
+          <div class="shop-item special">
+            <div class="shop-info"><b>◆ 1 600 bodů</b><small>Speciální nabídka · bez sušenek</small></div>
+            <button class="btn shop-btn" id="shopBuy3">ZDARMA</button>
+          </div>
+        </div>
+        <p class="notice">Sušenky se berou z Clickeru. Pro jistotu měj Clicker při nákupu zavřený.</p>
       </div>
       <div class="panel" style="margin-top:16px">
         <div class="section-head" style="margin:0 0 14px"><h3>Historie zápisů (jen tato relace)</h3><button class="small-btn" id="clearHistory">Vymazat</button></div>

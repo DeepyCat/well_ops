@@ -18,10 +18,10 @@
     {id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"B",symbol:"✎",type:"Robotika"},
     {id:"Huvarova",name:"Huvarová",file:"Huvarova",rank:"B",symbol:"✎",type:"Elektronika"},
   ];
- 
+
   // Historie je jen v paměti stránky – do localStorage ani Supabase se neukládá
   let sessionHistory = [];
- 
+
   function getGameState() {
     const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
     const g = (stats && stats.gacha) || {};
@@ -35,7 +35,7 @@
       inventory: { ...(g.inventory || {}) }   // postava = kolikrát padla
     };
   }
- 
+
   function saveGameState(s) {
     if (!window.OPS_STATS) return;
     const stats = window.OPS_STATS.getStats();
@@ -50,12 +50,81 @@
     };
     window.OPS_STATS.saveStats(stats);
   }
- 
+
+  // ---------- ZVUKY (WebAudio, žádné soubory) ----------
+  const sfx = (() => {
+    let ctx = null, muted = false;
+    try { muted = localStorage.getItem("ops_gacha_muted") === "1"; } catch (e) {}
+    function ac() {
+      if (muted) return null;
+      try {
+        if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ctx = new AC(); }
+        if (ctx.state === "suspended") ctx.resume();
+        return ctx;
+      } catch (e) { return null; }
+    }
+    function tone(f, t0, dur, type = "sine", vol = .12, f2) {
+      const c = ac(); if (!c) return;
+      const t = c.currentTime + t0;
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t);
+      if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + .015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(c.destination);
+      o.start(t); o.stop(t + dur + .05);
+    }
+    function noise(t0, dur, vol = .25) {
+      const c = ac(); if (!c) return;
+      const t = c.currentTime + t0, len = Math.floor(c.sampleRate * dur);
+      const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      const src = c.createBufferSource(); src.buffer = buf;
+      const lp = c.createBiquadFilter(); lp.type = "lowpass";
+      lp.frequency.setValueAtTime(1800, t); lp.frequency.exponentialRampToValueAtTime(100, t + dur);
+      const g = c.createGain(); g.gain.value = vol;
+      src.connect(lp); lp.connect(g); g.connect(c.destination);
+      src.start(t);
+    }
+    const arp = (notes, step, type, vol, dur = .3) => notes.forEach((n, i) => tone(n, i * step, dur, type, vol));
+    return {
+      isMuted: () => muted,
+      setMuted(v) { muted = !!v; try { localStorage.setItem("ops_gacha_muted", muted ? "1" : "0"); } catch (e) {} },
+      tick()  { tone(900, 0, .05, "square", .04); },
+      error() { tone(180, 0, .2, "sawtooth", .07, 110); },
+      coin()  { tone(988, 0, .08, "square", .06); tone(1319, .07, .2, "square", .06); },
+      jingle(){ arp([523, 659, 784, 1047, 1319], .09, "triangle", .1, .35); },
+      riser() { tone(120, 0, 1.3, "sawtooth", .05, 900); tone(240, 0, 1.3, "triangle", .05, 1800); },
+      impact(rank) {
+        noise(0, .55, rank === "Z" ? .4 : rank === "S" ? .32 : .22);
+        tone(90, 0, .55, "sine", .3, 38);
+      },
+      sting(rank) {
+        if (rank === "Z") { arp([392, 523, 659, 784, 1047, 1319], .07, "sawtooth", .06, .6); }
+        else if (rank === "S") { arp([523, 659, 784, 1047], .08, "triangle", .11, .45); }
+        else if (rank === "A") { arp([660, 880], .09, "triangle", .1, .3); }
+        else { tone(660, 0, .2, "triangle", .09); }
+      },
+      card(rank) {
+        if (rank === "Z") { [262, 392, 523, 659, 784].forEach(f => tone(f, 0, 1.4, "triangle", .08)); tone(1047, .25, 1.2, "sine", .1); }
+        else if (rank === "S") { [330, 494, 659].forEach(f => tone(f, 0, .9, "triangle", .09)); tone(988, .15, .7, "sine", .09); }
+        else if (rank === "A") { tone(587, 0, .25, "triangle", .08); tone(784, .1, .3, "triangle", .08); }
+        else { tone(520, 0, .15, "triangle", .06); }
+      },
+      results(z, sCount) {
+        if (z) arp([523, 659, 784, 1047, 1319, 1568], .08, "triangle", .1, .5);
+        else if (sCount) arp([523, 659, 784, 1047], .09, "triangle", .09, .4);
+        else tone(440, 0, .12, "triangle", .06);
+      }
+    };
+  })();
+
   let busy = false;
   let lastFocus = null;
   let mouseX = 0, mouseY = 0;
   let isSZAnimation = false;
- 
+
   const $ = id => document.getElementById(id);
   function toast(message) {
     const el = $("toast"); el.textContent = message; el.classList.add("show");
@@ -74,7 +143,7 @@
   document.addEventListener("error", e => {
     if (e.target.tagName === "IMG" && e.target.closest(".art")) e.target.classList.add("gone");
   }, true);
- 
+
   document.addEventListener("mousemove", e => {
     mouseX = e.clientX; mouseY = e.clientY;
     if ($("reveal").classList.contains("open")) {
@@ -89,7 +158,7 @@
       }
     }
   });
- 
+
   function rollOne(state) {
     state.zPity++;
     state.sPity++;
@@ -102,7 +171,7 @@
     else if (state.sPity >= S_HARD || Math.random() * 100 < sChance) rank = "S";
     else if (state.aPity >= A_HARD || Math.random() < .07) rank = "A";
     else rank = "B";
- 
+
     let agent, featured = false;
     if (rank === "Z") {
       agent = pick(agents.filter(a => a.rank === "Z"));
@@ -125,13 +194,13 @@
     return entry;
   }
   function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
- 
+
   const RANK_COLOR = {Z:"#7ff0ff",S:"#ffd477",A:"#c084fc",B:"#8cbbff"};
   const RANK_ORDER = ["Z","S","A","B"];
   const RANK_STARS = {B:3,A:4,S:5,Z:6};
   const STAGES = ["t-boot","t-streak","t-beam","t-reveal","t-out"];
   const REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
- 
+
   const fx = (() => {
     const cv = $("fx"), ctx = cv.getContext("2d");
     const NEUTRAL = [159,179,209];
@@ -218,16 +287,16 @@
       }
     };
   })();
- 
+
   const rv = {q:[], i:0, results:[], ready:0};
- 
+
   function showReveal(i) {
     const r = rv.q[i], a = agentById(r.id), ov = $("reveal");
     const isHighRank = (a.rank === "Z" || a.rank === "S");
     isSZAnimation = isHighRank;
     const skipBtn = $("rvSkip");
     skipBtn.classList.toggle("disabled", isHighRank);
- 
+
     ov.style.setProperty("--c", RANK_COLOR[a.rank]);
     ov.classList.toggle("hi", isHighRank);
     $("rvBig").textContent = a.rank;
@@ -239,28 +308,29 @@
     $("rvNext").textContent = rv.q.length > 1 ? `klepni pro pokračování · ${i+1} / ${rv.q.length}` : "klepni pro pokračování";
     ov.classList.remove("in"); void ov.offsetWidth; ov.classList.add("in");
     fx.start(); fx.setColor(RANK_COLOR[a.rank]); fx.embers(true);
+    sfx.card(a.rank);
     fx.burst(a.rank === "Z" ? 220 : a.rank === "S" ? 150 : 80, 480);
     rv.ready = Date.now() + (isHighRank ? 2500 : 650);
   }
- 
+
   function finishReveal() {
     if (isSZAnimation && Date.now() < rv.ready) return;
     $("reveal").classList.remove("open","in");
     isSZAnimation = false;
     showResults(rv.results);
   }
- 
+
   $("reveal").addEventListener("click", () => {
     if (isSZAnimation && Date.now() < rv.ready) return;
     if (Date.now() < rv.ready) return;
     if (rv.i + 1 < rv.q.length) { rv.i++; showReveal(rv.i); } else finishReveal();
   });
- 
+
   $("rvSkip").addEventListener("click", e => {
     e.stopPropagation();
     if (!isSZAnimation) finishReveal();
   });
- 
+
   window.inspectAgent = function(agentId) {
     const agent = agentById(agentId);
     if (!agent) return;
@@ -281,8 +351,9 @@
     ov.classList.add("open");
     fx.start(); fx.setColor(RANK_COLOR[agent.rank]); fx.embers(true);
     rv.ready = Date.now() + 200;
+    sfx.tick();
   };
- 
+
   let spinTimers = [];
   function endSpin(results) {
     spinTimers.forEach(clearTimeout); spinTimers = [];
@@ -298,26 +369,27 @@
       showResults(results);
     }
   }
- 
+
   function doPull(count) {
     if (busy) return;
     const cost = count * COST;
     const state = getGameState();
-    if (state.tokens < cost) { toast("Nemáš dost školních bodů. Koupit můžeš za sušenky nebo kliknout +1600."); return; }
- 
+    if (state.tokens < cost) { sfx.error(); toast("Nemáš dost školních bodů. Koupit je můžeš v obchodě."); return; }
+
     lastFocus = document.activeElement;
     if (lastFocus && lastFocus.blur) lastFocus.blur();
- 
+
     state.tokens -= cost;
     busy = true;
+    sfx.riser();
     const owned = {...state.inventory}, raw = [];
     for (let i = 0; i < count; i++) raw.push(rollOne(state));
     const seen = new Set();
     const results = raw.map(r => { const nw = !owned[r.id] && !seen.has(r.id); seen.add(r.id); return {...r, isNew:nw}; });
- 
+
     saveGameState(state);
     render();
- 
+
     const best = RANK_ORDER.find(r => results.some(x => x.rank === r)) || "B";
     const sc = $("scan"), status = $("scanStatus");
     sc.classList.remove(...STAGES);
@@ -333,8 +405,9 @@
     at(30,   () => { sc.classList.add("t-boot"); fx.setWarp(1); });
     at(600,  () => { sc.classList.add("t-streak"); fx.setMix(1); });
     at(1050, () => sc.classList.add("t-beam"));
-    at(1330, () => { fx.setWarp(0); fx.burst(110 + RANK_STARS[best] * 28, 420 + RANK_STARS[best] * 40); });
+    at(1330, () => { sfx.impact(best); fx.setWarp(0); fx.burst(110 + RANK_STARS[best] * 28, 420 + RANK_STARS[best] * 40); });
     at(1650, () => {
+      sfx.sting(best);
       sc.classList.add("t-reveal");
       fx.embers(true);
       status.classList.remove("dots");
@@ -344,7 +417,7 @@
     at(total, () => endSpin(results));
     sc.onclick = () => endSpin(results);
   }
- 
+
   function showResults(results) {
     busy = false; render();
     fx.release(); fx.embers(false);
@@ -362,8 +435,10 @@
     }).join("");
     $("overlay").classList.add("open");
     $("closeResults").focus();
+    sfx.results(zCount, sCount);
+    setTimeout(loadLeaderboard, 1500);
   }
- 
+
   function render() {
     const state = getGameState();
     $("tokens").textContent = state.tokens.toLocaleString("cs-CZ");
@@ -375,6 +450,7 @@
     $("aMeter").style.width = `${Math.min(100,state.aPity/A_HARD*100)}%`;
     $("guarantee").textContent = state.guaranteed ? "FEATURED" : "50/50";
     $("totalPulls").textContent = state.totalPulls.toLocaleString("cs-CZ");
+    $("shopCookies").textContent = "🍪 " + Math.floor(readCookies().available).toLocaleString("cs-CZ");
     $("singleBtn").disabled = busy || state.tokens < COST;
     $("tenBtn").disabled = busy || state.tokens < COST*10;
     $("roster").innerHTML = agents.map(a => `<div class="char ${a.rank.toLowerCase()}${state.inventory[a.id] ? "" : " locked"}" onclick="inspectAgent('${a.id}')">${art(a)}<span class="rk">${a.rank}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}</small><small>× ${state.inventory[a.id] || 0}</small></div>`).join("");
@@ -386,35 +462,62 @@
       return `<div class="history-item"><div class="rarity-dot ${a.rank}">${a.rank}</div><div><b>${escapeHtml(a.name)}${h.featured ? " ★" : ""}</b><small>${escapeHtml(a.type)} · #${h.pull} · ${date}</small></div></div>`;
     }).join("") : '<div class="empty">Zatím žádné zápisy.<br>První zvonění čeká.</div>';
   }
- 
+
   $("singleBtn").addEventListener("click", () => doPull(1));
   $("tenBtn").addEventListener("click", () => doPull(10));
- 
-  $("dailyBtn").addEventListener("click", () => {
-    const state = getGameState();
-    state.tokens += 1600;
-    saveGameState(state);
-    render();
-    toast("+1600 školních bodů přidáno.");
-  });
- 
-  $("buyTokensBtn").addEventListener("click", () => {
-    const COOKIE_COST = 1000, GAIN = 160;
+
+  // ---------- OBCHOD ----------
+  const RICKROLL_URL = "https://www.youtube.com/watch?v=Aq5WXmQQooo";
+
+  function readCookies() {
     let save = null;
     try { save = JSON.parse(localStorage.getItem("cookieClickerSave")); } catch (e) {}
-    if (!save || (Number(save.cookies) || 0) < COOKIE_COST) {
-      toast("Nemáš dost sušenek (potřeba 1 000).");
+    const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
+    const saveCookies = save ? (Number(save.cookies) || 0) : 0;
+    const statCookies = stats && stats.clicker ? (Number(stats.clicker.cookies) || 0) : 0;
+    return { save, saveCookies, statCookies, available: Math.max(saveCookies, statCookies) };
+  }
+
+  function addTokens(gain, cookieCost) {
+    const c = readCookies();
+    if (cookieCost > 0) {
+      if (c.save) {
+        c.save.cookies = Math.max(0, c.saveCookies - cookieCost);
+        localStorage.setItem("cookieClickerSave", JSON.stringify(c.save));
+      }
+    }
+    const stats = window.OPS_STATS.getStats();
+    if (cookieCost > 0 && !c.save && stats.clicker) {
+      stats.clicker.cookies = Math.max(0, c.statCookies - cookieCost);
+    }
+    stats.gacha = stats.gacha || {};
+    stats.gacha.tokens = (stats.gacha.tokens ?? 1600) + gain;
+    window.OPS_STATS.saveStats(stats);
+  }
+
+  function buyWithCookies(cookieCost, gain) {
+    const c = readCookies();
+    if (c.available < cookieCost) {
+      sfx.error();
+      toast(`Nemáš dost sušenek (vidím ${Math.floor(c.available).toLocaleString("cs-CZ")}, potřeba ${cookieCost.toLocaleString("cs-CZ")}).`);
       return;
     }
-    save.cookies -= COOKIE_COST;
-    localStorage.setItem("cookieClickerSave", JSON.stringify(save));
-    const state = getGameState();
-    state.tokens += GAIN;
-    saveGameState(state);
+    addTokens(gain, cookieCost);
+    sfx.coin();
     render();
-    toast(`Nakoupeno ${GAIN} bodů za 1 000 sušenek! Zbývá: ${Math.floor(save.cookies).toLocaleString("cs-CZ")}`);
+    toast(`Nakoupeno ${gain.toLocaleString("cs-CZ")} bodů za ${cookieCost.toLocaleString("cs-CZ")} sušenek! Zbývá: ${Math.floor(c.available - cookieCost).toLocaleString("cs-CZ")}`);
+  }
+
+  $("shopBuy1").addEventListener("click", () => buyWithCookies(1000, 160));
+  $("shopBuy2").addEventListener("click", () => buyWithCookies(10000, 1600));
+  $("shopBuy3").addEventListener("click", () => {
+    addTokens(1600, 0);
+    sfx.jingle();
+    render();
+    toast("+1 600 bodů! Užij si speciální nabídku 😉");
+    window.open(RICKROLL_URL, "_blank", "noopener");
   });
- 
+
   $("resetBtn").addEventListener("click", () => {
     if (busy) return;
     if (!confirm("Opravdu resetovat body, pity a sbor?")) return;
@@ -423,14 +526,14 @@
     render();
     toast("Účet gachy byl resetován.");
   });
- 
+
   $("clearHistory").addEventListener("click", () => {
     if (!sessionHistory.length) return;
     if (!confirm("Vymazat historii? Sbor a pity zůstanou zachovány.")) return;
     sessionHistory = [];
     render();
   });
- 
+
   function closeOverlay() {
     $("overlay").classList.remove("open");
     if (lastFocus && lastFocus.focus) lastFocus.focus();
@@ -438,7 +541,83 @@
   $("closeResults").addEventListener("click", closeOverlay);
   $("overlay").addEventListener("click", e => { if (e.target === $("overlay")) closeOverlay(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("overlay").classList.contains("open")) closeOverlay(); });
- 
+
+  // ---------- ŽEBŘÍČEK (Supabase, bez zásahu do ops-stats.js) ----------
+  let lbMode = "pulls", lbRows = [];
+  const Z_IDS = agents.filter(a => a.rank === "Z").map(a => a.id);
+  const S_IDS = agents.filter(a => a.rank === "S").map(a => a.id);
+
+  async function loadLeaderboard() {
+    const box = $("lbList");
+    const cfg = window.OPS_STATS && window.OPS_STATS.config;
+    if (!cfg || !cfg.url || !cfg.anonKey) { box.innerHTML = '<div class="empty">Žebříček není dostupný.</div>'; return; }
+    if (!lbRows.length) box.innerHTML = '<div class="empty">Načítám žebříček…</div>';
+    try {
+      const url = `${cfg.url}/rest/v1/${cfg.table}?select=username,totalPulls:stats->gacha->totalPulls,inventory:stats->gacha->inventory&order=stats->gacha->totalPulls.desc.nullslast&limit=100`;
+      const res = await fetch(url, { headers: { apikey: cfg.anonKey, Authorization: `Bearer ${cfg.anonKey}` } });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      lbRows = await res.json();
+      renderLeaderboard();
+    } catch (e) {
+      console.warn("[Gacha] Žebříček selhal:", e);
+      box.innerHTML = '<div class="empty">Žebříček se nepodařilo načíst.</div>';
+    }
+  }
+
+  function renderLeaderboard() {
+    const box = $("lbList");
+    const me = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
+    let rows = (Array.isArray(lbRows) ? lbRows : []).map(r => {
+      const inv = (r.inventory && typeof r.inventory === "object") ? r.inventory : {};
+      return {
+        name: r.username || "?",
+        pulls: Number(r.totalPulls) || 0,
+        collected: agents.filter(a => (Number(inv[a.id]) || 0) > 0).length,
+        z: Z_IDS.reduce((n, id) => n + (Number(inv[id]) || 0), 0),
+        s: S_IDS.reduce((n, id) => n + (Number(inv[id]) || 0), 0)
+      };
+    }).filter(r => r.pulls > 0);
+
+    rows.sort(lbMode === "pulls"
+      ? (a, b) => b.pulls - a.pulls
+      : (a, b) => (b.collected - a.collected) || ((b.z * 10 + b.s) - (a.z * 10 + a.s)) || (b.pulls - a.pulls));
+
+    if (!rows.length) { box.innerHTML = '<div class="empty">Zatím nikdo netáhl. Buď první!</div>'; return; }
+
+    const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+    const rowHtml = (r, i) => `<div class="lb-row${r.name === me ? " me" : ""}">
+      <span class="lb-pos">${medal(i)}</span>
+      <span class="lb-name">${escapeHtml(r.name)}</span>
+      <span class="lb-stats"><b>${r.pulls.toLocaleString("cs-CZ")}</b> zápisů · ${r.collected}/${agents.length} učitelů · <span class="lz">Z ${r.z}</span> · <span class="ls">S ${r.s}</span></span>
+    </div>`;
+
+    let html = rows.slice(0, 10).map(rowHtml).join("");
+    const myIdx = rows.findIndex(r => r.name === me);
+    if (myIdx >= 10) html += '<div class="lb-gap">···</div>' + rowHtml(rows[myIdx], myIdx);
+    box.innerHTML = html;
+  }
+
+  document.querySelectorAll(".lb-tab").forEach(btn => btn.addEventListener("click", () => {
+    lbMode = btn.dataset.mode;
+    document.querySelectorAll(".lb-tab").forEach(b => b.classList.toggle("active", b === btn));
+    sfx.tick();
+    renderLeaderboard();
+  }));
+  $("lbRefresh").addEventListener("click", () => { sfx.tick(); loadLeaderboard(); });
+
+  // ---------- Tlačítko ztlumení ----------
+  function updateMuteBtn() {
+    const b = $("muteBtn");
+    b.textContent = sfx.isMuted() ? "🔇" : "🔊";
+    b.title = sfx.isMuted() ? "Zapnout zvuky" : "Ztlumit zvuky";
+  }
+  $("muteBtn").addEventListener("click", () => {
+    sfx.setMuted(!sfx.isMuted());
+    updateMuteBtn();
+    if (!sfx.isMuted()) sfx.tick();
+  });
+  updateMuteBtn();
+
   render();
+  loadLeaderboard();
 })();
- 
