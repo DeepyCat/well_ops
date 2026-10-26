@@ -22,6 +22,7 @@ a{color:inherit}
 main{width:min(1280px,94vw);margin:30px auto 70px}
 h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
+.right-col{display:grid;gap:20px;min-width:0;align-items:start}.lb-panel{width:100%}
 .layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
 .game-container{display:flex;flex-direction:column;gap:20px}
 .panels-sidebar{display:flex;flex-direction:column;gap:20px}
@@ -172,13 +173,10 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
         <button class="link-btn" id="resetStats" type="button">Vynulovat statistiky</button>
         <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
       </div>
-      <div class="panel">
-        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
-      </div>
     </aside>
 
-    <div class="game-container">
+    <div class="right-col">
+<div class="game-container">
       <section class="table" id="table" aria-label="Herní stůl">
         <div class="rules">Blackjack vyplácí 3 : 2 · krupiér stojí na 17 · zdvojení na prvních dvou kartách</div>
 
@@ -229,6 +227,11 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
         </div>
       </section>
     </div>
+<div class="panel lb-panel">
+        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+      </div>
+</div>
   </div>
 </main>
 <div class="toast" id="toast" role="status"></div>

@@ -9,6 +9,7 @@
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
 .brand{font-weight:950;letter-spacing:.07em}.brand span{color:#c084fc}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
 main{width:min(1280px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.5rem);font-weight:1000;font-style:italic;text-shadow:0 0 26px #c084fc44}.sub{text-align:center;color:#ddc8ef;margin:0 auto 26px;max-width:650px}
+.right-col{display:grid;gap:20px;min-width:0;align-items:start}.lb-panel{width:100%}
 .layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
 .game-container{display:flex;flex-direction:column;gap:20px}
 .panels-sidebar{display:flex;flex-direction:column;gap:20px}
@@ -83,13 +84,10 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
       </div>
       <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
     </div>
-    <div class="panel">
-      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
-    </div>
   </div>
 
-  <div class="game-container">
+  <div class="right-col">
+<div class="game-container">
     <section class="panel">
       <div class="wheel-shell"><div class="pointer"></div><canvas id="wheelCanvas" width="800" height="800" aria-label="Velké kolo štěstí"></canvas></div>
       <div class="result" id="result">✨ Připraveno?</div><div class="result-note" id="resultNote">Vyber sázku a roztoč kolo.</div>
@@ -116,6 +114,11 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
       <div class="fineprint">Výhra se přičte do společného OPS zůstatku. Násobitel 1× znamená vrácení sázky; 0,5× vrací polovinu. Každé pole má stejnou pravděpodobnost. Výsledky jsou náhodné.</div>
     </section>
   </div>
+<div class="panel lb-panel">
+      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+    </div>
+</div>
 </div>
 </main><div class="toast" id="toast" role="status"></div>
 <script src="/js/ops-stats.js"></script>

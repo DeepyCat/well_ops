@@ -9,6 +9,7 @@
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
 .brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
 main{width:min(1280px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.4rem);font-weight:1000;font-style:italic;text-shadow:0 0 24px #ff526344}.sub{text-align:center;color:#e4c7cc;margin:0 auto 24px;max-width:650px}
+.right-col{display:grid;gap:20px;min-width:0;align-items:start}.lb-panel{width:100%}
 .layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
 .game-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
 .panels-sidebar{display:flex;flex-direction:column;gap:20px}
@@ -87,13 +88,10 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
       </div>
       <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
     </div>
-    <div class="panel">
-      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
-    </div>
   </div>
 
-  <div class="game-container">
+  <div class="right-col">
+<div class="game-container">
     <section class="panel">
       <div class="wheel-wrap"><div class="pointer"></div><canvas id="rouletteCanvas" width="700" height="700" aria-label="Kolo evropské rulety"></canvas></div>
       <div class="center-note">Evropská ruleta · čísla 0–36</div>
@@ -121,6 +119,11 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
       <div class="notice">Hra používá společné OPS tokeny. Výsledek je náhodný a dlouhodobě má ruleta výhodu kasina.</div>
     </section>
   </div>
+<div class="panel lb-panel">
+      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+    </div>
+</div>
 </div>
 </main><div class="toast" id="toast" role="status"></div>
 <script src="/js/ops-stats.js"></script>
