@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10121a"><title>OPS /// Ruleta</title>
+<style>
+:root{color-scheme:dark;--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#3b1822,#10121a 65%);color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;min-height:100vh}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
+.brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
+main{width:min(1180px,100%);margin:auto;padding:24px 16px 50px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.4rem);font-weight:1000;font-style:italic;text-shadow:0 0 24px #ff526344}.sub{text-align:center;color:#e4c7cc;margin:0 auto 24px;max-width:650px}
+.layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(300px,.9fr);gap:20px;align-items:start}.panel{background:linear-gradient(145deg,#1b1e2b,#11141e);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 18px 40px #0005}
+.wheel-wrap{display:grid;place-items:center;position:relative;padding:14px}.pointer{position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:3;width:0;height:0;border-left:17px solid transparent;border-right:17px solid transparent;border-top:34px solid #fff0b2;filter:drop-shadow(0 3px 4px #0009)}
+#rouletteCanvas{display:block;width:min(100%,440px);height:auto;aspect-ratio:1;border-radius:50%;border:8px ridge #e3bd67;box-shadow:0 12px 0 #291713,0 18px 25px #0008;transition:transform 5.4s cubic-bezier(.12,.72,.1,1);background:#0c3827}
+.center-note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:10px}
+label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 0 7px}input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #42485c;background:#10121a;color:var(--text);font:inherit}input:focus,select:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:15px}.bet-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 16px}.bet-option{border:1px solid #41475a;background:#202330;color:#e8eaf2;border-radius:10px;padding:10px 6px;font-weight:800;min-height:44px}.bet-option.active{border-color:var(--cyan);background:#153342;color:white;box-shadow:0 0 0 1px #7ff0ff33}.primary{width:100%;border:0;border-radius:12px;padding:14px 18px;background:linear-gradient(135deg,#ffd477,#b77b27);color:#27140d;font-size:1.05rem;font-weight:950;box-shadow:0 5px 0 #744b1e;transition:transform .15s,filter .15s}.primary:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}button{font:inherit;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.message{margin-top:14px;padding:13px;border-radius:10px;background:#111521;border:1px solid var(--line);min-height:48px;line-height:1.45}.message.win{border-color:#5be08a66;color:#b4ffd0}.message.loss{border-color:#ff526366;color:#ffc1c8}.result-number{font-size:2rem;font-weight:1000;text-align:center;color:var(--gold);margin:6px}.history{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.history span{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;font-weight:900;border:1px solid #ffffff30}.red{background:#b51f35}.black{background:#171923}.green{background:#176044}.paytable{font-size:.84rem;color:var(--muted);line-height:1.7;margin-top:16px}.paytable b{color:var(--text)}.notice{color:#c6c9d6;font-size:.83rem;margin-top:12px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.wheel-wrap{max-width:520px;margin:auto;width:100%}.panel{padding:15px}}@media(max-width:420px){.fields{grid-template-columns:1fr}.bet-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head>
+<body>
+<header><div class="brand">OPS <span>///</span> RULETA</div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="balance">◆ <b id="balance">—</b> tokenů</span><a href="/kasino/index.html">← Zpět do kasina</a></div></header>
+<main>
+<h1 class="heading">EVROPSKÁ RULETA</h1><p class="sub">Jedna nula, 37 polí a tvoje volba. Vyber sázku, zvol tip a roztoč kolo.</p>
+<div class="layout">
+<section class="panel">
+<div class="wheel-wrap"><div class="pointer"></div><canvas id="rouletteCanvas" width="700" height="700" aria-label="Kolo evropské rulety"></canvas></div>
+<div class="center-note">Evropská ruleta · čísla 0–36</div>
+<div class="result-number" id="lastResult">—</div><div class="center-note" id="lastResultText">Čekám na první roztočení</div>
+<div class="history" id="history" aria-label="Poslední výsledky"></div>
+</section>
+<section class="panel">
+<div class="fields">
+<div class="field"><label for="bet">Sázka (tokeny)</label><input id="bet" type="number" min="1" step="1" value="100" inputmode="numeric"></div>
+<div class="field"><label for="betType">Typ sázky</label><select id="betType"><option value="color">Červená / černá</option><option value="number">Konkrétní číslo</option><option value="parity">Sudé / liché</option><option value="half">1–18 / 19–36</option><option value="dozen">Tucet</option></select></div>
+</div>
+<div class="field" id="choiceField"><label for="choice">Tvůj tip</label><select id="choice"><option value="red">Červená</option><option value="black">Černá</option></select></div>
+<div style="background:#111521;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:15px"><div style="color:var(--muted);font-size:.82rem">Možná výplata při výhře</div><strong id="payout" style="font-size:1.3rem;color:var(--green)">200 tokenů celkem</strong><div class="notice" id="payoutNote">Výplata zahrnuje vrácení sázky.</div></div>
+<button class="primary" id="spinBtn" type="button">🎯 Vsadit a roztočit</button>
+<div id="message" class="message" role="status">Vyber sázku a zkus štěstí.</div>
+<div class="paytable"><b>Výplaty (celkem včetně sázky):</b><br>Číslo: 36× · Barva / sudé-liché / polovina: 2× · Tucet: 3×<br><span style="color:#5be08a">0 je zelená a pro běžné sázky znamená prohru.</span></div>
+<div class="notice">Hra používá společné OPS tokeny. Výsledek je náhodný a dlouhodobě má ruleta výhodu kasina.</div>
+</section>
+</div>
+</main>
+<script src="/js/ops-stats.js"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const nums=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const reds=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const color=n=>n===0?'green':reds.has(n)?'red':'black';
+let rotation=0,spinning=false,history=[];
+const canvas=$('rouletteCanvas'),ctx=canvas.getContext('2d'),step=Math.PI*2/37;
+function drawWheel(){
+ const c=canvas.width/2,r=canvas.width*.47;
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ nums.forEach((n,i)=>{
+  const start=-Math.PI/2+i*step,end=start+step;
+  ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,r,start,end);ctx.closePath();
+  ctx.fillStyle=n===0?'#176044':reds.has(n)?'#b51f35':'#171923';ctx.fill();
+  ctx.strokeStyle='#e5c477';ctx.lineWidth=2;ctx.stroke();
+  ctx.save();ctx.translate(c,c);ctx.rotate(start+step/2);ctx.textAlign='right';ctx.textBaseline='middle';
+  ctx.fillStyle='#fff5d7';ctx.font='bold 25px system-ui';ctx.fillText(String(n),r-22,0);ctx.restore();
+ });
+ ctx.beginPath();ctx.arc(c,c,canvas.width*.16,0,Math.PI*2);ctx.fillStyle='#b88938';ctx.fill();ctx.lineWidth=7;ctx.strokeStyle='#f8df9d';ctx.stroke();
+ ctx.beginPath();ctx.arc(c,c,canvas.width*.105,0,Math.PI*2);ctx.fillStyle='#27151b';ctx.fill();
+ ctx.fillStyle='#ffd477';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 36px system-ui';ctx.fillText('OPS',c,c);
+}
+function stats(){return window.OPS_STATS?window.OPS_STATS.getStats():null}
+function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.gacha.tokens))?Math.max(0,Number(s.gacha.tokens)):0}
+function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Math.floor(v));window.OPS_STATS.saveStats(s);renderBalance();return true}
+function renderBalance(){$('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updatePayout()}
+function selectedChoice(){return $('choice').value}
+function betType(){return $('betType').value}
+function validBet(){const v=Number($('bet').value);return Number.isSafeInteger(v)&&v>0&&v<=balance()}
+function odds(){return betType()==='number'?36:betType()==='dozen'?3:2}
+function updatePayout(){const b=Number($('bet').value);const o=odds();$('payout').textContent=(Number.isSafeInteger(b)&&b>0?Math.floor(b*o):0).toLocaleString('cs-CZ')+' tokenů celkem';$('payoutNote').textContent=betType()==='number'?'Výhra: 36× sázka (35× čistý zisk).':'Výplata zahrnuje vrácení sázky.';$('spinBtn').disabled=spinning||!validBet()||!window.OPS_STATS}
+function updateChoices(){
+ const type=betType(),sel=$('choice');
+ const opts= type==='color'?[['red','Červená'],['black','Černá']]
+ :type==='number'?Array.from({length:37},(_,i)=>[String(i),String(i)])
+ :type==='parity'?[['even','Sudé'],['odd','Liché']]
+ :type==='half'?[['low','1–18'],['high','19–36']]
+ :[['1','1. tucet (1–12)'],['2','2. tucet (13–24)'],['3','3. tucet (25–36)']];
+ sel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
+ $('choiceField').style.display='block';updatePayout();
+}
+function wins(n){
+ const t=betType(),c=selectedChoice();
+ if(t==='number')return n===Number(c);
+ if(t==='color')return n!==0&&color(n)===c;
+ if(t==='parity')return n!==0&&(c==='even'?n%2===0:n%2===1);
+ if(t==='half')return c==='low'?n>=1&&n<=18:n>=19&&n<=36;
+ if(t==='dozen')return n>=((Number(c)-1)*12+1)&&n<=Number(c)*12;
+ return false;
+}
+function showMessage(text,kind=''){const el=$('message');el.className='message '+kind;el.textContent=text}
+function renderHistory(){ $('history').innerHTML=history.map(n=>`<span class="${color(n)}" title="${color(n)==='red'?'Červená':color(n)==='black'?'Černá':'Zelená'}">${n}</span>`).join('')}
+function spin(){
+ if(spinning||!validBet()){showMessage('Zkontroluj sázku a svůj zůstatek.','loss');return}
+ const stake=Number($('bet').value),before=balance();
+ if(!saveBalance(before-stake)){showMessage('Nepodařilo se uložit zůstatek.','loss');return}
+ spinning=true;$('spinBtn').disabled=true;$('bet').disabled=true;$('betType').disabled=true;$('choice').disabled=true;
+ const index=Math.floor(Math.random()*nums.length),n=nums[index],centerDeg=-90+(index+.5)*360/37;
+ const target=(270-centerDeg+360)%360,delta=(target-((rotation%360)+360)%360+360)%360;
+ rotation+=360*7+delta;canvas.style.transform=`rotate(${rotation}deg)`;
+ showMessage('Kolo se točí…');
+ setTimeout(()=>{
+  const won=wins(n),mult=odds(),returned=won?stake*mult:0;
+  if(returned>0)saveBalance(balance()+returned);else renderBalance();
+  history.unshift(n);history=history.slice(0,12);renderHistory();
+  $('lastResult').textContent=String(n);$('lastResult').style.color=color(n)==='red'?'#ff5263':color(n)==='black'?'#f5f6fb':'#5be08a';
+  $('lastResultText').textContent=color(n)==='red'?'Červená':color(n)==='black'?'Černá':'Zelená';
+  if(won)showMessage(`🎉 Padlo ${n} (${color(n)}). Vyhráváš ${returned.toLocaleString('cs-CZ')} tokenů celkem; čistý výsledek ${ (returned-stake).toLocaleString('cs-CZ')} tokenů.`, 'win');
+  else showMessage(`Padlo ${n} (${color(n)}). Sázka ${stake.toLocaleString('cs-CZ')} tokenů propadá.`, 'loss');
+  spinning=false;$('bet').disabled=false;$('betType').disabled=false;$('choice').disabled=false;updatePayout();
+ },5500);
+}
+$('betType').addEventListener('change',updateChoices);$('choice').addEventListener('change',updatePayout);$('bet').addEventListener('input',updatePayout);$('spinBtn').addEventListener('click',spin);
+drawWheel();updateChoices();renderBalance();
+})();
+</script></body></html>

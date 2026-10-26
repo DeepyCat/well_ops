@@ -30,6 +30,28 @@
 .kiosk-slot-anim:after {content:"";position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,#38bdf8,transparent);animation:coinSlide 2s linear infinite}
 .kiosk-base {position:absolute;bottom:4px;left:10%;right:10%;height:10px;background:#090d16;border:2px solid #38bdf8;border-radius:4px}
 @keyframes coinSlide {0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+/* Ruleta + kolo štěstí */
+.stations{grid-template-columns:repeat(6,minmax(0,1fr))}
+.station{grid-column:span 2}
+.station.roulette{grid-column:2 / span 2;--beam:#ff5263}
+.station.wheel{grid-column:4 / span 2;--beam:#ffd477}
+.station.roulette .station-art,.station.wheel .station-art{height:clamp(220px,27vw,315px)}
+.roulette-table{width:94%;height:65%;position:relative;border:9px solid #5c3b26;border-radius:50% 50% 18% 18%;background:radial-gradient(ellipse,#176044,#082b20);box-shadow:inset 0 0 0 3px #c9a45b,0 10px 0 #24150f;transform:perspective(300px) rotateX(8deg);display:flex;align-items:center;justify-content:center}
+.roulette-table:before{content:"ROULETTE • 0–36";position:absolute;top:12%;color:#f4d88e;font-size:clamp(9px,1vw,12px);letter-spacing:.12em;font-weight:900}
+.roulette-wheel{position:relative;width:min(68%,190px);aspect-ratio:1;border-radius:50%;border:7px ridge #e8c46e;background:repeating-conic-gradient(#101217 0deg 9.73deg,#b82036 9.73deg 19.46deg);box-shadow:0 0 0 4px #5a321d,0 5px 12px #0009;display:grid;place-items:center;animation:rouletteIdle 18s linear infinite}
+.roulette-wheel:before{content:"";position:absolute;inset:13%;border-radius:50%;border:4px solid #d9b45c;background:radial-gradient(circle,#c9a15a 0 12%,#6b431e 13% 20%,#181a20 21% 100%);box-shadow:inset 0 0 0 3px #f5d780}
+.roulette-wheel:after{content:"";position:absolute;top:5%;left:calc(50% - 5px);width:10px;height:10px;border-radius:50%;background:#fff2b5;box-shadow:0 0 8px #fff}
+.roulette-ball{position:absolute;top:12%;left:54%;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 8px #fff}
+.station.roulette:hover .roulette-wheel{animation-duration:3s}
+@keyframes rouletteIdle{to{transform:rotate(360deg)}}
+.prize-wheel{width:min(75%,220px);aspect-ratio:1;position:relative;border:9px ridge #f2ce69;border-radius:50%;background:repeating-conic-gradient(from -15deg,#ff5263 0deg 30deg,#ffd477 30deg 60deg,#2c9d78 60deg 90deg,#4b62cf 90deg 120deg);box-shadow:0 0 0 5px #542b21,0 12px 20px #0008;display:grid;place-items:center;transition:transform .3s}
+.prize-wheel:before{content:"";position:absolute;inset:13%;border:3px solid #fff2c1;border-radius:50%;background:radial-gradient(circle,#26121a 0 24%,#e4b955 25% 32%,transparent 33%);box-shadow:inset 0 0 0 2px #30151a}
+.prize-wheel:after{content:"★";position:absolute;top:-12px;left:calc(50% - 13px);font-size:25px;color:#fff2c1;text-shadow:0 2px 4px #000}
+.wheel-multis{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:18%;font-weight:1000;font-size:clamp(10px,1.4vw,16px);text-shadow:0 2px 4px #000;pointer-events:none}
+.station.wheel:hover .prize-wheel{transform:rotate(20deg)}
+@media(max-width:900px) and (min-width:560px){.stations{grid-template-columns:repeat(3,minmax(0,1fr))}.station{grid-column:auto}.station.roulette,.station.wheel{grid-column:auto}}
+@media(max-width:559px){.stations{grid-template-columns:1fr}.station,.station.roulette,.station.wheel{grid-column:auto}}
+
 </style></head>
 <body>
 <header class="topbar"><div class="brand">OPS <span>///</span> KASINO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
@@ -37,6 +59,8 @@
 <a class="station bj" href="/kasino/blackjack.html" aria-label="Otevřít Blackjack, klávesa 1"><span class="beam"></span><div class="station-art"><div class="felt-table"><div class="mini-sign">Blackjack<br>výplata 3:2</div><div class="card a"><span>A<small>♠</small></span><span style="align-self:flex-end">♠</span></div><div class="card k"><span>K<small>♥</small></span><span style="align-self:flex-end">♥</span></div><div class="chips"></div></div></div><div class="plaque"><h2>♠ Blackjack</h2><p>Poraz dealera. Přirozený blackjack platí 3:2.</p><span class="stat" id="bj-stat">Ještě nehráno</span></div></a>
 <a class="station slot" href="/kasino/slot.html" aria-label="Otevřít výherní automat, klávesa 2"><span class="beam"></span><div class="station-art"><div class="machine"><div class="bulbs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="machine-label">AUTOMAT</div><div class="reels"><div class="reel"><span>📚</span></div><div class="reel"><span>🔔</span></div><div class="reel"><span>♛</span></div></div><div class="lever"></div><div class="slotbase"></div><div class="coin"></div></div></div><div class="plaque"><h2>✦ Výherní automat</h2><p>Roztoč válce a zkus štěstí.</p><span class="stat" id="slot-stat">Ještě nehráno</span></div></a>
 <a class="station pc" href="/kasino/gacha.html" aria-label="Otevřít nábor učitelů, klávesa 3"><span class="beam"></span><div class="station-art"><div class="computer"><div class="crt"><div class="screen"><strong>NÁBOR UČITELŮ</strong><div>&gt; inicializace sběrnice...</div><div>&gt; hledám kandidáty_</div><span class="cursor"></span><div class="teacher-cards"><i>Z</i><i>S</i><i>A</i><i>B</i></div></div></div><div class="keyboard"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><div class="plaque"><h2>▣ Nábor učitelů</h2><p>Vyvolej nové členy školního sboru.</p><span class="stat" id="gacha-stat">Načítám statistiky…</span></div></a>
+<a class="station roulette" href="/kasino/roulette.html" aria-label="Otevřít ruletu, klávesa 4"><span class="beam"></span><div class="station-art"><div class="roulette-table"><div class="roulette-wheel"><span class="roulette-ball"></span></div></div></div><div class="plaque"><h2>🎯 Ruleta</h2><p>Vsaď na číslo, barvu nebo skupinu čísel.</p><span class="stat">Výhra až 36× sázky</span></div></a>
+<a class="station wheel" href="/kasino/wheel.html" aria-label="Otevřít kolo štěstí, klávesa 5"><span class="beam"></span><div class="station-art"><div class="prize-wheel"><div class="wheel-multis"><span>×2</span><span>×5</span><span>×10</span></div></div></div><div class="plaque"><h2>🎡 Kolo štěstí</h2><p>Roztoč kolo a zkus trefit vysoký násobek.</p><span class="stat">Násobky až 10×</span></div></a>
 </div>
 <!-- OPS OBCHOD (Směnný automat / Kiosk) umístěný dole na ploše -->
 <div class="ops-shop-section" style="position:relative;z-index:10;max-width:320px;margin:25px auto 5px;text-align:center;pointer-events:auto;">
@@ -175,7 +199,7 @@
 
   document.addEventListener('keydown', e => {
     if (e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
-    const a = {'1': '/kasino/blackjack.html', '2': '/kasino/slot.html', '3': '/kasino/gacha.html'}[e.key];
+    const a = {'1': '/kasino/blackjack.html', '2': '/kasino/slot.html', '3': '/kasino/gacha.html', '4': '/kasino/roulette.html', '5': '/kasino/wheel.html'}[e.key];
     if (a && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) location.href = a;
   });
 

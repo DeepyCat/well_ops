@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10121a"><title>OPS /// Kolo štěstí</title>
+<style>
+:root{color-scheme:dark;--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a;--red:#ff5263}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;background:radial-gradient(ellipse at 50% 0,#3d1d51,#10121a 65%)}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
+.brand{font-weight:950;letter-spacing:.07em}.brand span{color:#c084fc}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
+main{width:min(1100px,100%);margin:auto;padding:24px 16px 50px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.5rem);font-weight:1000;font-style:italic;text-shadow:0 0 26px #c084fc44}.sub{text-align:center;color:#ddc8ef;margin:0 auto 26px;max-width:650px}
+.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr);gap:22px;align-items:center}.panel{background:linear-gradient(145deg,#1b1e2b,#11141e);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 40px #0005}
+.wheel-shell{width:min(100%,560px);margin:auto;position:relative;padding:14px}.pointer{position:absolute;top:-1px;left:50%;transform:translateX(-50%);z-index:3;width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:43px solid #fff0b2;filter:drop-shadow(0 4px 5px #0009)}
+#wheelCanvas{display:block;width:100%;height:auto;aspect-ratio:1;border-radius:50%;border:10px ridge #e7bd65;box-shadow:0 14px 0 #281813,0 20px 35px #0009;transition:transform 5.6s cubic-bezier(.12,.72,.1,1)}
+.wheel-caption{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px}
+label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bottom:7px}input{width:100%;padding:13px;border-radius:10px;border:1px solid #42485c;background:#10121a;color:var(--text);font:inherit}input:focus{outline:2px solid var(--cyan);outline-offset:1px}
+.field{margin-bottom:16px}.prizes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 18px}.prize{border:1px solid #ffffff22;border-radius:9px;padding:10px 6px;text-align:center;font-weight:900;background:#202330}.prize small{display:block;color:#c4c8d7;font-size:.72rem;font-weight:600;margin-top:2px}
+.primary{width:100%;border:0;border-radius:12px;padding:15px 18px;background:linear-gradient(135deg,#e9bfff,#9b5de5);color:#21102d;font-size:1.08rem;font-weight:1000;box-shadow:0 5px 0 #5a3283;transition:transform .15s,filter .15s}.primary:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}button{font:inherit;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+.message{margin-top:14px;padding:14px;border-radius:10px;background:#111521;border:1px solid var(--line);min-height:52px;line-height:1.5}.message.win{border-color:#5be08a66;color:#b4ffd0}.message.loss{border-color:#ff526366;color:#ffc1c8}.result{font-size:clamp(1.8rem,4vw,2.5rem);text-align:center;color:var(--gold);font-weight:1000;margin:18px 0 4px}.result-note{text-align:center;color:var(--muted);font-size:.9rem}.fineprint{color:#c6c9d6;font-size:.83rem;line-height:1.6;margin-top:15px}
+@media(max-width:820px){.layout{grid-template-columns:1fr}.wheel-shell{max-width:520px}.panel{padding:16px}}@media(max-width:400px){.prizes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style></head>
+<body>
+<header><div class="brand">OPS <span>///</span> KOLO ŠTĚSTÍ</div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="balance">◆ <b id="balance">—</b> tokenů</span><a href="/kasino/index.html">← Zpět do kasina</a></div></header>
+<main>
+<h1 class="heading">VELKÉ KOLO ŠTĚSTÍ</h1><p class="sub">Roztoč barevné kolo, tref násobitel a zkus proměnit sázku ve větší výhru.</p>
+<div class="layout">
+<section class="panel">
+<div class="wheel-shell"><div class="pointer"></div><canvas id="wheelCanvas" width="800" height="800" aria-label="Velké kolo štěstí"></canvas></div>
+<div class="result" id="result">✨ Připraveno?</div><div class="result-note" id="resultNote">Vyber sázku a roztoč kolo.</div>
+</section>
+<section class="panel">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px"><div><div style="font-size:.82rem;color:var(--muted)">Cena jednoho roztočení</div><div style="font-size:1.4rem;color:var(--gold);font-weight:1000">Tvoje sázka</div></div><div style="font-size:2rem">🎡</div></div>
+<div class="field"><label for="stake">Sázka v tokenech</label><input id="stake" type="number" min="10" max="100000000" step="10" value="100" inputmode="numeric"></div>
+<div style="background:#111521;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px"><div style="color:var(--muted);font-size:.82rem">Aktuální výsledek při jednotlivých násobitelích</div><div id="preview" style="font-weight:800;color:var(--green);margin-top:6px">Sázka 100 → výhra 0 až 1 000 tokenů</div></div>
+<div class="prizes">
+<div class="prize" style="background:#3a1a2a">0×<small>Nic</small></div><div class="prize" style="background:#31543e">0,5×<small>Polovina</small></div><div class="prize" style="background:#254d78">1×<small>Sázka zpět</small></div>
+<div class="prize" style="background:#6c3a91">1,5×<small>Malá výhra</small></div><div class="prize" style="background:#8b4b25">2×<small>Dvojnásobek</small></div><div class="prize" style="background:#7c2436">3×<small>Troj násobek</small></div>
+<div class="prize" style="background:#31543e">5×<small>Velká výhra</small></div><div class="prize" style="background:#8b6a18">10×<small>Jackpot</small></div><div class="prize" style="background:#252a3d">🍀<small>Štěstí přeje</small></div>
+</div>
+<button class="primary" id="spinBtn" type="button">🎡 ROZTOČIT KOLO</button>
+<div class="message" id="message" role="status">Hodně štěstí! Sázka se odečte před roztočením.</div>
+<div class="fineprint">Výhra se přičte do společného OPS zůstatku. Násobitel 1× znamená vrácení sázky; 0,5× vrací polovinu. Každé pole má stejnou pravděpodobnost. Výsledky jsou náhodné.</div>
+</section>
+</div>
+</main>
+<script src="/js/ops-stats.js"></script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const segments=[
+ {m:0,label:'0×',color:'#84223a'}, {m:.5,label:'0,5×',color:'#2f754d'},
+ {m:1,label:'1×',color:'#2766a4'}, {m:1.5,label:'1,5×',color:'#8751ae'},
+ {m:2,label:'2×',color:'#bd6b2e'}, {m:0,label:'0×',color:'#84223a'},
+ {m:3,label:'3×',color:'#c83f56'}, {m:1,label:'1×',color:'#2766a4'},
+ {m:5,label:'5×',color:'#26754c'}, {m:.5,label:'0,5×',color:'#2f754d'},
+ {m:2,label:'2×',color:'#bd6b2e'}, {m:10,label:'10×',color:'#d0a52e'}
+];
+const canvas=$('wheelCanvas'),ctx=canvas.getContext('2d');
+let rotation=0,spinning=false;
+function draw(){
+ const c=canvas.width/2,r=canvas.width*.475,step=Math.PI*2/segments.length;
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ segments.forEach((s,i)=>{
+  const start=-Math.PI/2+i*step,end=start+step;
+  ctx.beginPath();ctx.moveTo(c,c);ctx.arc(c,c,r,start,end);ctx.closePath();ctx.fillStyle=s.color;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#ffe8a6';ctx.stroke();
+  ctx.save();ctx.translate(c,c);ctx.rotate(start+step/2);ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillStyle='#fff9e8';ctx.font='900 34px system-ui';ctx.fillText(s.label,r-30,0);ctx.restore();
+  ctx.beginPath();ctx.arc(c+Math.cos(start+step/2)*r*.72,c+Math.sin(start+step/2)*r*.72,5,0,Math.PI*2);ctx.fillStyle='#fff2b7';ctx.fill();
+ });
+ ctx.beginPath();ctx.arc(c,c,canvas.width*.17,0,Math.PI*2);ctx.fillStyle='#d2a446';ctx.fill();ctx.lineWidth=9;ctx.strokeStyle='#fff0b2';ctx.stroke();
+ ctx.beginPath();ctx.arc(c,c,canvas.width*.12,0,Math.PI*2);ctx.fillStyle='#26162d';ctx.fill();
+ ctx.fillStyle='#e9bfff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='1000 44px system-ui';ctx.fillText('OPS',c,c);
+}
+function stats(){return window.OPS_STATS?window.OPS_STATS.getStats():null}
+function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.gacha.tokens))?Math.max(0,Number(s.gacha.tokens)):0}
+function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Math.floor(v));window.OPS_STATS.saveStats(s);renderBalance();return true}
+function stake(){return Number($('stake').value)}
+function valid(){return Number.isSafeInteger(stake())&&stake()>=10&&stake()<=100000000&&stake()<=balance()}
+function renderBalance(){ $('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updateUI()}
+function updateUI(){
+ const b=stake();$('preview').textContent=Number.isSafeInteger(b)&&b>=10?`Sázka ${b.toLocaleString('cs-CZ')} → odměna 0 až ${(b*10).toLocaleString('cs-CZ')} tokenů`:'Zadej celé číslo alespoň 10.';
+ $('spinBtn').disabled=spinning||!valid()||!window.OPS_STATS;
+}
+function message(text,kind=''){const el=$('message');el.className='message '+kind;el.textContent=text}
+function spin(){
+ if(spinning||!valid()){message('Zkontroluj sázku a zůstatek tokenů.','loss');return}
+ const bet=stake(),before=balance();
+ if(!saveBalance(before-bet)){message('Nepodařilo se uložit zůstatek.','loss');return}
+ spinning=true;$('stake').disabled=true;$('spinBtn').disabled=true;$('result').textContent='🎡 Kolo se točí…';$('resultNote').textContent='Drž palce!';
+ const index=Math.floor(Math.random()*segments.length),seg=segments[index],centerDeg=-90+(index+.5)*360/segments.length;
+ const target=(270-centerDeg+360)%360,delta=(target-((rotation%360)+360)%360+360)%360;
+ rotation+=360*7+delta;canvas.style.transform=`rotate(${rotation}deg)`;
+ message('Kolo se roztočilo…');
+ setTimeout(()=>{
+  const prize=Math.floor(bet*seg.m);
+  if(prize>0)saveBalance(balance()+prize);else renderBalance();
+  $('result').textContent=seg.label+' '+(seg.m===10?'JACKPOT!':'');
+  $('resultNote').textContent=`Sázka ${bet.toLocaleString('cs-CZ')} · odměna ${prize.toLocaleString('cs-CZ')} tokenů · čistý výsledek ${(prize-bet).toLocaleString('cs-CZ')} tokenů`;
+  if(seg.m>=2)message(`🎉 Paráda! Padlo ${seg.label}. Získáváš ${prize.toLocaleString('cs-CZ')} tokenů.`, 'win');
+  else if(seg.m===0)message(`Tentokrát padlo ${seg.label}. Sázka propadá. Zkus to znovu, až budeš chtít.`, 'loss');
+  else message(`Padlo ${seg.label}. Připsáno ${prize.toLocaleString('cs-CZ')} tokenů.`,seg.m>=1?'win':'loss');
+  spinning=false;$('stake').disabled=false;updateUI();
+ },5750);
+}
+$('stake').addEventListener('input',updateUI);$('spinBtn').addEventListener('click',spin);
+draw();renderBalance();
+})();
+</script></body></html>
