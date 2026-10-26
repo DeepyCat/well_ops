@@ -512,9 +512,7 @@
   }
 
   $("shopBuy1").addEventListener("click", () => buyWithCookies(1000, 160));
-    $("shopBuy2").addEventListener("click", () => {
-    const c = readCookies();
-    if (c.available >= 10000 && !confirm("Opravdu utratit 10 000 sušenek za 1 600 bodů?")) return;
+  $("shopBuy2").addEventListener("click", () => {
     buyWithCookies(10000, 1600);
   });
   $("shopBuy3").addEventListener("click", () => {

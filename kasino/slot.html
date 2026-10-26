@@ -40,6 +40,13 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .controls-dock{display:flex;flex-direction:column;gap:14px;background:#0a0b12d9;border:1px solid #ffffff1a;border-radius:16px;padding:16px;margin-top:16px}
 .control-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .bet-chips{display:flex;gap:6px;flex-wrap:wrap}
+.bet-custom-wrap{display:flex;align-items:center;gap:8px;font-size:.88rem}
+.bet-custom-wrap label{color:var(--muted);font-weight:700}
+.bet-summary{margin-left:6px}
+.custom-bet-input{width:90px;padding:6px 10px;background:#ffffff0d;border:1px solid var(--line);border-radius:8px;color:#fff;font-family:inherit;font-weight:700;font-size:.88rem;text-align:right}
+.custom-bet-input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 8px #7ff0ff44}
+.custom-bet-input::-webkit-outer-spin-button,.custom-bet-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.custom-bet-input[type=number]{-moz-appearance:textfield}
 .chip-btn{background:#ffffff0d;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-weight:800;font-size:.85rem;transition:.15s}
 .chip-btn:hover:not(:disabled){border-color:var(--cyan);background:#7ff0ff11}
 .chip-btn.active{background:var(--cyan);color:#0a0b10;border-color:var(--cyan)}
@@ -122,7 +129,11 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
             <button class="chip-btn" id="clearBet" type="button">Vymazat</button>
             <button class="chip-btn" id="maxBet" type="button">Vsadit vše</button>
           </div>
-          <div>Sázka: <strong id="betAmt" style="color:var(--gold)">10</strong></div>
+          <div class="bet-custom-wrap">
+            <label for="customBetInput">Vlastní:</label>
+            <input type="number" id="customBetInput" class="custom-bet-input" min="10" step="1" placeholder="10" aria-label="Zadat vlastní sázku">
+            <span class="bet-summary">Sázka: <strong id="betAmt" style="color:var(--gold)">10</strong></span>
+          </div>
         </div>
         <div class="control-row" style="justify-content:space-between">
           <div class="toggles">
@@ -316,13 +327,24 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   let autoRunning = false;
   let autoCount = 0;
 
-  function maxAffordable() { return Math.floor(getTokens() / MIN_BET) * MIN_BET; }
-  function clampBet() { bet = Math.max(MIN_BET, Math.min(bet, maxAffordable() || MIN_BET)); }
+  function maxAffordable() { return Math.max(0, Math.floor(getTokens())); }
+  function clampBet() {
+    const max = maxAffordable();
+    bet = Math.max(MIN_BET, Math.min(bet, max >= MIN_BET ? max : MIN_BET));
+  }
 
   function updateUI() {
     const tokens = getTokens();
     $("tokens").textContent = fmt(tokens);
     $("betAmt").textContent = fmt(bet);
+    const customIn = $("customBetInput");
+    if (customIn) {
+      customIn.disabled = busy || autoRunning;
+      customIn.max = maxAffordable();
+      if (document.activeElement !== customIn) {
+        customIn.value = bet;
+      }
+    }
     $("spinBtn").disabled = busy || tokens < bet;
     $("turboBtn").classList.toggle("active", turbo);
     $("autoBtn").classList.toggle("active", autoRunning);
@@ -573,7 +595,6 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       toast(`Nemáš dost sušenek (vidím ${fmt(c.available)}, potřeba ${fmt(cost)}).`);
       return;
     }
-    if (cost >= 10000 && !confirm(`Opravdu utratit ${fmt(cost)} sušenek za ${fmt(gain)} bodů?`)) return;
 
     if (c.save) {
       c.save.cookies = Math.max(0, c.saveCookies - cost);
@@ -708,6 +729,54 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     sfx.click();
     updateUI();
   });
+
+  const customBetInput = $("customBetInput");
+  if (customBetInput) {
+    customBetInput.addEventListener("input", () => {
+      if (busy || autoRunning) return;
+      const raw = customBetInput.value.trim();
+      if (raw === "") {
+        bet = MIN_BET;
+      } else {
+        let val = parseInt(raw, 10);
+        if (isNaN(val) || val < 1) val = MIN_BET;
+        const max = maxAffordable();
+        if (max >= MIN_BET && val > max) {
+          val = max;
+          customBetInput.value = val;
+          toast("Sázka upravena na tvé maximum (" + fmt(val) + ").");
+        }
+        bet = val;
+      }
+      updateUI();
+    });
+
+    customBetInput.addEventListener("change", () => {
+      if (busy || autoRunning) return;
+      let val = parseInt(customBetInput.value, 10);
+      const max = maxAffordable();
+      if (isNaN(val) || val < MIN_BET) {
+        toast(`Minimální sázka je ${MIN_BET} bodů.`);
+        bet = MIN_BET;
+      } else if (max >= MIN_BET && val > max) {
+        bet = max;
+      } else {
+        bet = val;
+      }
+      customBetInput.value = bet;
+      updateUI();
+    });
+
+    customBetInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        customBetInput.blur();
+        if (!busy && !autoRunning) {
+          spin();
+        }
+      }
+    });
+  }
 
   $("spinBtn").addEventListener("click", spin);
   $("turboBtn").addEventListener("click", () => { turbo = !turbo; sfx.click(); updateUI(); });
