@@ -8,11 +8,10 @@
 *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;background:radial-gradient(ellipse at 50% 0,#3d1d51,#10121a 65%)}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
 .brand{font-weight:950;letter-spacing:.07em}.brand span{color:#c084fc}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
-main{width:min(1180px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.5rem);font-weight:1000;font-style:italic;text-shadow:0 0 26px #c084fc44}.sub{text-align:center;color:#ddc8ef;margin:0 auto 26px;max-width:650px}
-.layout{display:grid;grid-template-columns:minmax(280px,.7fr) minmax(0,1.8fr);gap:24px;align-items:start}
+main{width:min(1280px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.5rem);font-weight:1000;font-style:italic;text-shadow:0 0 26px #c084fc44}.sub{text-align:center;color:#ddc8ef;margin:0 auto 26px;max-width:650px}
+.layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
 .game-container{display:flex;flex-direction:column;gap:20px}
 .panels-sidebar{display:flex;flex-direction:column;gap:20px}
-.panels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
 .panel{background:linear-gradient(145deg,#1b1e2b,#11141e);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 40px #0005}
 .wheel-shell{width:min(100%,480px);margin:auto;position:relative;padding:14px}.pointer{position:absolute;top:-1px;left:50%;transform:translateX(-50%);z-index:3;width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:43px solid #fff0b2;filter:drop-shadow(0 4px 5px #0009)}
 #wheelCanvas{display:block;width:100%;height:auto;aspect-ratio:1;border-radius:50%;border:10px ridge #e7bd65;box-shadow:0 14px 0 #281813,0 20px 35px #0009;transition:transform 5.6s cubic-bezier(.12,.72,.1,1)}
@@ -36,7 +35,7 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 .shop-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#ffffff06;border:1px solid #ffffff12;border-radius:13px}
 .shop-info b{display:block;color:var(--gold);font-size:1rem}.shop-info small{color:var(--muted);font-size:.72rem}
 .shop-btn{white-space:nowrap;background:linear-gradient(110deg,#0284c7,#2563eb);border-color:#38bdf8;padding:8px 12px;border-radius:8px;font-weight:700}
-.lb{display:flex;flex-direction:column;gap:7px}
+.lb{display:flex;flex-direction:column;gap:7px;max-height:350px;overflow-y:auto;padding-right:4px}
 .lb-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;background:#ffffff05;border:1px solid #ffffff0d;border-radius:11px;font-size:.88rem}
 .lb-row.me{border-color:#7ff0ff88;background:#7ff0ff10}
 .lb-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -44,6 +43,10 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 .lb-sub{grid-column:2/-1;color:var(--muted);font-size:.72rem;margin-top:-4px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252938;border:1px solid #4a5065;border-radius:12px;padding:12px 18px;z-index:80;display:none;max-width:90vw;box-shadow:0 10px 40px #0008}
 .toast.show{display:block}
+.bet-controls-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.quick-btn{background:#ffffff0d;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:800;font-size:.82rem;transition:.15s}
+.quick-btn:hover:not(:disabled){border-color:var(--cyan);background:#7ff0ff11}
+.quick-btn.half{background:#64748b33;border-color:#64748b}
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
 </style>
 </head>
@@ -80,6 +83,10 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
       </div>
       <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
     </div>
+    <div class="panel">
+      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+    </div>
   </div>
 
   <div class="game-container">
@@ -90,7 +97,14 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 
     <section class="panel">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px"><div><div style="font-size:.82rem;color:var(--muted)">Cena jednoho roztočení</div><div style="font-size:1.4rem;color:var(--gold);font-weight:1000">Tvoje sázka</div></div><div style="font-size:2rem">🎡</div></div>
-      <div class="field"><label for="stake">Sázka v tokenech</label><input id="stake" type="number" min="10" max="100000000" step="10" value="100" inputmode="numeric"></div>
+      <div class="field">
+        <label for="stake">Sázka v tokenech</label>
+        <input id="stake" type="number" min="10" max="100000000" step="10" value="100" inputmode="numeric">
+        <div class="bet-controls-row">
+          <button class="quick-btn half" id="halfStakeBtn" type="button">1/2</button>
+          <button class="quick-btn" id="maxStakeBtn" type="button">Vsadit vše</button>
+        </div>
+      </div>
       <div style="background:#111521;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px"><div style="color:var(--muted);font-size:.82rem">Aktuální výsledek při jednotlivých násobitelích</div><div id="preview" style="font-weight:800;color:var(--green);margin-top:6px">Sázka 100 → výhra 0 až 1 000 tokenů</div></div>
       <div class="prizes">
         <div class="prize" style="background:#3a1a2a">0×<small>Nic</small></div><div class="prize" style="background:#31543e">0,5×<small>Polovina</small></div><div class="prize" style="background:#254d78">1×<small>Sázka zpět</small></div>
@@ -101,13 +115,6 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
       <div class="message" id="message" role="status">Hodně štěstí! Sázka se odečte před roztočením.</div>
       <div class="fineprint">Výhra se přičte do společného OPS zůstatku. Násobitel 1× znamená vrácení sázky; 0,5× vrací polovinu. Každé pole má stejnou pravděpodobnost. Výsledky jsou náhodné.</div>
     </section>
-  </div>
-</div>
-
-<div style="margin-top: 24px;">
-  <div class="panel">
-    <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button">↻</button></div>
-    <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
   </div>
 </div>
 </main><div class="toast" id="toast" role="status"></div>
@@ -173,6 +180,19 @@ function spin(){
 }
 $('stake').addEventListener('input',updateUI);$('spinBtn').addEventListener('click',spin);
 
+$('halfStakeBtn').addEventListener('click', () => {
+  if (spinning) return;
+  const max = Math.floor(balance());
+  const half = Math.max(10, Math.floor(max / 2));
+  $('stake').value = half;
+  updateUI();
+});
+$('maxStakeBtn').addEventListener('click', () => {
+  if (spinning) return;
+  $('stake').value = Math.floor(balance());
+  updateUI();
+});
+
 const STAT_KEY='ops_wheel_stats';
 const emptyStats=()=>({spins:0,wins:0,biggest:0,jackpots:0,totalWagered:0,totalWon:0,net:0});
 function loadGameStats(){try{return {...emptyStats(),...(JSON.parse(localStorage.getItem(STAT_KEY))||{})}}catch(e){return emptyStats()}}
@@ -226,7 +246,7 @@ async function pullGameStats(){
  const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez přezdívky se statistiky ukládají jen lokálně.',true);return}
  try{const r=await fetch(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}&select=wheel`,{headers:cloudHeaders()});
  if(!r.ok){setCloudNote('Cloud: ověř sloupec wheel v Supabase.',false);return}
- const rows=await r.json(),remote=rows[0]&&rows[0].wheel;
+ const rows=await r.json(),remote=rows[0]&rows[0].wheel;
  const local=loadGameStats();
  if(remote&&Number(remote.spins)>local.spins){saveGameStats({...emptyStats(),...remote});renderStats();setCloudNote('Cloud: statistiky načteny.',true)}
  else if(local.spins>((remote&&Number(remote.spins))||0))pushGameStats();else setCloudNote('Cloud: statistiky jsou synchronizované.',true)
@@ -238,7 +258,7 @@ async function loadLeaderboard(){
  try{const r=await fetch(`${c.url}/rest/v1/${c.table}?select=username,wheel&wheel=not.is.null&order=wheel->net.desc.nullslast&limit=10`,{headers:cloudHeaders()});
  if(!r.ok)throw Error('HTTP '+r.status);
  const rows=(await r.json()).filter(x=>x.wheel&&(Number(x.wheel.spins)||0)>0);
- if(!rows.length){box.innerHTML='<div class="notice">Zatím nikdo nehrál. Buď první!</div>';return}
+ if(!rows.length){box.innerHTML='<div class="notice">Zatím nik동 nehrál. Buď první!</div>';return}
  const me=cloudUser(),medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
  box.innerHTML=rows.map((x,i)=>{const s=x.wheel,n=Number(s.net)||0;return `<div class="lb-row${x.username===me?' me':''}"><span>${medal(i)}</span><span class="lb-name">${esc(x.username)}</span><span class="lb-net ${n>0?'pos':n<0?'neg':''}">${signed(n)}</span><span class="lb-sub">${fmt(s.spins)} her · max výhra ${fmt(s.biggest)} ◆</span></div>`}).join('');
  }catch(e){box.innerHTML='<div class="notice">Žebříček se nepodařilo načíst. Zkontroluj cloudový sloupec wheel.</div>'}
