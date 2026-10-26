@@ -8,76 +8,99 @@
 *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;background:radial-gradient(ellipse at 50% 0,#3d1d51,#10121a 65%)}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
 .brand{font-weight:950;letter-spacing:.07em}.brand span{color:#c084fc}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
-main{width:min(1100px,100%);margin:auto;padding:24px 16px 50px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.5rem);font-weight:1000;font-style:italic;text-shadow:0 0 26px #c084fc44}.sub{text-align:center;color:#ddc8ef;margin:0 auto 26px;max-width:650px}
-.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(290px,.85fr);gap:22px;align-items:center}.panel{background:linear-gradient(145deg,#1b1e2b,#11141e);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 40px #0005}
-.wheel-shell{width:min(100%,560px);margin:auto;position:relative;padding:14px}.pointer{position:absolute;top:-1px;left:50%;transform:translateX(-50%);z-index:3;width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:43px solid #fff0b2;filter:drop-shadow(0 4px 5px #0009)}
+main{width:min(1180px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.5rem);font-weight:1000;font-style:italic;text-shadow:0 0 26px #c084fc44}.sub{text-align:center;color:#ddc8ef;margin:0 auto 26px;max-width:650px}
+.layout{display:flex;flex-direction:column;gap:24px}
+.panels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
+.panel{background:linear-gradient(145deg,#1b1e2b,#11141e);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 18px 40px #0005}
+.wheel-shell{width:min(100%,480px);margin:auto;position:relative;padding:14px}.pointer{position:absolute;top:-1px;left:50%;transform:translateX(-50%);z-index:3;width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:43px solid #fff0b2;filter:drop-shadow(0 4px 5px #0009)}
 #wheelCanvas{display:block;width:100%;height:auto;aspect-ratio:1;border-radius:50%;border:10px ridge #e7bd65;box-shadow:0 14px 0 #281813,0 20px 35px #0009;transition:transform 5.6s cubic-bezier(.12,.72,.1,1)}
-.wheel-caption{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px}
 label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bottom:7px}input{width:100%;padding:13px;border-radius:10px;border:1px solid #42485c;background:#10121a;color:var(--text);font:inherit}input:focus{outline:2px solid var(--cyan);outline-offset:1px}
 .field{margin-bottom:16px}.prizes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 18px}.prize{border:1px solid #ffffff22;border-radius:9px;padding:10px 6px;text-align:center;font-weight:900;background:#202330}.prize small{display:block;color:#c4c8d7;font-size:.72rem;font-weight:600;margin-top:2px}
 .primary{width:100%;border:0;border-radius:12px;padding:15px 18px;background:linear-gradient(135deg,#e9bfff,#9b5de5);color:#21102d;font-size:1.08rem;font-weight:1000;box-shadow:0 5px 0 #5a3283;transition:transform .15s,filter .15s}.primary:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}button{font:inherit;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
-.message{margin-top:14px;padding:14px;border-radius:10px;background:#111521;border:1px solid var(--line);min-height:52px;line-height:1.5}.message.win{border-color:#5be08a66;color:#b4ffd0}.message.loss{border-color:#ff526366;color:#ffc1c8}.result{font-size:clamp(1.8rem,4vw,2.5rem);text-align:center;color:var(--gold);font-weight:1000;margin:18px 0 4px}.result-note{text-align:center;color:var(--muted);font-size:.9rem}.fineprint{color:#c6c9d6;font-size:.83rem;line-height:1.6;margin-top:15px}
-@media(max-width:820px){.layout{grid-template-columns:1fr}.wheel-shell{max-width:520px}.panel{padding:16px}}@media(max-width:400px){.prizes{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style></head>
+.message{margin-top:14px;padding:14px;border-radius:10px;background:#111521;border:1px solid var(--line);min-height:52px;line-height:1.5}.message.win{border-color:#5be08a66;color:#b4ffd0}.message.loss{border-color:#ff526366;color:#ffc1c8}
+.result{font-size:clamp(1.8rem,4vw,2.5rem);text-align:center;color:var(--gold);font-weight:1000;margin:18px 0 4px}.result-note{text-align:center;color:var(--muted);font-size:.9rem}.fineprint{color:#c6c9d6;font-size:.83rem;line-height:1.6;margin-top:15px}
+.currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}.currency strong{color:var(--gold);font-size:1.5rem}
+.who{color:var(--muted);font-size:.82rem;margin:10px 0 0;line-height:1.5}.who button{background:none;border:0;color:var(--red);font-weight:700;padding:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#ffffff06;border:1px solid #ffffff0e;border-radius:12px;padding:11px 12px}
+.stat small{display:block;color:var(--muted);font-size:.72rem;margin-bottom:5px}.stat strong{font-size:1.1rem}
+.stat.wide{grid-column:1/-1}
+.pos{color:var(--green)}.neg{color:var(--red)}
+.notice{font-size:.78rem;color:var(--muted);line-height:1.55;margin:12px 0 0}
+.link-btn{background:none;border:0;color:var(--red);font-weight:700;padding:0;margin-top:10px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}.section-head h2{margin:0}
+.pill{border:1px solid #ffffff22;border-radius:999px;padding:5px 11px;font-size:.8rem;color:#d9dbea;background:#ffffff08}
+.shop{display:flex;flex-direction:column;gap:10px}
+.shop-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#ffffff06;border:1px solid #ffffff12;border-radius:13px}
+.shop-info b{display:block;color:var(--gold);font-size:1rem}.shop-info small{color:var(--muted);font-size:.72rem}
+.shop-btn{white-space:nowrap;background:linear-gradient(110deg,#0284c7,#2563eb);border-color:#38bdf8;padding:8px 12px;border-radius:8px;font-weight:700}
+.lb{display:flex;flex-direction:column;gap:7px}
+.lb-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;background:#ffffff05;border:1px solid #ffffff0d;border-radius:11px;font-size:.88rem}
+.lb-row.me{border-color:#7ff0ff88;background:#7ff0ff10}
+.lb-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-net{font-weight:900}
+.lb-sub{grid-column:2/-1;color:var(--muted);font-size:.72rem;margin-top:-4px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252938;border:1px solid #4a5065;border-radius:12px;padding:12px 18px;z-index:80;display:none;max-width:90vw;box-shadow:0 10px 40px #0008}
+.toast.show{display:block}
+</style>
+</head>
 <body>
 <header><div class="brand">OPS <span>///</span> KOLO ŠTĚSTÍ</div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="balance">◆ <b id="balance">—</b> tokenů</span><a href="/kasino/index.html">← Zpět do kasina</a></div></header>
 <main>
 <h1 class="heading">VELKÉ KOLO ŠTĚSTÍ</h1><p class="sub">Roztoč barevné kolo, tref násobitel a zkus proměnit sázku ve větší výhru.</p>
 <div class="layout">
-<div class="game-column">
-<section class="panel">
-<div class="wheel-shell"><div class="pointer"></div><canvas id="wheelCanvas" width="800" height="800" aria-label="Velké kolo štěstí"></canvas></div>
-<div class="result" id="result">✨ Připraveno?</div><div class="result-note" id="resultNote">Vyber sázku a roztoč kolo.</div>
-</section>
-<section class="panel">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px"><div><div style="font-size:.82rem;color:var(--muted)">Cena jednoho roztočení</div><div style="font-size:1.4rem;color:var(--gold);font-weight:1000">Tvoje sázka</div></div><div style="font-size:2rem">🎡</div></div>
-<div class="field"><label for="stake">Sázka v tokenech</label><input id="stake" type="number" min="10" max="100000000" step="10" value="100" inputmode="numeric"></div>
-<div style="background:#111521;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px"><div style="color:var(--muted);font-size:.82rem">Aktuální výsledek při jednotlivých násobitelích</div><div id="preview" style="font-weight:800;color:var(--green);margin-top:6px">Sázka 100 → výhra 0 až 1 000 tokenů</div></div>
-<div class="prizes">
-<div class="prize" style="background:#3a1a2a">0×<small>Nic</small></div><div class="prize" style="background:#31543e">0,5×<small>Polovina</small></div><div class="prize" style="background:#254d78">1×<small>Sázka zpět</small></div>
-<div class="prize" style="background:#6c3a91">1,5×<small>Malá výhra</small></div><div class="prize" style="background:#8b4b25">2×<small>Dvojnásobek</small></div><div class="prize" style="background:#7c2436">3×<small>Troj násobek</small></div>
-<div class="prize" style="background:#31543e">5×<small>Velká výhra</small></div><div class="prize" style="background:#8b6a18">10×<small>Jackpot</small></div><div class="prize" style="background:#252a3d">🍀<small>Štěstí přeje</small></div>
-</div>
-<button class="primary" id="spinBtn" type="button">🎡 ROZTOČIT KOLO</button>
-<div class="message" id="message" role="status">Hodně štěstí! Sázka se odečte před roztočením.</div>
-<div class="fineprint">Výhra se přičte do společného OPS zůstatku. Násobitel 1× znamená vrácení sázky; 0,5× vrací polovinu. Každé pole má stejnou pravděpodobnost. Výsledky jsou náhodné.</div>
-</section>
+  <section class="panel">
+    <div class="wheel-shell"><div class="pointer"></div><canvas id="wheelCanvas" width="800" height="800" aria-label="Velké kolo štěstí"></canvas></div>
+    <div class="result" id="result">✨ Připraveno?</div><div class="result-note" id="resultNote">Vyber sázku a roztoč kolo.</div>
+  </section>
 
-</div>
-<aside class="side-panels">
-  <div class="panel">
-    <div class="currency"><span>Školní body</span><strong>◆ <span id="sideBalance">0</span></strong></div>
-    <p class="who" id="who"></p>
-    <p class="notice hide" id="broke" style="color:var(--red)">Došly ti body! Kup si další v obchodu se sušenkami.</p>
-  </div>
-  <div class="panel">
-    <h2>🛒 Obchod se sušenkami</h2>
-    <div class="section-head"><span class="pill" id="shopCookies">🍪 0</span></div>
-    <div class="shop">
-      <div class="shop-item"><div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div><button class="shop-btn" id="shopBuy1" type="button">🍪 1 000</button></div>
-      <div class="shop-item"><div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček (10×)</small></div><button class="shop-btn" id="shopBuy2" type="button">🍪 10 000</button></div>
+  <section class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px"><div><div style="font-size:.82rem;color:var(--muted)">Cena jednoho roztočení</div><div style="font-size:1.4rem;color:var(--gold);font-weight:1000">Tvoje sázka</div></div><div style="font-size:2rem">🎡</div></div>
+    <div class="field"><label for="stake">Sázka v tokenech</label><input id="stake" type="number" min="10" max="100000000" step="10" value="100" inputmode="numeric"></div>
+    <div style="background:#111521;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px"><div style="color:var(--muted);font-size:.82rem">Aktuální výsledek při jednotlivých násobitelích</div><div id="preview" style="font-weight:800;color:var(--green);margin-top:6px">Sázka 100 → výhra 0 až 1 000 tokenů</div></div>
+    <div class="prizes">
+      <div class="prize" style="background:#3a1a2a">0×<small>Nic</small></div><div class="prize" style="background:#31543e">0,5×<small>Polovina</small></div><div class="prize" style="background:#254d78">1×<small>Sázka zpět</small></div>
+      <div class="prize" style="background:#6c3a91">1,5×<small>Malá výhra</small></div><div class="prize" style="background:#8b4b25">2×<small>Dvojnásobek</small></div><div class="prize" style="background:#7c2436">3×<small>Troj násobek</small></div>
+      <div class="prize" style="background:#31543e">5×<small>Velká výhra</small></div><div class="prize" style="background:#8b6a18">10×<small>Jackpot</small></div><div class="prize" style="background:#252a3d">🍀<small>Štěstí přeje</small></div>
     </div>
-    <p class="notice">Sušenky se berou z Clickeru. Obchod je dostupný mezi roztočeními.</p>
-  </div>
-  <div class="panel">
-    <h2>📊 Statistiky hry</h2>
-    <div class="stats">
-      <div class="stat"><small>Roztočení</small><strong id="stSpins">0</strong></div>
-      <div class="stat"><small>Výhry</small><strong id="stWins">0</strong></div>
-      <div class="stat"><small>Největší výhra</small><strong id="stBiggest">0</strong></div>
-      <div class="stat"><small>Jackpoty</small><strong id="stJackpots">0</strong></div>
-      <div class="stat"><small>Celkem vsazeno</small><strong id="stWagered">0</strong></div>
-      <div class="stat"><small>Celkem vyhráno</small><strong id="stWon">0</strong></div>
-      <div class="stat wide"><small>Čistý zisk</small><strong id="stNet">0</strong></div>
-    </div>
-    <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
-  </div>
-  <div class="panel">
-    <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button">↻</button></div>
-    <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
-  </div>
-</aside>
+    <button class="primary" id="spinBtn" type="button">🎡 ROZTOČIT KOLO</button>
+    <div class="message" id="message" role="status">Hodně štěstí! Sázka se odečte před roztočením.</div>
+    <div class="fineprint">Výhra se přičte do společného OPS zůstatku. Násobitel 1× znamená vrácení sázky; 0,5× vrací polovinu. Každé pole má stejnou pravděpodobnost. Výsledky jsou náhodné.</div>
+  </section>
 
+  <div class="panels-grid">
+    <div class="panel">
+      <div class="currency"><span>Školní body</span><strong>◆ <span id="sideBalance">0</span></strong></div>
+      <p class="who" id="who"></p>
+      <p class="notice hide" id="broke" style="color:var(--red)">Došly ti body! Kup si další v obchodu se sušenkami.</p>
+    </div>
+    <div class="panel">
+      <h2>🛒 Obchod se sušenkami</h2>
+      <div class="section-head"><span class="pill" id="shopCookies">🍪 0</span></div>
+      <div class="shop">
+        <div class="shop-item"><div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div><button class="shop-btn" id="shopBuy1" type="button">🍪 1 000</button></div>
+        <div class="shop-item"><div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček (10×)</small></div><button class="shop-btn" id="shopBuy2" type="button">🍪 10 000</button></div>
+      </div>
+      <p class="notice">Sušenky se berou z Clickeru. Obchod je dostupný mezi roztočeními.</p>
+    </div>
+    <div class="panel">
+      <h2>📊 Statistiky hry</h2>
+      <div class="stats">
+        <div class="stat"><small>Roztočení</small><strong id="stSpins">0</strong></div>
+        <div class="stat"><small>Výhry</small><strong id="stWins">0</strong></div>
+        <div class="stat"><small>Největší výhra</small><strong id="stBiggest">0</strong></div>
+        <div class="stat"><small>Jackpoty</small><strong id="stJackpots">0</strong></div>
+        <div class="stat"><small>Celkem vsazeno</small><strong id="stWagered">0</strong></div>
+        <div class="stat"><small>Celkem vyhráno</small><strong id="stWon">0</strong></div>
+        <div class="stat wide"><small>Čistý zisk</small><strong id="stNet">0</strong></div>
+      </div>
+      <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
+    </div>
+    <div class="panel" style="grid-column: 1 / -1;">
+      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button">↻</button></div>
+      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+    </div>
+  </div>
 </div>
 </main><div class="toast" id="toast" role="status"></div>
 <script src="/js/ops-stats.js"></script>

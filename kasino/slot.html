@@ -22,9 +22,10 @@ a{color:inherit}
 main{width:min(1180px,94vw);margin:30px auto 70px}
 h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
-.layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(260px,.7fr);gap:20px;align-items:start}
+.layout{display:flex;flex-direction:column;gap:24px}
+.panels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
 
-.machine-table{position:relative;border:10px solid #2a2d3d;border-radius:22px;background:radial-gradient(ellipse at 50% 30%,#241f33 0,#141622 55%,#0d0e15 100%);box-shadow:inset 0 0 60px #0009,0 18px 50px #0007;padding:24px;min-height:600px;display:flex;flex-direction:column;justify-content:space-between}
+.machine-table{position:relative;border:10px solid #2a2d3d;border-radius:22px;background:radial-gradient(ellipse at 50% 30%,#241f33 0,#141622 55%,#0d0e15 100%);box-shadow:inset 0 0 60px #0009,0 18px 50px #0007;padding:24px;display:flex;flex-direction:column;justify-content:space-between}
 .slot-screen{background:#0a0b10;border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:inset 0 0 30px #000a;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;position:relative;overflow:hidden}
 .reel-col{background:#121520;border:1px solid #ffffff14;border-radius:10px;height:270px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center}
 .reel-strip{position:absolute;width:100%;display:flex;flex-direction:column;transition:transform .4s cubic-bezier(.15,.85,.25,1)}
@@ -59,7 +60,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .toggle-btn.active{background:#ff526333;border-color:var(--red);color:#ff9da7}
 
 .panel{background:linear-gradient(160deg,#1b1e2a,#151722);border:1px solid var(--line);border-radius:20px;padding:20px}
-.panel+.panel{margin-top:16px}
+.panel+.panel{margin-top:0}
 .panel h2{margin:0 0 14px;font-size:1rem}
 .currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}
 .currency strong{color:var(--gold);font-size:1.5rem;font-variant-numeric:tabular-nums}
@@ -90,9 +91,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .lb-sub{grid-column:2/-1;color:var(--muted);font-size:.72rem;margin-top:-4px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252938;border:1px solid #4a5065;border-radius:12px;padding:12px 18px;z-index:80;display:none;max-width:90vw;box-shadow:0 10px 40px #0008}
 .toast.show{display:block}
-
-@media(max-width:900px){.layout{grid-template-columns:1fr}}
-@media(max-width:560px){.machine-table{padding:14px;min-height:500px}.reel-col{height:210px}.reel-symbol{height:70px;font-size:1.8rem}}
+@media(max-width:560px){.machine-table{padding:14px}.reel-col{height:210px}.reel-symbol{height:70px;font-size:1.8rem}}
 </style>
 </head>
 <body>
@@ -145,7 +144,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       </div>
     </section>
 
-    <aside>
+    <div class="panels-grid">
       <div class="panel">
         <div class="currency"><span>Školní body</span><strong>◆ <span id="tokens">0</span></strong></div>
         <p class="who" id="who"></p>
@@ -195,17 +194,17 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         <p class="notice" id="cloudNote" style="margin-top:10px">Cloud: zjišťuji…</p>
       </div>
 
-      <div class="panel">
+      <div class="panel" style="grid-column: 1 / -1;">
         <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
         <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
       </div>
-    </aside>
+    </div>
   </div>
 </main>
 
 <div class="big-win-overlay" id="bigWinOverlay">
   <div class="big-win-box">
-    <div class="eyebrow" style="color:var(--gold);font-weight:800;letter-spacing:.2em;margin-bottom:8px">VELKÁ VÝHRA</div>
+    <div class="eyebrow" style="color:var(--gold);font-weight:800;letter-spacing:.2em;margin-bottom:8px">VELKá VÝHRA</div>
     <h2 id="bigWinTitle">SKVĚLÉ!</h2>
     <p id="bigWinAmount">+0 ◆</p>
     <button class="btn primary" id="closeBigWin" type="button">Pokračovat</button>
