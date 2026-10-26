@@ -22,7 +22,9 @@ a{color:inherit}
 main{width:min(1180px,94vw);margin:30px auto 70px}
 h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
-.layout{display:flex;flex-direction:column;gap:24px}
+.layout{display:grid;grid-template-columns:minmax(280px,.7fr) minmax(0,1.8fr);gap:24px;align-items:start}
+.game-container{display:flex;flex-direction:column;gap:20px}
+.panels-sidebar{display:flex;flex-direction:column;gap:20px}
 .panels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
 
 .machine-table{position:relative;border:10px solid #2a2d3d;border-radius:22px;background:radial-gradient(ellipse at 50% 30%,#241f33 0,#141622 55%,#0d0e15 100%);box-shadow:inset 0 0 60px #0009,0 18px 50px #0007;padding:24px;display:flex;flex-direction:column;justify-content:space-between}
@@ -91,6 +93,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .lb-sub{grid-column:2/-1;color:var(--muted);font-size:.72rem;margin-top:-4px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252938;border:1px solid #4a5065;border-radius:12px;padding:12px 18px;z-index:80;display:none;max-width:90vw;box-shadow:0 10px 40px #0008}
 .toast.show{display:block}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
 @media(max-width:560px){.machine-table{padding:14px}.reel-col{height:210px}.reel-symbol{height:70px;font-size:1.8rem}}
 </style>
 </head>
@@ -108,43 +111,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   <p class="sub">Toč válci s tematickými školními symboly, skládej výherní linie a sbírej školní body sdílené s gachou i blackjackem.</p>
 
   <div class="layout">
-    <section class="machine-table" aria-label="Výherní automat">
-      <div class="slot-screen" id="slotScreen">
-        <div class="reel-col" data-col="0"><div class="reel-strip" id="strip0"></div></div>
-        <div class="reel-col" data-col="1"><div class="reel-strip" id="strip1"></div></div>
-        <div class="reel-col" data-col="2"><div class="reel-strip" id="strip2"></div></div>
-        <div class="reel-col" data-col="3"><div class="reel-strip" id="strip3"></div></div>
-        <div class="reel-col" data-col="4"><div class="reel-strip" id="strip4"></div></div>
-      </div>
-
-      <div class="controls-dock">
-        <div class="control-row">
-          <div class="bet-chips" id="betChips">
-            <button class="chip-btn" data-v="10" type="button">10</button>
-            <button class="chip-btn" data-v="50" type="button">50</button>
-            <button class="chip-btn" data-v="160" type="button">160</button>
-            <button class="chip-btn" data-v="500" type="button">500</button>
-            <button class="chip-btn" data-v="1600" type="button">1600</button>
-            <button class="chip-btn" id="clearBet" type="button">Vymazat</button>
-            <button class="chip-btn" id="maxBet" type="button">Vsadit vše</button>
-          </div>
-          <div class="bet-custom-wrap">
-            <label for="customBetInput">Vlastní:</label>
-            <input type="number" id="customBetInput" class="custom-bet-input" min="10" step="1" placeholder="10" aria-label="Zadat vlastní sázku">
-            <span class="bet-summary">Sázka: <strong id="betAmt" style="color:var(--gold)">10</strong></span>
-          </div>
-        </div>
-        <div class="control-row" style="justify-content:space-between">
-          <div class="toggles">
-            <button class="toggle-btn" id="turboBtn" type="button">⚡ Turbo</button>
-            <button class="toggle-btn" id="autoBtn" type="button">🔄 Auto-spin</button>
-          </div>
-          <button class="btn primary spin" id="spinBtn" type="button">TOČIT <kbd style="margin-left:8px;font-size:.8rem;opacity:.7">Space</kbd></button>
-        </div>
-      </div>
-    </section>
-
-    <div class="panels-grid">
+    <div class="panels-sidebar">
       <div class="panel">
         <div class="currency"><span>Školní body</span><strong>◆ <span id="tokens">0</span></strong></div>
         <p class="who" id="who"></p>
@@ -168,19 +135,6 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       </div>
 
       <div class="panel">
-        <h2>Výplatní tabulka (Paytable)</h2>
-        <div class="paytable-grid">
-          <div class="paytable-item"><span>♛ Ředitel (Wild)</span><span>5× = 500×</span></div>
-          <div class="paytable-item"><span>🔔 Zvonek</span><span>5× = 200×</span></div>
-          <div class="paytable-item"><span>📚 Kniha</span><span>5× = 100×</span></div>
-          <div class="paytable-item"><span>✏️ Tužka</span><span>5× = 50×</span></div>
-          <div class="paytable-item"><span>🍎 Jablko</span><span>5× = 20×</span></div>
-          <div class="paytable-item"><span>⭐ Známka</span><span>5× = 10×</span></div>
-        </div>
-        <p class="notice" style="margin-top:10px">RTP 93.37%. Výherních je 5 pevných linií (střed, horní, dolní a 2 diagonály).</p>
-      </div>
-
-      <div class="panel">
         <h2>Statistiky automatu</h2>
         <div class="stats">
           <div class="stat"><small>Toček</small><strong id="stSpins">0</strong></div>
@@ -193,11 +147,64 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         </div>
         <p class="notice" id="cloudNote" style="margin-top:10px">Cloud: zjišťuji…</p>
       </div>
+    </div>
 
-      <div class="panel" style="grid-column: 1 / -1;">
-        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+    <div class="game-container">
+      <section class="machine-table" aria-label="Výherní automat">
+        <div class="slot-screen" id="slotScreen">
+          <div class="reel-col" data-col="0"><div class="reel-strip" id="strip0"></div></div>
+          <div class="reel-col" data-col="1"><div class="reel-strip" id="strip1"></div></div>
+          <div class="reel-col" data-col="2"><div class="reel-strip" id="strip2"></div></div>
+          <div class="reel-col" data-col="3"><div class="reel-strip" id="strip3"></div></div>
+          <div class="reel-col" data-col="4"><div class="reel-strip" id="strip4"></div></div>
+        </div>
+
+        <div class="controls-dock">
+          <div class="control-row">
+            <div class="bet-chips" id="betChips">
+              <button class="chip-btn" data-v="10" type="button">10</button>
+              <button class="chip-btn" data-v="50" type="button">50</button>
+              <button class="chip-btn" data-v="160" type="button">160</button>
+              <button class="chip-btn" data-v="500" type="button">500</button>
+              <button class="chip-btn" data-v="1600" type="button">1600</button>
+              <button class="chip-btn" id="clearBet" type="button">Vymazat</button>
+              <button class="chip-btn" id="maxBet" type="button">Vsadit vše</button>
+            </div>
+            <div class="bet-custom-wrap">
+              <label for="customBetInput">Vlastní:</label>
+              <input type="number" id="customBetInput" class="custom-bet-input" min="10" step="1" placeholder="10" aria-label="Zadat vlastní sázku">
+              <span class="bet-summary">Sázka: <strong id="betAmt" style="color:var(--gold)">10</strong></span>
+            </div>
+          </div>
+          <div class="control-row" style="justify-content:space-between">
+            <div class="toggles">
+              <button class="toggle-btn" id="turboBtn" type="button">⚡ Turbo</button>
+              <button class="toggle-btn" id="autoBtn" type="button">🔄 Auto-spin</button>
+            </div>
+            <button class="btn primary spin" id="spinBtn" type="button">TOČIT <kbd style="margin-left:8px;font-size:.8rem;opacity:.7">Space</kbd></button>
+          </div>
+        </div>
+      </section>
+
+      <div class="panel">
+        <h2>Výplatní tabulka (Paytable)</h2>
+        <div class="paytable-grid">
+          <div class="paytable-item"><span>♛ Ředitel (Wild)</span><span>5× = 500×</span></div>
+          <div class="paytable-item"><span>🔔 Zvonek</span><span>5× = 200×</span></div>
+          <div class="paytable-item"><span>📚 Kniha</span><span>5× = 100×</span></div>
+          <div class="paytable-item"><span>✏️ Tužka</span><span>5× = 50×</span></div>
+          <div class="paytable-item"><span>🍎 Jablko</span><span>5× = 20×</span></div>
+          <div class="paytable-item"><span>⭐ Známka</span><span>5× = 10×</span></div>
+        </div>
+        <p class="notice" style="margin-top:10px">RTP 93.37%. Výherních je 5 pevných linií (střed, horní, dolní a 2 diagonály).</p>
       </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 24px;">
+    <div class="panel">
+      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
     </div>
   </div>
 </main>
@@ -554,7 +561,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
   function showBigWin(amount) {
     sfx.jackpot();
-    $("bigWinTitle").textContent = amount >= bet * 50 ? "EPICKÝ JACKPOT!" : "VELKÁ VÝHRA!";
+    $("bigWinTitle").textContent = amount >= bet * 50 ? "EPICKÝ JACKPOT!" : "VELKá VÝHRA!";
     $("bigWinAmount").textContent = `+${fmt(amount)} ◆`;
     $("bigWinOverlay").classList.add("show");
   }
