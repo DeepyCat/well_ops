@@ -22,7 +22,8 @@ a{color:inherit}
 main{width:min(1180px,94vw);margin:30px auto 70px}
 h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
-.layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(260px,.7fr);gap:20px;align-items:start}
+.layout{display:grid;grid-template-columns:minmax(260px,.7fr) minmax(0,1.9fr);gap:20px;align-items:start}
+.game-container{display:flex;flex-direction:column;gap:20px}
 
 /* stůl */
 .table{position:relative;border:10px solid #4a3220;border-radius:22px;background:radial-gradient(ellipse at 50% 30%,#1f5143 0,#12322a 55%,#0b211b 100%);box-shadow:inset 0 0 60px #0009,0 18px 50px #0007;padding:22px 20px 0;min-height:620px;display:flex;flex-direction:column;overflow:hidden}
@@ -136,55 +137,6 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
   <p class="sub">Dej se do 21 dřív než krupiér, ale nepřekroč ji. Sázíš školní body z gachy, takže co vyhraješ, můžeš hned utratit v náboru učitelů.</p>
 
   <div class="layout">
-    <section class="table" id="table" aria-label="Herní stůl">
-      <div class="rules">Blackjack vyplácí 3 : 2 · krupiér stojí na 17 · zdvojení na prvních dvou kartách</div>
-
-      <div class="zone">
-        <div class="label">Krupiér <span class="total" id="dTotal">–</span></div>
-        <div class="hand" id="dealerHand" aria-live="polite"></div>
-      </div>
-
-      <div class="result" id="result" role="status"><b id="resTitle"></b><span id="resAmt"></span></div>
-
-      <div class="zone" style="margin-top:12px">
-        <div class="hand" id="playerHand" aria-live="polite"></div>
-        <div class="label">Ty <span class="total" id="pTotal">–</span><span class="betchip hide" id="betShown"></span></div>
-      </div>
-
-      <div class="dock">
-        <p class="broke hide" id="broke">Došly ti body. Kup si další za sušenky v obchodě, nebo je získej v <a href="/gacha">náboru učitelů</a>.</p>
-
-        <div id="betPanel">
-          <div class="chips" id="chips">
-            <button class="chip" data-v="10" type="button" aria-label="Přidat 10">10</button>
-            <button class="chip" data-v="50" type="button" aria-label="Přidat 50">50</button>
-            <button class="chip" data-v="160" type="button" aria-label="Přidat 160">160</button>
-            <button class="chip" data-v="500" type="button" aria-label="Přidat 500">500</button>
-            <button class="chip" data-v="1600" type="button" aria-label="Přidat 1600">1600</button>
-          </div>
-          <div class="bet-line">
-            <span>Sázka</span>
-            <strong id="betAmt">0</strong>
-            <div class="custom-bet-wrap">
-              <label for="customBetInput">Vlastní:</label>
-              <input type="number" id="customBetInput" class="custom-bet-input" min="10" step="1" placeholder="10" aria-label="Zadat vlastní sázku">
-            </div>
-          </div>
-          <div class="row">
-            <button class="btn small" id="clearBet" type="button">Vymazat</button>
-            <button class="btn small" id="maxBet" type="button">Vsadit vše</button>
-            <button class="btn primary" id="dealBtn" type="button">Rozdat <kbd>Enter</kbd></button>
-          </div>
-        </div>
-
-        <div class="row hide" id="actions">
-          <button class="btn hit" id="hitBtn" type="button">Hit <kbd>H</kbd></button>
-          <button class="btn stand" id="standBtn" type="button">Stand <kbd>S</kbd></button>
-          <button class="btn dbl" id="dblBtn" type="button">Double <kbd>D</kbd></button>
-        </div>
-      </div>
-    </section>
-
     <aside>
       <div class="panel">
         <div class="currency"><span>Školní body</span><strong>◆ <span id="tokens">0</span></strong></div>
@@ -218,11 +170,65 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
         <button class="link-btn" id="resetStats" type="button">Vynulovat statistiky</button>
         <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
       </div>
-      <div class="panel">
-        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
-      </div>
     </aside>
+
+    <div class="game-container">
+      <section class="table" id="table" aria-label="Herní stůl">
+        <div class="rules">Blackjack vyplácí 3 : 2 · krupiér stojí na 17 · zdvojení na prvních dvou kartách</div>
+
+        <div class="zone">
+          <div class="label">Krupiér <span class="total" id="dTotal">–</span></div>
+          <div class="hand" id="dealerHand" aria-live="polite"></div>
+        </div>
+
+        <div class="result" id="result" role="status"><b id="resTitle"></b><span id="resAmt"></span></div>
+
+        <div class="zone" style="margin-top:12px">
+          <div class="hand" id="playerHand" aria-live="polite"></div>
+          <div class="label">Ty <span class="total" id="pTotal">–</span><span class="betchip hide" id="betShown"></span></div>
+        </div>
+
+        <div class="dock">
+          <p class="broke hide" id="broke">Došly ti body. Kup si další za sušenky v obchodě, nebo je získej v <a href="/gacha">náboru učitelů</a>.</p>
+
+          <div id="betPanel">
+            <div class="chips" id="chips">
+              <button class="chip" data-v="10" type="button" aria-label="Přidat 10">10</button>
+              <button class="chip" data-v="50" type="button" aria-label="Přidat 50">50</button>
+              <button class="chip" data-v="160" type="button" aria-label="Přidat 160">160</button>
+              <button class="chip" data-v="500" type="button" aria-label="Přidat 500">500</button>
+              <button class="chip" data-v="1600" type="button" aria-label="Přidat 1600">1600</button>
+            </div>
+            <div class="bet-line">
+              <span>Sázka</span>
+              <strong id="betAmt">0</strong>
+              <div class="custom-bet-wrap">
+                <label for="customBetInput">Vlastní:</label>
+                <input type="number" id="customBetInput" class="custom-bet-input" min="10" step="1" placeholder="10" aria-label="Zadat vlastní sázku">
+              </div>
+            </div>
+            <div class="row">
+              <button class="btn small" id="clearBet" type="button">Vymazat</button>
+              <button class="btn small" id="maxBet" type="button">Vsadit vše</button>
+              <button class="btn primary" id="dealBtn" type="button">Rozdat <kbd>Enter</kbd></button>
+            </div>
+          </div>
+
+          <div class="row hide" id="actions">
+            <button class="btn hit" id="hitBtn" type="button">Hit <kbd>H</kbd></button>
+            <button class="btn stand" id="standBtn" type="button">Stand <kbd>S</kbd></button>
+            <button class="btn dbl" id="dblBtn" type="button">Double <kbd>D</kbd></button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <div class="panel">
+      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+    </div>
   </div>
 </main>
 <div class="toast" id="toast" role="status"></div>
