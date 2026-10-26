@@ -129,9 +129,11 @@
 .tut-foot .tut-btn{padding:8px 16px;font-size:.86rem}
 @media(max-width:560px){.tut-dialog{gap:0;padding:0 8px 8px}.tut-char{height:120px;max-width:34vw}.tut-bubble{padding:13px 14px 12px}.tut-text{font-size:.88rem}.tut-bubble:before{bottom:26px}}
 @media(prefers-reduced-motion:reduce){.tut-char{animation:none}.tut-spot{transition:none}}
+ 
+#musicBtn.off{opacity:.45;text-decoration:line-through}
 </style></head>
 <body>
-<header class="topbar"><div class="brand">OPS <span>///</span> CpASÍNO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
+<header class="topbar"><div class="brand">OPS <span>///</span> CpASÍNO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="musicBtn" type="button" aria-pressed="true" aria-label="Vypnout hudbu" title="Hudba">🎵</button><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
 <main class="wall">
 <div class="sign">CpASÍNO OPS</div>
 <p class="intro">Vyber si stanoviště. Hraješ o školní body, které máš ve všech hrách společné.</p>
@@ -712,6 +714,103 @@
  
   root.hidden = false;
   setTimeout(() => $('tutYes').focus(), 50);
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  /* ===== Hudba na pozadí =====
+     Hraje všechno ze složky song/ (náhodné pořadí, pořád dokola).
+     Seznam skladeb se zjistí takto:
+       1) soubor song/playlist.json, například ["pisnicka1.mp3","pisnicka2.mp3"]
+       2) výpis složky song/ (funguje jen když to server povolí)
+       3) pole FALLBACK níže */
+  const DIR = 'song/';
+  const FALLBACK = [];            // např. ['pisnicka1.mp3', 'pisnicka2.mp3']
+  const VOLUME = 0.3;
+  const KEY = 'cpasino_music';    // 'off' = vypnuto, jinak zapnuto
+  const EXT = /\.(mp3|ogg|wav|m4a|aac|flac)$/i;
+ 
+  const btn = document.getElementById('musicBtn');
+  const get = () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
+  const set = v => { try { localStorage.setItem(KEY, v); } catch (e) {} };
+  let enabled = get() !== 'off';
+  let list = [], queue = [], current = '', errors = 0, started = false;
+  const audio = new Audio();
+  audio.volume = VOLUME; audio.preload = 'auto';
+ 
+  const nice = f => decodeURIComponent(f).replace(EXT, '').replace(/[_]+/g, ' ');
+  function paint() {
+    btn.classList.toggle('off', !enabled);
+    btn.setAttribute('aria-pressed', String(enabled));
+    btn.setAttribute('aria-label', enabled ? 'Vypnout hudbu' : 'Zapnout hudbu');
+    btn.title = enabled ? (current ? 'Hraje: ' + nice(current) : 'Hudba') : 'Hudba je vypnutá';
+  }
+ 
+  async function loadList() {
+    const norm = a => [...new Set(a.filter(f => typeof f === 'string' && EXT.test(f)))];
+    try {
+      const r = await fetch(DIR + 'playlist.json', { cache: 'no-cache' });
+      if (r.ok) { const j = await r.json(); const a = norm(Array.isArray(j) ? j : (j.files || [])); if (a.length) return a; }
+    } catch (e) {}
+    try {
+      const r = await fetch(DIR, { cache: 'no-cache' });
+      if (r.ok) {
+        const html = await r.text();
+        const a = norm([...html.matchAll(/href="([^"?#]+)"/gi)].map(m => m[1].split('/').pop()));
+        if (a.length) return a;
+      }
+    } catch (e) {}
+    return norm(FALLBACK);
+  }
+ 
+  function nextTrack() {
+    if (!list.length) return '';
+    if (!queue.length) {            // nové náhodné kolo, stejná skladba dvakrát po sobě nehraje
+      queue = list.slice().sort(() => Math.random() - 0.5);
+      if (queue.length > 1 && queue[0] === current) queue.push(queue.shift());
+    }
+    return queue.shift();
+  }
+ 
+  function play() {
+    if (!enabled || document.hidden || !list.length) return;
+    if (!audio.src || audio.ended) { current = nextTrack(); audio.src = DIR + encodeURIComponent(current).replace(/%2F/g, '/'); paint(); }
+    const pr = audio.play();
+    if (pr && pr.catch) pr.catch(() => waitForGesture());      // prohlížeč zatím nepouští zvuk
+  }
+ 
+  // Prohlížeče pustí zvuk až po prvním kliknutí/klávese, takže na něj počkáme
+  let waiting = false;
+  function waitForGesture() {
+    if (waiting) return; waiting = true;
+    const go = () => {
+      ['pointerdown', 'keydown', 'touchstart'].forEach(t => document.removeEventListener(t, go, true));
+      waiting = false; play();
+    };
+    ['pointerdown', 'keydown', 'touchstart'].forEach(t => document.addEventListener(t, go, true));
+  }
+ 
+  audio.addEventListener('ended', () => { audio.removeAttribute('src'); audio.load(); play(); });
+  audio.addEventListener('playing', () => { errors = 0; });
+  audio.addEventListener('error', () => {                        // vadný soubor přeskočíme
+    if (++errors > list.length + 1) return;
+    audio.removeAttribute('src'); play();
+  });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) audio.pause(); else play(); });
+ 
+  btn.addEventListener('click', () => {
+    enabled = !enabled; set(enabled ? 'on' : 'off');
+    if (enabled) play(); else audio.pause();
+    paint();
+  });
+ 
+  paint();
+  loadList().then(a => {
+    list = a; started = true;
+    if (!list.length) { btn.title = 'Ve složce song/ jsem nenašel žádnou hudbu'; return; }
+    if (enabled) play();
+  });
 })();
 </script>
 </body>
