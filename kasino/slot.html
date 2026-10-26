@@ -22,6 +22,7 @@ a{color:inherit}
 main{width:min(1280px,94vw);margin:30px auto 70px}
 h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
+.right-col{display:grid;gap:20px;min-width:0;align-items:start}.lb-panel{width:100%}
 .layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
 .game-container{display:flex;flex-direction:column;gap:20px}
 .panels-sidebar{display:flex;flex-direction:column;gap:20px}
@@ -147,14 +148,10 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         </div>
         <p class="notice" id="cloudNote" style="margin-top:10px">Cloud: zjišťuji…</p>
       </div>
-
-      <div class="panel">
-        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
-      </div>
     </div>
 
-    <div class="game-container">
+    <div class="right-col">
+<div class="game-container">
       <section class="machine-table" aria-label="Výherní automat">
         <div class="slot-screen" id="slotScreen">
           <div class="reel-col" data-col="0"><div class="reel-strip" id="strip0"></div></div>
@@ -205,6 +202,11 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         <p class="notice" style="margin-top:10px">RTP 93.37%. Výherních je 5 pevných linií (střed, horní, dolní a 2 diagonály).</p>
       </div>
     </div>
+<div class="panel lb-panel">
+        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+      </div>
+</div>
   </div>
 </main>
 

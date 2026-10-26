@@ -12,7 +12,7 @@
 .arcade-monitor-value{font-size:1.35rem;font-weight:1000;font-family:monospace;letter-spacing:0.04em}
 .arcade-monitor-sub{font-size:0.68rem;color:#64748b;margin-top:4px}
 .floor{position:absolute;z-index:-1;left:-15%;right:-15%;bottom:-20px;height:42%;transform:perspective(450px) rotateX(24deg);transform-origin:bottom;background:radial-gradient(ellipse at center,#681c2c 0,#391321 48%,#100b10 85%);border-top:2px solid #94613b;opacity:.95}.floor:after{content:"◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇";position:absolute;inset:15% 0;color:#d8a64a28;font-size:clamp(20px,4vw,48px);letter-spacing:.3em;text-align:center;background:repeating-linear-gradient(90deg,transparent 0 80px,#d7a64810 81px 83px,transparent 84px 160px)}.stations{max-width:1250px;margin:0 auto;display:grid;grid-template-columns:1fr 1.12fr 1fr;align-items:end;gap:clamp(10px,2vw,28px)}.station{position:relative;display:flex;flex-direction:column;align-items:center;text-decoration:none;min-width:0;transition:transform .22s ease;isolation:isolate}.station:focus-visible{outline:3px solid var(--cyan);outline-offset:7px;border-radius:12px}.beam{position:absolute;z-index:-1;top:-18px;left:0;right:0;height:65%;pointer-events:none;opacity:.27;mix-blend-mode:screen;background:linear-gradient(180deg,var(--beam),transparent 90%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);transition:opacity .22s}.station:hover,.station:focus-visible{transform:translateY(-6px)}.station:hover .beam,.station:focus-visible .beam{opacity:.62}.station-art{width:100%;height:clamp(220px,27vw,315px);display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 18px 16px #0009)}.station.slot{--beam:#ffd477}.station.bj{--beam:#5be08a}.station.pc{--beam:#7ff0ff}.slot .station-art{height:clamp(310px,35vw,405px)}.plaque{width:100%;padding:12px 13px 13px;background:linear-gradient(135deg,#21151a,#11131b);border:1px solid #9b713a;border-radius:8px;text-align:center;box-shadow:0 7px 0 #12090d,0 12px 22px #0007}.plaque h2{margin:0 0 4px;color:var(--gold);font-size:1.08rem;font-style:italic;text-transform:uppercase;letter-spacing:.05em}.plaque p{margin:0 0 8px;font-size:.82rem;color:#d0c5c6}.stat{display:block;color:var(--green);font-size:.79rem;font-weight:700}.felt-table{width:94%;height:64%;position:relative;border:10px solid var(--wood);border-radius:48% 48% 16% 16% / 48% 48% 18% 18%;background:linear-gradient(145deg,#1f5143,#0b211b);box-shadow:inset 0 0 0 3px #8b6a43,0 10px 0 #2a1a13;transform:perspective(300px) rotateX(8deg)}.felt-table:before{content:"♠  BLACKJACK  ♥";position:absolute;top:14%;left:0;right:0;text-align:center;color:#d9c89a;font-size:clamp(10px,1.2vw,14px);letter-spacing:.1em}.card{position:absolute;width:22%;height:43%;top:34%;background:#fffdf5;border-radius:6px;color:#171923;box-shadow:0 3px 7px #0007;display:flex;flex-direction:column;justify-content:space-between;padding:5px;font-family:Georgia,serif;font-size:clamp(15px,2vw,25px);font-weight:bold;transition:transform .25s}.card.a{left:37%;transform:rotate(-10deg)}.card.k{left:53%;color:#d82943;transform:rotate(8deg)}.station.bj:hover .card.a{transform:translateX(-12px) rotate(-16deg)}.station.bj:hover .card.k{transform:translateX(12px) rotate(15deg)}.card small{font-size:.65em}.chips{position:absolute;bottom:10%;left:45%;width:25px;height:25px;border-radius:50%;border:5px dashed #e8e8e8;background:#3386d8;box-shadow:0 5px 0 #20538a,0 10px 0 #e34252,0 15px 0 #a62b3c,0 20px 0 #e6b84d,0 25px 0 #9c772b;transition:transform .2s}.station.bj:hover .chips{transform:translateY(-5px)}.mini-sign{position:absolute;left:0;top:44%;background:#17131a;border:1px solid var(--gold);padding:5px 6px;color:var(--gold);font-size:clamp(8px,.8vw,11px);border-radius:4px}.machine{height:91%;width:67%;max-width:245px;background:linear-gradient(100deg,#8d1729,#d73547 18%,#a51c30 70%,#6e1322);border:7px ridge #e6b64c;border-radius:17px 17px 9px 9px;position:relative;box-shadow:inset 0 0 0 3px #641323,0 12px 0 #42111b}.machine:before{content:"";position:absolute;left:7%;right:7%;top:6%;height:10%;border:2px solid var(--gold);background:#230b12;border-radius:7px;box-shadow:0 0 12px #ffd47788}.machine-label{position:absolute;top:7.3%;left:0;right:0;text-align:center;font-size:clamp(12px,1.7vw,19px);font-weight:1000;font-style:italic;color:var(--gold);text-shadow:0 0 8px #ffd477;letter-spacing:.1em}.bulbs{position:absolute;top:2%;left:9%;right:9%;display:flex;justify-content:space-between}.bulbs i{width:7px;height:7px;border-radius:50%;background:#fff0a1;box-shadow:0 0 6px #ffe878;animation:bulb 1.8s linear infinite}.bulbs i:nth-child(2n){animation-delay:-.3s}.bulbs i:nth-child(3n){animation-delay:-.6s}.reels{position:absolute;top:23%;left:9%;right:9%;height:37%;display:flex;gap:4px;padding:5px;background:#130e18;border:3px solid #f5cf70;border-radius:7px;box-shadow:inset 0 0 15px #000}.reel{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(#f9f0d8,#fffdf3,#d8c9a5);color:#9d2033;font-size:clamp(23px,3.4vw,43px);text-shadow:0 2px #fff;overflow:hidden}.reel span{display:block;animation:reelStop 3.8s ease-out 1}.lever{position:absolute;right:-16%;top:28%;width:13%;height:30%;transform-origin:top center;transition:transform .25s}.lever:before{content:"";position:absolute;left:40%;top:10%;height:80%;width:7px;background:linear-gradient(90deg,#999,#fff,#666);border-radius:5px}.lever:after{content:"";position:absolute;left:-5px;top:0;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#ffb2b5,#e22d43 45%,#760e20);box-shadow:0 0 10px #ff526388}.station.slot:hover .lever{transform:rotate(25deg)}.slotbase{position:absolute;bottom:8%;left:13%;right:13%;height:12%;border:3px solid #f6d578;background:linear-gradient(#21121a,#08090e);border-radius:4px}.coin{position:absolute;bottom:4%;left:29%;width:17px;height:17px;border:3px solid #f8d36e;border-radius:50%;background:#a87c26;box-shadow:17px 0 0 -2px #e5b54d,30px 2px 0 -4px #f5d477}.computer{width:91%;position:relative;display:flex;flex-direction:column;align-items:center;transform:translateY(-5%)}.crt{width:91%;height:65%;min-height:145px;background:linear-gradient(135deg,#d8d5ca,#a9a69d);border:6px solid #77766e;border-radius:14px 14px 20px 20px;padding:10px;box-shadow:inset 0 0 0 3px #eee9da,0 8px 0 #77736b}.screen{height:100%;min-height:125px;border:4px solid #3a3c37;border-radius:25px;background:radial-gradient(ellipse,#123c3b,#071c20);padding:13px 9px;color:#7ff0c9;box-shadow:inset 0 0 22px #00f5bf44;overflow:hidden;font-family:monospace;font-size:clamp(9px,1.1vw,13px);text-shadow:0 0 7px #41ffca}.screen strong{display:block;color:#a6ffe5;font-size:1.08em;letter-spacing:.04em}.cursor{display:inline-block;width:7px;height:12px;background:#7ff0c9;vertical-align:middle;animation:cursor 1s steps(1) infinite}.teacher-cards{display:flex;gap:4px;margin-top:9px}.teacher-cards i{height:36px;flex:1;min-width:0;border:2px solid #6ad7b3;background:linear-gradient(135deg,#163f3c,#101c28);display:grid;place-items:center;color:#d8fff4;font-style:normal;font-weight:bold;font-size:12px}.teacher-cards i:nth-child(2){border-color:#d6bbff;color:#e2d1ff}.teacher-cards i:nth-child(3){border-color:#ffd477;color:#ffd477}.teacher-cards i:nth-child(4){border-color:#a4a9bc;color:#d5d9e6}.keyboard{width:100%;height:37px;margin-top:8px;border:2px solid #8e8b82;border-radius:5px;background:#c9c6bd;transform:perspective(100px) rotateX(12deg);display:flex;gap:3px;padding:5px}.keyboard i{flex:1;background:#77786f;border-radius:2px;box-shadow:0 1px #efeadb}.station.pc:hover .screen{box-shadow:inset 0 0 28px #00ffd966,0 0 16px #7ff0ff55}.station.pc:hover .cursor{animation-duration:.25s}.station.pc:hover .screen:after{content:"";position:absolute;left:8%;right:8%;height:2px;background:#7ff0ff99;animation:scan .9s linear 1;pointer-events:none}.station.pc .station-art{height:clamp(220px,27vw,315px)}@keyframes signFlash{0%,12%,24%,36%{opacity:.3;text-shadow:none;box-shadow:none}6%,18%,30%,100%{opacity:1}}@keyframes bulb{0%,100%{opacity:.35}50%{opacity:1}}@keyframes cursor{50%{opacity:0}}@keyframes scan{from{top:18%}to{top:75%}}@keyframes reelStop{0%{transform:translateY(-110%)}70%{transform:translateY(100%)}100%{transform:translateY(0)}}@media(max-width:900px) and (min-width:560px){.stations{gap:10px}.station-art{height:230px}.slot .station-art{height:300px}.plaque{padding:10px 7px}.plaque h2{font-size:.95rem}.plaque p,.stat{font-size:.72rem}.machine{width:72%}.mini-sign{font-size:8px}}@media(max-width:559px){.topbar{align-items:flex-start}.right{gap:8px;font-size:.78rem}.wall{padding-top:22px}.intro{font-size:.9rem;margin-bottom:24px}.stations{grid-template-columns:1fr;gap:26px;max-width:420px}.station.slot{order:0}.station.bj{order:1}.station.pc{order:2}.station-art,.station.pc .station-art{height:245px}.slot .station-art{height:310px}.machine{width:56%;max-width:230px}.plaque{padding:12px}.plaque h2{font-size:1.08rem}.plaque p,.stat{font-size:.82rem}.beam{top:-8px;height:80%}.sign{letter-spacing:.08em;padding:9px 12px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}.station:hover,.station:focus-visible{transform:none}.station:hover .beam,.station:focus-visible .beam{opacity:.5}.station.bj:hover .card.a{transform:rotate(-10deg)}.station.bj:hover .card.k{transform:rotate(8deg)}.station.bj:hover .chips{transform:none}.station.slot:hover .lever{transform:none}}
-
+ 
 /* OPS Shop Modal Open Fix */
 #opsShopModal.open {
   opacity: 1 !important;
@@ -21,7 +21,7 @@
 #opsShopModal.open > div {
   transform: scale(1) !important;
 }
-
+ 
 /* Kiosk / Směnárna CSS */
 .station.kiosk {--beam:#38bdf8}
 .kiosk-machine {height:94%;width:65%;max-width:210px;background:linear-gradient(100deg,#1e293b,#334155 18%,#1e293b 70%,#0f172a);border:6px ridge #38bdf8;border-radius:16px 16px 8px 8px;position:relative;box-shadow:inset 0 0 0 3px #0f172a,0 10px 0 #090d16;display:flex;flex-direction:column;align-items:center;padding:12px;transition:transform 0.25s ease}
@@ -58,27 +58,55 @@
 .station.wheel:hover .prize-wheel{transform:rotate(20deg)}
 @media(max-width:900px) and (min-width:560px){.stations{grid-template-columns:repeat(3,minmax(0,1fr))}.station{grid-column:auto}.station.roulette,.station.wheel{grid-column:auto}}
 @media(max-width:559px){.stations{grid-template-columns:1fr}.station,.station.roulette,.station.wheel{grid-column:auto}}
+ 
+/* ===== Vylepšení UI ===== */
+.sign{animation:signFlash 1.5s steps(1,end) 1,signGlow 3.4s ease-in-out 1.5s infinite}
+@keyframes signGlow{0%,100%{box-shadow:0 0 18px #ff526355,inset 0 0 18px #ff526322}50%{box-shadow:0 0 30px #ff526399,inset 0 0 24px #ff526338}}
+.arcade-monitors{max-width:1000px}
+.arcade-monitor:after{content:"";position:absolute;inset:0;border-radius:10px;pointer-events:none;background:repeating-linear-gradient(0deg,#ffffff07 0 1px,transparent 1px 3px)}
+.arcade-monitor-value{text-shadow:0 0 10px currentColor}
+.plaque{position:relative;transition:border-color .22s,box-shadow .22s}
+.station:hover .plaque,.station:focus-visible .plaque{border-color:var(--beam);box-shadow:0 7px 0 #12090d,0 12px 26px #0007,0 0 20px color-mix(in srgb,var(--beam) 45%,transparent)}
+.keyhint{position:absolute;top:-12px;right:12px;min-width:24px;height:24px;padding:0 7px;display:grid;place-items:center;border:1px solid var(--gold);border-radius:6px;background:#17131a;color:var(--gold);font:700 .74rem/1 ui-monospace,Consolas,monospace;box-shadow:0 2px 0 #000}
+.station.kiosk{cursor:pointer}
+@media(hover:none){.keyhint{display:none}}
+ 
+/* ===== Úklid: méně prvků, víc klidu ===== */
+.wall{padding-top:22px;padding-bottom:40px}
+.wall:before{opacity:.06}
+.floor:after{display:none}
+.sign{font-size:clamp(1.4rem,3vw,2.2rem);padding:8px 22px 10px;margin-bottom:10px}
+.intro{margin-bottom:16px;font-size:.9rem;opacity:.8}
+.statbar{display:flex;justify-content:center;gap:clamp(14px,4vw,44px);flex-wrap:wrap;margin:0 auto 26px;padding:10px 22px;width:max-content;max-width:100%;border:1px solid #ffffff1c;border-radius:999px;background:#0000003d}
+.sb{display:flex;align-items:baseline;gap:9px;font-size:.85rem}
+.sb span{color:#c9b3b8;font-size:.74rem;letter-spacing:.05em;text-transform:uppercase}
+.sb b{font-family:ui-monospace,Consolas,monospace;font-size:1rem}
+.beam{opacity:.12!important}
+.station:hover .beam,.station:focus-visible .beam{opacity:.35!important}
+.stations{max-width:1050px;gap:clamp(18px,3vw,40px) clamp(10px,2vw,28px)}
+.stations .station .station-art{height:clamp(160px,17vw,215px)}
+.stations .station.slot .station-art{height:clamp(200px,22vw,265px)}
+.plaque p{display:none}
+.plaque{padding:10px 12px;background:#14101acc;border-color:#ffffff22}
+.plaque h2{margin:0 0 2px;font-size:1rem}
+.stat{font-size:.76rem;opacity:.9}
+.shop-wrap{display:flex;justify-content:center;margin:34px auto 0;position:relative;z-index:10}
+.station.kiosk{display:inline-flex;grid-column:auto;flex-direction:row;align-items:center;gap:10px;padding:11px 22px;border:1px solid #38bdf8aa;border-radius:999px;background:#0b1626cc;color:#e8f6ff;font-weight:800;cursor:pointer;transition:background .2s,transform .2s}
+.station.kiosk small{color:#7dd3fc;font-weight:600;font-size:.76rem}
+.station.kiosk:hover{background:#12253d;transform:translateY(-2px)}
+@media(max-width:559px){.statbar{border-radius:16px;flex-direction:column;gap:6px;width:100%}.sb{justify-content:space-between}.stations .station .station-art,.stations .station.slot .station-art{height:200px}}
 </style></head>
 <body>
 <header class="topbar"><div class="brand">OPS <span>///</span> KASINO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
 <main class="wall">
 <div class="sign">KASINO OPS</div>
 <p class="intro">Vyber si stanoviště. Hraješ o školní body, které máš ve všech hrách společné.</p>
-
-<!-- Dva arcade monitory nahoře -->
-<div class="arcade-monitors">
-  <div class="arcade-monitor">
-    <div class="arcade-monitor-title">TVŮJ ČISTÝ ZISK</div>
-    <div class="arcade-monitor-value" id="monitorPersonal">0 ◆</div>
-    <div class="arcade-monitor-sub">Součet ze všech her</div>
-  </div>
-  <div class="arcade-monitor">
-    <div class="arcade-monitor-title">CELKOVÉ VÝDĚLKY HRÁČŮ</div>
-    <div class="arcade-monitor-value" id="monitorGlobal" style="color:#ffd477">Načítám…</div>
-    <div class="arcade-monitor-sub">Globální žebříček OPS</div>
-  </div>
+ 
+<div class="statbar">
+  <div class="sb"><span>Tvůj čistý zisk</span><b id="monitorPersonal">0 ◆</b></div>
+  <div class="sb"><span>Zisk všech hráčů</span><b id="monitorGlobal" style="color:#ffd477">…</b></div>
 </div>
-
+ 
 <div class="stations">
 <a class="station bj" href="/kasino/blackjack.html" aria-label="Otevřít Blackjack, klávesa 1"><span class="beam"></span><div class="station-art"><div class="felt-table"><div class="mini-sign">Blackjack<br>výplata 3:2</div><div class="card a"><span>A<small>♠</small></span><span style="align-self:flex-end">♠</span></div><div class="card k"><span>K<small>♥</small></span><span style="align-self:flex-end">♥</span></div><div class="chips"></div></div></div><div class="plaque"><h2>♠ Blackjack</h2><p>Poraz dealera. Přirozený blackjack platí 3:2.</p><span class="stat" id="bj-stat">Ještě nehráno</span></div></a>
 <a class="station slot" href="/kasino/slot.html" aria-label="Otevřít výherní automat, klávesa 2"><span class="beam"></span><div class="station-art"><div class="machine"><div class="bulbs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="machine-label">AUTOMAT</div><div class="reels"><div class="reel"><span>📚</span></div><div class="reel"><span>🔔</span></div><div class="reel"><span>♛</span></div></div><div class="lever"></div><div class="slotbase"></div><div class="coin"></div></div></div><div class="plaque"><h2>✦ Výherní automat</h2><p>Roztoč válce a zkus štěstí.</p><span class="stat" id="slot-stat">Ještě nehráno</span></div></a>
@@ -86,38 +114,17 @@
 <a class="station roulette" href="/kasino/roulette.html" aria-label="Otevřít ruletu, klávesa 4"><span class="beam"></span><div class="station-art"><div class="roulette-table"><div class="roulette-wheel"><span class="roulette-ball"></span></div></div></div><div class="plaque"><h2>🎯 Ruleta</h2><p>Vsaď na číslo, barvu nebo skupinu čísel.</p><span class="stat" id="roulette-stat">Ještě nehráno</span></div></a>
 <a class="station wheel" href="/kasino/wheel.html" aria-label="Otevřít kolo štěstí, klávesa 5"><span class="beam"></span><div class="station-art"><div class="prize-wheel"><div class="wheel-multis"><span>×2</span><span>×5</span><span>×10</span></div></div></div><div class="plaque"><h2>🎡 Kolo štěstí</h2><p>Roztoč kolo a zkus trefit vysoký násobek.</p><span class="stat" id="wheel-stat">Ještě nehráno</span></div></a>
 </div>
-<!-- OPS OBCHOD (Směnný automat / Kiosk) umístěný dole na ploše -->
-<div class="ops-shop-section" style="position:relative;z-index:10;max-width:320px;margin:25px auto 5px;text-align:center;pointer-events:auto;">
-  <div class="station kiosk" id="openOpsShopBtn" role="button" aria-label="Otevřít Obchod OPS - Směna měn" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;cursor:pointer;">
-    <span class="beam" style="--beam:#38bdf8;"></span>
-    <div class="station-art" style="height:170px;">
-      <div class="kiosk-machine">
-        <div class="kiosk-bulbs"><i></i><i></i><i></i><i></i></div>
-        <div class="kiosk-screen">
-          <div class="kiosk-screen-title">SMĚNA MĚN</div>
-          <div class="kiosk-screen-rates">🍪 ⇄ ◆</div>
-        </div>
-        <div class="kiosk-slot-anim"></div>
-        <div class="kiosk-base"></div>
-      </div>
-    </div>
-    <div class="plaque" style="margin-top:-10px;">
-      <h2>🛒 Obchod OPS</h2>
-      <p>Kupuj tokeny za sušenky nebo měň zpět.</p>
-      <span class="stat" style="color:var(--cyan);">Otevřít směnárnu</span>
-    </div>
-  </div>
-</div>
+<div class="shop-wrap"><div class="station kiosk" id="openOpsShopBtn" role="button" tabindex="0" aria-label="Otevřít Obchod OPS - Směna měn">🛒 Obchod OPS <small>sušenky ⇄ tokeny</small></div></div>
 <div class="floor"></div></main>
-
+ 
 <!-- Modální okno obchodu -->
-<div id="opsShopModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity 0.25s ease;">
+<div id="opsShopModal" role="dialog" aria-modal="true" aria-label="Obchod OPS" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity 0.25s ease;">
   <div style="background:linear-gradient(135deg,#151929 0,#0f1322 100%);border:2px solid rgba(255,212,119,0.4);border-radius:20px;max-width:540px;width:100%;padding:28px;color:#f8fafc;font-family:Inter,sans-serif;box-shadow:0 25px 60px rgba(0,0,0,0.8),0 0 40px rgba(255,212,119,0.15);transform:scale(0.95);transition:transform 0.25s ease;max-height:90vh;overflow-y:auto;" id="opsShopCard">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <h2 style="margin:0;font-size:1.5rem;color:#ffd477;display:flex;align-items:center;gap:10px;">🛒 Obchod OPS</h2>
-      <button type="button" id="closeOpsShopBtn" style="background:none;border:none;color:#a4a9bc;font-size:26px;cursor:pointer;line-height:1;">&times;</button>
+      <button type="button" id="closeOpsShopBtn" aria-label="Zavřít" style="background:none;border:none;color:#a4a9bc;font-size:26px;cursor:pointer;line-height:1;">&times;</button>
     </div>
-
+ 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;background:rgba(25,28,39,0.8);border:1px solid #34394b;border-radius:14px;padding:14px;">
       <div style="text-align:center;">
         <div style="font-size:0.8rem;color:#a4a9bc;margin-bottom:4px;">Aktuální zůstatek tokenů</div>
@@ -128,7 +135,7 @@
         <div style="font-size:1.3rem;font-weight:900;color:#5be08a;">🍪 <span id="shopModalCookies">0</span></div>
       </div>
     </div>
-
+ 
     <!-- Výběr směru -->
     <div style="margin-bottom:18px;">
       <label style="display:block;font-size:0.85rem;color:#a4a9bc;margin-bottom:8px;font-weight:700;">Směr směny</label>
@@ -137,7 +144,7 @@
         <button type="button" id="dirCookiesToTokens" style="background:#252a3d;border:2px solid #38bdf8;color:#fff;padding:10px;border-radius:10px;font-weight:700;cursor:pointer;font-size:0.9rem;">Sušenky ➔ Tokeny</button>
       </div>
     </div>
-
+ 
     <!-- Předvolby -->
     <div id="presetsContainer" style="margin-bottom:18px;">
       <label style="display:block;font-size:0.85rem;color:#a4a9bc;margin-bottom:8px;font-weight:700;">Rychlé předvolby</label>
@@ -152,27 +159,27 @@
         </button>
       </div>
     </div>
-
+ 
     <!-- Vlastní množství -->
     <div style="margin-bottom:18px;">
       <label style="display:block;font-size:0.85rem;color:#a4a9bc;margin-bottom:8px;font-weight:700;">Vlastní množství (<span id="spendCurrencyLabel">sušenek</span>)</label>
       <input type="number" id="opsCustomAmountInput" min="1" step="1" placeholder="Zadej množství..." style="width:100%;background:#10121a;border:1px solid #34394b;border-radius:10px;padding:12px 14px;color:#fff;font-size:1.1rem;font-family:Consolas,monospace;outline:none;" />
     </div>
-
+ 
     <!-- Výsledek / Přehled -->
     <div id="opsExchangeSummary" style="background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.3);border-radius:12px;padding:14px;margin-bottom:20px;font-size:0.95rem;line-height:1.5;">
       Zadej množství nebo vyber předvolbu.
     </div>
-
+ 
     <div id="opsShopMsg" style="display:none;padding:10px 14px;border-radius:8px;font-size:0.9rem;margin-bottom:14px;"></div>
-
+ 
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button type="button" id="opsShopCancelBtn" style="background:rgba(255,255,255,0.08);color:#cbd5e1;border:none;border-radius:10px;padding:12px 20px;font-weight:700;cursor:pointer;">Zavřít</button>
       <button type="button" id="opsShopConfirmBtn" style="background:linear-gradient(135deg,#38bdf8,#2563eb);color:#fff;border:none;border-radius:10px;padding:12px 24px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(37,99,235,0.4);" disabled>Provést směnu</button>
     </div>
   </div>
 </div>
-
+ 
 <script src="/js/ops-stats.js"></script>
 <script>
 (() => {
@@ -188,7 +195,7 @@
     }
   };
   paintSound();
-
+ 
   function tone(freq = 650, duration = .045, volume = .025) {
     if (muted) return;
     try {
@@ -205,7 +212,7 @@
       o.stop(ctx.currentTime + duration);
     } catch (_) {}
   }
-
+ 
   const sndBtn = $('sound');
   if (sndBtn) {
     sndBtn.addEventListener('click', () => {
@@ -215,35 +222,36 @@
       if (!muted) tone(850, .08);
     });
   }
-
+ 
   document.querySelectorAll('.station').forEach(a => {
     a.addEventListener('pointerenter', () => tone(540, .025, .012));
     a.addEventListener('click', () => tone(900, .09, .03));
   });
-
+ 
   document.addEventListener('keydown', e => {
     if (e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
     const a = {'1': '/kasino/blackjack.html', '2': '/kasino/slot.html', '3': '/kasino/gacha.html', '4': '/kasino/roulette.html', '5': '/kasino/wheel.html'}[e.key];
-    if (a && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) location.href = a;
+    const shopOpen = $('opsShopModal') && $('opsShopModal').classList.contains('open');
+    if (a && !shopOpen && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) location.href = a;
   });
-
+ 
   function money(n) {
     n = Number(n) || 0;
     return (n > 0 ? '+' : '') + n.toLocaleString('cs-CZ');
   }
-
+ 
   function readNet(key) {
     try {
       const v = JSON.parse(localStorage.getItem(key) || 'null');
       return v && Number.isFinite(Number(v.net)) ? Number(v.net) : 0;
     } catch (_) { return 0; }
   }
-
+ 
   const b = readNet('ops_blackjack_stats');
   const s = readNet('ops_slots_stats');
   const r = readNet('ops_roulette_stats');
   const w = readNet('ops_wheel_stats');
-
+ 
   // Individuální statistiky na dlaždicích
   const setPlaqueStat = (elId, val) => {
     const el = $(elId);
@@ -251,12 +259,12 @@
     el.textContent = val === 0 ? 'Ještě nehráno' : 'Čistý zisk: ' + money(val);
     el.style.color = val > 0 ? 'var(--green)' : val < 0 ? 'var(--red)' : '';
   };
-
+ 
   setPlaqueStat('bj-stat', b);
   setPlaqueStat('slot-stat', s);
   setPlaqueStat('roulette-stat', r);
   setPlaqueStat('wheel-stat', w);
-
+ 
   // Monitor 1: Tvé celkové výdělky ze všech her
   const totalPersonalNet = b + s + r + w;
   const mPers = $('monitorPersonal');
@@ -264,7 +272,7 @@
     mPers.textContent = money(totalPersonalNet) + ' ◆';
     mPers.style.color = totalPersonalNet > 0 ? 'var(--green)' : totalPersonalNet < 0 ? 'var(--red)' : '#f5f6fb';
   }
-
+ 
   // Monitor 2: Celkové výdělky lidí (načteme z cloudu Supabase žebříčku, nebo fallback lokálně)
   async function loadGlobalStats() {
     const mGlob = $('monitorGlobal');
@@ -297,7 +305,7 @@
     }
   }
   loadGlobalStats();
-
+ 
   try {
     const stats = window.OPS_STATS && OPS_STATS.getStats ? OPS_STATS.getStats() : {};
     const g = stats.gacha || {};
@@ -319,7 +327,7 @@
   }
 })();
 </script>
-
+ 
 <script>
 (() => {
   'use strict';
@@ -361,10 +369,10 @@
       window.OPS_STATS.saveStats(s);
     }
   }
-
+ 
   let exchangeDirection = "cookies_to_tokens";
   let activeSpendAmount = 0;
-
+ 
   const modal = document.getElementById("opsShopModal");
   const openBtn = document.getElementById("openOpsShopBtn");
   const closeBtn = document.getElementById("closeOpsShopBtn");
@@ -377,7 +385,7 @@
   const summaryEl = document.getElementById("opsExchangeSummary");
   const msgEl = document.getElementById("opsShopMsg");
   const spendLabel = document.getElementById("spendCurrencyLabel");
-
+ 
   if (openBtn && modal) {
     function openModal() {
       updateModalBalances();
@@ -529,6 +537,28 @@
     if (confirmBtn) confirmBtn.addEventListener("click", executeExchange);
     attachPresetListeners();
   }
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const modal = $('opsShopModal'), kiosk = $('openOpsShopBtn');
+  const isOpen = () => modal && modal.classList.contains('open');
+ 
+  // Zůstatek na monitoru (stejná hodnota jako v horní liště)
+  const bal = $('monitorBalance'), tok = $('tokens');
+  if (bal && tok) bal.textContent = tok.textContent + ' ◆';
+ 
+  // Obchod: klávesnice (Enter/Mezerník na kiosku, klávesa 6, Esc zavře)
+  if (kiosk) kiosk.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); kiosk.click(); }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'Escape' && isOpen()) { const c = $('closeOpsShopBtn'); if (c) c.click(); return; }
+    if (e.key === '6' && !e.repeat && !isOpen() && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && kiosk) kiosk.click();
+  });
 })();
 </script>
 </body>
