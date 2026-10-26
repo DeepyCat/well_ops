@@ -4,7 +4,14 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10121a"><title>OPS /// Kasino</title>
 <style>
-:root{color-scheme:dark;--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a;--wine:#2a0f1a;--felt:#1f5143;--wood:#4a3220}*{box-sizing:border-box}html{min-width:360px;overflow-x:hidden}body{margin:0;min-width:360px;overflow-x:hidden;color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;background:#10121a}a{color:inherit}.topbar{min-height:62px;padding:12px clamp(12px,3vw,34px);display:flex;align-items:center;justify-content:space-between;gap:14px;background:#141620;border-bottom:1px solid var(--line);position:relative;z-index:5}.brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}.right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}.tokens{color:var(--gold);font-weight:800}.topbar a{color:var(--text);text-decoration:none}.topbar a:hover{color:var(--cyan)}button{font:inherit;cursor:pointer}.sound{border:1px solid var(--line);border-radius:8px;background:#202330;color:var(--text);padding:5px 9px}.wall{min-height:calc(100vh - 62px);position:relative;isolation:isolate;overflow:hidden;padding:30px clamp(10px,3vw,34px) 50px;background:radial-gradient(ellipse at 50% 25%,#421725 0,#2a0f1a 42%,#170a12 100%)}.wall:before{content:"";position:absolute;inset:0;z-index:-2;opacity:.15;background:repeating-linear-gradient(45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px),repeating-linear-gradient(-45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px);mask-image:linear-gradient(#000,transparent 90%)}.sign{width:max-content;max-width:100%;margin:0 auto 14px;padding:10px 25px 12px;border:2px solid #9d414a;border-radius:10px;background:linear-gradient(#39131f,#200b13);color:var(--gold);font-size:clamp(1.65rem,4vw,3.1rem);font-weight:1000;font-style:italic;letter-spacing:.14em;text-align:center;text-shadow:0 0 5px var(--gold),0 0 14px var(--red),0 0 32px #ff304f;box-shadow:0 0 18px #ff526355,inset 0 0 18px #ff526322;animation:signFlash 1.5s steps(1,end) 1}.intro{text-align:center;color:#f3c5cc;margin:0 auto 28px;max-width:650px;font-size:.96rem}.floor{position:absolute;z-index:-1;left:-15%;right:-15%;bottom:-20px;height:42%;transform:perspective(450px) rotateX(24deg);transform-origin:bottom;background:radial-gradient(ellipse at center,#681c2c 0,#391321 48%,#100b10 85%);border-top:2px solid #94613b;opacity:.95}.floor:after{content:"◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇";position:absolute;inset:15% 0;color:#d8a64a28;font-size:clamp(20px,4vw,48px);letter-spacing:.3em;text-align:center;background:repeating-linear-gradient(90deg,transparent 0 80px,#d7a64810 81px 83px,transparent 84px 160px)}.stations{max-width:1250px;margin:0 auto;display:grid;grid-template-columns:1fr 1.12fr 1fr;align-items:end;gap:clamp(10px,2vw,28px)}.station{position:relative;display:flex;flex-direction:column;align-items:center;text-decoration:none;min-width:0;transition:transform .22s ease;isolation:isolate}.station:focus-visible{outline:3px solid var(--cyan);outline-offset:7px;border-radius:12px}.beam{position:absolute;z-index:-1;top:-18px;left:0;right:0;height:65%;pointer-events:none;opacity:.27;mix-blend-mode:screen;background:linear-gradient(180deg,var(--beam),transparent 90%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);transition:opacity .22s}.station:hover,.station:focus-visible{transform:translateY(-6px)}.station:hover .beam,.station:focus-visible .beam{opacity:.62}.station-art{width:100%;height:clamp(220px,27vw,315px);display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 18px 16px #0009)}.station.slot{--beam:#ffd477}.station.bj{--beam:#5be08a}.station.pc{--beam:#7ff0ff}.slot .station-art{height:clamp(310px,35vw,405px)}.plaque{width:100%;padding:12px 13px 13px;background:linear-gradient(135deg,#21151a,#11131b);border:1px solid #9b713a;border-radius:8px;text-align:center;box-shadow:0 7px 0 #12090d,0 12px 22px #0007}.plaque h2{margin:0 0 4px;color:var(--gold);font-size:1.08rem;font-style:italic;text-transform:uppercase;letter-spacing:.05em}.plaque p{margin:0 0 8px;font-size:.82rem;color:#d0c5c6}.stat{display:block;color:var(--green);font-size:.79rem;font-weight:700}.felt-table{width:94%;height:64%;position:relative;border:10px solid var(--wood);border-radius:48% 48% 16% 16% / 48% 48% 18% 18%;background:linear-gradient(145deg,#1f5143,#0b211b);box-shadow:inset 0 0 0 3px #8b6a43,0 10px 0 #2a1a13;transform:perspective(300px) rotateX(8deg)}.felt-table:before{content:"♠  BLACKJACK  ♥";position:absolute;top:14%;left:0;right:0;text-align:center;color:#d9c89a;font-size:clamp(10px,1.2vw,14px);letter-spacing:.1em}.card{position:absolute;width:22%;height:43%;top:34%;background:#fffdf5;border-radius:6px;color:#171923;box-shadow:0 3px 7px #0007;display:flex;flex-direction:column;justify-content:space-between;padding:5px;font-family:Georgia,serif;font-size:clamp(15px,2vw,25px);font-weight:bold;transition:transform .25s}.card.a{left:37%;transform:rotate(-10deg)}.card.k{left:53%;color:#d82943;transform:rotate(8deg)}.station.bj:hover .card.a{transform:translateX(-12px) rotate(-16deg)}.station.bj:hover .card.k{transform:translateX(12px) rotate(15deg)}.card small{font-size:.65em}.chips{position:absolute;bottom:10%;left:45%;width:25px;height:25px;border-radius:50%;border:5px dashed #e8e8e8;background:#3386d8;box-shadow:0 5px 0 #20538a,0 10px 0 #e34252,0 15px 0 #a62b3c,0 20px 0 #e6b84d,0 25px 0 #9c772b;transition:transform .2s}.station.bj:hover .chips{transform:translateY(-5px)}.mini-sign{position:absolute;left:0;top:44%;background:#17131a;border:1px solid var(--gold);padding:5px 6px;color:var(--gold);font-size:clamp(8px,.8vw,11px);border-radius:4px}.machine{height:91%;width:67%;max-width:245px;background:linear-gradient(100deg,#8d1729,#d73547 18%,#a51c30 70%,#6e1322);border:7px ridge #e6b64c;border-radius:17px 17px 9px 9px;position:relative;box-shadow:inset 0 0 0 3px #641323,0 12px 0 #42111b}.machine:before{content:"";position:absolute;left:7%;right:7%;top:6%;height:10%;border:2px solid var(--gold);background:#230b12;border-radius:7px;box-shadow:0 0 12px #ffd47788}.machine-label{position:absolute;top:7.3%;left:0;right:0;text-align:center;font-size:clamp(12px,1.7vw,19px);font-weight:1000;font-style:italic;color:var(--gold);text-shadow:0 0 8px #ffd477;letter-spacing:.1em}.bulbs{position:absolute;top:2%;left:9%;right:9%;display:flex;justify-content:space-between}.bulbs i{width:7px;height:7px;border-radius:50%;background:#fff0a1;box-shadow:0 0 6px #ffe878;animation:bulb 1.8s linear infinite}.bulbs i:nth-child(2n){animation-delay:-.3s}.bulbs i:nth-child(3n){animation-delay:-.6s}.reels{position:absolute;top:23%;left:9%;right:9%;height:37%;display:flex;gap:4px;padding:5px;background:#130e18;border:3px solid #f5cf70;border-radius:7px;box-shadow:inset 0 0 15px #000}.reel{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(#f9f0d8,#fffdf3,#d8c9a5);color:#9d2033;font-size:clamp(23px,3.4vw,43px);text-shadow:0 2px #fff;overflow:hidden}.reel span{display:block;animation:reelStop 3.8s ease-out 1}.lever{position:absolute;right:-16%;top:28%;width:13%;height:30%;transform-origin:top center;transition:transform .25s}.lever:before{content:"";position:absolute;left:40%;top:10%;height:80%;width:7px;background:linear-gradient(90deg,#999,#fff,#666);border-radius:5px}.lever:after{content:"";position:absolute;left:-5px;top:0;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#ffb2b5,#e22d43 45%,#760e20);box-shadow:0 0 10px #ff526388}.station.slot:hover .lever{transform:rotate(25deg)}.slotbase{position:absolute;bottom:8%;left:13%;right:13%;height:12%;border:3px solid #f6d578;background:linear-gradient(#21121a,#08090e);border-radius:4px}.coin{position:absolute;bottom:4%;left:29%;width:17px;height:17px;border:3px solid #f8d36e;border-radius:50%;background:#a87c26;box-shadow:17px 0 0 -2px #e5b54d,30px 2px 0 -4px #f5d477}.computer{width:91%;position:relative;display:flex;flex-direction:column;align-items:center;transform:translateY(-5%)}.crt{width:91%;height:65%;min-height:145px;background:linear-gradient(135deg,#d8d5ca,#a9a69d);border:6px solid #77766e;border-radius:14px 14px 20px 20px;padding:10px;box-shadow:inset 0 0 0 3px #eee9da,0 8px 0 #77736b}.screen{height:100%;min-height:125px;border:4px solid #3a3c37;border-radius:25px;background:radial-gradient(ellipse,#123c3b,#071c20);padding:13px 9px;color:#7ff0c9;box-shadow:inset 0 0 22px #00f5bf44;overflow:hidden;font-family:monospace;font-size:clamp(9px,1.1vw,13px);text-shadow:0 0 7px #41ffca}.screen strong{display:block;color:#a6ffe5;font-size:1.08em;letter-spacing:.04em}.cursor{display:inline-block;width:7px;height:12px;background:#7ff0c9;vertical-align:middle;animation:cursor 1s steps(1) infinite}.teacher-cards{display:flex;gap:4px;margin-top:9px}.teacher-cards i{height:36px;flex:1;min-width:0;border:2px solid #6ad7b3;background:linear-gradient(135deg,#163f3c,#101c28);display:grid;place-items:center;color:#d8fff4;font-style:normal;font-weight:bold;font-size:12px}.teacher-cards i:nth-child(2){border-color:#d6bbff;color:#e2d1ff}.teacher-cards i:nth-child(3){border-color:#ffd477;color:#ffd477}.teacher-cards i:nth-child(4){border-color:#a4a9bc;color:#d5d9e6}.keyboard{width:100%;height:37px;margin-top:8px;border:2px solid #8e8b82;border-radius:5px;background:#c9c6bd;transform:perspective(100px) rotateX(12deg);display:flex;gap:3px;padding:5px}.keyboard i{flex:1;background:#77786f;border-radius:2px;box-shadow:0 1px #efeadb}.station.pc:hover .screen{box-shadow:inset 0 0 28px #00ffd966,0 0 16px #7ff0ff55}.station.pc:hover .cursor{animation-duration:.25s}.station.pc:hover .screen:after{content:"";position:absolute;left:8%;right:8%;height:2px;background:#7ff0ff99;animation:scan .9s linear 1;pointer-events:none}.station.pc .station-art{height:clamp(220px,27vw,315px)}@keyframes signFlash{0%,12%,24%,36%{opacity:.3;text-shadow:none;box-shadow:none}6%,18%,30%,100%{opacity:1}}@keyframes bulb{0%,100%{opacity:.35}50%{opacity:1}}@keyframes cursor{50%{opacity:0}}@keyframes scan{from{top:18%}to{top:75%}}@keyframes reelStop{0%{transform:translateY(-110%)}70%{transform:translateY(100%)}100%{transform:translateY(0)}}@media(max-width:900px) and (min-width:560px){.stations{gap:10px}.station-art{height:230px}.slot .station-art{height:300px}.plaque{padding:10px 7px}.plaque h2{font-size:.95rem}.plaque p,.stat{font-size:.72rem}.machine{width:72%}.mini-sign{font-size:8px}}@media(max-width:559px){.topbar{align-items:flex-start}.right{gap:8px;font-size:.78rem}.wall{padding-top:22px}.intro{font-size:.9rem;margin-bottom:24px}.stations{grid-template-columns:1fr;gap:26px;max-width:420px}.station.slot{order:0}.station.bj{order:1}.station.pc{order:2}.station-art,.station.pc .station-art{height:245px}.slot .station-art{height:310px}.machine{width:56%;max-width:230px}.plaque{padding:12px}.plaque h2{font-size:1.08rem}.plaque p,.stat{font-size:.82rem}.beam{top:-8px;height:80%}.sign{letter-spacing:.08em;padding:9px 12px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}.station:hover,.station:focus-visible{transform:none}.station:hover .beam,.station:focus-visible .beam{opacity:.5}.station.bj:hover .card.a{transform:rotate(-10deg)}.station.bj:hover .card.k{transform:rotate(8deg)}.station.bj:hover .chips{transform:none}.station.slot:hover .lever{transform:none}}
+:root{color-scheme:dark;--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a;--wine:#2a0f1a;--felt:#1f5143;--wood:#4a3220}*{box-sizing:border-box}html{min-width:360px;overflow-x:hidden}body{margin:0;min-width:360px;overflow-x:hidden;color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;background:#10121a}a{color:inherit}.topbar{min-height:62px;padding:12px clamp(12px,3vw,34px);display:flex;align-items:center;justify-content:space-between;gap:14px;background:#141620;border-bottom:1px solid var(--line);position:relative;z-index:5}.brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}.right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}.tokens{color:var(--gold);font-weight:800}.topbar a{color:var(--text);text-decoration:none}.topbar a:hover{color:var(--cyan)}button{font:inherit;cursor:pointer}.sound{border:1px solid var(--line);border-radius:8px;background:#202330;color:var(--text);padding:5px 9px}.wall{min-height:calc(100vh - 62px);position:relative;isolation:isolate;overflow:hidden;padding:30px clamp(10px,3vw,34px) 50px;background:radial-gradient(ellipse at 50% 25%,#421725 0,#2a0f1a 42%,#170a12 100%)}.wall:before{content:"";position:absolute;inset:0;z-index:-2;opacity:.15;background:repeating-linear-gradient(45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px),repeating-linear-gradient(-45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px);mask-image:linear-gradient(#000,transparent 90%)}.sign{width:max-content;max-width:100%;margin:0 auto 14px;padding:10px 25px 12px;border:2px solid #9d414a;border-radius:10px;background:linear-gradient(#39131f,#200b13);color:var(--gold);font-size:clamp(1.65rem,4vw,3.1rem);font-weight:1000;font-style:italic;letter-spacing:.14em;text-align:center;text-shadow:0 0 5px var(--gold),0 0 14px var(--red),0 0 32px #ff304f;box-shadow:0 0 18px #ff526355,inset 0 0 18px #ff526322;animation:signFlash 1.5s steps(1,end) 1}.intro{text-align:center;color:#f3c5cc;margin:0 auto 20px;max-width:650px;font-size:.96rem}
+.arcade-monitors{display:flex;justify-content:center;gap:16px;max-width:760px;margin:0 auto 26px;flex-wrap:wrap}
+.arcade-monitor{flex:1;min-width:240px;background:linear-gradient(145deg,#121622,#0a0d14);border:4px ridge #5a6578;border-radius:14px;padding:14px 16px;text-align:center;box-shadow:inset 0 0 20px #000,0 8px 24px #0008;position:relative}
+.arcade-monitor:before{content:"";position:absolute;top:4px;left:50%;transform:translateX(-50%);width:30px;height:4px;background:#374151;border-radius:2px}
+.arcade-monitor-title{font-size:0.72rem;color:#94a3b8;font-weight:900;letter-spacing:0.12em;margin-bottom:6px;text-transform:uppercase}
+.arcade-monitor-value{font-size:1.35rem;font-weight:1000;font-family:monospace;letter-spacing:0.04em}
+.arcade-monitor-sub{font-size:0.68rem;color:#64748b;margin-top:4px}
+.floor{position:absolute;z-index:-1;left:-15%;right:-15%;bottom:-20px;height:42%;transform:perspective(450px) rotateX(24deg);transform-origin:bottom;background:radial-gradient(ellipse at center,#681c2c 0,#391321 48%,#100b10 85%);border-top:2px solid #94613b;opacity:.95}.floor:after{content:"◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇   ◇";position:absolute;inset:15% 0;color:#d8a64a28;font-size:clamp(20px,4vw,48px);letter-spacing:.3em;text-align:center;background:repeating-linear-gradient(90deg,transparent 0 80px,#d7a64810 81px 83px,transparent 84px 160px)}.stations{max-width:1250px;margin:0 auto;display:grid;grid-template-columns:1fr 1.12fr 1fr;align-items:end;gap:clamp(10px,2vw,28px)}.station{position:relative;display:flex;flex-direction:column;align-items:center;text-decoration:none;min-width:0;transition:transform .22s ease;isolation:isolate}.station:focus-visible{outline:3px solid var(--cyan);outline-offset:7px;border-radius:12px}.beam{position:absolute;z-index:-1;top:-18px;left:0;right:0;height:65%;pointer-events:none;opacity:.27;mix-blend-mode:screen;background:linear-gradient(180deg,var(--beam),transparent 90%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%);transition:opacity .22s}.station:hover,.station:focus-visible{transform:translateY(-6px)}.station:hover .beam,.station:focus-visible .beam{opacity:.62}.station-art{width:100%;height:clamp(220px,27vw,315px);display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 18px 16px #0009)}.station.slot{--beam:#ffd477}.station.bj{--beam:#5be08a}.station.pc{--beam:#7ff0ff}.slot .station-art{height:clamp(310px,35vw,405px)}.plaque{width:100%;padding:12px 13px 13px;background:linear-gradient(135deg,#21151a,#11131b);border:1px solid #9b713a;border-radius:8px;text-align:center;box-shadow:0 7px 0 #12090d,0 12px 22px #0007}.plaque h2{margin:0 0 4px;color:var(--gold);font-size:1.08rem;font-style:italic;text-transform:uppercase;letter-spacing:.05em}.plaque p{margin:0 0 8px;font-size:.82rem;color:#d0c5c6}.stat{display:block;color:var(--green);font-size:.79rem;font-weight:700}.felt-table{width:94%;height:64%;position:relative;border:10px solid var(--wood);border-radius:48% 48% 16% 16% / 48% 48% 18% 18%;background:linear-gradient(145deg,#1f5143,#0b211b);box-shadow:inset 0 0 0 3px #8b6a43,0 10px 0 #2a1a13;transform:perspective(300px) rotateX(8deg)}.felt-table:before{content:"♠  BLACKJACK  ♥";position:absolute;top:14%;left:0;right:0;text-align:center;color:#d9c89a;font-size:clamp(10px,1.2vw,14px);letter-spacing:.1em}.card{position:absolute;width:22%;height:43%;top:34%;background:#fffdf5;border-radius:6px;color:#171923;box-shadow:0 3px 7px #0007;display:flex;flex-direction:column;justify-content:space-between;padding:5px;font-family:Georgia,serif;font-size:clamp(15px,2vw,25px);font-weight:bold;transition:transform .25s}.card.a{left:37%;transform:rotate(-10deg)}.card.k{left:53%;color:#d82943;transform:rotate(8deg)}.station.bj:hover .card.a{transform:translateX(-12px) rotate(-16deg)}.station.bj:hover .card.k{transform:translateX(12px) rotate(15deg)}.card small{font-size:.65em}.chips{position:absolute;bottom:10%;left:45%;width:25px;height:25px;border-radius:50%;border:5px dashed #e8e8e8;background:#3386d8;box-shadow:0 5px 0 #20538a,0 10px 0 #e34252,0 15px 0 #a62b3c,0 20px 0 #e6b84d,0 25px 0 #9c772b;transition:transform .2s}.station.bj:hover .chips{transform:translateY(-5px)}.mini-sign{position:absolute;left:0;top:44%;background:#17131a;border:1px solid var(--gold);padding:5px 6px;color:var(--gold);font-size:clamp(8px,.8vw,11px);border-radius:4px}.machine{height:91%;width:67%;max-width:245px;background:linear-gradient(100deg,#8d1729,#d73547 18%,#a51c30 70%,#6e1322);border:7px ridge #e6b64c;border-radius:17px 17px 9px 9px;position:relative;box-shadow:inset 0 0 0 3px #641323,0 12px 0 #42111b}.machine:before{content:"";position:absolute;left:7%;right:7%;top:6%;height:10%;border:2px solid var(--gold);background:#230b12;border-radius:7px;box-shadow:0 0 12px #ffd47788}.machine-label{position:absolute;top:7.3%;left:0;right:0;text-align:center;font-size:clamp(12px,1.7vw,19px);font-weight:1000;font-style:italic;color:var(--gold);text-shadow:0 0 8px #ffd477;letter-spacing:.1em}.bulbs{position:absolute;top:2%;left:9%;right:9%;display:flex;justify-content:space-between}.bulbs i{width:7px;height:7px;border-radius:50%;background:#fff0a1;box-shadow:0 0 6px #ffe878;animation:bulb 1.8s linear infinite}.bulbs i:nth-child(2n){animation-delay:-.3s}.bulbs i:nth-child(3n){animation-delay:-.6s}.reels{position:absolute;top:23%;left:9%;right:9%;height:37%;display:flex;gap:4px;padding:5px;background:#130e18;border:3px solid #f5cf70;border-radius:7px;box-shadow:inset 0 0 15px #000}.reel{flex:1;display:flex;align-items:center;justify-content:center;background:linear-gradient(#f9f0d8,#fffdf3,#d8c9a5);color:#9d2033;font-size:clamp(23px,3.4vw,43px);text-shadow:0 2px #fff;overflow:hidden}.reel span{display:block;animation:reelStop 3.8s ease-out 1}.lever{position:absolute;right:-16%;top:28%;width:13%;height:30%;transform-origin:top center;transition:transform .25s}.lever:before{content:"";position:absolute;left:40%;top:10%;height:80%;width:7px;background:linear-gradient(90deg,#999,#fff,#666);border-radius:5px}.lever:after{content:"";position:absolute;left:-5px;top:0;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#ffb2b5,#e22d43 45%,#760e20);box-shadow:0 0 10px #ff526388}.station.slot:hover .lever{transform:rotate(25deg)}.slotbase{position:absolute;bottom:8%;left:13%;right:13%;height:12%;border:3px solid #f6d578;background:linear-gradient(#21121a,#08090e);border-radius:4px}.coin{position:absolute;bottom:4%;left:29%;width:17px;height:17px;border:3px solid #f8d36e;border-radius:50%;background:#a87c26;box-shadow:17px 0 0 -2px #e5b54d,30px 2px 0 -4px #f5d477}.computer{width:91%;position:relative;display:flex;flex-direction:column;align-items:center;transform:translateY(-5%)}.crt{width:91%;height:65%;min-height:145px;background:linear-gradient(135deg,#d8d5ca,#a9a69d);border:6px solid #77766e;border-radius:14px 14px 20px 20px;padding:10px;box-shadow:inset 0 0 0 3px #eee9da,0 8px 0 #77736b}.screen{height:100%;min-height:125px;border:4px solid #3a3c37;border-radius:25px;background:radial-gradient(ellipse,#123c3b,#071c20);padding:13px 9px;color:#7ff0c9;box-shadow:inset 0 0 22px #00f5bf44;overflow:hidden;font-family:monospace;font-size:clamp(9px,1.1vw,13px);text-shadow:0 0 7px #41ffca}.screen strong{display:block;color:#a6ffe5;font-size:1.08em;letter-spacing:.04em}.cursor{display:inline-block;width:7px;height:12px;background:#7ff0c9;vertical-align:middle;animation:cursor 1s steps(1) infinite}.teacher-cards{display:flex;gap:4px;margin-top:9px}.teacher-cards i{height:36px;flex:1;min-width:0;border:2px solid #6ad7b3;background:linear-gradient(135deg,#163f3c,#101c28);display:grid;place-items:center;color:#d8fff4;font-style:normal;font-weight:bold;font-size:12px}.teacher-cards i:nth-child(2){border-color:#d6bbff;color:#e2d1ff}.teacher-cards i:nth-child(3){border-color:#ffd477;color:#ffd477}.teacher-cards i:nth-child(4){border-color:#a4a9bc;color:#d5d9e6}.keyboard{width:100%;height:37px;margin-top:8px;border:2px solid #8e8b82;border-radius:5px;background:#c9c6bd;transform:perspective(100px) rotateX(12deg);display:flex;gap:3px;padding:5px}.keyboard i{flex:1;background:#77786f;border-radius:2px;box-shadow:0 1px #efeadb}.station.pc:hover .screen{box-shadow:inset 0 0 28px #00ffd966,0 0 16px #7ff0ff55}.station.pc:hover .cursor{animation-duration:.25s}.station.pc:hover .screen:after{content:"";position:absolute;left:8%;right:8%;height:2px;background:#7ff0ff99;animation:scan .9s linear 1;pointer-events:none}.station.pc .station-art{height:clamp(220px,27vw,315px)}@keyframes signFlash{0%,12%,24%,36%{opacity:.3;text-shadow:none;box-shadow:none}6%,18%,30%,100%{opacity:1}}@keyframes bulb{0%,100%{opacity:.35}50%{opacity:1}}@keyframes cursor{50%{opacity:0}}@keyframes scan{from{top:18%}to{top:75%}}@keyframes reelStop{0%{transform:translateY(-110%)}70%{transform:translateY(100%)}100%{transform:translateY(0)}}@media(max-width:900px) and (min-width:560px){.stations{gap:10px}.station-art{height:230px}.slot .station-art{height:300px}.plaque{padding:10px 7px}.plaque h2{font-size:.95rem}.plaque p,.stat{font-size:.72rem}.machine{width:72%}.mini-sign{font-size:8px}}@media(max-width:559px){.topbar{align-items:flex-start}.right{gap:8px;font-size:.78rem}.wall{padding-top:22px}.intro{font-size:.9rem;margin-bottom:24px}.stations{grid-template-columns:1fr;gap:26px;max-width:420px}.station.slot{order:0}.station.bj{order:1}.station.pc{order:2}.station-art,.station.pc .station-art{height:245px}.slot .station-art{height:310px}.machine{width:56%;max-width:230px}.plaque{padding:12px}.plaque h2{font-size:1.08rem}.plaque p,.stat{font-size:.82rem}.beam{top:-8px;height:80%}.sign{letter-spacing:.08em;padding:9px 12px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}.station:hover,.station:focus-visible{transform:none}.station:hover .beam,.station:focus-visible .beam{opacity:.5}.station.bj:hover .card.a{transform:rotate(-10deg)}.station.bj:hover .card.k{transform:rotate(8deg)}.station.bj:hover .chips{transform:none}.station.slot:hover .lever{transform:none}}
 
 /* OPS Shop Modal Open Fix */
 #opsShopModal.open {
@@ -54,7 +61,25 @@
 </style></head>
 <body>
 <header class="topbar"><div class="brand">OPS <span>///</span> KASINO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
-<main class="wall"><div class="sign">KASINO OPS</div><p class="intro">Vyber si stanoviště. Hraješ o školní body, které máš ve všech hrách společné.</p><div class="stations">
+<main class="wall">
+<div class="sign">KASINO OPS</div>
+<p class="intro">Vyber si stanoviště. Hraješ o školní body, které máš ve všech hrách společné.</p>
+
+<!-- Dva arcade monitory nahoře -->
+<div class="arcade-monitors">
+  <div class="arcade-monitor">
+    <div class="arcade-monitor-title">TVŮJ ČISTÝ ZISK</div>
+    <div class="arcade-monitor-value" id="monitorPersonal">0 ◆</div>
+    <div class="arcade-monitor-sub">Součet ze všech her</div>
+  </div>
+  <div class="arcade-monitor">
+    <div class="arcade-monitor-title">CELKOVÉ VÝDĚLKY HRÁČŮ</div>
+    <div class="arcade-monitor-value" id="monitorGlobal" style="color:#ffd477">Načítám…</div>
+    <div class="arcade-monitor-sub">Globální žebříček OPS</div>
+  </div>
+</div>
+
+<div class="stations">
 <a class="station bj" href="/kasino/blackjack.html" aria-label="Otevřít Blackjack, klávesa 1"><span class="beam"></span><div class="station-art"><div class="felt-table"><div class="mini-sign">Blackjack<br>výplata 3:2</div><div class="card a"><span>A<small>♠</small></span><span style="align-self:flex-end">♠</span></div><div class="card k"><span>K<small>♥</small></span><span style="align-self:flex-end">♥</span></div><div class="chips"></div></div></div><div class="plaque"><h2>♠ Blackjack</h2><p>Poraz dealera. Přirozený blackjack platí 3:2.</p><span class="stat" id="bj-stat">Ještě nehráno</span></div></a>
 <a class="station slot" href="/kasino/slot.html" aria-label="Otevřít výherní automat, klávesa 2"><span class="beam"></span><div class="station-art"><div class="machine"><div class="bulbs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="machine-label">AUTOMAT</div><div class="reels"><div class="reel"><span>📚</span></div><div class="reel"><span>🔔</span></div><div class="reel"><span>♛</span></div></div><div class="lever"></div><div class="slotbase"></div><div class="coin"></div></div></div><div class="plaque"><h2>✦ Výherní automat</h2><p>Roztoč válce a zkus štěstí.</p><span class="stat" id="slot-stat">Ještě nehráno</span></div></a>
 <a class="station pc" href="/kasino/gacha.html" aria-label="Otevřít nábor učitelů, klávesa 3"><span class="beam"></span><div class="station-art"><div class="computer"><div class="crt"><div class="screen"><strong>NÁBOR UČITELŮ</strong><div>&gt; inicializace sběrnice...</div><div>&gt; hledám kandidáty_</div><span class="cursor"></span><div class="teacher-cards"><i>Z</i><i>S</i><i>A</i><i>B</i></div></div></div><div class="keyboard"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div><div class="plaque"><h2>▣ Nábor učitelů</h2><p>Vyvolej nové členy školního sboru.</p><span class="stat" id="gacha-stat">Načítám statistiky…</span></div></a>
@@ -210,29 +235,68 @@
   function readNet(key) {
     try {
       const v = JSON.parse(localStorage.getItem(key) || 'null');
-      return v && Number.isFinite(Number(v.net)) ? Number(v.net) : null;
-    } catch (_) { return null; }
+      return v && Number.isFinite(Number(v.net)) ? Number(v.net) : 0;
+    } catch (_) { return 0; }
   }
 
-  const b = readNet('ops_blackjack_stats'), s = readNet('ops_slots_stats');
-  const r = readNet('ops_roulette_stats'), w = readNet('ops_wheel_stats');
+  const b = readNet('ops_blackjack_stats');
+  const s = readNet('ops_slots_stats');
+  const r = readNet('ops_roulette_stats');
+  const w = readNet('ops_wheel_stats');
 
- if ($('bj-stat')) {
-    $('bj-stat').textContent = b === null ? 'Ještě nehráno' : 'Čistý zisk: ' + money(b);
-    $('bj-stat').style.color = b > 0 ? 'var(--green)' : b < 0 ? 'var(--red)' : '';
+  // Individuální statistiky na dlaždicích
+  const setPlaqueStat = (elId, val) => {
+    const el = $(elId);
+    if (!el) return;
+    el.textContent = val === 0 ? 'Ještě nehráno' : 'Čistý zisk: ' + money(val);
+    el.style.color = val > 0 ? 'var(--green)' : val < 0 ? 'var(--red)' : '';
+  };
+
+  setPlaqueStat('bj-stat', b);
+  setPlaqueStat('slot-stat', s);
+  setPlaqueStat('roulette-stat', r);
+  setPlaqueStat('wheel-stat', w);
+
+  // Monitor 1: Tvé celkové výdělky ze všech her
+  const totalPersonalNet = b + s + r + w;
+  const mPers = $('monitorPersonal');
+  if (mPers) {
+    mPers.textContent = money(totalPersonalNet) + ' ◆';
+    mPers.style.color = totalPersonalNet > 0 ? 'var(--green)' : totalPersonalNet < 0 ? 'var(--red)' : '#f5f6fb';
   }
-  if ($('slot-stat')) {
-    $('slot-stat').textContent = s === null ? 'Ještě nehráno' : 'Čistý zisk: ' + money(s);
-    $('slot-stat').style.color = s > 0 ? 'var(--green)' : s < 0 ? 'var(--red)' : '';
+
+  // Monitor 2: Celkové výdělky lidí (načteme z cloudu Supabase žebříčku, nebo fallback lokálně)
+  async function loadGlobalStats() {
+    const mGlob = $('monitorGlobal');
+    if (!mGlob) return;
+    try {
+      const cfg = window.OPS_STATS && window.OPS_STATS.config;
+      if (!cfg) {
+        mGlob.textContent = money(totalPersonalNet) + ' ◆ (lokálně)';
+        mGlob.style.color = totalPersonalNet > 0 ? 'var(--green)' : totalPersonalNet < 0 ? 'var(--red)' : '#f5f6fb';
+        return;
+      }
+      const res = await fetch(`${cfg.url}/rest/v1/${cfg.table}?select=blackjack,slots,roulette,wheel`, {
+        headers: { apikey: cfg.anonKey, Authorization: 'Bearer ' + cfg.anonKey }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const rows = await res.json();
+      let globalNet = 0;
+      rows.forEach(row => {
+        ['blackjack', 'slots', 'roulette', 'wheel'].forEach(game => {
+          if (row[game] && typeof row[game].net === 'number') {
+            globalNet += row[game].net;
+          }
+        });
+      });
+      mGlob.textContent = money(globalNet) + ' ◆';
+      mGlob.style.color = globalNet > 0 ? 'var(--green)' : globalNet < 0 ? 'var(--red)' : '#f5f6fb';
+    } catch (e) {
+      mGlob.textContent = money(totalPersonalNet) + ' ◆ (lokální)';
+      mGlob.style.color = totalPersonalNet > 0 ? 'var(--green)' : totalPersonalNet < 0 ? 'var(--red)' : '#f5f6fb';
+    }
   }
-  if ($('roulette-stat')) {
-    $('roulette-stat').textContent = r === null ? 'Ještě nehráno' : 'Čistý zisk: ' + money(r);
-    $('roulette-stat').style.color = r > 0 ? 'var(--green)' : r < 0 ? 'var(--red)' : '';
-  }
-  if ($('wheel-stat')) {
-    $('wheel-stat').textContent = w === null ? 'Ještě nehráno' : 'Čistý zisk: ' + money(w);
-    $('wheel-stat').style.color = w > 0 ? 'var(--green)' : w < 0 ? 'var(--red)' : '';
-  }
+  loadGlobalStats();
 
   try {
     const stats = window.OPS_STATS && OPS_STATS.getStats ? OPS_STATS.getStats() : {};
@@ -252,7 +316,6 @@
     if ($('gacha-stat')) $('gacha-stat').textContent = 'Zápisů: ' + Number(g.totalPulls || 0).toLocaleString('cs-CZ') + ' · Sbor: ' + count + '/' + (g.characterCount || g.totalCharacters || '?');
   } catch (e) {
     if ($('gacha-stat')) $('gacha-stat').textContent = 'Statistiky nejsou dostupné';
-    console.warn('OPS stats:', e);
   }
 })();
 </script>
@@ -260,13 +323,11 @@
 <script>
 (() => {
   'use strict';
-
   function getTokens() {
     if (!window.OPS_STATS) return 1600;
     const s = window.OPS_STATS.getStats();
     return s && s.gacha && typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600;
   }
-
   function addTokens(delta) {
     if (!window.OPS_STATS) return;
     const s = window.OPS_STATS.getStats();
@@ -274,7 +335,6 @@
     s.gacha.tokens = Math.max(0, (typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600) + delta);
     window.OPS_STATS.saveStats(s);
   }
-
   function readCookiesData() {
     let save = null;
     try { save = JSON.parse(localStorage.getItem("cookieClickerSave")); } catch (e) {}
@@ -283,28 +343,17 @@
     const statCookies = stats && stats.clicker ? (Number(stats.clicker.cookies) || 0) : 0;
     return { save, saveCookies, statCookies, available: Math.max(saveCookies, statCookies) };
   }
-
   function deductCookies(amount) {
     const c = readCookiesData();
-    if (c.save) {
-      c.save.cookies = Math.max(0, c.saveCookies - amount);
-      localStorage.setItem("cookieClickerSave", JSON.stringify(c.save));
-    }
+    if (c.save) { c.save.cookies = Math.max(0, c.saveCookies - amount); localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); }
     if (window.OPS_STATS) {
       const s = window.OPS_STATS.getStats();
-      if (s.clicker) {
-        s.clicker.cookies = Math.max(0, c.statCookies - amount);
-        window.OPS_STATS.saveStats(s);
-      }
+      if (s.clicker) { s.clicker.cookies = Math.max(0, c.statCookies - amount); window.OPS_STATS.saveStats(s); }
     }
   }
-
   function addCookies(amount) {
     const c = readCookiesData();
-    if (c.save) {
-      c.save.cookies = c.saveCookies + amount;
-      localStorage.setItem("cookieClickerSave", JSON.stringify(c.save));
-    }
+    if (c.save) { c.save.cookies = c.saveCookies + amount; localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); }
     if (window.OPS_STATS) {
       const s = window.OPS_STATS.getStats();
       s.clicker = s.clicker || {};
@@ -340,12 +389,10 @@
       updateCalculation();
       if (msgEl) msgEl.style.display = "none";
     }
-
     function closeModal() {
       modal.classList.remove("open");
       setTimeout(() => modal.style.display = "none", 250);
     }
-
     function updateModalBalances() {
       const t = getTokens();
       const c = readCookiesData().available;
@@ -354,24 +401,14 @@
       if (tEl) tEl.textContent = Math.round(t).toLocaleString("cs-CZ");
       if (cEl) cEl.textContent = Math.round(c).toLocaleString("cs-CZ");
     }
-
     function setDirection(dir) {
       exchangeDirection = dir;
       customInput.value = "";
       activeSpendAmount = 0;
       if (msgEl) msgEl.style.display = "none";
-
       if (dir === "cookies_to_tokens") {
-        if (dirCookiesBtn) {
-          dirCookiesBtn.style.background = "#252a3d";
-          dirCookiesBtn.style.borderColor = "#38bdf8";
-          dirCookiesBtn.style.color = "#fff";
-        }
-        if (dirTokensBtn) {
-          dirTokensBtn.style.background = "#191c27";
-          dirTokensBtn.style.borderColor = "#34394b";
-          dirTokensBtn.style.color = "#a4a9bc";
-        }
+        if (dirCookiesBtn) { dirCookiesBtn.style.background = "#252a3d"; dirCookiesBtn.style.borderColor = "#38bdf8"; dirCookiesBtn.style.color = "#fff"; }
+        if (dirTokensBtn) { dirTokensBtn.style.background = "#191c27"; dirTokensBtn.style.borderColor = "#34394b"; dirTokensBtn.style.color = "#a4a9bc"; }
         if (spendLabel) spendLabel.textContent = "sušenek";
         if (presetsGrid) {
           presetsGrid.innerHTML = `
@@ -386,16 +423,8 @@
           `;
         }
       } else {
-        if (dirTokensBtn) {
-          dirTokensBtn.style.background = "#252a3d";
-          dirTokensBtn.style.borderColor = "#38bdf8";
-          dirTokensBtn.style.color = "#fff";
-        }
-        if (dirCookiesBtn) {
-          dirCookiesBtn.style.background = "#191c27";
-          dirCookiesBtn.style.borderColor = "#34394b";
-          dirCookiesBtn.style.color = "#a4a9bc";
-        }
+        if (dirTokensBtn) { dirTokensBtn.style.background = "#252a3d"; dirTokensBtn.style.borderColor = "#38bdf8"; dirTokensBtn.style.color = "#fff"; }
+        if (dirCookiesBtn) { dirCookiesBtn.style.background = "#191c27"; dirCookiesBtn.style.borderColor = "#34394b"; dirCookiesBtn.style.color = "#a4a9bc"; }
         if (spendLabel) spendLabel.textContent = "tokenů";
         if (presetsGrid) {
           presetsGrid.innerHTML = `
@@ -413,7 +442,6 @@
       attachPresetListeners();
       updateCalculation();
     }
-
     function attachPresetListeners() {
       document.querySelectorAll(".ops-preset-btn").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -424,105 +452,65 @@
         });
       });
     }
-
     function updateCalculation() {
       updateModalBalances();
       const rawVal = parseInt(customInput.value, 10);
       if (isNaN(rawVal) || rawVal <= 0) {
         activeSpendAmount = 0;
         if (summaryEl) summaryEl.innerHTML = "Zadej platné kladné celé číslo nebo vyber předvolbu.";
-        if (confirmBtn) {
-          confirmBtn.disabled = true;
-          confirmBtn.style.opacity = "0.5";
-        }
+        if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.5"; }
         return;
       }
       activeSpendAmount = rawVal;
-
       let spendName = "", getVal = 0, getName = "";
       const currentTokens = getTokens();
       const currentCookies = readCookiesData().available;
-
       if (exchangeDirection === "cookies_to_tokens") {
-        spendName = "sušenek";
-        getName = "tokenů";
-        getVal = Math.floor(activeSpendAmount * (160 / 1000));
+        spendName = "sušenek"; getName = "tokenů"; getVal = Math.floor(activeSpendAmount * (160 / 1000));
       } else {
-        spendName = "tokenů";
-        getName = "sušenek";
-        getVal = Math.floor(activeSpendAmount * (800 / 160));
+        spendName = "tokenů"; getName = "sušenek"; getVal = Math.floor(activeSpendAmount * (800 / 160));
       }
-
       let hasEnough = true;
       if (exchangeDirection === "cookies_to_tokens") {
         if (activeSpendAmount > currentCookies) hasEnough = false;
       } else {
         if (activeSpendAmount > currentTokens) hasEnough = false;
       }
-
       let extraNote = "";
       if (exchangeDirection === "cookies_to_tokens") {
         extraNote = `<br><small style="color:#ffd477;">Nákup tokenů za sušenky (1 000 sušenek = 160 tokenů). Získáš ${Number(getVal).toLocaleString("cs-CZ")} tokenů.</small>`;
       } else {
         extraNote = `<br><small style="color:#7dd3fc;">Zpětná směna tokenů zpět na sušenky (kurz: 160 tokenů = 800 sušenek).</small>`;
       }
-
       if (!hasEnough) {
         if (summaryEl) summaryEl.innerHTML = `<span style="color:#ef4444;font-weight:700;">Nedostatek prostředků!</span> Utrácíš ${Number(activeSpendAmount).toLocaleString("cs-CZ")} ${spendName}, ale máš k dispozici pouze ${Number(exchangeDirection === "cookies_to_tokens" ? currentCookies : currentTokens).toLocaleString("cs-CZ")}.`;
-        if (confirmBtn) {
-          confirmBtn.disabled = true;
-          confirmBtn.style.opacity = "0.5";
-        }
+        if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.5"; }
         return;
       }
-
       if (summaryEl) summaryEl.innerHTML = `Utratíš <b>${Number(activeSpendAmount).toLocaleString("cs-CZ")}</b> ${spendName} a získáš <b>${Number(getVal).toLocaleString("cs-CZ")}</b> ${getName}.${extraNote}`;
-      if (confirmBtn) {
-        confirmBtn.disabled = false;
-        confirmBtn.style.opacity = "1";
-      }
+      if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = "1"; }
     }
-
     function executeExchange() {
       if (activeSpendAmount <= 0) return;
       const currentTokens = getTokens();
       const currentCookies = readCookiesData().available;
-
       if (exchangeDirection === "cookies_to_tokens") {
-        if (activeSpendAmount > currentCookies) {
-          showMsg("Nemáš dostatek sušenek!", false);
-          return;
-        }
+        if (activeSpendAmount > currentCookies) { showMsg("Nemáš dostatek sušenek!", false); return; }
         const getTokensVal = Math.floor(activeSpendAmount * (160 / 1000));
-        deductCookies(activeSpendAmount);
-        addTokens(getTokensVal);
+        deductCookies(activeSpendAmount); addTokens(getTokensVal);
         showMsg(`Úspěšně zakoupeno ${Number(getTokensVal).toLocaleString("cs-CZ")} tokenů za ${Number(activeSpendAmount).toLocaleString("cs-CZ")} sušenek!`, true);
       } else {
-        if (activeSpendAmount > currentTokens) {
-          showMsg("Nemáš dostatek tokenů!", false);
-          return;
-        }
+        if (activeSpendAmount > currentTokens) { showMsg("Nemáš dostatek tokenů!", false); return; }
         const getCookiesVal = Math.floor(activeSpendAmount * (800 / 160));
-        addTokens(-activeSpendAmount);
-        addCookies(getCookiesVal);
+        addTokens(-activeSpendAmount); addCookies(getCookiesVal);
         showMsg(`Zpětně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} tokenů za ${Number(getCookiesVal).toLocaleString("cs-CZ")} sušenek (se ztrátou)!`, true);
       }
-
       updateModalBalances();
       const mainTokensEl = document.getElementById("tokens");
-      if (mainTokensEl && window.OPS_STATS) {
-        mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
-      }
-
-      customInput.value = "";
-      activeSpendAmount = 0;
-      updateCalculation();
-      setTimeout(() => {
-        closeModal();
-        window.location.reload();
-      }, 1200);
+      if (mainTokensEl && window.OPS_STATS) { mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ"); }
+      customInput.value = ""; activeSpendAmount = 0; updateCalculation();
+      setTimeout(() => { closeModal(); window.location.reload(); }, 1200);
     }
-
     function showMsg(text, isSuccess) {
       if (!msgEl) return;
       msgEl.style.display = "block";
@@ -531,20 +519,14 @@
       msgEl.style.color = isSuccess ? "#86efac" : "#fca5a5";
       msgEl.textContent = text;
     }
-
     if (openBtn) openBtn.addEventListener("click", openModal);
     if (closeBtn) closeBtn.addEventListener("click", closeModal);
-    if (cancelBtn) closeModal ? cancelBtn.addEventListener("click", closeModal) : null;
+    if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
     if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-
     if (dirTokensBtn) dirTokensBtn.addEventListener("click", () => setDirection("tokens_to_cookies"));
     if (dirCookiesBtn) dirCookiesBtn.addEventListener("click", () => setDirection("cookies_to_tokens"));
-    if (customInput) {
-      customInput.value = "";
-      customInput.addEventListener("input", updateCalculation);
-    }
+    if (customInput) { customInput.value = ""; customInput.addEventListener("input", updateCalculation); }
     if (confirmBtn) confirmBtn.addEventListener("click", executeExchange);
-
     attachPresetListeners();
   }
 })();
