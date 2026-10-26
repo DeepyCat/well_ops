@@ -66,8 +66,14 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .chip:hover:not(:disabled){transform:translateY(-3px)}.chip:disabled{opacity:.4;cursor:not-allowed}
 .chip[data-v="50"]{--c:#16a34a}.chip[data-v="160"]{--c:#dc2626}.chip[data-v="500"]{--c:#7c3aed}.chip[data-v="1600"]{--c:#d4a017;color:#241a00}
 .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center}
-.bet-line{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:12px;color:var(--muted)}
+.bet-line{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:12px;color:var(--muted);flex-wrap:wrap}
 .bet-line strong{color:var(--gold);font-size:1.4rem;font-variant-numeric:tabular-nums}
+.custom-bet-wrap{display:inline-flex;align-items:center;gap:8px;margin-left:6px;font-size:.85rem}
+.custom-bet-wrap label{color:var(--muted);font-weight:700}
+.custom-bet-input{width:110px;padding:6px 10px;background:#ffffff0d;border:1px solid var(--line);border-radius:8px;color:#fff;font-family:inherit;font-weight:700;font-size:.9rem;text-align:right}
+.custom-bet-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 8px #ffd47744}
+.custom-bet-input::-webkit-outer-spin-button,.custom-bet-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.custom-bet-input[type=number]{-moz-appearance:textfield}
 .btn{border:1px solid var(--line);border-radius:12px;padding:12px 20px;font-weight:850;background:#ffffff0d;transition:transform .15s,border-color .15s}
 .btn:hover:not(:disabled){transform:translateY(-2px);border-color:#ffffff66}.btn:disabled{opacity:.4;cursor:not-allowed}
 .btn.primary{background:linear-gradient(110deg,#ff435c,#d92750);border-color:#ff697a;box-shadow:0 8px 26px #ff335022}
@@ -156,7 +162,14 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
             <button class="chip" data-v="500" type="button" aria-label="Přidat 500">500</button>
             <button class="chip" data-v="1600" type="button" aria-label="Přidat 1600">1600</button>
           </div>
-          <div class="bet-line"><span>Sázka</span><strong id="betAmt">0</strong></div>
+          <div class="bet-line">
+            <span>Sázka</span>
+            <strong id="betAmt">0</strong>
+            <div class="custom-bet-wrap">
+              <label for="customBetInput">Vlastní:</label>
+              <input type="number" id="customBetInput" class="custom-bet-input" min="10" step="1" placeholder="10" aria-label="Zadat vlastní sázku">
+            </div>
+          </div>
           <div class="row">
             <button class="btn small" id="clearBet" type="button">Vymazat</button>
             <button class="btn small" id="maxBet" type="button">Vsadit vše</button>
@@ -378,7 +391,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
     setTotal($("dTotal"), dealer, !!holeEl);
   }
 
-  function maxAffordable() { return Math.floor(getTokens() / MIN_BET) * MIN_BET; }
+  function maxAffordable() { return Math.max(0, Math.floor(getTokens())); }
   function clampBet() { bet = Math.max(0, Math.min(bet, maxAffordable())); }
 
   function updateUI() {
@@ -388,6 +401,14 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
     $("betPanel").classList.toggle("hide", !inBet);
     $("actions").classList.toggle("hide", inBet);
     $("betAmt").textContent = fmt(bet);
+    const customIn = $("customBetInput");
+    if (customIn) {
+      customIn.disabled = busy || !inBet;
+      customIn.max = maxAffordable();
+      if (document.activeElement !== customIn) {
+        customIn.value = bet > 0 ? bet : "";
+      }
+    }
     const shown = inBet ? 0 : roundBet;
     $("betShown").textContent = "Sázka " + fmt(shown);
     $("betShown").classList.toggle("hide", inBet);
@@ -541,7 +562,6 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
       toast(`Nemáš dost sušenek (vidím ${fmt(c.available)}, potřeba ${fmt(cost)}).`);
       return;
     }
-    if (cost >= 10000 && !confirm(`Opravdu utratit ${fmt(cost)} sušenek za ${fmt(gain)} bodů?`)) return;
 
     if (c.save) {
       c.save.cookies = Math.max(0, c.saveCookies - cost);
@@ -667,6 +687,60 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
   $("clearBet").addEventListener("click", () => { bet = 0; sfx.chip(); updateUI(); });
   $("maxBet").addEventListener("click", () => { bet = maxAffordable(); sfx.chip(); updateUI(); });
   $("dealBtn").addEventListener("click", deal);
+
+  const customBetInput = $("customBetInput");
+  if (customBetInput) {
+    customBetInput.addEventListener("input", () => {
+      if (busy || phase !== "bet") return;
+      const raw = customBetInput.value.trim();
+      if (raw === "") {
+        bet = 0;
+      } else {
+        let val = parseInt(raw, 10);
+        if (isNaN(val) || val < 0) val = 0;
+        const max = maxAffordable();
+        if (val > max) {
+          val = max;
+          customBetInput.value = val;
+          toast("Sázka upravena na tvé maximum (" + fmt(val) + ").");
+        }
+        bet = val;
+      }
+      updateUI();
+    });
+
+    customBetInput.addEventListener("change", () => {
+      if (busy || phase !== "bet") return;
+      const raw = customBetInput.value.trim();
+      if (raw !== "") {
+        let val = parseInt(raw, 10);
+        if (isNaN(val) || val < MIN_BET) {
+          if (maxAffordable() >= MIN_BET) {
+            toast(`Minimální sázka je ${MIN_BET} bodů.`);
+            bet = MIN_BET;
+          } else {
+            bet = 0;
+          }
+        } else {
+          bet = Math.min(val, maxAffordable());
+        }
+      } else {
+        bet = 0;
+      }
+      customBetInput.value = bet > 0 ? bet : "";
+      updateUI();
+    });
+
+    customBetInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        customBetInput.blur();
+        if (!busy && phase === "bet" && bet >= MIN_BET) {
+          deal();
+        }
+      }
+    });
+  }
   $("shopBuy1").addEventListener("click", () => buyWithCookies(1000, 160));
   $("shopBuy2").addEventListener("click", () => buyWithCookies(10000, 1600));
   $("lbRefresh").addEventListener("click", () => { sfx.chip(); loadLeaderboard(); });
