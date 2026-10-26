@@ -24,6 +24,7 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 <main>
 <h1 class="heading">VELKÉ KOLO ŠTĚSTÍ</h1><p class="sub">Roztoč barevné kolo, tref násobitel a zkus proměnit sázku ve větší výhru.</p>
 <div class="layout">
+<div class="game-column">
 <section class="panel">
 <div class="wheel-shell"><div class="pointer"></div><canvas id="wheelCanvas" width="800" height="800" aria-label="Velké kolo štěstí"></canvas></div>
 <div class="result" id="result">✨ Připraveno?</div><div class="result-note" id="resultNote">Vyber sázku a roztoč kolo.</div>
@@ -41,8 +42,44 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 <div class="message" id="message" role="status">Hodně štěstí! Sázka se odečte před roztočením.</div>
 <div class="fineprint">Výhra se přičte do společného OPS zůstatku. Násobitel 1× znamená vrácení sázky; 0,5× vrací polovinu. Každé pole má stejnou pravděpodobnost. Výsledky jsou náhodné.</div>
 </section>
+
 </div>
-</main>
+<aside class="side-panels">
+  <div class="panel">
+    <div class="currency"><span>Školní body</span><strong>◆ <span id="sideBalance">0</span></strong></div>
+    <p class="who" id="who"></p>
+    <p class="notice hide" id="broke" style="color:var(--red)">Došly ti body! Kup si další v obchodu se sušenkami.</p>
+  </div>
+  <div class="panel">
+    <h2>🛒 Obchod se sušenkami</h2>
+    <div class="section-head"><span class="pill" id="shopCookies">🍪 0</span></div>
+    <div class="shop">
+      <div class="shop-item"><div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div><button class="shop-btn" id="shopBuy1" type="button">🍪 1 000</button></div>
+      <div class="shop-item"><div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček (10×)</small></div><button class="shop-btn" id="shopBuy2" type="button">🍪 10 000</button></div>
+    </div>
+    <p class="notice">Sušenky se berou z Clickeru. Obchod je dostupný mezi roztočeními.</p>
+  </div>
+  <div class="panel">
+    <h2>📊 Statistiky hry</h2>
+    <div class="stats">
+      <div class="stat"><small>Roztočení</small><strong id="stSpins">0</strong></div>
+      <div class="stat"><small>Výhry</small><strong id="stWins">0</strong></div>
+      <div class="stat"><small>Největší výhra</small><strong id="stBiggest">0</strong></div>
+      <div class="stat"><small>Jackpoty</small><strong id="stJackpots">0</strong></div>
+      <div class="stat"><small>Celkem vsazeno</small><strong id="stWagered">0</strong></div>
+      <div class="stat"><small>Celkem vyhráno</small><strong id="stWon">0</strong></div>
+      <div class="stat wide"><small>Čistý zisk</small><strong id="stNet">0</strong></div>
+    </div>
+    <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
+  </div>
+  <div class="panel">
+    <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button">↻</button></div>
+    <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+  </div>
+</aside>
+
+</div>
+</main><div class="toast" id="toast" role="status"></div>
 <script src="/js/ops-stats.js"></script>
 <script>
 (()=>{'use strict';
@@ -75,17 +112,18 @@ function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.g
 function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Math.floor(v));window.OPS_STATS.saveStats(s);renderBalance();return true}
 function stake(){return Number($('stake').value)}
 function valid(){return Number.isSafeInteger(stake())&&stake()>=10&&stake()<=100000000&&stake()<=balance()}
-function renderBalance(){ $('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updateUI()}
+function renderBalance(){ $('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');if($('sideBalance'))$('sideBalance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updateUI()}
 function updateUI(){
  const b=stake();$('preview').textContent=Number.isSafeInteger(b)&&b>=10?`Sázka ${b.toLocaleString('cs-CZ')} → odměna 0 až ${(b*10).toLocaleString('cs-CZ')} tokenů`:'Zadej celé číslo alespoň 10.';
  $('spinBtn').disabled=spinning||!valid()||!window.OPS_STATS;
 }
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
 function message(text,kind=''){const el=$('message');el.className='message '+kind;el.textContent=text}
 function spin(){
  if(spinning||!valid()){message('Zkontroluj sázku a zůstatek tokenů.','loss');return}
  const bet=stake(),before=balance();
  if(!saveBalance(before-bet)){message('Nepodařilo se uložit zůstatek.','loss');return}
- spinning=true;$('stake').disabled=true;$('spinBtn').disabled=true;$('result').textContent='🎡 Kolo se točí…';$('resultNote').textContent='Drž palce!';
+ spinning=true;refreshSide();$('stake').disabled=true;$('spinBtn').disabled=true;$('result').textContent='🎡 Kolo se točí…';$('resultNote').textContent='Drž palce!';
  const index=Math.floor(Math.random()*segments.length),seg=segments[index],centerDeg=-90+(index+.5)*360/segments.length;
  const target=(270-centerDeg+360)%360,delta=(target-((rotation%360)+360)%360+360)%360;
  rotation+=360*7+delta;canvas.style.transform=`rotate(${rotation}deg)`;
@@ -93,15 +131,96 @@ function spin(){
  setTimeout(()=>{
   const prize=Math.floor(bet*seg.m);
   if(prize>0)saveBalance(balance()+prize);else renderBalance();
+  recordRound(bet,prize,seg.m===10);refreshSide();
   $('result').textContent=seg.label+' '+(seg.m===10?'JACKPOT!':'');
   $('resultNote').textContent=`Sázka ${bet.toLocaleString('cs-CZ')} · odměna ${prize.toLocaleString('cs-CZ')} tokenů · čistý výsledek ${(prize-bet).toLocaleString('cs-CZ')} tokenů`;
   if(seg.m>=2)message(`🎉 Paráda! Padlo ${seg.label}. Získáváš ${prize.toLocaleString('cs-CZ')} tokenů.`, 'win');
   else if(seg.m===0)message(`Tentokrát padlo ${seg.label}. Sázka propadá. Zkus to znovu, až budeš chtít.`, 'loss');
   else message(`Padlo ${seg.label}. Připsáno ${prize.toLocaleString('cs-CZ')} tokenů.`,seg.m>=1?'win':'loss');
-  spinning=false;$('stake').disabled=false;updateUI();
+  spinning=false;refreshSide();$('stake').disabled=false;updateUI();
  },5750);
 }
 $('stake').addEventListener('input',updateUI);$('spinBtn').addEventListener('click',spin);
-draw();renderBalance();
+
+const STAT_KEY='ops_wheel_stats';
+const emptyStats=()=>({spins:0,wins:0,biggest:0,jackpots:0,totalWagered:0,totalWon:0,net:0});
+function loadGameStats(){try{return {...emptyStats(),...(JSON.parse(localStorage.getItem(STAT_KEY))||{})}}catch(e){return emptyStats()}}
+function saveGameStats(s){try{localStorage.setItem(STAT_KEY,JSON.stringify(s))}catch(e){}}
+const fmt=n=>Math.round(Number(n)||0).toLocaleString('cs-CZ');
+const signed=n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
+function renderStats(){
+ const s=loadGameStats();
+ $('stSpins').textContent=fmt(s.spins);$('stWins').textContent=fmt(s.wins);
+ $('stBiggest').textContent=fmt(s.biggest);$('stJackpots').textContent=fmt(s.jackpots);
+ $('stWagered').textContent=fmt(s.totalWagered);$('stWon').textContent=fmt(s.totalWon);
+ const n=$('stNet');n.textContent=signed(s.net);n.className=s.net>0?'pos':s.net<0?'neg':'';
+}
+function readCookies(){
+ let save=null;try{save=JSON.parse(localStorage.getItem('cookieClickerSave'))}catch(e){}
+ const s=window.OPS_STATS?window.OPS_STATS.getStats():null;
+ const a=save?(Number(save.cookies)||0):0,b=s&&s.clicker?(Number(s.clicker.cookies)||0):0;
+ return {save,a,b,available:Math.max(a,b)};
+}
+function refreshSide(){
+ const b=Math.floor(balance());$('sideBalance').textContent=fmt(b);
+ $('broke').classList.toggle('hide',b>=10);
+ $('shopCookies').textContent='🍪 '+fmt(readCookies().available);
+ const user=window.OPS_STATS?window.OPS_STATS.getUsername():'';
+ if(user&&!user.startsWith('Host'))$('who').textContent='Hraješ jako '+user+'. Body se sdílí s ostatními hrami OPS.';
+ else {$('who').innerHTML='Hraješ bez přezdívky, body se ukládají lokálně. <button type="button" id="setName">Zadat přezdívku</button>';const x=$('setName');if(x)x.onclick=()=>window.OPS_STATS&&window.OPS_STATS.promptUsernameModal();}
+ $('shopBuy1').disabled=spinning;$('shopBuy2').disabled=spinning;
+}
+function buyCookies(cost,gain){
+ if(spinning){toast('Počkej, až se hra dotočí.');return}
+ const c=readCookies();if(c.available<cost){toast('Nemáš dost sušenek (potřeba '+fmt(cost)+').');return}
+ if(c.save){c.save.cookies=Math.max(0,c.a-cost);try{localStorage.setItem('cookieClickerSave',JSON.stringify(c.save))}catch(e){};const s=window.OPS_STATS.getStats();s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Number(s.gacha.tokens)||0)+gain;window.OPS_STATS.saveStats(s)}
+ else if(window.OPS_STATS){const s=window.OPS_STATS.getStats();s.clicker=s.clicker||{};s.clicker.cookies=Math.max(0,c.b-cost);s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Number(s.gacha.tokens)||0)+gain;window.OPS_STATS.saveStats(s)}
+ refreshSide();renderBalance();toast('Nakoupeno '+fmt(gain)+' bodů za '+fmt(cost)+' sušenek.');
+}
+const cloudCfg=()=>window.OPS_STATS&&window.OPS_STATS.config;
+const cloudUser=()=>{const u=window.OPS_STATS?window.OPS_STATS.getUsername():'';return u&&!u.startsWith('Host')?u:''};
+const cloudHeaders=()=>{const c=cloudCfg();return {apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'}};
+function setCloudNote(t,ok){$('cloudNote').textContent=t;$('cloudNote').style.color=ok?'':'var(--red)'}
+let cloudTimer;
+async function pushGameStats(){
+ const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez přezdívky se statistiky ukládají jen lokálně.',true);return}
+ try{const r=await fetch(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}`,{method:'PATCH',headers:{...cloudHeaders(),Prefer:'return=representation'},body:JSON.stringify({wheel:loadGameStats()}),keepalive:true});
+ if(!r.ok){setCloudNote(r.status===400||r.status===404?'Cloud: ověř sloupec wheel v Supabase.':`Cloud: uložení selhalo (${r.status}).`,false);return}
+ const rows=await r.json();if(!rows.length){setCloudNote('Cloud: uživatelský záznam nebyl nalezen.',false);return}
+ setCloudNote('Cloud: statistiky uloženy.',true);loadLeaderboard();
+ }catch(e){setCloudNote('Cloud: chyba spojení.',false)}
+}
+function schedulePush(){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushGameStats,800)}
+async function pullGameStats(){
+ const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez přezdívky se statistiky ukládají jen lokálně.',true);return}
+ try{const r=await fetch(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}&select=wheel`,{headers:cloudHeaders()});
+ if(!r.ok){setCloudNote('Cloud: ověř sloupec wheel v Supabase.',false);return}
+ const rows=await r.json(),remote=rows[0]&&rows[0].wheel;
+ const local=loadGameStats();
+ if(remote&&Number(remote.spins)>local.spins){saveGameStats({...emptyStats(),...remote});renderStats();setCloudNote('Cloud: statistiky načteny.',true)}
+ else if(local.spins>((remote&&Number(remote.spins))||0))pushGameStats();else setCloudNote('Cloud: statistiky jsou synchronizované.',true)
+ }catch(e){setCloudNote('Cloud: chyba spojení.',false)}
+}
+const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+async function loadLeaderboard(){
+ const box=$('lbList'),c=cloudCfg();if(!c){box.innerHTML='<div class="notice">Žebříček není dostupný.</div>';return}
+ try{const r=await fetch(`${c.url}/rest/v1/${c.table}?select=username,wheel&wheel=not.is.null&order=wheel->net.desc.nullslast&limit=10`,{headers:cloudHeaders()});
+ if(!r.ok)throw Error('HTTP '+r.status);
+ const rows=(await r.json()).filter(x=>x.wheel&&(Number(x.wheel.spins)||0)>0);
+ if(!rows.length){box.innerHTML='<div class="notice">Zatím nikdo nehrál. Buď první!</div>';return}
+ const me=cloudUser(),medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
+ box.innerHTML=rows.map((x,i)=>{const s=x.wheel,n=Number(s.net)||0;return `<div class="lb-row${x.username===me?' me':''}"><span>${medal(i)}</span><span class="lb-name">${esc(x.username)}</span><span class="lb-net ${n>0?'pos':n<0?'neg':''}">${signed(n)}</span><span class="lb-sub">${fmt(s.spins)} her · max výhra ${fmt(s.biggest)} ◆</span></div>`}).join('');
+ }catch(e){box.innerHTML='<div class="notice">Žebříček se nepodařilo načíst. Zkontroluj cloudový sloupec wheel.</div>'}
+}
+function recordRound(stake,wonAmount,jackpot=false){
+ const s=loadGameStats();s.spins++;s.totalWagered+=stake;s.totalWon+=wonAmount;s.net=s.totalWon-s.totalWagered;
+ if(wonAmount>0){s.wins++;s.biggest=Math.max(s.biggest,wonAmount)}if(jackpot)s.jackpots++;
+ saveGameStats(s);renderStats();schedulePush();
+}
+$('shopBuy1').addEventListener('click',()=>buyCookies(1000,160));
+$('shopBuy2').addEventListener('click',()=>buyCookies(10000,1600));
+$('lbRefresh').addEventListener('click',loadLeaderboard);
+
+draw();renderBalance();refreshSide();renderStats();pullGameStats();loadLeaderboard();
 })();
 </script></body></html>
