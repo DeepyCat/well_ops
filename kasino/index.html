@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#10121a"><title>OPS /// Kasino</title>
+<meta name="theme-color" content="#10121a"><title>OPS /// CpASÍNO</title>
 <style>
 :root{color-scheme:dark;--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a;--wine:#2a0f1a;--felt:#1f5143;--wood:#4a3220}*{box-sizing:border-box}html{min-width:360px;overflow-x:hidden}body{margin:0;min-width:360px;overflow-x:hidden;color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;background:#10121a}a{color:inherit}.topbar{min-height:62px;padding:12px clamp(12px,3vw,34px);display:flex;align-items:center;justify-content:space-between;gap:14px;background:#141620;border-bottom:1px solid var(--line);position:relative;z-index:5}.brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}.right{display:flex;align-items:center;justify-content:flex-end;gap:14px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}.tokens{color:var(--gold);font-weight:800}.topbar a{color:var(--text);text-decoration:none}.topbar a:hover{color:var(--cyan)}button{font:inherit;cursor:pointer}.sound{border:1px solid var(--line);border-radius:8px;background:#202330;color:var(--text);padding:5px 9px}.wall{min-height:calc(100vh - 62px);position:relative;isolation:isolate;overflow:hidden;padding:30px clamp(10px,3vw,34px) 50px;background:radial-gradient(ellipse at 50% 25%,#421725 0,#2a0f1a 42%,#170a12 100%)}.wall:before{content:"";position:absolute;inset:0;z-index:-2;opacity:.15;background:repeating-linear-gradient(45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px),repeating-linear-gradient(-45deg,transparent 0 17px,#a65a65 18px 19px,transparent 20px 36px);mask-image:linear-gradient(#000,transparent 90%)}.sign{width:max-content;max-width:100%;margin:0 auto 14px;padding:10px 25px 12px;border:2px solid #9d414a;border-radius:10px;background:linear-gradient(#39131f,#200b13);color:var(--gold);font-size:clamp(1.65rem,4vw,3.1rem);font-weight:1000;font-style:italic;letter-spacing:.14em;text-align:center;text-shadow:0 0 5px var(--gold),0 0 14px var(--red),0 0 32px #ff304f;box-shadow:0 0 18px #ff526355,inset 0 0 18px #ff526322;animation:signFlash 1.5s steps(1,end) 1}.intro{text-align:center;color:#f3c5cc;margin:0 auto 20px;max-width:650px;font-size:.96rem}
 .arcade-monitors{display:flex;justify-content:center;gap:16px;max-width:760px;margin:0 auto 26px;flex-wrap:wrap}
@@ -95,11 +95,45 @@
 .station.kiosk small{color:#7dd3fc;font-weight:600;font-size:.76rem}
 .station.kiosk:hover{background:#12253d;transform:translateY(-2px)}
 @media(max-width:559px){.statbar{border-radius:16px;flex-direction:column;gap:6px;width:100%}.sb{justify-content:space-between}.stations .station .station-art,.stations .station.slot .station-art{height:200px}}
+ 
+/* ===== Tutoriál ===== */
+#tutRoot[hidden]{display:none}
+.tut-block{position:fixed;inset:0;z-index:9990}
+.tut-spot{position:fixed;z-index:9991;pointer-events:none;border-radius:14px;box-shadow:0 0 0 9999px rgba(6,3,9,.8),0 0 0 3px var(--gold),0 0 26px #ffd47799;transition:left .35s,top .35s,width .35s,height .35s}
+.tut-spot.none{box-shadow:0 0 0 9999px rgba(6,3,9,.8);border-radius:0}
+.tut-ask,.tut-dialog{position:fixed;z-index:9992;color:var(--text)}
+.tut-ask[hidden],.tut-dialog[hidden]{display:none}
+.tut-ask{left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);padding:26px 24px 22px;text-align:center;background:linear-gradient(#1d1522,#140f19);border:1px solid var(--gold);border-radius:18px;box-shadow:0 20px 60px #000a,0 0 30px #ffd47733}
+.tut-ask img{height:120px;width:auto;margin:-80px auto 6px;display:block;filter:drop-shadow(0 8px 14px #000a)}
+.tut-ask h3{margin:0 0 6px;font-size:1.35rem;color:var(--gold)}
+.tut-ask p{margin:0 0 18px;color:var(--muted);font-size:.95rem;line-height:1.5}
+.tut-btns{display:flex;gap:10px;justify-content:center}
+.tut-btn{border:1px solid #ffffff2e;background:#262030;color:var(--text);padding:10px 22px;border-radius:10px;font-weight:700;font-size:.95rem;font-family:inherit;cursor:pointer;transition:transform .15s,background .15s}
+.tut-btn:hover{transform:translateY(-1px);background:#32293e}
+.tut-btn.primary{background:linear-gradient(135deg,#ffd477,#f0a640);color:#2a1604;border-color:#ffd477}
+.tut-btn.primary:hover{background:linear-gradient(135deg,#ffe090,#f5b155)}
+.tut-btn.ghost{background:transparent;color:var(--muted)}
+.tut-dialog{left:50%;bottom:0;transform:translateX(-50%);width:min(860px,100%);display:flex;align-items:flex-end;gap:10px;padding:0 14px 14px;pointer-events:none}
+.tut-dialog>*{pointer-events:auto}
+.tut-char{flex:0 0 auto;height:clamp(150px,26vh,250px);width:auto;max-width:42vw;object-fit:contain;filter:drop-shadow(0 10px 16px #000b);animation:tutIn .35s ease-out}
+@keyframes tutIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.tut-bubble{position:relative;flex:1;min-width:0;margin-bottom:14px;padding:16px 18px 14px;background:linear-gradient(#1d1522f2,#140f19f2);border:1px solid var(--gold);border-radius:16px;box-shadow:0 12px 40px #000a}
+.tut-bubble:before{content:"";position:absolute;left:-9px;bottom:34px;width:16px;height:16px;background:#1b1420;border-left:1px solid var(--gold);border-bottom:1px solid var(--gold);transform:rotate(45deg)}
+.tut-title{margin:0 0 6px;font-size:1.1rem;font-weight:900;color:var(--gold)}
+.tut-text{margin:0;font-size:.95rem;line-height:1.55;color:#ece8f2}
+.tut-text b{color:var(--gold)}
+.tut-foot{display:flex;align-items:center;gap:8px;margin-top:14px}
+.tut-dots{display:flex;gap:6px;margin-right:auto}
+.tut-dots i{width:8px;height:8px;border-radius:50%;background:#ffffff2e}
+.tut-dots i.on{background:var(--gold)}
+.tut-foot .tut-btn{padding:8px 16px;font-size:.86rem}
+@media(max-width:560px){.tut-dialog{gap:0;padding:0 8px 8px}.tut-char{height:120px;max-width:34vw}.tut-bubble{padding:13px 14px 12px}.tut-text{font-size:.88rem}.tut-bubble:before{bottom:26px}}
+@media(prefers-reduced-motion:reduce){.tut-char{animation:none}.tut-spot{transition:none}}
 </style></head>
 <body>
-<header class="topbar"><div class="brand">OPS <span>///</span> KASINO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
+<header class="topbar"><div class="brand">OPS <span>///</span> CpASÍNO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
 <main class="wall">
-<div class="sign">CpASÍNO</div>
+<div class="sign">CpASÍNO OPS</div>
 <p class="intro">Vyber si stanoviště. Hraješ o školní body, které máš ve všech hrách společné.</p>
  
 <div class="statbar">
@@ -559,6 +593,125 @@
     if (e.key === 'Escape' && isOpen()) { const c = $('closeOpsShopBtn'); if (c) c.click(); return; }
     if (e.key === '6' && !e.repeat && !isOpen() && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) && kiosk) kiosk.click();
   });
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const KEY = 'cpasino_tutorial';           // 'declined' | 'done'
+  const get = () => { try { return localStorage.getItem(KEY); } catch (e) { return null; } };
+  const set = v => { try { localStorage.setItem(KEY, v); } catch (e) {} };
+  if (get()) return;                         // už jsme se ptali / už proběhl
+ 
+  const STEPS = [
+    { img: 'show', title: 'Vítej v CpASÍNU! 🎰',
+      text: 'Jsem tvůj průvodce. Za chvilku ti ukážu, jak tu všechno funguje, abys nemusel nic hledat.' },
+    { img: 'show', title: 'Pět stanovišť, jedny tokeny',
+      text: 'Můžeš hrát <b>Blackjack</b>, <b>výherní automat</b>, <b>nábor učitelů</b>, <b>ruletu</b> a <b>kolo štěstí</b>. Všechny hry sdílejí stejné OPS tokeny, takže co vyhraješ nebo prohraješ jinde, vidíš všude. Hry otevřeš kliknutím nebo klávesami <b>1–5</b>.' },
+    { img: 'show', title: 'Tvůj zůstatek', target: '.topbar .tokens',
+      text: 'Tady vpravo nahoře vidíš, kolik máš tokenů. Mění se po každé hře. Pod nápisem na hlavní stránce najdeš ještě svůj čistý zisk a zisk všech hráčů.' },
+    { img: 'point', title: 'Obchod OPS', target: '#openOpsShopBtn',
+      text: 'Tohle je <b>Obchod OPS</b>, směnárna mezi sušenkami z Cookie Clickeru a tokeny. Otevřeš ho kliknutím nebo klávesou <b>6</b>. Vybereš směr směny, zadáš množství a potvrdíš. Můžeš použít i rychlé předvolby.' },
+    { img: 'point', title: 'Pozor, směna je ztrátová!', target: '#openOpsShopBtn',
+      text: 'Za <b>1 000 sušenek</b> dostaneš jen <b>160 tokenů</b> a za <b>160 tokenů</b> zpátky jen <b>800 sušenek</b>. Když tedy změníš tam a zpátky, přijdeš zhruba o <b>20 %</b>. Měň jen to, co opravdu potřebuješ.' },
+    { img: 'think', title: 'Je to dobré CpASÍNO 👌',
+      text: 'Hraje se jen o školní body, žádné skutečné peníze. Hraj s rozumem, nevsázej všechno najednou a hlavně se u toho bav. Hodně štěstí!' }
+  ];
+ 
+  const $ = id => document.getElementById(id);
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<div id="tutRoot" hidden>
+  <div class="tut-block"></div>
+  <div class="tut-spot none" id="tutSpot"></div>
+  <div class="tut-ask" id="tutAsk" role="dialog" aria-modal="true" aria-labelledby="tutAskTitle">
+    <img src="img/think.png" alt="">
+    <h3 id="tutAskTitle">Chceš tutoriál?</h3>
+    <p>Rychle ti ukážu, jak CpASÍNO funguje. Zabere to míň než minutu a potom už se ti nezobrazí.</p>
+    <div class="tut-btns"><button type="button" class="tut-btn ghost" id="tutNo">Ne, díky</button><button type="button" class="tut-btn primary" id="tutYes">Jo, ukaž</button></div>
+  </div>
+  <div class="tut-dialog" id="tutDialog" role="dialog" aria-modal="true" aria-live="polite" hidden>
+    <img class="tut-char" id="tutChar" src="img/show.png" alt="">
+    <div class="tut-bubble">
+      <div class="tut-title" id="tutTitle"></div>
+      <p class="tut-text" id="tutText"></p>
+      <div class="tut-foot">
+        <div class="tut-dots" id="tutDots"></div>
+        <button type="button" class="tut-btn ghost" id="tutSkip">Přeskočit</button>
+        <button type="button" class="tut-btn" id="tutBack">Zpět</button>
+        <button type="button" class="tut-btn primary" id="tutNext">Další</button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+  document.body.appendChild(wrap.firstElementChild);
+  const root = $('tutRoot'), spot = $('tutSpot'), ask = $('tutAsk'), dlg = $('tutDialog');
+  let i = 0, active = false;
+ 
+  ['point','show','think'].forEach(n => { new Image().src = 'img/' + n + '.png'; });
+ 
+  function close(value) {
+    set(value); active = false;
+    window.removeEventListener('keydown', onKey, true);
+    window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true);
+    root.remove();
+  }
+ 
+  function place() {
+    if (!active) return;
+    const st = STEPS[i], el = st.target && document.querySelector(st.target);
+    if (!el) { spot.className = 'tut-spot none'; spot.style.cssText = 'left:50%;top:50%;width:0;height:0'; return; }
+    const r = el.getBoundingClientRect(), pad = 8;
+    spot.className = 'tut-spot';
+    spot.style.left = (r.left - pad) + 'px'; spot.style.top = (r.top - pad) + 'px';
+    spot.style.width = (r.width + pad * 2) + 'px'; spot.style.height = (r.height + pad * 2) + 'px';
+  }
+ 
+  function show() {
+    const st = STEPS[i], ch = $('tutChar');
+    ch.src = 'img/' + st.img + '.png';
+    ch.style.animation = 'none'; void ch.offsetWidth; ch.style.animation = '';
+    $('tutTitle').textContent = st.title;
+    $('tutText').innerHTML = st.text;
+    $('tutDots').innerHTML = STEPS.map((_, k) => '<i class="' + (k === i ? 'on' : '') + '"></i>').join('');
+    $('tutBack').style.visibility = i ? 'visible' : 'hidden';
+    $('tutNext').textContent = i === STEPS.length - 1 ? 'Hotovo' : 'Další';
+    $('tutSkip').style.display = i === STEPS.length - 1 ? 'none' : '';
+    const el = st.target && document.querySelector(st.target);
+    if (el) {
+      if (el.closest('header')) window.scrollTo(0, 0);
+      else {
+        el.scrollIntoView({ block: 'center' });
+        // cíl nesmí zůstat schovaný za dialogem
+        const over = el.getBoundingClientRect().bottom + 24 - dlg.getBoundingClientRect().top;
+        if (over > 0) window.scrollBy(0, over);
+      }
+    }
+    place();
+  }
+ 
+  function start() { active = true; ask.hidden = true; dlg.hidden = false; i = 0; show(); }
+  function next() { if (i >= STEPS.length - 1) close('done'); else { i++; show(); } }
+  function back() { if (i > 0) { i--; show(); } }
+ 
+  function onKey(e) {
+    e.stopPropagation();                      // zablokuje klávesy 1–6 na stránce
+    if (!active) { if (e.key === 'Escape') close('declined'); return; }
+    if (e.key === 'Escape') close('done');
+    else if (e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); back(); }
+  }
+ 
+  $('tutYes').addEventListener('click', start);
+  $('tutNo').addEventListener('click', () => close('declined'));
+  $('tutNext').addEventListener('click', next);
+  $('tutBack').addEventListener('click', back);
+  $('tutSkip').addEventListener('click', () => close('done'));
+  window.addEventListener('keydown', onKey, true);
+  window.addEventListener('resize', place); window.addEventListener('scroll', place, true);
+ 
+  root.hidden = false;
+  setTimeout(() => $('tutYes').focus(), 50);
 })();
 </script>
 </body>
