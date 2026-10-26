@@ -19,13 +19,12 @@ a{color:inherit}
 .top-right{display:flex;align-items:center;gap:10px}
 .mute-btn{background:#ffffff09;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:1rem}.mute-btn:hover{border-color:var(--red)}
 .back{color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:10px}.back:hover{color:white;border-color:var(--red)}
-main{width:min(1180px,94vw);margin:30px auto 70px}
+main{width:min(1280px,94vw);margin:30px auto 70px}
 h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
-.layout{display:grid;grid-template-columns:minmax(280px,.7fr) minmax(0,1.8fr);gap:24px;align-items:start}
+.layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
 .game-container{display:flex;flex-direction:column;gap:20px}
 .panels-sidebar{display:flex;flex-direction:column;gap:20px}
-.panels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
 
 .machine-table{position:relative;border:10px solid #2a2d3d;border-radius:22px;background:radial-gradient(ellipse at 50% 30%,#241f33 0,#141622 55%,#0d0e15 100%);box-shadow:inset 0 0 60px #0009,0 18px 50px #0007;padding:24px;display:flex;flex-direction:column;justify-content:space-between}
 .slot-screen{background:#0a0b10;border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:inset 0 0 30px #000a;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;position:relative;overflow:hidden}
@@ -42,7 +41,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
 .controls-dock{display:flex;flex-direction:column;gap:14px;background:#0a0b12d9;border:1px solid #ffffff1a;border-radius:16px;padding:16px;margin-top:16px}
 .control-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.bet-chips{display:flex;gap:6px;flex-wrap:wrap}
+.bet-chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .bet-custom-wrap{display:flex;align-items:center;gap:8px;font-size:.88rem}
 .bet-custom-wrap label{color:var(--muted);font-weight:700}
 .bet-summary{margin-left:6px}
@@ -53,6 +52,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .chip-btn{background:#ffffff0d;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-weight:800;font-size:.85rem;transition:.15s}
 .chip-btn:hover:not(:disabled){border-color:var(--cyan);background:#7ff0ff11}
 .chip-btn.active{background:var(--cyan);color:#0a0b10;border-color:var(--cyan)}
+.chip-btn.half{background:#64748b33;border-color:#64748b}
 .btn{border:1px solid var(--line);border-radius:12px;padding:12px 20px;font-weight:850;background:#ffffff0d;transition:transform .15s,border-color .15s}
 .btn:hover:not(:disabled){transform:translateY(-2px);border-color:#ffffff66}.btn:disabled{opacity:.4;cursor:not-allowed}
 .btn.primary{background:linear-gradient(110deg,#ff435c,#d92750);border-color:#ff697a;box-shadow:0 8px 26px #ff335022}
@@ -85,7 +85,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .shop-info b{display:block;color:var(--gold);font-size:1rem}
 .shop-info small{color:var(--muted);font-size:.72rem}
 .shop-btn{white-space:nowrap;background:linear-gradient(110deg,#0284c7,#2563eb);border-color:#38bdf8}
-.lb{display:flex;flex-direction:column;gap:7px}
+.lb{display:flex;flex-direction:column;gap:7px;max-height:350px;overflow-y:auto;padding-right:4px}
 .lb-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;background:#ffffff05;border:1px solid #ffffff0d;border-radius:11px;font-size:.88rem}
 .lb-row.me{border-color:#7ff0ff88;background:#7ff0ff10}
 .lb-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -147,6 +147,11 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         </div>
         <p class="notice" id="cloudNote" style="margin-top:10px">Cloud: zjišťuji…</p>
       </div>
+
+      <div class="panel">
+        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+        <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+      </div>
     </div>
 
     <div class="game-container">
@@ -167,6 +172,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
               <button class="chip-btn" data-v="160" type="button">160</button>
               <button class="chip-btn" data-v="500" type="button">500</button>
               <button class="chip-btn" data-v="1600" type="button">1600</button>
+              <button class="chip-btn half" id="halfBet" type="button" title="Vsadit polovinu dostupných tokenů">1/2</button>
               <button class="chip-btn" id="clearBet" type="button">Vymazat</button>
               <button class="chip-btn" id="maxBet" type="button">Vsadit vše</button>
             </div>
@@ -198,13 +204,6 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         </div>
         <p class="notice" style="margin-top:10px">RTP 93.37%. Výherních je 5 pevných linií (střed, horní, dolní a 2 diagonály).</p>
       </div>
-    </div>
-  </div>
-
-  <div style="margin-top: 24px;">
-    <div class="panel">
-      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
     </div>
   </div>
 </main>
@@ -370,11 +369,12 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     }
 
     document.querySelectorAll(".chip-btn").forEach(btn => {
-      if (btn.id === "clearBet" || btn.id === "maxBet") return;
+      if (btn.id === "clearBet" || btn.id === "maxBet" || btn.id === "halfBet") return;
       const v = Number(btn.dataset.v);
       btn.classList.toggle("active", bet === v);
       btn.disabled = busy || autoRunning;
     });
+    $("halfBet").disabled = busy || autoRunning || maxAffordable() < MIN_BET * 2;
   }
 
   function renderStats() {
@@ -713,7 +713,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   }
 
   document.querySelectorAll(".chip-btn").forEach(btn => {
-    if (btn.id === "clearBet" || btn.id === "maxBet") return;
+    if (btn.id === "clearBet" || btn.id === "maxBet" || btn.id === "halfBet") return;
     btn.addEventListener("click", () => {
       if (busy || autoRunning) return;
       bet = Number(btn.dataset.v);
@@ -721,6 +721,14 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       sfx.click();
       updateUI();
     });
+  });
+  $("halfBet").addEventListener("click", () => {
+    if (busy || autoRunning) return;
+    const max = maxAffordable();
+    bet = Math.max(MIN_BET, Math.floor(max / 2));
+    clampBet();
+    sfx.click();
+    updateUI();
   });
   $("clearBet").addEventListener("click", () => {
     if (busy || autoRunning) return;

@@ -8,8 +8,8 @@
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#3b1822,#10121a 65%);color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;min-height:100vh}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
 .brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
-main{width:min(1180px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.4rem);font-weight:1000;font-style:italic;text-shadow:0 0 24px #ff526344}.sub{text-align:center;color:#e4c7cc;margin:0 auto 24px;max-width:650px}
-.layout{display:grid;grid-template-columns:minmax(280px,.7fr) minmax(0,1.8fr);gap:24px;align-items:start}
+main{width:min(1280px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.4rem);font-weight:1000;font-style:italic;text-shadow:0 0 24px #ff526344}.sub{text-align:center;color:#e4c7cc;margin:0 auto 24px;max-width:650px}
+.layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
 .game-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
 .panels-sidebar{display:flex;flex-direction:column;gap:20px}
 .panel{background:linear-gradient(145deg,#1b1e2b,#11141e);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 18px 40px #0005}
@@ -38,7 +38,7 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 .shop-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:#ffffff06;border:1px solid #ffffff12;border-radius:13px}
 .shop-info b{display:block;color:var(--gold);font-size:1rem}.shop-info small{color:var(--muted);font-size:.72rem}
 .shop-btn{white-space:nowrap;background:linear-gradient(110deg,#0284c7,#2563eb);border-color:#38bdf8;padding:8px 12px;border-radius:8px;font-weight:700}
-.lb{display:flex;flex-direction:column;gap:7px}
+.lb{display:flex;flex-direction:column;gap:7px;max-height:350px;overflow-y:auto;padding-right:4px}
 .lb-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 11px;background:#ffffff05;border:1px solid #ffffff0d;border-radius:11px;font-size:.88rem}
 .lb-row.me{border-color:#7ff0ff88;background:#7ff0ff10}
 .lb-name{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -46,6 +46,10 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 .lb-sub{grid-column:2/-1;color:var(--muted);font-size:.72rem;margin-top:-4px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252938;border:1px solid #4a5065;border-radius:12px;padding:12px 18px;z-index:80;display:none;max-width:90vw;box-shadow:0 10px 40px #0008}
 .toast.show{display:block}
+.bet-controls-row{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.quick-btn{background:#ffffff0d;border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:800;font-size:.82rem;transition:.15s}
+.quick-btn:hover:not(:disabled){border-color:var(--cyan);background:#7ff0ff11}
+.quick-btn.half{background:#64748b33;border-color:#64748b}
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
 @media(max-width:420px){.fields{grid-template-columns:1fr}}
 </style>
@@ -83,6 +87,10 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
       </div>
       <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
     </div>
+    <div class="panel">
+      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+    </div>
   </div>
 
   <div class="game-container">
@@ -95,7 +103,14 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 
     <section class="panel">
       <div class="fields">
-        <div class="field"><label for="bet">Sázka (tokeny)</label><input id="bet" type="number" min="1" step="1" value="100" inputmode="numeric"></div>
+        <div class="field">
+          <label for="bet">Sázka (tokeny)</label>
+          <input id="bet" type="number" min="1" step="1" value="100" inputmode="numeric">
+          <div class="bet-controls-row">
+            <button class="quick-btn half" id="halfBetBtn" type="button">1/2</button>
+            <button class="quick-btn" id="maxBetBtn" type="button">Vsadit vše</button>
+          </div>
+        </div>
         <div class="field"><label for="betType">Typ sázky</label><select id="betType"><option value="color">Červená / černá</option><option value="number">Konkrétní číslo</option><option value="parity">Sudé / liché</option><option value="half">1–18 / 19–36</option><option value="dozen">Tucet</option></select></div>
       </div>
       <div class="field" id="choiceField"><label for="choice">Tvůj tip</label><select id="choice"><option value="red">Červená</option><option value="black">Černá</option></select></div>
@@ -105,13 +120,6 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
       <div class="paytable"><b>Výplaty (celkem včetně sázky):</b><br>Číslo: 36× · Barva / sudé-liché / polovina: 2× · Tucet: 3×<br><span style="color:#5be08a">0 je zelená a pro běžné sázky znamená prohru.</span></div>
       <div class="notice">Hra používá společné OPS tokeny. Výsledek je náhodný a dlouhodobě má ruleta výhodu kasina.</div>
     </section>
-  </div>
-</div>
-
-<div style="margin-top: 24px;">
-  <div class="panel">
-    <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button">↻</button></div>
-    <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
   </div>
 </div>
 </main><div class="toast" id="toast" role="status"></div>
@@ -194,6 +202,19 @@ function spin(){
 }
 $('betType').addEventListener('change',updateChoices);$('choice').addEventListener('change',updatePayout);$('bet').addEventListener('input',updatePayout);$('spinBtn').addEventListener('click',spin);
 
+$('halfBetBtn').addEventListener('click', () => {
+  if (spinning) return;
+  const max = Math.floor(balance());
+  const half = Math.max(1, Math.floor(max / 2));
+  $('bet').value = half;
+  updatePayout();
+});
+$('maxBetBtn').addEventListener('click', () => {
+  if (spinning) return;
+  $('bet').value = Math.floor(balance());
+  updatePayout();
+});
+
 const STAT_KEY='ops_roulette_stats';
 const emptyStats=()=>({spins:0,wins:0,biggest:0,jackpots:0,totalWagered:0,totalWon:0,net:0});
 function loadGameStats(){try{return {...emptyStats(),...(JSON.parse(localStorage.getItem(STAT_KEY))||{})}}catch(e){return emptyStats()}}
@@ -266,7 +287,7 @@ async function loadLeaderboard(){
 }
 function recordRound(stake,wonAmount,jackpot=false){
  const s=loadGameStats();s.spins++;s.totalWagered+=stake;s.totalWon+=wonAmount;s.net=s.totalWon-s.totalWagered;
- if(wonAmount>0){s.wins++;s.biggest=Math.saveGameStats?s.biggest=Math.max(s.biggest,wonAmount):Math.max(s.biggest,wonAmount)}if(jackpot)s.jackpots++;
+ if(wonAmount>0){s.wins++;s.biggest=Math.max(s.biggest,wonAmount)}if(jackpot)s.jackpots++;
  saveGameStats(s);renderStats();schedulePush();
 }
 $('shopBuy1').addEventListener('click',()=>buyCookies(1000,160));
