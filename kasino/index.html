@@ -132,6 +132,27 @@
 @media(prefers-reduced-motion:reduce){.tut-char{animation:none}.tut-spot{transition:none}}
  
 #musicBtn.off{opacity:.45;text-decoration:line-through}
+ 
+/* Tutoriál: mobil */
+@media(max-width:560px){
+  .tut-dialog{gap:0;padding:0 8px calc(8px + env(safe-area-inset-bottom,0px))}
+  .tut-char{height:auto;width:30vw;max-width:110px;max-height:130px;margin-right:-4px}
+  .tut-bubble{margin-bottom:6px;padding:12px;max-height:58vh;max-height:58dvh;overflow-y:auto;border-radius:14px}
+  .tut-title{font-size:1rem}
+  .tut-text{font-size:.86rem;line-height:1.45}
+  .tut-foot{flex-wrap:wrap;gap:6px;margin-top:10px}
+  .tut-dots{flex:1 0 100%;order:-1;justify-content:center;margin:0 0 4px}
+  .tut-foot .tut-btn{flex:1 1 0;padding:9px 6px;font-size:.82rem}
+  .tut-ask{padding:22px 16px 18px}
+  .tut-ask img{height:96px;margin-top:-70px}
+  .tut-btns .tut-btn{flex:1}
+}
+/* nízké displeje / na šířku */
+@media(max-height:480px){
+  .tut-char{display:none}
+  .tut-bubble{max-height:70vh;max-height:70dvh}
+  .tut-bubble:before{display:none}
+}
 </style></head>
 <body>
 <header class="topbar"><div class="brand">OPS <span>///</span> CpASÍNO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="musicBtn" type="button" aria-pressed="true" aria-label="Vypnout hudbu" title="Hudba">🎵</button><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">🔊</button><a href="/games.html">← Zpět na hry</a></div></header>
@@ -444,6 +465,13 @@
       if (tEl) tEl.textContent = Math.round(t).toLocaleString("cs-CZ");
       if (cEl) cEl.textContent = Math.round(c).toLocaleString("cs-CZ");
     }
+    function getAllAmount() {
+      if (exchangeDirection === "cookies_to_tokens") {
+        // sušenky mohou být desetinné, proto floor a -1, jinak by kontrola "nedostatek" selhala
+        return Math.max(0, Math.floor(readCookiesData().available) - 1);
+      }
+      return Math.max(0, Math.floor(getTokens()));
+    }
     function setDirection(dir) {
       exchangeDirection = dir;
       customInput.value = "";
@@ -482,13 +510,22 @@
           `;
         }
       }
+      if (presetsGrid) {
+        const allAmount = getAllAmount();
+        const isCookies = exchangeDirection === "cookies_to_tokens";
+        presetsGrid.insertAdjacentHTML("beforeend", `
+          <button type="button" class="ops-preset-btn" data-all="1" style="grid-column:1/-1;background:linear-gradient(135deg,#252a3d,#1b2236);border:1px solid #38bdf8;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:center;">
+            <div style="color:#7dd3fc;">Vše</div>
+            <div style="font-size:0.8rem;color:${isCookies ? "#5be08a" : "#ffd477"};">${Number(allAmount).toLocaleString("cs-CZ")} ${isCookies ? "sušenek" : "tokenů"}</div>
+          </button>`);
+      }
       attachPresetListeners();
       updateCalculation();
     }
     function attachPresetListeners() {
       document.querySelectorAll(".ops-preset-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-          const spend = Number(btn.dataset.spend);
+          const spend = btn.dataset.all ? getAllAmount() : Number(btn.dataset.spend);
           if (customInput) customInput.value = spend;
           activeSpendAmount = spend;
           updateCalculation();
@@ -655,6 +692,7 @@
     set(value); active = false;
     window.removeEventListener('keydown', onKey, true);
     window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true);
+    document.body.style.paddingBottom = '';
     root.remove();
   }
  
@@ -678,14 +716,15 @@
     $('tutBack').style.visibility = i ? 'visible' : 'hidden';
     $('tutNext').textContent = i === STEPS.length - 1 ? 'Hotovo' : 'Další';
     $('tutSkip').style.display = i === STEPS.length - 1 ? 'none' : '';
+    document.body.style.paddingBottom = dlg.offsetHeight + 'px';   // aby šlo odscrollovat i úplně dole
     const el = st.target && document.querySelector(st.target);
     if (el) {
       if (el.closest('header')) window.scrollTo(0, 0);
       else {
-        el.scrollIntoView({ block: 'center' });
-        // cíl nesmí zůstat schovaný za dialogem
-        const over = el.getBoundingClientRect().bottom + 24 - dlg.getBoundingClientRect().top;
-        if (over > 0) window.scrollBy(0, over);
+        const bubbleTop = document.querySelector('.tut-bubble').getBoundingClientRect().top;
+        const r = el.getBoundingClientRect();
+        // vycentruje cíl do volné části nad dialogem
+        window.scrollBy(0, r.top + r.height / 2 - bubbleTop / 2);
       }
     }
     place();
@@ -814,3 +853,4 @@
 </script>
 </body>
 </html>
+ 
