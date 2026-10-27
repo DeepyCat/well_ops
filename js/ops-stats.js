@@ -432,13 +432,16 @@
         if (titleText) badge.title = titleText;
     }
 
+    let isSyncingToCloud = false;
     async function syncToCloud() {
+        if (isSyncingToCloud) return;
         const username = OPS_STATS.getUsername();
         if (!username || !isSupabaseConfigured() || username.startsWith("Host")) {
             updateCloudSyncBadge("offline");
             return;
         }
 
+        isSyncingToCloud = true;
         updateCloudSyncBadge("syncing", "Cloud: Ukladam...");
         const stats = loadLocalStats();
         if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
@@ -474,6 +477,8 @@
         } catch (err) {
             console.warn("[OPS Stats Cloud] Sitova chyba pri syncToCloud:", err);
             updateCloudSyncBadge("error");
+        } finally {
+            isSyncingToCloud = false;
         }
     }
 
@@ -1268,9 +1273,16 @@
     // -------------------------------------------------------------------------
     // CLICKER LOCALSTORAGE HOOK & AUTOSAVE
     // -------------------------------------------------------------------------
+    let lastClickerSaveTime = 0;
     function handleSaveClickerState(data) {
         if (!data || typeof data !== "object") return;
         if (isReloadingForCloud) return;
+
+        const now = Date.now();
+        if (now - lastClickerSaveTime < 400) {
+            return;
+        }
+        lastClickerSaveTime = now;
 
         const stats = loadLocalStats();
         const currentTotal = Number(stats.clicker?.totalCookies) || 0;
@@ -1454,7 +1466,12 @@
         saveStats: function(stats) {
             if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
             saveLocalStats(stats);
-            syncToCloud();
+            if (!syncCloudDebounceTimer) {
+                syncCloudDebounceTimer = setTimeout(() => {
+                    syncCloudDebounceTimer = null;
+                    syncToCloud();
+                }, 4000);
+            }
         },
 
         recordScore: function(gameId, score, extraData = {}) {
@@ -1500,7 +1517,12 @@
             }
 
             saveLocalStats(stats);
-            syncToCloud();
+            if (!syncCloudDebounceTimer) {
+                syncCloudDebounceTimer = setTimeout(() => {
+                    syncCloudDebounceTimer = null;
+                    syncToCloud();
+                }, 4000);
+            }
         },
 
         recordPlayTime: function(gameId, seconds) {
@@ -1514,7 +1536,12 @@
                 stats[gameId].playTime = (stats[gameId].playTime || 0) + seconds;
             }
             saveLocalStats(stats);
-            syncToCloud();
+            if (!syncCloudDebounceTimer) {
+                syncCloudDebounceTimer = setTimeout(() => {
+                    syncCloudDebounceTimer = null;
+                    syncToCloud();
+                }, 4000);
+            }
         },
 
         recordSession: function(gameId) {
@@ -1527,7 +1554,12 @@
                 stats.mc.sessions = (stats.mc.sessions || 0) + 1;
             }
             saveLocalStats(stats);
-            syncToCloud();
+            if (!syncCloudDebounceTimer) {
+                syncCloudDebounceTimer = setTimeout(() => {
+                    syncCloudDebounceTimer = null;
+                    syncToCloud();
+                }, 4000);
+            }
         },
 
         // Gacha metoda - inkrementuje celkový počet pullů a počty pro jednotlivé postavy v inventáři (bez ukládání historie)
@@ -1547,7 +1579,12 @@
             }
 
             saveLocalStats(stats);
-            syncToCloud();
+            if (!syncCloudDebounceTimer) {
+                syncCloudDebounceTimer = setTimeout(() => {
+                    syncCloudDebounceTimer = null;
+                    syncToCloud();
+                }, 4000);
+            }
         },
 
         fetchLeaderboard: async function(orderBy = "total_play_time", limit = 10) {
