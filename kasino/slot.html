@@ -102,7 +102,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 <header class="topbar">
   <div class="brand">OPS <span>///</span> AUTOMAT</div>
   <div class="top-right">
-    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky" title="Ztlumit zvuky">🔊</button>
+    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky" title="Ztlumit zvuky">Zvuk</button>
     <a class="back" href="index.html">← Zpět na hry</a>
   </div>
 </header>
@@ -114,22 +114,22 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   <div class="layout">
     <div class="panels-sidebar">
       <div class="panel">
-        <div class="currency"><span>Školní body</span><strong>◆ <span id="tokens">0</span></strong></div>
+        <div class="currency"><span>Školní body</span><strong>[B] <span id="tokens">0</span></strong></div>
         <p class="who" id="who"></p>
         <p class="notice hide" id="broke" style="color:var(--red);margin-top:10px">Došly ti body! Kup si další v obchodu nebo v <a href="/gacha" style="color:var(--gold);font-weight:700">náboru učitelů</a>.</p>
       </div>
 
       <div class="panel">
-        <h2>🛒 Obchod se sušenkami</h2>
-        <div class="section-head" style="margin:0 0 10px"><span class="pill" id="shopCookies">🍪 0</span></div>
+        <h2>Obchod se sušenkami</h2>
+        <div class="section-head" style="margin:0 0 10px"><span class="pill" id="shopCookies">0 sušenek</span></div>
         <div class="shop">
           <div class="shop-item">
-            <div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div>
-            <button class="btn small shop-btn" id="shopBuy1" type="button">🍪 1 000</button>
+            <div class="shop-info"><b>160 bodů</b><small>Základní balíček</small></div>
+            <button class="btn small shop-btn" id="shopBuy1" type="button">1 000 sušenek</button>
           </div>
           <div class="shop-item">
-            <div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček (10×)</small></div>
-            <button class="btn small shop-btn" id="shopBuy2" type="button">🍪 10 000</button>
+            <div class="shop-info"><b>1 600 bodů</b><small>Výhodný balíček (10×)</small></div>
+            <button class="btn small shop-btn" id="shopBuy2" type="button">10 000 sušenek</button>
           </div>
         </div>
         <p class="notice">Sušenky se berou z Clickeru. Nakupovat lze pouze mezi točeními.</p>
@@ -141,7 +141,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
           <div class="stat"><small>Toček</small><strong id="stSpins">0</strong></div>
           <div class="stat"><small>Výher</small><strong id="stWins">0</strong></div>
           <div class="stat"><small>Největší výhra</small><strong id="stBiggest">0</strong></div>
-          <div class="stat"><small>Jackpoty ♛</small><strong id="stJackpots">0</strong></div>
+          <div class="stat"><small>Jackpoty [Z]</small><strong id="stJackpots">0</strong></div>
           <div class="stat"><small>Celkem vsazeno</small><strong id="stWagered">0</strong></div>
           <div class="stat"><small>Celkem vyhráno</small><strong id="stWon">0</strong></div>
           <div class="stat wide"><small>Čistý zisk</small><strong id="stNet">0</strong></div>
@@ -181,8 +181,8 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
           </div>
           <div class="control-row" style="justify-content:space-between">
             <div class="toggles">
-              <button class="toggle-btn" id="turboBtn" type="button">⚡ Turbo</button>
-              <button class="toggle-btn" id="autoBtn" type="button">🔄 Auto-spin</button>
+              <button class="toggle-btn" id="turboBtn" type="button">Turbo</button>
+              <button class="toggle-btn" id="autoBtn" type="button">Auto-spin</button>
             </div>
             <button class="btn primary spin" id="spinBtn" type="button">TOČIT <kbd style="margin-left:8px;font-size:.8rem;opacity:.7">Space</kbd></button>
           </div>
@@ -192,18 +192,18 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       <div class="panel">
         <h2>Výplatní tabulka (Paytable)</h2>
         <div class="paytable-grid">
-          <div class="paytable-item"><span>♛ Ředitel (Wild)</span><span>5× = 500×</span></div>
-          <div class="paytable-item"><span>🔔 Zvonek</span><span>5× = 200×</span></div>
-          <div class="paytable-item"><span>📚 Kniha</span><span>5× = 100×</span></div>
-          <div class="paytable-item"><span>✏️ Tužka</span><span>5× = 50×</span></div>
-          <div class="paytable-item"><span>🍎 Jablko</span><span>5× = 20×</span></div>
-          <div class="paytable-item"><span>⭐ Známka</span><span>5× = 10×</span></div>
+          <div class="paytable-item"><span>[Z] Ředitel (Wild)</span><span>5× = 500×</span></div>
+          <div class="paytable-item"><span>[S] Zvonek</span><span>5× = 200×</span></div>
+          <div class="paytable-item"><span>[A] Kniha</span><span>5× = 100×</span></div>
+          <div class="paytable-item"><span>[B] Tužka</span><span>5× = 50×</span></div>
+          <div class="paytable-item"><span>[C] Jablko</span><span>5× = 20×</span></div>
+          <div class="paytable-item"><span>[D] Známka</span><span>5× = 10×</span></div>
         </div>
         <p class="notice" style="margin-top:10px">RTP 93.37%. Výherních je 5 pevných linií (střed, horní, dolní a 2 diagonály).</p>
       </div>
     </div>
 <div class="panel lb-panel">
-        <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
+        <div class="section-head"><h2>Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
         <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
       </div>
 </div>
@@ -212,9 +212,9 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
 <div class="big-win-overlay" id="bigWinOverlay">
   <div class="big-win-box">
-    <div class="eyebrow" style="color:var(--gold);font-weight:800;letter-spacing:.2em;margin-bottom:8px">VELKá VÝHRA</div>
+    <div class="eyebrow" style="color:var(--gold);font-weight:800;letter-spacing:.2em;margin-bottom:8px">VELKÁ VÝHRA</div>
     <h2 id="bigWinTitle">SKVĚLÉ!</h2>
-    <p id="bigWinAmount">+0 ◆</p>
+    <p id="bigWinAmount">+0 tokenů</p>
     <button class="btn primary" id="closeBigWin" type="button">Pokračovat</button>
   </div>
 </div>
@@ -225,48 +225,79 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 <script>
 (() => {
   "use strict";
+  const _secureRng = (() => {
+    const rawCrypto = (typeof window !== 'undefined' && window.crypto) ? window.crypto : null;
+    const rawGetRandomValues = rawCrypto && typeof rawCrypto.getRandomValues === 'function' ? rawCrypto.getRandomValues.bind(rawCrypto) : null;
+    const rawMathRandom = Math.random.bind(Math);
+    const U32 = typeof Uint32Array !== 'undefined' ? Uint32Array : null;
+    try { Object.freeze(Math); } catch (e) {}
+    try { if (rawCrypto) Object.freeze(rawCrypto); } catch (e) {}
+    function randomFloat() {
+      if (rawGetRandomValues && U32) {
+        try {
+          const buf = new U32(1);
+          rawGetRandomValues(buf);
+          return buf[0] / 4294967296;
+        } catch (e) {}
+      }
+      return rawMathRandom();
+    }
+    return Object.freeze({
+      random: randomFloat,
+      int: (min, max) => Math.floor(randomFloat() * (max - min + 1)) + min
+    });
+  })();
+
+  const _nativeFetch = (typeof window !== 'undefined' && window.fetch) ? window.fetch.bind(window) : null;
+  try { if (typeof window !== 'undefined' && window.fetch) Object.freeze(window.fetch); } catch (e) {}
+
   const MIN_BET = 10;
   const STATS_KEY = "ops_slots_stats";
   const REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = id => document.getElementById(id);
   const sleep = ms => new Promise(r => setTimeout(r, REDUCE ? Math.min(ms, 30) : ms));
 
-  const SYMBOLS = [
-    { name: "Ředitel", icon: "♛", rank: "Z" },
-    { name: "Zvonek", icon: "🔔", rank: "S" },
-    { name: "Kniha", icon: "📚", rank: "A" },
-    { name: "Tužka", icon: "✏️", rank: "B" },
-    { name: "Jablko", icon: "🍎", rank: "C" },
-    { name: "Známka", icon: "⭐", rank: "D" }
-  ];
-  const WEIGHTS = [2, 12, 35, 90, 220, 450];
-  const PAYOUTS = {
-    "Ředitel": {5: 500, 4: 120, 3: 25},
-    "Zvonek":  {5: 240, 4: 58,  3: 11.5},
-    "Kniha":   {5: 115, 4: 29,  3: 5.8},
-    "Tužka":   {5: 58,  4: 14.5,3: 3.1},
-    "Jablko":  {5: 25,  4: 5.8,  3: 1.05},
-    "Známka":  {5: 12.5,4: 2.9,  3: 0.52}
-  };
-  const PAYLINES = [
-    [1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0],
-    [2, 2, 2, 2, 2],
-    [0, 1, 2, 1, 0],
-    [2, 1, 0, 1, 2]
-  ];
+  const SYMBOLS = Object.freeze([
+    Object.freeze({ name: "Ředitel", icon: "[Z]", rank: "Z" }),
+    Object.freeze({ name: "Zvonek", icon: "[S]", rank: "S" }),
+    Object.freeze({ name: "Kniha", icon: "[A]", rank: "A" }),
+    Object.freeze({ name: "Tužka", icon: "[B]", rank: "B" }),
+    Object.freeze({ name: "Jablko", icon: "[C]", rank: "C" }),
+    Object.freeze({ name: "Známka", icon: "[D]", rank: "D" })
+  ]);
+  const WEIGHTS = Object.freeze([2, 12, 35, 90, 220, 450]);
+  const PAYOUTS = Object.freeze({
+    "Ředitel": Object.freeze({5: 500, 4: 120, 3: 25}),
+    "Zvonek":  Object.freeze({5: 240, 4: 58,  3: 11.5}),
+    "Kniha":   Object.freeze({5: 115, 4: 29,  3: 5.8}),
+    "Tužka":   Object.freeze({5: 58,  4: 14.5,3: 3.1}),
+    "Jablko":  Object.freeze({5: 25,  4: 5.8,  3: 1.05}),
+    "Známka":  Object.freeze({5: 12.5,4: 2.9,  3: 0.52})
+  });
+  const PAYLINES = Object.freeze([
+    Object.freeze([1, 1, 1, 1, 1]),
+    Object.freeze([0, 0, 0, 0, 0]),
+    Object.freeze([2, 2, 2, 2, 2]),
+    Object.freeze([0, 1, 2, 1, 0]),
+    Object.freeze([2, 1, 0, 1, 2])
+  ]);
 
   let fallbackTokens = 1600;
   function getTokens() {
-    if (!window.OPS_STATS) return fallbackTokens;
+    if (!window.OPS_STATS) return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, fallbackTokens));
     const s = window.OPS_STATS.getStats();
-    return s && s.gacha && typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600;
+    const t = s && s.gacha && typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 1600;
+    return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(t)));
   }
   function addTokens(delta) {
-    if (!window.OPS_STATS) { fallbackTokens += delta; return; }
+    if (!window.OPS_STATS) {
+      fallbackTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, fallbackTokens + delta));
+      return;
+    }
     const s = window.OPS_STATS.getStats();
     s.gacha = s.gacha || {};
-    s.gacha.tokens = Math.max(0, (typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600) + delta);
+    const cur = typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 1600;
+    s.gacha.tokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(cur + delta)));
     window.OPS_STATS.saveStats(s);
   }
 
@@ -302,7 +333,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       const c = ac(); if (!c) return;
       const t = c.currentTime + t0, len = Math.floor(c.sampleRate * dur);
       const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      for (let i = 0; i < len; i++) d[i] = (_secureRng.random() * 2 - 1) * (1 - i / len);
       const src = c.createBufferSource(); src.buffer = buf;
       const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = freq;
       const g = c.createGain(); g.gain.value = vol;
@@ -334,11 +365,13 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   let autoRunning = false;
   let autoCount = 0;
 
-  function maxAffordable() { return Math.max(0, Math.floor(getTokens())); }
+  function maxAffordable() { return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(getTokens()))); }
   function clampBet() {
     const max = maxAffordable();
-    bet = Math.max(MIN_BET, Math.min(bet, max >= MIN_BET ? max : MIN_BET));
+    bet = Math.min(Number.MAX_SAFE_INTEGER, Math.max(MIN_BET, Math.min(bet, max >= MIN_BET ? max : MIN_BET)));
   }
+
+  const esc = v => String(v).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 
   function updateUI() {
     const tokens = getTokens();
@@ -355,15 +388,16 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     $("spinBtn").disabled = busy || tokens < bet;
     $("turboBtn").classList.toggle("active", turbo);
     $("autoBtn").classList.toggle("active", autoRunning);
-    $("autoBtn").textContent = autoRunning ? `⏹ Zastavit (${autoCount})` : "🔄 Auto-spin";
+    $("autoBtn").textContent = autoRunning ? `Zastavit (${autoCount})` : "Auto-spin";
     $("broke").classList.toggle("hide", tokens >= MIN_BET);
-    $("shopCookies").textContent = "🍪 " + fmt(readCookies().available);
+    $("shopCookies").textContent = fmt(readCookies().available) + " sušenek";
     $("shopBuy1").disabled = busy || autoRunning;
     $("shopBuy2").disabled = busy || autoRunning;
 
     const user = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
-    if (user && !user.startsWith("Host")) {
-      $("who").innerHTML = `Hraješ jako <b>${user.replace(/[<>&"]/g, "")}</b>. Body se synchronizují do cloudu. <button type="button" id="setName" style="background:none;border:none;color:var(--gold);cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;margin-left:6px">[změnit]</button>`;
+    const isGuest = !user || (window.OPS_STATS && window.OPS_STATS.isGuestUsername ? window.OPS_STATS.isGuestUsername(user) : /^host(_\d+)?$/i.test(user));
+    if (user && !isGuest) {
+      $("who").innerHTML = `Hraješ jako <b>${esc(user)}</b>. Body se synchronizují do cloudu. <button type="button" id="setName" style="background:none;border:none;color:var(--gold);cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;margin-left:6px">[změnit]</button>`;
       const b = $("setName");
       if (b) b.addEventListener("click", () => window.OPS_STATS && window.OPS_STATS.promptUsernameModal());
     } else {
@@ -395,9 +429,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   }
 
   function getRandomSymbol() {
-    const arr = new Uint32Array(1);
-    crypto.getRandomValues(arr);
-    const rand = arr[0] / 4294967296;
+    const rand = _secureRng.random();
     let sum = 0;
     const totalWeight = WEIGHTS.reduce((a, b) => a + b, 0);
     const target = rand * totalWeight;
@@ -440,7 +472,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     addTokens(-bet);
     const st = loadStats();
     st.spins++;
-    st.totalWagered += bet;
+    st.totalWagered = Math.min(Number.MAX_SAFE_INTEGER, st.totalWagered + bet);
 
     const outcomeMatrix = [];
     for (let c = 0; c < 5; c++) {
@@ -473,7 +505,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         const symToPay = first !== "Ředitel" ? first : "Ředitel";
         const mult = PAYOUTS[symToPay][count] || 0;
         const lineWin = Math.floor((bet / PAYLINES.length) * mult);
-        totalWin += lineWin;
+        totalWin = Math.min(Number.MAX_SAFE_INTEGER, totalWin + lineWin);
         for (let c = 0; c < count; c++) {
           winningSymbolsSet.add(`${c}-${PAYLINES[li][c]}`);
         }
@@ -483,8 +515,8 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     if (totalWin > 0) {
       addTokens(totalWin);
       st.wins++;
-      st.totalWon += totalWin;
-      st.biggest = Math.max(st.biggest, totalWin);
+      st.totalWon = Math.min(Number.MAX_SAFE_INTEGER, st.totalWon + totalWin);
+      st.biggest = Math.min(Number.MAX_SAFE_INTEGER, Math.max(st.biggest, totalWin));
       if (outcomeMatrix.flat().some(s => s.name === "Ředitel")) {
         st.jackpots++;
       }
@@ -549,7 +581,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       } else {
         if (outcomeMatrix.flat().some(s => s.name === "Ředitel")) sfx.jackpot();
         else sfx.win();
-        toast(`Výhra: +${fmt(totalWin)} ◆`);
+        toast(`Výhra: +${fmt(totalWin)} tokenů`);
       }
     }
 
@@ -565,8 +597,8 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
   function showBigWin(amount) {
     sfx.jackpot();
-    $("bigWinTitle").textContent = amount >= bet * 50 ? "EPICKÝ JACKPOT!" : "VELKá VÝHRA!";
-    $("bigWinAmount").textContent = `+${fmt(amount)} ◆`;
+    $("bigWinTitle").textContent = amount >= bet * 50 ? "EPICKÝ JACKPOT!" : "VELKÁ VÝHRA!";
+    $("bigWinAmount").textContent = `+${fmt(amount)} tokenů`;
     $("bigWinOverlay").classList.add("show");
   }
 
@@ -592,9 +624,10 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     let save = null;
     try { save = JSON.parse(localStorage.getItem("cookieClickerSave")); } catch (e) {}
     const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
-    const saveCookies = save ? (Number(save.cookies) || 0) : 0;
-    const statCookies = stats && stats.clicker ? (Number(stats.clicker.cookies) || 0) : 0;
-    return { save, saveCookies, statCookies, available: Math.max(saveCookies, statCookies) };
+    const saveCookies = save && Number.isFinite(Number(save.cookies)) ? Math.max(0, Number(save.cookies)) : 0;
+    const statCookies = stats && stats.clicker && Number.isFinite(Number(stats.clicker.cookies)) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
+    const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
+    return { save, saveCookies, statCookies, available };
   }
 
   function buyWithCookies(cost, gain) {
@@ -606,17 +639,22 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       return;
     }
 
+    const remainingCookies = Math.max(0, c.available - cost);
     if (c.save) {
-      c.save.cookies = Math.max(0, c.saveCookies - cost);
-      localStorage.setItem("cookieClickerSave", JSON.stringify(c.save));
-      addTokens(gain);
-    } else if (window.OPS_STATS) {
-      const s = window.OPS_STATS.getStats();
-      if (s.clicker) s.clicker.cookies = Math.max(0, c.statCookies - cost);
+      c.save.cookies = remainingCookies;
+      try { localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); } catch (e) {}
+    }
+    const s = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
+    if (s) {
+      s.clicker = s.clicker || {};
+      s.clicker.cookies = remainingCookies;
       s.gacha = s.gacha || {};
-      s.gacha.tokens = (typeof s.gacha.tokens === "number" ? s.gacha.tokens : 1600) + gain;
+      const cur = Math.max(0, Number(s.gacha.tokens) || 0);
+      s.gacha.tokens = Math.min(Number.MAX_SAFE_INTEGER, cur + gain);
       window.OPS_STATS.saveStats(s);
-    } else { addTokens(gain); }
+    } else {
+      addTokens(gain);
+    }
 
     sfx.click();
     updateUI();
@@ -627,7 +665,8 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   const cloudCfg = () => (window.OPS_STATS && window.OPS_STATS.config) || null;
   function cloudUser() {
     const u = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
-    return u && !u.startsWith("Host") ? u : "";
+    const isGuest = !u || (window.OPS_STATS && window.OPS_STATS.isGuestUsername ? window.OPS_STATS.isGuestUsername(u) : /^host(_\d+)?$/i.test(u));
+    return isGuest ? "" : u;
   }
   function cloudHeaders(extra) {
     const cfg = cloudCfg();
@@ -643,11 +682,14 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   async function pushStats() {
     const cfg = cloudCfg(), user = cloudUser();
     if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen lokálně.", true); return; }
+    const st = loadStats();
+    if (!Number.isFinite(st.spins) || st.spins < 0 || !Number.isFinite(st.totalWagered) || st.totalWagered < 0 || !Number.isFinite(st.totalWon) || st.totalWon < 0) return;
     try {
-      const res = await fetch(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}`, {
+      const fetchFn = _nativeFetch || fetch;
+      const res = await fetchFn(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}`, {
         method: "PATCH",
         headers: cloudHeaders({ Prefer: "return=representation" }),
-        body: JSON.stringify({ slots: loadStats() }),
+        body: JSON.stringify({ slots: st }),
         keepalive: true
       });
       if (!res.ok) {
@@ -674,7 +716,8 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     const cfg = cloudCfg(), user = cloudUser();
     if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen lokálně.", true); return; }
     try {
-      const res = await fetch(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}&select=slots`, { headers: cloudHeaders() });
+      const fetchFn = _nativeFetch || fetch;
+      const res = await fetchFn(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}&select=slots`, { headers: cloudHeaders() });
       if (!res.ok) {
         const t = await res.text();
         setCloudNote(missingColumn(t) ? "Cloud: ve Supabase chybí sloupec „slots“." : `Cloud: načtení selhalo (${res.status}).`, false);
@@ -695,21 +738,21 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     } catch (e) { setCloudNote("Cloud: chyba spojení.", false); }
   }
 
-  const esc = v => String(v).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
   async function loadLeaderboard() {
     const box = $("lbList"), cfg = cloudCfg();
     if (!cfg) { box.innerHTML = '<div class="notice">Žebříček není dostupný.</div>'; return; }
     try {
+      const fetchFn = _nativeFetch || fetch;
       const url = `${cfg.url}/rest/v1/${cfg.table}?select=username,slots&slots=not.is.null&order=slots->net.desc.nullslast&limit=10`;
-      const res = await fetch(url, { headers: cloudHeaders() });
+      const res = await fetchFn(url, { headers: cloudHeaders() });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const rows = (await res.json()).filter(r => r.slots && (Number(r.slots.spins) || 0) > 0);
       if (!rows.length) { box.innerHTML = '<div class="notice">Zatím nikdo nehrál automat. Buď první!</div>'; return; }
       const me = cloudUser();
-      const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+      const medal = i => "#" + (i + 1);
       box.innerHTML = rows.map((r, i) => {
         const s = r.slots, net = Number(s.net) || 0;
-        return `<div class="lb-row${r.username === me ? " me" : ""}"><span>${medal(i)}</span><span class="lb-name">${esc(r.username)}</span><span class="lb-net ${net > 0 ? "pos" : net < 0 ? "neg" : ""}">${signed(net)}</span><span class="lb-sub">${fmt(s.spins)} toček · max výhra ${fmt(s.biggest)} ◆</span></div>`;
+        return `<div class="lb-row${r.username === me ? " me" : ""}"><span>${medal(i)}</span><span class="lb-name">${esc(r.username)}</span><span class="lb-net ${net > 0 ? "pos" : net < 0 ? "neg" : ""}">${signed(net)}</span><span class="lb-sub">${fmt(s.spins)} toček · max výhra ${fmt(s.biggest)} tokenů</span></div>`;
       }).join("");
     } catch (e) {
       box.innerHTML = '<div class="notice">Žebříček se nepodařilo načíst.</div>';
@@ -764,7 +807,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
           customBetInput.value = val;
           toast("Sázka upravena na tvé maximum (" + fmt(val) + ").");
         }
-        bet = val;
+        bet = Math.min(Number.MAX_SAFE_INTEGER, Math.max(MIN_BET, val));
       }
       updateUI();
     });
@@ -779,7 +822,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       } else if (max >= MIN_BET && val > max) {
         bet = max;
       } else {
-        bet = val;
+        bet = Math.min(Number.MAX_SAFE_INTEGER, val);
       }
       customBetInput.value = bet;
       updateUI();
@@ -816,7 +859,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   });
 
   function updateMuteBtn() {
-    $("muteBtn").textContent = sfx.isMuted() ? "🔇" : "🔊";
+    $("muteBtn").textContent = sfx.isMuted() ? "Zvuk: VYP" : "Zvuk: ZAP";
     $("muteBtn").title = sfx.isMuted() ? "Zapnout zvuky" : "Ztlumit zvuky";
   }
   $("muteBtn").addEventListener("click", () => {

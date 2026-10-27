@@ -5,14 +5,93 @@
 (function() {
     'use strict';
 
+    // -------------------------------------------------------------------------
+    // SEALED TAMPER-RESISTANT CSPRNG & NETWORK CAPTURE
+    // -------------------------------------------------------------------------
+    const _secureRng = (() => {
+        const rawCrypto = (typeof window !== "undefined" && window.crypto) ? window.crypto : (typeof crypto !== "undefined" ? crypto : null);
+        const rawGetRandomValues = rawCrypto && typeof rawCrypto.getRandomValues === "function"
+            ? rawCrypto.getRandomValues.bind(rawCrypto)
+            : null;
+        const rawMathRandom = Math.random.bind(Math);
+        const U32 = typeof Uint32Array !== "undefined" ? Uint32Array : null;
+
+        try { Object.freeze(Math); } catch (e) {}
+        try { if (rawCrypto) Object.freeze(rawCrypto); } catch (e) {}
+
+        function randomFloat() {
+            if (rawGetRandomValues && U32) {
+                try {
+                    const buf = new U32(1);
+                    rawGetRandomValues(buf);
+                    return buf[0] / 4294967296;
+                } catch (err) {}
+            }
+            return rawMathRandom();
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(randomFloat() * (max - min + 1)) + min;
+        }
+
+        function getRandomBytes(byteArray) {
+            if (rawGetRandomValues) {
+                try {
+                    rawGetRandomValues(byteArray);
+                    return byteArray;
+                } catch (err) {}
+            }
+            for (let i = 0; i < byteArray.length; i++) {
+                byteArray[i] = Math.floor(randomFloat() * 256);
+            }
+            return byteArray;
+        }
+
+        return Object.freeze({
+            random: randomFloat,
+            int: randomInt,
+            getRandomBytes: getRandomBytes
+        });
+    })();
+
+    const _nativeFetch = (typeof window !== "undefined" && window.fetch) ? window.fetch.bind(window) : null;
+    try { if (typeof window !== "undefined" && window.fetch) Object.freeze(window.fetch); } catch (e) {}
+
+    function escapeHtml(str) {
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[&<>"']/g, ch => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        }[ch]));
+    }
+
+    function clearOpsStorage() {
+        try {
+            if (typeof localStorage === "undefined") return;
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && (k.startsWith("ops_") || k === "cookieClickerSave" || k === "opsGameSave")) {
+                    keysToRemove.push(k);
+                }
+            }
+            for (const k of keysToRemove) {
+                localStorage.removeItem(k);
+            }
+        } catch (e) {}
+    }
+
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     // SUPABASE CONFIGURATION
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    const SUPABASE_CONFIG = {
+    const SUPABASE_CONFIG = Object.freeze({
         url: "https://xtrykhppxqngfaqadypr.supabase.co",
         anonKey: "sb_publishable_mTi5-8yRt7OqqLW5axZK8g_2lmsZCIO",
         table: "player_stats"
-    };
+    });
 
     const STORAGE_KEY_USER = "ops_username";
     const STORAGE_KEY_STATS = "ops_game_stats";
@@ -20,8 +99,8 @@
 
     function isGuestUsername(username) {
         if (!username || typeof username !== "string") return false;
-        const lower = username.trim().toLowerCase();
-        return lower === "host" || lower.startsWith("host_") || lower.startsWith("host");
+        const trimmed = username.trim();
+        return /^host(_\d+)?$/i.test(trimmed);
     }
 
     // Seznam dostupných agentů/postav (školní sbor / NPC)
@@ -269,18 +348,18 @@
         if (!saveData || typeof saveData !== "object") {
             return { ...DEFAULT_STATS.clicker, playTime: existingPlayTime };
         }
-        const totalCookies = typeof saveData.totalCookies === "number" ? saveData.totalCookies : 0;
-        const clicks = typeof saveData.clicks === "number" ? saveData.clicks : 0;
+        const totalCookies = typeof saveData.totalCookies === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, saveData.totalCookies)) : 0;
+        const clicks = typeof saveData.clicks === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, saveData.clicks)) : 0;
         const bonuses = computeClickerBonuses(saveData.upgrades);
         const totalClickedCookies = typeof saveData.totalClickedCookies === "number"
             ? Math.min(totalCookies, Math.max(0, saveData.totalClickedCookies))
             : Math.min(totalCookies, clicks * bonuses.baseClick);
 
         return {
-            cookies: typeof saveData.cookies === "number" ? saveData.cookies : 0,
+            cookies: typeof saveData.cookies === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, saveData.cookies)) : 0,
             totalCookies: totalCookies,
             clicks: clicks,
-            totalClickedCookies: totalClickedCookies,
+            totalClickedCookies: Math.min(Number.MAX_SAFE_INTEGER, totalClickedCookies),
             clickPower: computeClickerClickPower(saveData),
             cps: computeClickerCps(saveData),
             clickCps: typeof saveData.clickCps === "number" ? Math.min(20, Math.max(0, saveData.clickCps)) : 0,
@@ -301,11 +380,11 @@
             if (rawSave) {
                 const s = JSON.parse(rawSave);
                 if (s && typeof s === "object") {
-                    const totalFromSave = Number(s.totalCookies) || 0;
+                    const totalFromSave = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(s.totalCookies) || 0));
                     if (totalFromSave >= (clickerState.totalCookies || 0)) {
-                        clickerState.cookies = typeof s.cookies === "number" ? s.cookies : clickerState.cookies;
+                        clickerState.cookies = typeof s.cookies === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, s.cookies)) : clickerState.cookies;
                         clickerState.totalCookies = totalFromSave;
-                        clickerState.clicks = Math.max(clickerState.clicks || 0, Number(s.clicks) || 0);
+                        clickerState.clicks = Math.min(Number.MAX_SAFE_INTEGER, Math.max(clickerState.clicks || 0, Number(s.clicks) || 0));
                         if (typeof s.totalClickedCookies === "number") {
                             clickerState.totalClickedCookies = Math.min(clickerState.totalCookies || 0, Math.max(0, s.totalClickedCookies));
                         } else if (typeof clickerState.totalClickedCookies !== "number") {
@@ -331,6 +410,109 @@
     }
 
     // -------------------------------------------------------------------------
+    // ANTI-TAMPER INTEGRITY VERIFICATION (Sealed closure key & device salt)
+    // -------------------------------------------------------------------------
+    const INTEGRITY_PEPPER = "OPS_SEC_PEPPER_2026_KASINO_STATS_SIG";
+    const AUTH_PEPPER = "OPS_SEC_AUTH_PEPPER_V2_KASINO_9021";
+    const DEVICE_SALT_KEY = "ops_client_dev_id";
+    let lastVerifiedTokens = null;
+    let lastVerifiedTimestamp = Date.now();
+
+    function getDeviceSalt() {
+        let devId = null;
+        try {
+            if (typeof localStorage !== "undefined") {
+                devId = localStorage.getItem(DEVICE_SALT_KEY);
+                if (!devId) {
+                    const bytes = new Uint8Array(16);
+                    _secureRng.getRandomBytes(bytes);
+                    devId = Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+                    localStorage.setItem(DEVICE_SALT_KEY, devId);
+                }
+            }
+        } catch (e) {
+            devId = "fallback_device_salt";
+        }
+        return devId || "fallback_device_salt";
+    }
+
+    function computeStateSignature(username, tokens, totalPulls, totalCookies, cookies, lastActive) {
+        const salt = getDeviceSalt();
+        const msg = [
+            username || "",
+            tokens,
+            totalPulls,
+            totalCookies,
+            cookies,
+            lastActive,
+            salt,
+            INTEGRITY_PEPPER
+        ].join("::");
+
+        let h1 = 0xdeadbeef ^ 0x12345678;
+        let h2 = 0x41c64e6d ^ 0x87654321;
+        let h3 = 0x9e3779b9 ^ 0xabcdef01;
+        let h4 = 0x85ebca6b ^ 0x13579bdf;
+
+        for (let i = 0; i < msg.length; i++) {
+            const c = msg.charCodeAt(i);
+            h1 = Math.imul(h1 ^ c, 0x85ebca6b);
+            h1 = (h1 << 13) | (h1 >>> 19);
+            h2 = Math.imul(h2 ^ (c * 31), 0xc2b2ae35);
+            h2 = (h2 << 17) | (h2 >>> 15);
+            h3 = Math.imul(h3 ^ (c * 17), 0x27d4eb2f);
+            h3 = (h3 << 11) | (h3 >>> 21);
+            h4 = Math.imul(h4 ^ (c * 53), 0x165667b1);
+            h4 = (h4 << 19) | (h4 >>> 13);
+        }
+
+        h1 ^= h2 >>> 16; h1 = Math.imul(h1, 0x85ebca6b); h1 ^= h1 >>> 13;
+        h2 ^= h3 >>> 16; h2 = Math.imul(h2, 0xc2b2ae35); h2 ^= h2 >>> 15;
+        h3 ^= h4 >>> 16; h3 = Math.imul(h3, 0x27d4eb2f); h3 ^= h3 >>> 11;
+        h4 ^= h1 >>> 16; h4 = Math.imul(h4, 0x165667b1); h4 ^= h4 >>> 17;
+
+        return [(h1 >>> 0).toString(16).padStart(8, '0'),
+                (h2 >>> 0).toString(16).padStart(8, '0'),
+                (h3 >>> 0).toString(16).padStart(8, '0'),
+                (h4 >>> 0).toString(16).padStart(8, '0')].join("");
+    }
+
+    function computeAuthBlind(saltHex, hashHex, updatedAt) {
+        const msg = [saltHex, hashHex, updatedAt || 0, AUTH_PEPPER].join("::");
+        let h1 = 0x6a09e667, h2 = 0xbb67ae85, h3 = 0x3c6ef372, h4 = 0xa54ff53a;
+        for (let i = 0; i < msg.length; i++) {
+            const c = msg.charCodeAt(i);
+            h1 = Math.imul(h1 ^ c, 0x85ebca6b);
+            h1 = (h1 << 13) | (h1 >>> 19);
+            h2 = Math.imul(h2 ^ (c * 31), 0xc2b2ae35);
+            h2 = (h2 << 17) | (h2 >>> 15);
+            h3 = Math.imul(h3 ^ (c * 17), 0x27d4eb2f);
+            h3 = (h3 << 11) | (h3 >>> 21);
+            h4 = Math.imul(h4 ^ (c * 53), 0x165667b1);
+            h4 = (h4 << 19) | (h4 >>> 13);
+        }
+        return [(h1 >>> 0).toString(16).padStart(8, '0'),
+                (h2 >>> 0).toString(16).padStart(8, '0'),
+                (h3 >>> 0).toString(16).padStart(8, '0'),
+                (h4 >>> 0).toString(16).padStart(8, '0')].join("");
+    }
+
+    function secureAuthForCloud(auth) {
+        if (!auth || typeof auth !== "object") return null;
+        if (auth.blinded && auth.verifier) return auth;
+        const salt = String(auth.salt || "");
+        const hash = String(auth.hash || "");
+        const updatedAt = auth.updatedAt || Date.now();
+        const verifier = computeAuthBlind(salt, hash, updatedAt);
+        return {
+            blinded: true,
+            salt: salt,
+            verifier: verifier,
+            updatedAt: updatedAt
+        };
+    }
+
+    // -------------------------------------------------------------------------
     // LOCAL STORAGE HELPERS
     // -------------------------------------------------------------------------
     function loadLocalStats() {
@@ -339,6 +521,7 @@
             if (!raw) {
                 const def = JSON.parse(JSON.stringify(DEFAULT_STATS));
                 populateClickerFromStorage(def.clicker);
+                lastVerifiedTokens = def.gacha.tokens;
                 return def;
             }
             const parsed = JSON.parse(raw);
@@ -353,14 +536,41 @@
                 achievements: Array.isArray(clickerParsed.achievements) ? [...clickerParsed.achievements] : []
             };
 
-            populateClickerFromStorage(clickerState);
+            clickerState.cookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(clickerState.cookies) || 0));
+            clickerState.totalCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(clickerState.totalCookies) || 0));
+            clickerState.totalClickedCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(clickerState.totalClickedCookies) || 0));
 
-            // Zajištění, že ignorujeme staré pole "history" a vytáhneme čistě inventory a totalPulls
             const gachaParsed = parsed.gacha || {};
             const cleanInventory = { ...(gachaParsed.inventory || {}) };
-            
-            // Pokud by v localStorage náhodou ještě viselo staré pole history, můžeme ho případně jednorázově slít do inventory,
-            // nebo ho prostě úplně ignorovat a vyčistit. Tady ho ignorujeme.
+
+            const u = localStorage.getItem(STORAGE_KEY_USER) || "";
+            let tokensCandidate = Number(gachaParsed.tokens);
+            if (!Number.isFinite(tokensCandidate) || tokensCandidate < 0) {
+                tokensCandidate = DEFAULT_STATS.gacha.tokens;
+            }
+            tokensCandidate = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(tokensCandidate));
+
+            // Verify state integrity signature
+            const expectedSig = computeStateSignature(
+                u,
+                tokensCandidate,
+                gachaParsed.totalPulls || 0,
+                clickerState.totalCookies || 0,
+                clickerState.cookies || 0,
+                parsed.meta?.lastActive || 0
+            );
+            if (parsed._sig) {
+                if (parsed._sig !== expectedSig) {
+                    console.warn("[OPS Security] Neplatny podpis stavu v localStorage! Resetuji tokeny na vychozi hodnotu.");
+                    tokensCandidate = DEFAULT_STATS.gacha.tokens;
+                }
+            } else if (raw && tokensCandidate !== DEFAULT_STATS.gacha.tokens) {
+                console.warn("[OPS Security] Chybejici podpis stavu v localStorage! Resetuji tokeny na vychozi hodnotu.");
+                tokensCandidate = DEFAULT_STATS.gacha.tokens;
+            }
+
+            lastVerifiedTokens = tokensCandidate;
+            lastVerifiedTimestamp = Date.now();
 
             return {
                 gd: { ...DEFAULT_STATS.gd, ...(parsed.gd || {}) },
@@ -371,7 +581,7 @@
                 runner404: { ...DEFAULT_STATS.runner404, ...(parsed.runner404 || {}) },
                 clicker: clickerState,
                 gacha: {
-                    tokens: gachaParsed.tokens ?? DEFAULT_STATS.gacha.tokens,
+                    tokens: tokensCandidate,
                     zPity: gachaParsed.zPity ?? 0,
                     sPity: gachaParsed.sPity ?? 0,
                     aPity: gachaParsed.aPity ?? 0,
@@ -383,23 +593,62 @@
                 auth: parsed.auth || null
             };
         } catch (e) {
-            console.warn("[OPS Stats] Chyba při čtení localStorage:", e);
+            console.warn("[OPS Stats] Chyba pri cteni localStorage:", e);
             const def = JSON.parse(JSON.stringify(DEFAULT_STATS));
             populateClickerFromStorage(def.clicker);
+            lastVerifiedTokens = def.gacha.tokens;
             return def;
         }
     }
 
     function saveLocalStats(stats) {
         try {
-            // Bezpečnostní pojistka: odstranění klíče history, pokud by se tam odněkud zvenku připletl
             if (stats.gacha && stats.gacha.history) {
                 delete stats.gacha.history;
             }
-            stats.meta.lastActive = Date.now();
+            if (stats.auth && stats.auth.hash) {
+                stats.auth = secureAuthForCloud(stats.auth);
+            }
+            if (stats.clicker) {
+                stats.clicker.cookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(stats.clicker.cookies) || 0));
+                stats.clicker.totalCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(stats.clicker.totalCookies) || 0));
+                stats.clicker.totalClickedCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(stats.clicker.totalClickedCookies) || 0));
+            }
+
+            const prev = (lastVerifiedTokens !== null) ? lastVerifiedTokens : DEFAULT_STATS.gacha.tokens;
+            let cand = Number(stats.gacha?.tokens);
+            if (!Number.isFinite(cand) || cand < 0) cand = prev;
+            cand = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(cand));
+
+            // Sanity check against impossible balance jumps
+            const delta = cand - prev;
+            const maxAllowedGain = Math.max(100000, prev * 3000);
+            if (delta > maxAllowedGain) {
+                console.warn("[OPS Security] Odmitnut nemozny skok zustatku z", prev, "na", cand);
+                cand = prev;
+            }
+
+            stats.gacha = stats.gacha || {};
+            stats.gacha.tokens = cand;
+            lastVerifiedTokens = cand;
+            lastVerifiedTimestamp = Date.now();
+
+            stats.meta = stats.meta || {};
+            stats.meta.lastActive = lastVerifiedTimestamp;
+
+            const u = localStorage.getItem(STORAGE_KEY_USER) || "";
+            stats._sig = computeStateSignature(
+                u,
+                cand,
+                stats.gacha.totalPulls || 0,
+                stats.clicker?.totalCookies || 0,
+                stats.clicker?.cookies || 0,
+                stats.meta.lastActive
+            );
+
             localStorage.setItem(STORAGE_KEY_STATS, JSON.stringify(stats));
         } catch (e) {
-            console.warn("[OPS Stats] Chyba při zápisu do localStorage:", e);
+            console.warn("[OPS Stats] Chyba pri zapisu do localStorage:", e);
         }
     }
 
@@ -411,14 +660,8 @@
     async function hashPassword(password, saltHex) {
         if (!saltHex) {
             const saltBytes = new Uint8Array(16);
-            if (typeof window !== "undefined" && window.crypto && window.crypto.getRandomValues) {
-                window.crypto.getRandomValues(saltBytes);
-            } else if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-                crypto.getRandomValues(saltBytes);
-            } else {
-                for (let i = 0; i < 16; i++) saltBytes[i] = Math.floor(Math.random() * 256);
-            }
-            saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join(''); /* taste-skill-ignore */
+            _secureRng.getRandomBytes(saltBytes);
+            saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         const subtle = (typeof window !== "undefined" && window.crypto && window.crypto.subtle)
@@ -433,7 +676,7 @@
         const data = encoder.encode(saltHex + ":" + password);
         const hashBuffer = await subtle.digest("SHA-256", data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); /* taste-skill-ignore */
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
         return {
             salt: saltHex,
@@ -442,12 +685,24 @@
         };
     }
 
-    async function verifyPassword(password, saltHex, expectedHashHex) {
+    async function verifyPassword(password, saltHex, expectedAuth) {
         if (typeof password !== "string" || password.length === 0) return false;
-        if (typeof saltHex !== "string" || typeof expectedHashHex !== "string") return false;
+        if (typeof saltHex !== "string" || !expectedAuth) return false;
         try {
             const result = await hashPassword(password, saltHex);
-            return result.hash === expectedHashHex;
+            if (typeof expectedAuth === "string") {
+                return result.hash === expectedAuth;
+            }
+            if (typeof expectedAuth === "object") {
+                if (expectedAuth.verifier) {
+                    const expectedBlind = computeAuthBlind(saltHex, result.hash, expectedAuth.updatedAt || 0);
+                    return expectedBlind === expectedAuth.verifier;
+                }
+                if (expectedAuth.hash) {
+                    return result.hash === expectedAuth.hash;
+                }
+            }
+            return false;
         } catch (e) {
             console.warn("[OPS Auth] Chyba pri overovani hesla:", e);
             return false;
@@ -488,7 +743,8 @@
         }
         try {
             const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=username,stats`;
-            const res = await fetch(endpoint, {
+            const fetchFn = _nativeFetch || fetch;
+            const res = await fetchFn(endpoint, {
                 method: "GET",
                 headers: getSupabaseHeaders()
             });
@@ -503,7 +759,7 @@
             const row = rows[0];
             const stats = (typeof row.stats === "string") ? JSON.parse(row.stats || "{}") : (row.stats || {});
             const auth = stats.auth || null;
-            const hasPassword = !!(auth && typeof auth.hash === "string" && typeof auth.salt === "string");
+            const hasPassword = !!(auth && typeof auth.salt === "string" && (typeof auth.hash === "string" || typeof auth.verifier === "string"));
             return { exists: true, hasPassword, auth, stats, error: false };
         } catch (err) {
             console.warn("[OPS Auth] Sitova chyba pri ziskavani uzivatele:", err);
@@ -570,6 +826,12 @@
             stats.auth = cachedAuthData[username];
         }
 
+        const statsToUpload = JSON.parse(JSON.stringify(stats));
+        if (statsToUpload.auth) {
+            statsToUpload.auth = secureAuthForCloud(statsToUpload.auth);
+        }
+        delete statsToUpload._sig;
+
         const payload = {
             username: username,
             updated_at: new Date().toISOString(),
@@ -577,12 +839,13 @@
             gd_total_jumps: stats.gd?.jumps || 0,
             stratagem_highscore: stats.stratagem?.highScore || 0,
             total_play_time: Math.floor(stats.meta?.totalPlayTime || 0),
-            stats: stats
+            stats: statsToUpload
         };
 
         try {
             const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`;
-            const res = await fetch(endpoint, {
+            const fetchFn = _nativeFetch || fetch;
+            const res = await fetchFn(endpoint, {
                 method: "POST",
                 headers: {
                     ...getSupabaseHeaders(),
@@ -619,7 +882,8 @@
         updateCloudSyncBadge("syncing", "Cloud: Nacitam...");
         try {
             const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=*`;
-            const res = await fetch(endpoint, {
+            const fetchFn = _nativeFetch || fetch;
+            const res = await fetchFn(endpoint, {
                 method: "GET",
                 headers: getSupabaseHeaders()
             });
@@ -704,10 +968,10 @@
                             : (typeof localEffective.cookies === "number" ? localEffective.cookies : cloudClicker.cookies);
 
                         const mergedSaveObj = {
-                            cookies: Math.max(0, Number(spendableCookies) || 0),
-                            totalCookies: higherTotalCookies,
-                            clicks: higherClicks,
-                            totalClickedCookies: higherTotalClicked,
+                            cookies: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(spendableCookies) || 0)),
+                            totalCookies: Math.min(Number.MAX_SAFE_INTEGER, higherTotalCookies),
+                            clicks: Math.min(Number.MAX_SAFE_INTEGER, higherClicks),
+                            totalClickedCookies: Math.min(Number.MAX_SAFE_INTEGER, higherTotalClicked),
                             buildings: mergedBuildings,
                             upgrades: mergedUpgrades,
                             achievements: mergedAchievements,
@@ -803,15 +1067,23 @@
                         playTime: Math.max(local.runner404.playTime, cloudStats.runner404?.playTime || 0)
                     },
                     clicker: mergedClicker,
-                    gacha: {
-                        tokens: Math.max(local.gacha?.tokens || 2000, cloudStats.gacha?.tokens || 2000),
-                        zPity: Math.max(local.gacha?.zPity || 0, cloudStats.gacha?.zPity || 0),
-                        sPity: Math.max(local.gacha?.sPity || 0, cloudStats.gacha?.sPity || 0),
-                        aPity: Math.max(local.gacha?.aPity || 0, cloudStats.gacha?.aPity || 0),
-                        guaranteed: local.gacha?.guaranteed ?? cloudStats.gacha?.guaranteed ?? false,
-                        totalPulls: mergedTotalPulls,
-                        inventory: mergedGachaInventory
-                    },
+                    gacha: (() => {
+                        const localTok = Number.isFinite(local.gacha?.tokens) ? local.gacha.tokens : 2000;
+                        const cloudTok = Number.isFinite(cloudStats.gacha?.tokens) ? cloudStats.gacha.tokens : 2000;
+                        const localTime = Number(local.meta?.lastActive) || 0;
+                        const cloudTime = Number(cloudStats.meta?.lastActive) || (rows[0].updated_at ? new Date(rows[0].updated_at).getTime() : 0);
+                        const resolvedTok = (cloudTime > localTime) ? cloudTok : localTok;
+                        const safeTok = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(resolvedTok)));
+                        return {
+                            tokens: safeTok,
+                            zPity: Math.max(local.gacha?.zPity ?? 0, cloudStats.gacha?.zPity ?? 0),
+                            sPity: Math.max(local.gacha?.sPity ?? 0, cloudStats.gacha?.sPity ?? 0),
+                            aPity: Math.max(local.gacha?.aPity ?? 0, cloudStats.gacha?.aPity ?? 0),
+                            guaranteed: local.gacha?.guaranteed ?? cloudStats.gacha?.guaranteed ?? false,
+                            totalPulls: mergedTotalPulls,
+                            inventory: mergedGachaInventory
+                        };
+                    })(),
                     meta: {
                         totalPlayTime: Math.max(local.meta.totalPlayTime, cloudStats.meta?.totalPlayTime || 0),
                         lastPlayedGame: cloudStats.meta?.lastPlayedGame || local.meta.lastPlayedGame,
@@ -819,8 +1091,8 @@
                     },
                     auth: (() => {
                         const localAuth = local.auth;
-                        const cloudAuth = (cloudStats.auth && typeof cloudStats.auth.hash === "string") ? cloudStats.auth : null;
-                        if (localAuth && localAuth.hash) {
+                        const cloudAuth = cloudStats.auth || null;
+                        if (localAuth && (localAuth.hash || (localAuth.blinded && localAuth.verifier))) {
                             if (!cloudAuth) return localAuth;
                             if ((localAuth.updatedAt || 0) >= (cloudAuth.updatedAt || 0)) return localAuth;
                             return cloudAuth;
@@ -1567,7 +1839,7 @@
                         clearTimeout(syncCloudDebounceTimer);
                         syncCloudDebounceTimer = null;
                     }
-                    localStorage.clear();
+                    clearOpsStorage();
                 }
                 localStorage.setItem(STORAGE_KEY_USER, clean);
                 setSessionAuthenticated(clean);
@@ -1751,7 +2023,8 @@
                     orderParam = "stats->clicker->totalCookies.desc.nullslast";
                 }
                 const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats&order=${orderParam}&limit=${limit}`;
-                const res = await fetch(endpoint, {
+                const fetchFn = _nativeFetch || fetch;
+                const res = await fetchFn(endpoint, {
                     method: "GET",
                     headers: getSupabaseHeaders()
                 });
@@ -1800,8 +2073,9 @@
             }
 
             try {
+                const fetchFn = _nativeFetch || fetch;
                 let endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(cleanUser)}&select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats`;
-                let res = await fetch(endpoint, {
+                let res = await fetchFn(endpoint, {
                     method: "GET",
                     headers: getSupabaseHeaders()
                 });
@@ -1810,7 +2084,7 @@
                 if ((!rows || rows.length === 0) && cleanUser.length > 0) {
                     const safePattern = cleanUser.replace(/([%_\\])/g, "\\$1");
                     endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=ilike.${encodeURIComponent(safePattern)}&select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats&limit=1`;
-                    res = await fetch(endpoint, {
+                    res = await fetchFn(endpoint, {
                         method: "GET",
                         headers: getSupabaseHeaders()
                     });
@@ -1920,6 +2194,14 @@
 
         openMinecraftBackupModal: function() {
             showMinecraftBackupModal();
+        },
+
+        isGuestUsername: function(username) {
+            return isGuestUsername(username);
+        },
+
+        escapeHtml: function(str) {
+            return escapeHtml(str);
         }
     };
 
@@ -1990,7 +2272,7 @@
                 inset: 0;
                 background: rgba(0, 0, 0, 0.85);
                 z-index: 1000000;
-                display: flex;
+                display: none;
                 align-items: center;
                 justify-content: center;
                 padding: 16px;
@@ -1999,6 +2281,7 @@
                 transition: opacity 0.2s ease;
             }
             .ops-modal-backdrop.open {
+                display: flex;
                 opacity: 1;
                 pointer-events: auto;
             }
@@ -2010,8 +2293,8 @@
                 width: 100%;
                 padding: 24px;
                 color: #f8fafc;
-                font-family: system-ui, -apple-system, sans-serif;
-                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7); /* taste-skill-ignore */
+                font-family: inherit;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* taste-skill-ignore */
                 transform: scale(0.96);
                 transition: transform 0.2s ease;
                 box-sizing: border-box;
@@ -2039,12 +2322,12 @@
             }
             .ops-modal-label {
                 display: block;
-                font-size: 0.78rem;
-                font-weight: 700;
+                font-size: 13px;
+                font-weight: 600;
                 color: #94a3b8;
                 margin-bottom: 6px;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
+                text-transform: none;
+                letter-spacing: normal;
             }
             .ops-modal-input {
                 width: 100%;
@@ -2299,7 +2582,7 @@
 
         if (currentModalMode === "login") {
             titleEl.textContent = "Prihlaseni k uctu";
-            descEl.innerHTML = `Vitej zpet! Zadej heslo pro prihlaseni k uctu <strong style="color:#38bdf8;">${currentTargetUsername}</strong>:`;
+            descEl.innerHTML = `Vitej zpet! Zadej heslo pro prihlaseni k uctu <strong style="color:#38bdf8;">${escapeHtml(currentTargetUsername)}</strong>:`;
             userGroup.style.display = "none";
             passGroup.style.display = "block";
             passLabel.textContent = "Heslo:";
@@ -2317,7 +2600,7 @@
             setTimeout(() => passInput.focus(), 120);
         } else if (currentModalMode === "set-password") {
             titleEl.textContent = "Nastaveni hesla";
-            descEl.innerHTML = `Tvuj ucet <strong style="color:#38bdf8;">${currentTargetUsername}</strong> zatim nema heslo. Zvol si prosim heslo pro zabezpeceni profilu a ukladani statistik:`;
+            descEl.innerHTML = `Tvuj ucet <strong style="color:#38bdf8;">${escapeHtml(currentTargetUsername)}</strong> zatim nema heslo. Zvol si prosim heslo pro zabezpeceni profilu a ukladani statistik:`;
             userGroup.style.display = "none";
             passGroup.style.display = "block";
             passLabel.textContent = "Nove heslo:";
@@ -2412,16 +2695,16 @@
                 }
                 if (!auth) {
                     const local = loadLocalStats();
-                    if (local.auth && local.auth.hash) auth = local.auth;
+                    if (local.auth && (local.auth.hash || local.auth.verifier)) auth = local.auth;
                 }
-                if (!auth || !auth.hash) {
+                if (!auth || (!auth.hash && !auth.verifier)) {
                     showModalError("Ucet nema nastavene heslo.");
                     saveBtn.disabled = false;
                     saveBtn.textContent = originalText;
                     return;
                 }
 
-                const match = await verifyPassword(pass, auth.salt, auth.hash);
+                const match = await verifyPassword(pass, auth.salt, auth);
                 if (!match) {
                     showModalError("Nespravne heslo. Zkuste to znovu.");
                     const pInput = document.getElementById("opsPasswordInput");
@@ -2507,7 +2790,7 @@
                 const cloud = await fetchUserAuthFromCloud(username);
 
                 if (cloud.exists && cloud.hasPassword) {
-                    const match = await verifyPassword(pass, cloud.auth.salt, cloud.auth.hash);
+                    const match = await verifyPassword(pass, cloud.auth.salt, cloud.auth);
                     if (!match) {
                         showModalError(`Ucet '${username}' jiz existuje. Zadane heslo neni spravne.`);
                         saveBtn.disabled = false;
@@ -2558,7 +2841,7 @@
                 clearTimeout(syncCloudDebounceTimer);
                 syncCloudDebounceTimer = null;
             }
-            localStorage.clear();
+            clearOpsStorage();
         }
 
         localStorage.setItem(STORAGE_KEY_USER, username);
@@ -2595,7 +2878,7 @@
     async function playAsGuest() {
         clearModalAlerts();
         let current = OPS_STATS.getUsername();
-        let guestName = (current && isGuestUsername(current)) ? current : `Host_${Math.floor(1000 + Math.random() * 9000)}`;
+        let guestName = (current && isGuestUsername(current)) ? current : `Host_${_secureRng.int(1000, 9999)}`;
         const oldUser = OPS_STATS.getUsername();
         const isChanged = oldUser !== guestName;
 
@@ -2607,7 +2890,7 @@
                 clearTimeout(syncCloudDebounceTimer);
                 syncCloudDebounceTimer = null;
             }
-            localStorage.clear();
+            clearOpsStorage();
         }
 
         localStorage.setItem(STORAGE_KEY_USER, guestName);
@@ -2634,7 +2917,7 @@
             clearTimeout(syncCloudDebounceTimer);
             syncCloudDebounceTimer = null;
         }
-        localStorage.clear();
+        clearOpsStorage();
         updateCloudSyncBadge("offline");
         closeModal();
         updatePlayerBadgeUI();
@@ -2670,13 +2953,13 @@
                 badge.innerHTML = `<span id="topUsernameDisplay" style="color:#fbbf24;">Prihlasit se / Zadat prezdivku</span>`;
                 badge.title = "Kliknete pro prihlaseni nebo registraci";
             } else if (isGuestUsername(username)) {
-                badge.innerHTML = `<span id="topUsernameDisplay" class="ops-user-badge-name">${username}</span> <span style="opacity:0.6;font-size:10px;">(Host)</span> <span style="color:#38bdf8;font-size:10px;">[prihlasit]</span>`;
+                badge.innerHTML = `<span id="topUsernameDisplay" class="ops-user-badge-name">${escapeHtml(username)}</span> <span style="opacity:0.6;font-size:10px;">(Host)</span> <span style="color:#38bdf8;font-size:10px;">[prihlasit]</span>`;
                 badge.title = "Hrajete jako host. Kliknete pro prihlaseni nebo registraci.";
             } else if (!isAuthenticated(username)) {
-                badge.innerHTML = `<span id="topUsernameDisplay" class="ops-user-badge-name">${username}</span> <span style="color:#f87171;font-size:10px;">[neprihlasen]</span>`;
+                badge.innerHTML = `<span id="topUsernameDisplay" class="ops-user-badge-name">${escapeHtml(username)}</span> <span style="color:#f87171;font-size:10px;">[neprihlasen]</span>`;
                 badge.title = "Ucet neni v teto relaci overen. Kliknete pro zadani hesla.";
             } else {
-                badge.innerHTML = `<span id="topUsernameDisplay" class="ops-user-badge-name">${username}</span> <span style="opacity:0.6;font-size:10px;">[ucet]</span>`;
+                badge.innerHTML = `<span id="topUsernameDisplay" class="ops-user-badge-name">${escapeHtml(username)}</span> <span style="opacity:0.6;font-size:10px;">[ucet]</span>`;
                 badge.title = "Prihlasen a overen. Kliknete pro spravu profilu.";
             }
         }
@@ -2689,7 +2972,7 @@
 
         if (cloudAuth.error) {
             const localStats = loadLocalStats();
-            if (localStats.auth && localStats.auth.hash) {
+            if (localStats.auth && (localStats.auth.hash || localStats.auth.verifier)) {
                 cachedAuthData[username] = localStats.auth;
                 if (shouldPrompt) {
                     showAuthModal({ mode: "login", username: username, allowCancel: false });
@@ -2705,7 +2988,7 @@
 
         if (!cloudAuth.exists) {
             const localStats = loadLocalStats();
-            if (localStats.auth && localStats.auth.hash) {
+            if (localStats.auth && (localStats.auth.hash || localStats.auth.verifier)) {
                 cachedAuthData[username] = localStats.auth;
                 if (shouldPrompt) {
                     showAuthModal({ mode: "login", username: username, allowCancel: false });
@@ -2749,12 +3032,12 @@
             }
             if (!auth) {
                 const local = loadLocalStats();
-                if (local.auth && local.auth.hash) auth = local.auth;
+                if (local.auth && (local.auth.hash || local.auth.verifier)) auth = local.auth;
             }
-            if (!auth || !auth.hash) {
+            if (!auth || (!auth.hash && !auth.verifier)) {
                 return { success: false, error: "Ucet nema nastavene heslo." };
             }
-            const match = await verifyPassword(password, auth.salt, auth.hash);
+            const match = await verifyPassword(password, auth.salt, auth);
             if (!match) {
                 return { success: false, error: "Nespravne heslo." };
             }
@@ -2774,7 +3057,7 @@
         try {
             const cloud = await fetchUserAuthFromCloud(clean);
             if (cloud.exists && cloud.hasPassword) {
-                const match = await verifyPassword(password, cloud.auth.salt, cloud.auth.hash);
+                const match = await verifyPassword(password, cloud.auth.salt, cloud.auth);
                 if (!match) return { success: false, error: "Ucet jiz existuje a heslo nesouhlasi." };
                 await executeUserSwitch(clean, cloud.auth, false);
                 return { success: true, mode: "login" };
@@ -3025,8 +3308,7 @@
 
         const isGameOrHub = window.location.pathname.endsWith("games.html") || 
                             window.location.pathname.includes("games.html") || 
-                            !!document.querySelector(".landing-page") ||
-                            window.location.pathname.includes("statistika.html") || 
+                            !!document.querySelector(".landing-page") || 
                             window.location.pathname.includes("/gd/") || 
                             window.location.pathname.includes("/stratagem/") || 
                             window.location.pathname.includes("/hyperdrive/") || 

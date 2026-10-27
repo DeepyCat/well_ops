@@ -1,38 +1,65 @@
 (() => {
   "use strict";
+  const _secureRng = (() => {
+    const rawCrypto = (typeof window !== 'undefined' && window.crypto) ? window.crypto : null;
+    const rawGetRandomValues = rawCrypto && typeof rawCrypto.getRandomValues === 'function' ? rawCrypto.getRandomValues.bind(rawCrypto) : null;
+    const rawMathRandom = Math.random.bind(Math);
+    const U32 = typeof Uint32Array !== 'undefined' ? Uint32Array : null;
+    try { Object.freeze(Math); } catch (e) {}
+    try { if (rawCrypto) Object.freeze(rawCrypto); } catch (e) {}
+    function randomFloat() {
+      if (rawGetRandomValues && U32) {
+        try {
+          const buf = new U32(1);
+          rawGetRandomValues(buf);
+          return buf[0] / 4294967296;
+        } catch (e) {}
+      }
+      return rawMathRandom();
+    }
+    return Object.freeze({
+      random: randomFloat,
+      int: (min, max) => Math.floor(randomFloat() * (max - min + 1)) + min
+    });
+  })();
+
+  const _nativeFetch = (typeof window !== 'undefined' && window.fetch) ? window.fetch.bind(window) : null;
+  try { if (typeof window !== 'undefined' && window.fetch) Object.freeze(window.fetch); } catch (e) {}
+
   const IMG_DIR = "img/";
   const COST = 160, Z_HARD = 200, Z_SOFT = 150, S_HARD = 90, S_SOFT = 75, A_HARD = 10, HISTORY_MAX = 200;
-  const agents = [
-    {id:"reditel",name:"Ředitel",file:"Reditel",rank:"Z",symbol:"♛",type:"Ředitel školy"},
-    {id:"rybar",name:"Rybář",file:"Rybar",rank:"Z",symbol:"♛",type:"Zástupce ředitele"},
-    {id:"nova",name:"Chobot",file:"Nova",rank:"S",symbol:"✦",type:"Třídní · Featured"},
-    {id:"riven",name:"Juchelka",file:"Riven",rank:"S",symbol:"∑",type:"Matikář/OPS"},
-    {id:"vesper",name:"Jašík",file:"Vesper",rank:"S",symbol:"⚗",type:"POS"},
-    {id:"mira",name:"Bařina",file:"Mira",rank:"A",symbol:"🌍",type:"Češtinář"},
-    {id:"kairo",name:"Bizoň",file:"Kairo",rank:"A",symbol:"⚽",type:"Tělocvik"},
-    {id:"lyra",name:"Otahalík",file:"Lyra",rank:"A",symbol:"♫",type:"MIT"},
-    {id:"rook",name:"Kytková",file:"Rook",rank:"A",symbol:"⌛",type:"PRV/DBS"},
-    {id:"echo",name:"Kubačáková",file:"Echo",rank:"A",symbol:"Aa",type:"Angličtina"},
-    {id:"pixel",name:"Petrová",file:"Pixel",rank:"B",symbol:"⌨",type:"Angličtina"},
-    {id:"drift",name:"Romanovský",file:"Drift",rank:"B",symbol:"✎",type:"DBS"},
-    {id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"B",symbol:"✎",type:"Robotika"},
-    {id:"Huvarova",name:"Huvarová",file:"Huvarova",rank:"B",symbol:"✎",type:"Elektronika"},
-  ];
+  const agents = Object.freeze([
+    Object.freeze({id:"reditel",name:"Ředitel",file:"Reditel",rank:"Z",symbol:"[Z]",type:"Ředitel školy"}),
+    Object.freeze({id:"rybar",name:"Rybář",file:"Rybar",rank:"Z",symbol:"[Z]",type:"Zástupce ředitele"}),
+    Object.freeze({id:"nova",name:"Chobot",file:"Nova",rank:"S",symbol:"[S]",type:"Třídní · Featured"}),
+    Object.freeze({id:"riven",name:"Juchelka",file:"Riven",rank:"S",symbol:"[S]",type:"Matikář/OPS"}),
+    Object.freeze({id:"vesper",name:"Jašík",file:"Vesper",rank:"S",symbol:"[S]",type:"POS"}),
+    Object.freeze({id:"mira",name:"Bařina",file:"Mira",rank:"A",symbol:"[A]",type:"Češtinář"}),
+    Object.freeze({id:"kairo",name:"Bizoň",file:"Kairo",rank:"A",symbol:"[A]",type:"Tělocvik"}),
+    Object.freeze({id:"lyra",name:"Otahalík",file:"Lyra",rank:"A",symbol:"[A]",type:"MIT"}),
+    Object.freeze({id:"rook",name:"Kytková",file:"Rook",rank:"A",symbol:"[A]",type:"PRV/DBS"}),
+    Object.freeze({id:"echo",name:"Kubačáková",file:"Echo",rank:"A",symbol:"[A]",type:"Angličtina"}),
+    Object.freeze({id:"pixel",name:"Petrová",file:"Pixel",rank:"B",symbol:"[B]",type:"Angličtina"}),
+    Object.freeze({id:"drift",name:"Romanovský",file:"Drift",rank:"B",symbol:"[B]",type:"DBS"}),
+    Object.freeze({id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"B",symbol:"[B]",type:"Robotika"}),
+    Object.freeze({id:"Huvarova",name:"Huvarová",file:"Huvarova",rank:"B",symbol:"[B]",type:"Elektronika"})
+  ]);
 
-  // Historie je jen v paměti stránky – do localStorage ani Supabase se neukládá
   let sessionHistory = [];
 
   function getGameState() {
     const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
     const g = (stats && stats.gacha) || {};
+    const t = Number(g.tokens);
+    const p = Number(g.totalPulls);
     return {
-      tokens: g.tokens ?? 1600,
-      zPity: g.zPity || 0,
-      sPity: g.sPity || 0,
-      aPity: g.aPity || 0,
+      tokens: Number.isFinite(t) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(t))) : 1600,
+      zPity: Math.max(0, Math.floor(Number(g.zPity) || 0)),
+      sPity: Math.max(0, Math.floor(Number(g.sPity) || 0)),
+      aPity: Math.max(0, Math.floor(Number(g.aPity) || 0)),
       guaranteed: !!g.guaranteed,
-      totalPulls: g.totalPulls || 0,          // Pull = kolikrát se táhlo
-      inventory: { ...(g.inventory || {}) }   // postava = kolikrát padla
+      totalPulls: Number.isFinite(p) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(p))) : 0,
+      inventory: { ...(g.inventory || {}) }
     };
   }
 
@@ -40,18 +67,17 @@
     if (!window.OPS_STATS) return;
     const stats = window.OPS_STATS.getStats();
     stats.gacha = {
-      tokens: s.tokens,
-      zPity: s.zPity,
-      sPity: s.sPity,
-      aPity: s.aPity,
-      guaranteed: s.guaranteed,
-      totalPulls: s.totalPulls,
+      tokens: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(Number(s.tokens) || 0))),
+      zPity: Math.max(0, Math.floor(Number(s.zPity) || 0)),
+      sPity: Math.max(0, Math.floor(Number(s.sPity) || 0)),
+      aPity: Math.max(0, Math.floor(Number(s.aPity) || 0)),
+      guaranteed: !!s.guaranteed,
+      totalPulls: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(Number(s.totalPulls) || 0))),
       inventory: s.inventory
     };
     window.OPS_STATS.saveStats(stats);
   }
 
-  // ---------- ZVUKY (WebAudio, žádné soubory) ----------
   const sfx = (() => {
     let ctx = null, muted = false;
     try { muted = localStorage.getItem("ops_gacha_muted") === "1"; } catch (e) {}
@@ -79,7 +105,7 @@
       const c = ac(); if (!c) return;
       const t = c.currentTime + t0, len = Math.floor(c.sampleRate * dur);
       const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      for (let i = 0; i < len; i++) d[i] = (_secureRng.random() * 2 - 1) * (1 - i / len);
       const src = c.createBufferSource(); src.buffer = buf;
       const lp = c.createBiquadFilter(); lp.type = "lowpass";
       lp.frequency.setValueAtTime(1800, t); lp.frequency.exponentialRampToValueAtTime(100, t + dur);
@@ -163,13 +189,16 @@
     state.zPity++;
     state.sPity++;
     state.aPity++;
-    state.totalPulls++;
+    state.totalPulls = Math.min(Number.MAX_SAFE_INTEGER, state.totalPulls + 1);
     const zChance = state.zPity >= Z_SOFT ? Math.min(.1 + (state.zPity - Z_SOFT + 1) * 2, 100) : .1;
     const sChance = state.sPity >= S_SOFT ? Math.min(.6 + (state.sPity - S_SOFT + 1) * 6, 100) : .6;
     let rank;
-    if (state.zPity >= Z_HARD || Math.random() * 100 < zChance) rank = "Z";
-    else if (state.sPity >= S_HARD || Math.random() * 100 < sChance) rank = "S";
-    else if (state.aPity >= A_HARD || Math.random() < .07) rank = "A";
+    const randZ = _secureRng.random() * 100;
+    const randS = _secureRng.random() * 100;
+    const randA = _secureRng.random();
+    if (state.zPity >= Z_HARD || randZ < zChance) rank = "Z";
+    else if (state.sPity >= S_HARD || randS < sChance) rank = "S";
+    else if (state.aPity >= A_HARD || randA < .07) rank = "A";
     else rank = "B";
 
     let agent, featured = false;
@@ -177,7 +206,7 @@
       agent = pick(agents.filter(a => a.rank === "Z"));
       state.zPity = 0; state.sPity = 0; state.aPity = 0;
     } else if (rank === "S") {
-      featured = state.guaranteed || Math.random() < .5;
+      featured = state.guaranteed || (_secureRng.random() < .5);
       agent = featured ? agents.find(a => a.id === "nova") : pick(agents.filter(a => a.rank === "S" && a.id !== "nova"));
       state.guaranteed = !featured;
       state.sPity = 0; state.aPity = 0;
@@ -193,7 +222,7 @@
     if (sessionHistory.length > HISTORY_MAX) sessionHistory.length = HISTORY_MAX;
     return entry;
   }
-  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+  function pick(list) { return list[_secureRng.int(0, list.length - 1)]; }
 
   const RANK_COLOR = {Z:"#7ff0ff",S:"#ffd477",A:"#c084fc",B:"#8cbbff"};
   const RANK_ORDER = ["Z","S","A","B"];
@@ -226,7 +255,7 @@
         ctx.lineCap = "round";
         for (const l of lines) {
           l.r += (.02 + l.r * 1.6) * l.v * warp * dt * 2.2;
-          if (l.r > 1.05) { l.r = Math.random() * .05; l.a = Math.random() * Math.PI * 2; }
+          if (l.r > 1.05) { l.r = _secureRng.random() * .05; l.a = _secureRng.random() * Math.PI * 2; }
           const r0 = l.r * maxR, r1 = Math.max(0, r0 - (4 + l.r * 240 * warp));
           const al = Math.min(1, l.r * 1.8) * warp;
           ctx.strokeStyle = `rgba(${c[0]},${c[1]},${c[2]},${al.toFixed(3)})`;
@@ -241,7 +270,7 @@
         emberAcc += dt * 55;
         while (emberAcc >= 1) {
           emberAcc--;
-          parts.push({x:Math.random()*w,y:h+8,vx:(Math.random()-.5)*30,vy:-(60+Math.random()*130),g:0,drag:1,life:2.4+Math.random()*2,max:4,size:1+Math.random()*2.2,col});
+          parts.push({x:_secureRng.random()*w,y:h+8,vx:(_secureRng.random()-.5)*30,vy:-(60+_secureRng.random()*130),g:0,drag:1,life:2.4+_secureRng.random()*2,max:4,size:1+_secureRng.random()*2.2,col});
         }
       }
       for (let i = parts.length - 1; i >= 0; i--) {
@@ -264,7 +293,7 @@
       if (alive) return;
       alive = true; warp = warpT = mix = mixT = 0; parts = []; emberAcc = 0;
       resize();
-      lines = Array.from({length:150}, () => ({a:Math.random()*Math.PI*2, r:Math.random(), v:.4+Math.random()*.9}));
+      lines = Array.from({length:150}, () => ({a:_secureRng.random()*Math.PI*2, r:_secureRng.random(), v:.4+_secureRng.random()*.9}));
       cv.style.display = "block";
       last = performance.now();
       raf = requestAnimationFrame(frame);
@@ -281,8 +310,8 @@
       burst(n, speed) {
         if (!alive) return;
         for (let i = 0; i < n; i++) {
-          const a = Math.random() * 6.283, sp = speed * (.3 + Math.random() * .9);
-          parts.push({x:w/2,y:h/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,g:140,drag:.965,life:.8+Math.random()*1.1,max:1.4,size:1.5+Math.random()*2.8,col});
+          const a = _secureRng.random() * 6.283, sp = speed * (.3 + _secureRng.random() * .9);
+          parts.push({x:w/2,y:h/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,g:140,drag:.965,life:.8+_secureRng.random()*1.1,max:1.4,size:1.5+_secureRng.random()*2.8,col});
         }
       }
     };
@@ -395,7 +424,7 @@
     sc.classList.remove(...STAGES);
     sc.style.setProperty("--c", RANK_COLOR[best]);
     $("scanRank").textContent = best;
-    $("scanCh").textContent = "CH " + String(1000 + Math.floor(Math.random() * 9000));
+    $("scanCh").textContent = "CH " + String(_secureRng.int(1000, 9999));
     status.textContent = "ANALYZING SIGNAL"; status.classList.add("dots");
     $("scanPips").querySelectorAll("i").forEach((p, i) => p.classList.toggle("on", i < RANK_STARS[best]));
     sc.classList.add("show");
@@ -453,7 +482,7 @@
     $("aMeter").style.width = `${Math.min(100,state.aPity/A_HARD*100)}%`;
     $("guarantee").textContent = state.guaranteed ? "FEATURED" : "50/50";
     $("totalPulls").textContent = state.totalPulls.toLocaleString("cs-CZ");
-    $("shopCookies").textContent = "🍪 " + Math.floor(readCookies().available).toLocaleString("cs-CZ");
+    $("shopCookies").textContent = Math.floor(readCookies().available).toLocaleString("cs-CZ") + " sušenek";
     $("singleBtn").disabled = busy || state.tokens < COST;
     $("tenBtn").disabled = busy || state.tokens < COST*10;
     $("roster").innerHTML = agents.map(a => `<div class="char ${a.rank.toLowerCase()}${state.inventory[a.id] ? "" : " locked"}" onclick="inspectAgent('${a.id}')">${art(a)}<span class="rk">${a.rank}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}</small><small>× ${state.inventory[a.id] || 0}</small></div>`).join("");
@@ -462,7 +491,7 @@
     $("history").innerHTML = sessionHistory.length ? sessionHistory.slice(0,8).map(h => {
       const a = agentById(h.id);
       const date = new Date(h.time).toLocaleString("cs-CZ",{dateStyle:"short",timeStyle:"short"});
-      return `<div class="history-item"><div class="rarity-dot ${a.rank}">${a.rank}</div><div><b>${escapeHtml(a.name)}${h.featured ? " ★" : ""}</b><small>${escapeHtml(a.type)} · #${h.pull} · ${date}</small></div></div>`;
+      return `<div class="history-item"><div class="rarity-dot ${a.rank}">${a.rank}</div><div><b>${escapeHtml(a.name)}${h.featured ? " *" : ""}</b><small>${escapeHtml(a.type)} · #${h.pull} · ${date}</small></div></div>`;
     }).join("") : '<div class="empty">Zatím žádné zápisy.<br>První zvonění čeká.</div>';
   }
 
@@ -476,26 +505,32 @@
     let save = null;
     try { save = JSON.parse(localStorage.getItem("cookieClickerSave")); } catch (e) {}
     const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
-    const saveCookies = save ? (Number(save.cookies) || 0) : 0;
-    const statCookies = stats && stats.clicker ? (Number(stats.clicker.cookies) || 0) : 0;
-    return { save, saveCookies, statCookies, available: Math.max(saveCookies, statCookies) };
+    const saveCookies = save && Number.isFinite(Number(save.cookies)) ? Math.max(0, Number(save.cookies)) : 0;
+    const statCookies = stats && stats.clicker && Number.isFinite(Number(stats.clicker.cookies)) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
+    const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
+    return { save, saveCookies, statCookies, available };
   }
 
   function addTokens(gain, cookieCost) {
     const c = readCookies();
+    const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
+
     if (cookieCost > 0) {
+      const remainingCookies = Math.max(0, c.available - cookieCost);
       if (c.save) {
-        c.save.cookies = Math.max(0, c.saveCookies - cookieCost);
-        localStorage.setItem("cookieClickerSave", JSON.stringify(c.save));
+        c.save.cookies = remainingCookies;
+        try { localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); } catch (e) {}
+      }
+      if (stats && stats.clicker) {
+        stats.clicker.cookies = remainingCookies;
       }
     }
-    const stats = window.OPS_STATS.getStats();
-    if (cookieCost > 0 && !c.save && stats.clicker) {
-      stats.clicker.cookies = Math.max(0, c.statCookies - cookieCost);
+    if (stats) {
+      stats.gacha = stats.gacha || {};
+      const cur = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : 2000;
+      stats.gacha.tokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, cur + gain));
+      window.OPS_STATS.saveStats(stats);
     }
-    stats.gacha = stats.gacha || {};
-    stats.gacha.tokens = (stats.gacha.tokens ?? 1600) + gain;
-    window.OPS_STATS.saveStats(stats);
   }
 
   function buyWithCookies(cookieCost, gain) {
@@ -508,7 +543,7 @@
     addTokens(gain, cookieCost);
     sfx.coin();
     render();
-    toast(`Nakoupeno ${gain.toLocaleString("cs-CZ")} bodů za ${cookieCost.toLocaleString("cs-CZ")} sušenek! Zbývá: ${Math.floor(c.available - cookieCost).toLocaleString("cs-CZ")}`);
+    toast(`Nakoupeno ${gain.toLocaleString("cs-CZ")} bodů za ${cookieCost.toLocaleString("cs-CZ")} sušenek! Zbývá: ${Math.floor(Math.max(0, c.available - cookieCost)).toLocaleString("cs-CZ")}`);
   }
 
   $("shopBuy1").addEventListener("click", () => buyWithCookies(1000, 160));
@@ -519,7 +554,7 @@
     addTokens(1600, 0);
     sfx.jingle();
     render();
-    toast("+1 600 bodů! Užij si speciální nabídku 😉");
+    toast("+1 600 bodů! Užij si speciální nabídku.");
     window.open(RICKROLL_URL, "_blank", "noopener");
   });
 
@@ -547,7 +582,7 @@
   $("overlay").addEventListener("click", e => { if (e.target === $("overlay")) closeOverlay(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && $("overlay").classList.contains("open")) closeOverlay(); });
 
-  // ---------- ŽEBŘÍČEK (Supabase, bez zásahu do ops-stats.js) ----------
+  // ---------- ŽEBŘÍČEK ----------
   let lbMode = "pulls", lbRows = [];
   const Z_IDS = agents.filter(a => a.rank === "Z").map(a => a.id);
   const S_IDS = agents.filter(a => a.rank === "S").map(a => a.id);
@@ -558,8 +593,9 @@
     if (!cfg || !cfg.url || !cfg.anonKey) { box.innerHTML = '<div class="empty">Žebříček není dostupný.</div>'; return; }
     if (!lbRows.length) box.innerHTML = '<div class="empty">Načítám žebříček…</div>';
     try {
+      const fetchFn = _nativeFetch || fetch;
       const url = `${cfg.url}/rest/v1/${cfg.table}?select=username,totalPulls:stats->gacha->totalPulls,inventory:stats->gacha->inventory&order=stats->gacha->totalPulls.desc.nullslast&limit=100`;
-      const res = await fetch(url, { headers: { apikey: cfg.anonKey, Authorization: `Bearer ${cfg.anonKey}` } });
+      const res = await fetchFn(url, { headers: { apikey: cfg.anonKey, Authorization: `Bearer ${cfg.anonKey}` } });
       if (!res.ok) throw new Error("HTTP " + res.status);
       lbRows = await res.json();
       renderLeaderboard();
@@ -589,7 +625,7 @@
 
     if (!rows.length) { box.innerHTML = '<div class="empty">Zatím nikdo netáhl. Buď první!</div>'; return; }
 
-    const medal = i => i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+    const medal = i => "#" + (i + 1);
     const rowHtml = (r, i) => `<div class="lb-row${r.name === me ? " me" : ""}">
       <span class="lb-pos">${medal(i)}</span>
       <span class="lb-name">${escapeHtml(r.name)}</span>
@@ -613,7 +649,7 @@
   // ---------- Tlačítko ztlumení ----------
   function updateMuteBtn() {
     const b = $("muteBtn");
-    b.textContent = sfx.isMuted() ? "🔇" : "🔊";
+    b.textContent = sfx.isMuted() ? "Zvuk: VYP" : "Zvuk: ZAP";
     b.title = sfx.isMuted() ? "Zapnout zvuky" : "Ztlumit zvuky";
   }
   $("muteBtn").addEventListener("click", () => {

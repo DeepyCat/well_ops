@@ -64,75 +64,75 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 <header class="topbar">
   <div class="brand">OPS <span>///</span> RULETA</div>
   <div class="top-right">
-    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky" title="Ztlumit zvuky">🔊</button>
-    <a class="back" href="index.html">← Zpět na hry</a>
+    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky" title="Ztlumit zvuky">Zvuk</button>
+    <a class="back" href="index.html">Zpet na hry</a>
   </div>
 </header>
 <main>
-<h1 class="heading">EVROPSKÁ RULETA</h1><p class="sub">Jedna nula, 37 polí a tvoje volba. Vyber sázku, zvol tip a roztoč kolo.</p>
+<h1 class="heading">EVROPSKA RULETA</h1><p class="sub">Jedna nula, 37 poli a tvoje volba. Vyber sazku, zvol tip a roztoc kolo.</p>
 <div class="layout">
   <div class="panels-sidebar">
     <div class="panel">
-      <div class="currency"><span>Školní body</span><strong>◆ <span id="sideBalance">0</span></strong></div>
+      <div class="currency"><span>Skolni body</span><strong>[B] <span id="sideBalance">0</span></strong></div>
       <p class="who" id="who"></p>
-      <p class="notice hide" id="broke" style="color:var(--red)">Došly ti body! Kup si další v obchodu se sušenkami.</p>
+      <p class="notice hide" id="broke" style="color:var(--red)">Dosly ti body! Kup si dalsi v obchodu se susenkami.</p>
     </div>
     <div class="panel">
-      <h2>🛒 Obchod se sušenkami</h2>
-      <div class="section-head"><span class="pill" id="shopCookies">🍪 0</span></div>
+      <h2>Obchod se susenkami</h2>
+      <div class="section-head"><span class="pill" id="shopCookies">0 susenek</span></div>
       <div class="shop">
-        <div class="shop-item"><div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div><button class="shop-btn" id="shopBuy1" type="button">🍪 1 000</button></div>
-        <div class="shop-item"><div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček (10×)</small></div><button class="shop-btn" id="shopBuy2" type="button">🍪 10 000</button></div>
+        <div class="shop-item"><div class="shop-info"><b>160 bodu</b><small>Zakladni balicek</small></div><button class="shop-btn" id="shopBuy1" type="button">1 000 susenek</button></div>
+        <div class="shop-item"><div class="shop-info"><b>1 600 bodu</b><small>Vyhodny balicek (10x)</small></div><button class="shop-btn" id="shopBuy2" type="button">10 000 susenek</button></div>
       </div>
-      <p class="notice">Sušenky se berou z Clickeru. Obchod je dostupný mezi roztočeními.</p>
+      <p class="notice">Susenky se berou z Clickeru. Obchod je dostupny mezi roztocenimi.</p>
     </div>
     <div class="panel">
-      <h2>📊 Statistiky hry</h2>
+      <h2>Statistiky hry</h2>
       <div class="stats">
-        <div class="stat"><small>Roztočení</small><strong id="stSpins">0</strong></div>
-        <div class="stat"><small>Výhry</small><strong id="stWins">0</strong></div>
-        <div class="stat"><small>Největší výhra</small><strong id="stBiggest">0</strong></div>
+        <div class="stat"><small>Roztoceni</small><strong id="stSpins">0</strong></div>
+        <div class="stat"><small>Vyhry</small><strong id="stWins">0</strong></div>
+        <div class="stat"><small>Nejvetsi vyhra</small><strong id="stBiggest">0</strong></div>
         <div class="stat"><small>Jackpoty</small><strong id="stJackpots">0</strong></div>
         <div class="stat"><small>Celkem vsazeno</small><strong id="stWagered">0</strong></div>
-        <div class="stat"><small>Celkem vyhráno</small><strong id="stWon">0</strong></div>
-        <div class="stat wide"><small>Čistý zisk</small><strong id="stNet">0</strong></div>
+        <div class="stat"><small>Celkem vyhrano</small><strong id="stWon">0</strong></div>
+        <div class="stat wide"><small>Cisty zisk</small><strong id="stNet">0</strong></div>
       </div>
-      <p class="notice" id="cloudNote">Cloud: zjišťuji…</p>
+      <p class="notice" id="cloudNote">Cloud: zjistuji...</p>
     </div>
   </div>
 
   <div class="right-col">
 <div class="game-container">
     <section class="panel">
-      <div class="wheel-wrap"><div class="pointer"></div><canvas id="rouletteCanvas" width="700" height="700" aria-label="Kolo evropské rulety"></canvas></div>
-      <div class="center-note">Evropská ruleta · čísla 0–36</div>
-      <div class="result-number" id="lastResult">—</div><div class="center-note" id="lastResultText">Čekám na první roztočení</div>
-      <div class="history" id="history" aria-label="Poslední výsledky"></div>
+      <div class="wheel-wrap"><div class="pointer"></div><canvas id="rouletteCanvas" width="700" height="700" aria-label="Kolo evropske rulety"></canvas></div>
+      <div class="center-note">Evropska ruleta - cisla 0-36</div>
+      <div class="result-number" id="lastResult">-</div><div class="center-note" id="lastResultText">Cekam na prvni roztoceni</div>
+      <div class="history" id="history" aria-label="Posledni vysledky"></div>
     </section>
 
     <section class="panel">
       <div class="fields">
         <div class="field">
-          <label for="bet">Sázka (tokeny)</label>
+          <label for="bet">Sazka (tokeny)</label>
           <input id="bet" type="number" min="1" step="1" value="100" inputmode="numeric">
           <div class="bet-controls-row">
             <button class="quick-btn half" id="halfBetBtn" type="button">1/2</button>
-            <button class="quick-btn" id="maxBetBtn" type="button">Vsadit vše</button>
+            <button class="quick-btn" id="maxBetBtn" type="button">Vsadit vse</button>
           </div>
         </div>
-        <div class="field"><label for="betType">Typ sázky</label><select id="betType"><option value="color">Červená / černá</option><option value="number">Konkrétní číslo</option><option value="parity">Sudé / liché</option><option value="half">1–18 / 19–36</option><option value="dozen">Tucet</option></select></div>
+        <div class="field"><label for="betType">Typ sazky</label><select id="betType"><option value="color">Cervena / cerna</option><option value="number">Konkretni cislo</option><option value="parity">Sude / liche</option><option value="half">1-18 / 19-36</option><option value="dozen">Tucet</option></select></div>
       </div>
-      <div class="field" id="choiceField"><label for="choice">Tvůj tip</label><select id="choice"><option value="red">Červená</option><option value="black">Černá</option></select></div>
-      <div style="background:#111521;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:15px"><div style="color:var(--muted);font-size:.82rem">Možná výplata při výhře</div><strong id="payout" style="font-size:1.3rem;color:var(--green)">200 tokenů celkem</strong><div class="notice" id="payoutNote">Výplata zahrnuje vrácení sázky.</div></div>
-      <button class="primary" id="spinBtn" type="button">🎯 Vsadit a roztočit</button>
-      <div id="message" class="message" role="status">Vyber sázku a zkus štěstí.</div>
-      <div class="paytable"><b>Výplaty (celkem včetně sázky):</b><br>Číslo: 36× · Barva / sudé-liché / polovina: 2× · Tucet: 3×<br><span style="color:#5be08a">0 je zelená a pro běžné sázky znamená prohru.</span></div>
-      <div class="notice">Hra používá společné OPS tokeny. Výsledek je náhodný a dlouhodobě má ruleta výhodu kasina.</div>
+      <div class="field" id="choiceField"><label for="choice">Tvuj tip</label><select id="choice"><option value="red">Cervena</option><option value="black">Cerna</option></select></div>
+      <div style="background:#111521;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:15px"><div style="color:var(--muted);font-size:.82rem">Mozna vyplata pri vyhre</div><strong id="payout" style="font-size:1.3rem;color:var(--green)">200 tokenu celkem</strong><div class="notice" id="payoutNote">Vyplata zahrnuje vraceni sazky.</div></div>
+      <button class="primary" id="spinBtn" type="button">Vsadit a roztocit</button>
+      <div id="message" class="message" role="status">Vyber sazku a zkus stesti.</div>
+      <div class="paytable"><b>Vyplaty (celkem vcetne sazky):</b><br>Cislo: 36x - Barva / sude-liche / polovina: 2x - Tucet: 3x<br><span style="color:#5be08a">0 je zelena a pro bezne sazky znamena prohru.</span></div>
+      <div class="notice">Hra pouziva spolecne OPS tokeny. Vysledek je nahodny a dlouhodobe ma ruleta vyhodu kasina.</div>
     </section>
   </div>
 <div class="panel lb-panel">
-      <div class="section-head"><h2>🏆 Žebříček · čistý zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">↻</button></div>
-      <div class="lb" id="lbList"><div class="notice">Načítám…</div></div>
+      <div class="section-head"><h2>Zebricek - cisty zisk</h2><button class="link-btn" id="lbRefresh" type="button" style="margin:0">Obnovit</button></div>
+      <div class="lb" id="lbList"><div class="notice">Nacitam...</div></div>
     </div>
 </div>
 </div>
@@ -140,9 +140,38 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 <script src="/js/ops-stats.js"></script>
 <script>
 (()=>{'use strict';
+const _secureRng = (() => {
+  const rawCrypto = (typeof window !== 'undefined' && window.crypto) ? window.crypto : null;
+  const rawGetRandomValues = rawCrypto && typeof rawCrypto.getRandomValues === 'function' ? rawCrypto.getRandomValues.bind(rawCrypto) : null;
+  const rawMathRandom = Math.random.bind(Math);
+  const U32 = typeof Uint32Array !== 'undefined' ? Uint32Array : null;
+  try { Object.freeze(Math); } catch (e) {}
+  try { if (rawCrypto) Object.freeze(rawCrypto); } catch (e) {}
+  function randomFloat() {
+    if (rawGetRandomValues && U32) {
+      try {
+        const buf = new U32(1);
+        rawGetRandomValues(buf);
+        return buf[0] / 4294967296;
+      } catch (e) {}
+    }
+    return rawMathRandom();
+  }
+  return Object.freeze({
+    random: randomFloat,
+    int: (min, max) => Math.floor(randomFloat() * (max - min + 1)) + min
+  });
+})();
+
+const _nativeFetch = (typeof window !== 'undefined' && window.fetch) ? window.fetch.bind(window) : null;
+try { if (typeof window !== 'undefined' && window.fetch) Object.freeze(window.fetch); } catch (e) {}
+
 const $=id=>document.getElementById(id);
 const nums=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
 const reds=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+Object.freeze(nums);
+Object.freeze(reds);
+
 const color=n=>n===0?'green':reds.has(n)?'red':'black';
 let rotation=0,spinning=false,history=[];
 const canvas=$('rouletteCanvas'),ctx=canvas.getContext('2d'),step=Math.PI*2/37;
@@ -162,14 +191,14 @@ function drawWheel(){
  ctx.fillStyle='#ffd477';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 36px system-ui';ctx.fillText('OPS',c,c);
 }
 function stats(){return window.OPS_STATS?window.OPS_STATS.getStats():null}
-function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.gacha.tokens))?Math.max(0,Number(s.gacha.tokens)):0}
-function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Math.floor(v));window.OPS_STATS.saveStats(s);renderBalance();return true}
+function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.gacha.tokens))?Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Number(s.gacha.tokens))):0}
+function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Math.floor(v)));window.OPS_STATS.saveStats(s);renderBalance();return true}
 function renderBalance(){if($('balance'))$('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');if($('sideBalance'))$('sideBalance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updatePayout()}
 function selectedChoice(){return $('choice').value}
 function betType(){return $('betType').value}
-function validBet(){const v=Number($('bet').value);return Number.isSafeInteger(v)&&v>0&&v<=balance()}
+function validBet(){const v=Number($('bet').value);return Number.isSafeInteger(v)&&v>0&&v<=balance()&&v<=Number.MAX_SAFE_INTEGER}
 function odds(){return betType()==='number'?36:betType()==='dozen'?3:2}
-function updatePayout(){const b=Number($('bet').value);const o=odds();$('payout').textContent=(Number.isSafeInteger(b)&&b>0?Math.floor(b*o):0).toLocaleString('cs-CZ')+' tokenů celkem';$('payoutNote').textContent=betType()==='number'?'Výhra: 36× sázka (35× čistý zisk).':'Výplata zahrnuje vrácení sázky.';$('spinBtn').disabled=spinning||!validButton()||!window.OPS_STATS}
+function updatePayout(){const b=Number($('bet').value);const o=odds();$('payout').textContent=(Number.isSafeInteger(b)&&b>0?Math.floor(b*o):0).toLocaleString('cs-CZ')+' tokenu celkem';$('payoutNote').textContent=betType()==='number'?'Vyhra: 36x sazka (35x cisty zisk).':'Vyplata zahrnuje vraceni sazky.';$('spinBtn').disabled=spinning||!validButton()||!window.OPS_STATS}
 function validButton(){return Number.isSafeInteger(Number($('bet').value))&&Number($('bet').value)>0&&Number($('bet').value)<=balance()}
 
 const sfx = (() => {
@@ -207,7 +236,7 @@ const sfx = (() => {
 function updateMuteBtn() {
   const b = $("muteBtn");
   if (!b) return;
-  b.textContent = sfx.isMuted() ? "🔇" : "🔊";
+  b.textContent = sfx.isMuted() ? "Zvuk: Vyp" : "Zvuk: Zap";
   b.title = sfx.isMuted() ? "Zapnout zvuky" : "Ztlumit zvuky";
 }
 const mb = $("muteBtn");
@@ -220,11 +249,11 @@ if (mb) {
 }
 function updateChoices(){
  const type=betType(),sel=$('choice');
- const opts= type==='color'?[['red','Červená'],['black','Černá']]
+ const opts= type==='color'?[['red','Cervena'],['black','Cerna']]
  :type==='number'?Array.from({length:37},(_,i)=>[String(i),String(i)])
- :type==='parity'?[['even','Sudé'],['odd','Liché']]
- :type==='half'?[['low','1–18'],['high','19–36']]
- :[['1','1. tucet (1–12)'],['2','2. tucet (13–24)'],['3','3. tucet (25–36)']];
+ :type==='parity'?[['even','Sude'],['odd','Liche']]
+ :type==='half'?[['low','1-18'],['high','19-36']]
+ :[['1','1. tucet (1-12)'],['2','2. tucet (13-24)'],['3','3. tucet (25-36)']];
  sel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
  $('choiceField').style.display='block';updatePayout();
 }
@@ -239,26 +268,26 @@ function wins(n){
 }
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
 function showMessage(text,kind=''){const el=$('message');el.className='message '+kind;el.textContent=text}
-function renderHistory(){ $('history').innerHTML=history.map(n=>`<span class="${color(n)}" title="${color(n)==='red'?'Červená':color(n)==='black'?'Černá':'Zelená'}">${n}</span>`).join('')}
+function renderHistory(){ $('history').innerHTML=history.map(n=>`<span class="${color(n)}" title="${color(n)==='red'?'Cervena':color(n)==='black'?'Cerna':'Zelena'}">${n}</span>`).join('')}
 function spin(){
- if(spinning||!validBet()){showMessage('Zkontroluj sázku a svůj zůstatek.','loss');return}
+ if(spinning||!validBet()){showMessage('Zkontroluj sazku a svuj zustatek.','loss');return}
  const stake=Number($('bet').value),before=balance();
- if(!saveBalance(before-stake)){showMessage('Nepodařilo se uložit zůstatek.','loss');return}
+ if(!saveBalance(before-stake)){showMessage('Nepodarilo se ulozit zustatek.','loss');return}
  sfx.spin();
  spinning=true;refreshSide();$('spinBtn').disabled=true;$('bet').disabled=true;$('betType').disabled=true;$('choice').disabled=true;
- const index=Math.floor(Math.random()*nums.length),n=nums[index],centerDeg=-90+(index+.5)*360/37;
+ const index=_secureRng.int(0,nums.length-1),n=nums[index],centerDeg=-90+(index+.5)*360/37;
  const target=(270-centerDeg+360)%360,delta=(target-((rotation%360)+360)%360+360)%360;
  rotation+=360*7+delta;canvas.style.transform=`rotate(${rotation}deg)`;
- showMessage('Kolo se točí…');
+ showMessage('Kolo se toci...');
  setTimeout(()=>{
   const won=wins(n),mult=odds(),returned=won?stake*mult:0;
   if(returned>0)saveBalance(balance()+returned);else renderBalance();
   recordRound(stake,returned,won && betType()==='number');refreshSide();
   history.unshift(n);history=history.slice(0,12);renderHistory();
   $('lastResult').textContent=String(n);$('lastResult').style.color=color(n)==='red'?'#ff5263':color(n)==='black'?'#f5f6fb':'#5be08a';
-  $('lastResultText').textContent=color(n)==='red'?'Červená':color(n)==='black'?'Černá':'Zelená';
-  if(won){sfx.win();showMessage(`Padlo ${n} (${color(n)}). Vyhráváš ${returned.toLocaleString('cs-CZ')} tokenů celkem; čistý výsledek ${ (returned-stake).toLocaleString('cs-CZ')} tokenů.`, 'win');}
-  else{sfx.loss();showMessage(`Padlo ${n} (${color(n)}). Sázka ${stake.toLocaleString('cs-CZ')} tokenů propadá.`, 'loss');}
+  $('lastResultText').textContent=color(n)==='red'?'Cervena':color(n)==='black'?'Cerna':'Zelena';
+  if(won){sfx.win();showMessage(`Padlo ${n} (${color(n)}). Vyhravas ${returned.toLocaleString('cs-CZ')} tokenu celkem; cisty vysledek ${ (returned-stake).toLocaleString('cs-CZ')} tokenu.`, 'win');}
+  else{sfx.loss();showMessage(`Padlo ${n} (${color(n)}). Sazka ${stake.toLocaleString('cs-CZ')} tokenu propada.`, 'loss');}
   spinning=false;refreshSide();$('bet').disabled=false;$('betType').disabled=false;$('choice').disabled=false;updatePayout();
  },5500);
 }
@@ -275,7 +304,7 @@ $('halfBetBtn').addEventListener('click', () => {
 $('maxBetBtn').addEventListener('click', () => {
   if (spinning) return;
   sfx.tick();
-  $('bet').value = Math.floor(balance());
+  $('bet').value = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(balance()));
   updatePayout();
 });
 
@@ -284,7 +313,7 @@ const emptyStats=()=>({spins:0,wins:0,biggest:0,jackpots:0,totalWagered:0,totalW
 function loadGameStats(){try{return {...emptyStats(),...(JSON.parse(localStorage.getItem(STAT_KEY))||{})}}catch(e){return emptyStats()}}
 function saveGameStats(s){try{localStorage.setItem(STAT_KEY,JSON.stringify(s))}catch(e){}}
 const fmt=n=>Math.round(Number(n)||0).toLocaleString('cs-CZ');
-const signed=n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
+const signed=n=>(n>0?'+':n<0?'-':'')+fmt(Math.abs(n));
 function renderStats(){
  const s=loadGameStats();
  $('stSpins').textContent=fmt(s.spins);$('stWins').textContent=fmt(s.wins);
@@ -295,60 +324,79 @@ function renderStats(){
 function readCookies(){
  let save=null;try{save=JSON.parse(localStorage.getItem('cookieClickerSave'))}catch(e){}
  const s=window.OPS_STATS?window.OPS_STATS.getStats():null;
- const a=save?(Number(save.cookies)||0):0,b=s&&s.clicker?(Number(s.clicker.cookies)||0):0;
- return {save,a,b,available:Math.max(a,b)};
+ const a=save&&Number.isFinite(Number(save.cookies))?Math.max(0,Number(save.cookies)):0;
+ const b=s&&s.clicker&&Number.isFinite(Number(s.clicker.cookies))?Math.max(0,Number(s.clicker.cookies)):0;
+ const available=Math.min(Number.MAX_SAFE_INTEGER,Math.max(a,b));
+ return {save,a,b,available};
 }
+const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 function refreshSide(){
  const b=Math.floor(balance());$('sideBalance').textContent=fmt(b);
  $('broke').classList.toggle('hide',b>=10);
- $('shopCookies').textContent='🍪 '+fmt(readCookies().available);
+ $('shopCookies').textContent=fmt(readCookies().available)+' susenek';
  const user=window.OPS_STATS?window.OPS_STATS.getUsername():'';
- if(user&&!user.startsWith('Host'))$('who').innerHTML='Hraješ jako '+user+'. Body se sdílí s ostatními hrami OPS. <button type="button" id="setName" style="background:none;border:none;color:var(--gold);cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;margin-left:6px">[změnit]</button>';
- else $('who').innerHTML='Hraješ bez přezdívky, body se ukládají lokálně. <button type="button" id="setName">Zadat přezdívku</button>';
+ const cleanUser=esc(user);
+ const isGuest=!user||(window.OPS_STATS&&window.OPS_STATS.isGuestUsername?window.OPS_STATS.isGuestUsername(user):/^host(_\d+)?$/i.test(user));
+ if(user&&!isGuest)$('who').innerHTML='Hrajes jako '+cleanUser+'. Body se sdili s ostatnimi hrami OPS. <button type="button" id="setName" style="background:none;border:none;color:var(--gold);cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;margin-left:6px">[zmenit]</button>';
+ else $('who').innerHTML='Hrajes bez prezdivky, body se ukladaji lokalne. <button type="button" id="setName">Zadat prezdivku</button>';
  const x=$('setName');if(x)x.onclick=()=>window.OPS_STATS&&window.OPS_STATS.promptUsernameModal();
  $('shopBuy1').disabled=spinning;$('shopBuy2').disabled=spinning;
 }
 function buyCookies(cost,gain){
- if(spinning){toast('Počkej, až se hra dotočí.');return}
- const c=readCookies();if(c.available<cost){toast('Nemáš dost sušenek (potřeba '+fmt(cost)+').');return}
- if(c.save){c.save.cookies=Math.max(0,c.a-cost);try{localStorage.setItem('cookieClickerSave',JSON.stringify(c.save))}catch(e){};const s=window.OPS_STATS.getStats();s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Number(s.gacha.tokens)||0)+gain;window.OPS_STATS.saveStats(s)}
- else if(window.OPS_STATS){const s=window.OPS_STATS.getStats();s.clicker=s.clicker||{};s.clicker.cookies=Math.max(0,c.b-cost);s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Number(s.gacha.tokens)||0)+gain;window.OPS_STATS.saveStats(s)}
- refreshSide();renderBalance();toast('Nakoupeno '+fmt(gain)+' bodů za '+fmt(cost)+' sušenek.');
+ if(spinning){toast('Pockej, az se hra dotoci.');return}
+ const c=readCookies();
+ if(c.available<cost){toast('Nemas dost susenek (potreba '+fmt(cost)+').');return}
+ const remainingCookies=Math.max(0,c.available-cost);
+ if(c.save){c.save.cookies=remainingCookies;try{localStorage.setItem('cookieClickerSave',JSON.stringify(c.save))}catch(e){}}
+ const s=window.OPS_STATS?window.OPS_STATS.getStats():null;
+ if(s){
+  s.clicker=s.clicker||{};s.clicker.cookies=remainingCookies;
+  s.gacha=s.gacha||{};s.gacha.tokens=Math.min(Number.MAX_SAFE_INTEGER,(Number(s.gacha.tokens)||0)+gain);
+  window.OPS_STATS.saveStats(s);
+ }
+ refreshSide();renderBalance();toast('Nakoupeno '+fmt(gain)+' bodu za '+fmt(cost)+' susenek.');
 }
 const cloudCfg=()=>window.OPS_STATS&&window.OPS_STATS.config;
-const cloudUser=()=>{const u=window.OPS_STATS?window.OPS_STATS.getUsername():'';return u&&!u.startsWith('Host')?u:''};
+const cloudUser=()=>{const u=window.OPS_STATS?window.OPS_STATS.getUsername():'';const isGuest=!u||(window.OPS_STATS&&window.OPS_STATS.isGuestUsername?window.OPS_STATS.isGuestUsername(u):/^host(_\d+)?$/i.test(u));return isGuest?'':u};
 const cloudHeaders=()=>{const c=cloudCfg();return {apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'}};
 function setCloudNote(t,ok){$('cloudNote').textContent=t;$('cloudNote').style.color=ok?'':'var(--red)'}
 let cloudTimer;
 async function pushGameStats(){
- const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez přezdívky se statistiky ukládají jen lokálně.',true);return}
- try{const r=await fetch(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}`,{method:'PATCH',headers:{...cloudHeaders(),Prefer:'return=representation'},body:JSON.stringify({roulette:loadGameStats()}),keepalive:true});
- if(!r.ok){setCloudNote(r.status===400||r.status===404?'Cloud: ověř sloupec roulette v Supabase.':`Cloud: uložení selhalo (${r.status}).`,false);return}
- const rows=await r.json();if(!rows.length){setCloudNote('Cloud: uživatelský záznam nebyl nalezen.',false);return}
- setCloudNote('Cloud: statistiky uloženy.',true);loadLeaderboard();
- }catch(e){setCloudNote('Cloud: chyba spojení.',false)}
+ const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez prezdivky se statistiky ukladaji jen lokalne.',true);return}
+ const st=loadGameStats();
+ if(!Number.isFinite(st.spins)||st.spins<0||!Number.isFinite(st.totalWagered)||st.totalWagered<0||!Number.isFinite(st.totalWon)||st.totalWon<0)return;
+ try{
+  const fetchFn=_nativeFetch||fetch;
+  const r=await fetchFn(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}`,{method:'PATCH',headers:{...cloudHeaders(),Prefer:'return=representation'},body:JSON.stringify({roulette:st}),keepalive:true});
+  if(!r.ok){setCloudNote(r.status===400||r.status===404?'Cloud: over sloupec roulette v Supabase.':`Cloud: ulozeni selhalo (${r.status}).`,false);return}
+  const rows=await r.json();if(!rows.length){setCloudNote('Cloud: uzivatelsky zaznam nebyl nalezen.',false);return}
+  setCloudNote('Cloud: statistiky ulozeny.',true);loadLeaderboard();
+ }catch(e){setCloudNote('Cloud: chyba spojeni.',false)}
 }
 function schedulePush(){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushGameStats,800)}
 async function pullGameStats(){
- const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez přezdívky se statistiky ukládají jen lokálně.',true);return}
- try{const r=await fetch(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}&select=roulette`,{headers:cloudHeaders()});
- if(!r.ok){setCloudNote('Cloud: ověř sloupec roulette v Supabase.',false);return}
- const rows=await r.json(),remote=rows[0]&&rows[0].roulette;
- const local=loadGameStats();
- if(remote&&Number(remote.spins)>local.spins){saveGameStats({...emptyStats(),...remote});renderStats();setCloudNote('Cloud: statistiky načteny.',true)}
- else if(local.spins>((remote&&Number(remote.spins))||0))pushGameStats();else setCloudNote('Cloud: statistiky jsou synchronizované.',true)
- }catch(e){setCloudNote('Cloud: chyba spojení.',false)}
+ const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez prezdivky se statistiky ukladaji jen lokalne.',true);return}
+ try{
+  const fetchFn=_nativeFetch||fetch;
+  const r=await fetchFn(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}&select=roulette`,{headers:cloudHeaders()});
+  if(!r.ok){setCloudNote('Cloud: over sloupec roulette v Supabase.',false);return}
+  const rows=await r.json(),remote=rows[0]&&rows[0].roulette;
+  const local=loadGameStats();
+  if(remote&&Number(remote.spins)>local.spins){saveGameStats({...emptyStats(),...remote});renderStats();setCloudNote('Cloud: statistiky nacteny.',true)}
+  else if(local.spins>((remote&&Number(remote.spins))||0))pushGameStats();else setCloudNote('Cloud: statistiky jsou synchronizovane.',true)
+ }catch(e){setCloudNote('Cloud: chyba spojeni.',false)}
 }
-const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 async function loadLeaderboard(){
- const box=$('lbList'),c=cloudCfg();if(!c){box.innerHTML='<div class="notice">Žebříček není dostupný.</div>';return}
- try{const r=await fetch(`${c.url}/rest/v1/${c.table}?select=username,roulette&roulette=not.is.null&order=roulette->net.desc.nullslast&limit=10`,{headers:cloudHeaders()});
- if(!r.ok)throw Error('HTTP '+r.status);
- const rows=(await r.json()).filter(x=>x.roulette&&(Number(x.roulette.spins)||0)>0);
- if(!rows.length){box.innerHTML='<div class="notice">Zatím nikdo nehrál. Buď první!</div>';return}
- const me=cloudUser(),medal=i=>i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1);
- box.innerHTML=rows.map((x,i)=>{const s=x.roulette,n=Number(s.net)||0;return `<div class="lb-row${x.username===me?' me':''}"><span>${medal(i)}</span><span class="lb-name">${esc(x.username)}</span><span class="lb-net ${n>0?'pos':n<0?'neg':''}">${signed(n)}</span><span class="lb-sub">${fmt(s.spins)} her · max výhra ${fmt(s.biggest)} ◆</span></div>`}).join('');
- }catch(e){box.innerHTML='<div class="notice">Žebříček se nepodařilo načíst. Zkontroluj cloudový sloupec roulette.</div>'}
+ const box=$('lbList'),c=cloudCfg();if(!c){box.innerHTML='<div class="notice">Zebricek neni dostupny.</div>';return}
+ try{
+  const fetchFn=_nativeFetch||fetch;
+  const r=await fetchFn(`${c.url}/rest/v1/${c.table}?select=username,roulette&roulette=not.is.null&order=roulette->net.desc.nullslast&limit=10`,{headers:cloudHeaders()});
+  if(!r.ok)throw Error('HTTP '+r.status);
+  const rows=(await r.json()).filter(x=>x.roulette&&(Number(x.roulette.spins)||0)>0);
+  if(!rows.length){box.innerHTML='<div class="notice">Zatim nikdo nehral. Bud prvni!</div>';return}
+  const me=cloudUser(),medal=i=>'#'+(i+1);
+  box.innerHTML=rows.map((x,i)=>{const s=x.roulette,n=Number(s.net)||0;return `<div class="lb-row${x.username===me?' me':''}"><span>${medal(i)}</span><span class="lb-name">${esc(x.username)}</span><span class="lb-net ${n>0?'pos':n<0?'neg':''}">${signed(n)}</span><span class="lb-sub">${fmt(s.spins)} her - max vyhra ${fmt(s.biggest)} [B]</span></div>`}).join('');
+ }catch(e){box.innerHTML='<div class="notice">Zebricek se nepodarilo nacist. Zkontroluj cloudovy sloupec roulette.</div>'}
 }
 function recordRound(stake,wonAmount,jackpot=false){
  const s=loadGameStats();s.spins++;s.totalWagered+=stake;s.totalWon+=wonAmount;s.net=s.totalWon-s.totalWagered;
