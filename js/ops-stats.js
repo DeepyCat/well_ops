@@ -601,7 +601,7 @@
         }
     }
 
-    function saveLocalStats(stats) {
+    function saveLocalStats(stats, allowLargeJump = false) {
         try {
             if (stats.gacha && stats.gacha.history) {
                 delete stats.gacha.history;
@@ -623,7 +623,7 @@
             // Sanity check against impossible balance jumps
             const delta = cand - prev;
             const maxAllowedGain = Math.max(100000, prev * 3000);
-            if (delta > maxAllowedGain) {
+            if (!allowLargeJump && delta > maxAllowedGain) {
                 console.warn("[OPS Security] Odmitnut nemozny skok zustatku z", prev, "na", cand);
                 cand = prev;
             }
@@ -772,6 +772,7 @@
     // -------------------------------------------------------------------------
     let isSyncingFromCloud = false;
     let isReloadingForCloud = false;
+    let isExchangingCookies = false;
     let syncCloudDebounceTimer = null;
 
     function updateCloudSyncBadge(state, customText) {
@@ -1102,7 +1103,7 @@
                     })()
                 };
 
-                saveLocalStats(merged);
+                saveLocalStats(merged, true);
                 updateCloudSyncBadge("synced");
                 try {
                     if (typeof window !== "undefined" && window.dispatchEvent) {
@@ -1693,7 +1694,7 @@
     let lastClickerSaveTime = 0;
     function handleSaveClickerState(data) {
         if (!data || typeof data !== "object") return;
-        if (isReloadingForCloud) return;
+        if (isReloadingForCloud || isExchangingCookies) return;
 
         const now = Date.now();
         if (now - lastClickerSaveTime < 400) {
@@ -1898,9 +1899,9 @@
             return loadLocalStats();
         },
 
-        saveStats: function(stats) {
+        saveStats: function(stats, allowLargeJump = false) {
             if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
-            saveLocalStats(stats);
+            saveLocalStats(stats, allowLargeJump);
             if (!syncCloudDebounceTimer) {
                 syncCloudDebounceTimer = setTimeout(() => {
                     syncCloudDebounceTimer = null;
@@ -1909,14 +1910,14 @@
             }
         },
 
-        addTokens: function(delta) {
+        addTokens: function(delta, allowLargeJump = false) {
             delta = Math.floor(Number(delta) || 0);
             const stats = loadLocalStats();
             stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
             const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
             const newTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(curTokens + delta)));
             stats.gacha.tokens = newTokens;
-            saveLocalStats(stats);
+            saveLocalStats(stats, allowLargeJump);
             if (!syncCloudDebounceTimer) {
                 syncCloudDebounceTimer = setTimeout(() => {
                     syncCloudDebounceTimer = null;
@@ -1934,7 +1935,12 @@
 
         exchangeCookies: function(cost, gain) {
             cost = Math.max(0, Math.floor(Number(cost) || 0));
-            gain = Math.max(0, Math.floor(Number(gain) || 0));
+            const allowedGain = Math.floor(cost * (160 / 1000));
+            if (cost <= 0 || allowedGain <= 0) {
+                return { success: false, error: "Cost too low" };
+            }
+            gain = Math.min(Math.max(0, Math.floor(Number(gain) || 0)), allowedGain);
+            if (gain <= 0) gain = allowedGain;
 
             let save = null;
             try {
@@ -1953,6 +1959,23 @@
 
             const remainingCookies = Math.max(0, available - cost);
 
+            stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
+            stats.clicker.cookies = remainingCookies;
+            if (Number(stats.clicker.totalCookies || 0) < remainingCookies) {
+                stats.clicker.totalCookies = remainingCookies;
+            }
+            if (save && Number(save.totalCookies || 0) > Number(stats.clicker.totalCookies || 0)) {
+                stats.clicker.totalCookies = save.totalCookies;
+            }
+
+            stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
+            const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
+            const newTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(curTokens + gain)));
+            stats.gacha.tokens = newTokens;
+
+            saveLocalStats(stats, true);
+
+            isExchangingCookies = true;
             if (save) {
                 save.cookies = remainingCookies;
                 if (Number(save.totalCookies || 0) < remainingCookies) {
@@ -1972,22 +1995,7 @@
             try {
                 localStorage.setItem("cookieClickerSave", JSON.stringify(save));
             } catch (e) {}
-
-            stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
-            stats.clicker.cookies = remainingCookies;
-            if (Number(stats.clicker.totalCookies || 0) < remainingCookies) {
-                stats.clicker.totalCookies = remainingCookies;
-            }
-            if (save && Number(save.totalCookies || 0) > Number(stats.clicker.totalCookies || 0)) {
-                stats.clicker.totalCookies = save.totalCookies;
-            }
-
-            stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
-            const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
-            const newTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(curTokens + gain)));
-            stats.gacha.tokens = newTokens;
-
-            saveLocalStats(stats);
+            isExchangingCookies = false;
 
             if (syncCloudDebounceTimer) {
                 clearTimeout(syncCloudDebounceTimer);
@@ -2007,7 +2015,12 @@
 
         exchangeTokens: function(cost, gain) {
             cost = Math.max(0, Math.floor(Number(cost) || 0));
-            gain = Math.max(0, Math.floor(Number(gain) || 0));
+            if (cost <= 0) {
+                return { success: false, error: "Cost too low" };
+            }
+            const allowedGain = Math.floor(cost * (800 / 160));
+            gain = Math.min(Math.max(0, Math.floor(Number(gain) || 0)), allowedGain);
+            if (gain <= 0) gain = allowedGain;
 
             const stats = loadLocalStats();
             stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
@@ -2031,6 +2044,18 @@
             const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
             const newCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(available + gain));
 
+            stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
+            stats.clicker.cookies = newCookies;
+            if (Number(stats.clicker.totalCookies || 0) < newCookies) {
+                stats.clicker.totalCookies = newCookies;
+            }
+            if (save && Number(save.totalCookies || 0) > Number(stats.clicker.totalCookies || 0)) {
+                stats.clicker.totalCookies = save.totalCookies;
+            }
+
+            saveLocalStats(stats, true);
+
+            isExchangingCookies = true;
             if (!save) {
                 save = {
                     cookies: newCookies,
@@ -2050,17 +2075,7 @@
             try {
                 localStorage.setItem("cookieClickerSave", JSON.stringify(save));
             } catch (e) {}
-
-            stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
-            stats.clicker.cookies = newCookies;
-            if (Number(stats.clicker.totalCookies || 0) < newCookies) {
-                stats.clicker.totalCookies = newCookies;
-            }
-            if (save && Number(save.totalCookies || 0) > Number(stats.clicker.totalCookies || 0)) {
-                stats.clicker.totalCookies = save.totalCookies;
-            }
-
-            saveLocalStats(stats);
+            isExchangingCookies = false;
 
             if (syncCloudDebounceTimer) {
                 clearTimeout(syncCloudDebounceTimer);
@@ -3027,7 +3042,7 @@
         let stats = loadLocalStats();
         if (authData) {
             stats.auth = authData;
-            saveLocalStats(stats);
+            saveLocalStats(stats, true);
         }
 
         updatePlayerBadgeUI();
@@ -3038,7 +3053,7 @@
                 if (authData) {
                     stats = loadLocalStats();
                     stats.auth = authData;
-                    saveLocalStats(stats);
+                    saveLocalStats(stats, true);
                 }
                 await syncToCloud();
             } catch (e) {
