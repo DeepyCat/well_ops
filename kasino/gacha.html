@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#11131c">
 <title>OPS · Sborovna – nábor učitelů</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/x-icon" href="img/favicon.svg">
 <style>
 :root{--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--blue:#8cbbff;--cyan:#7ff0ff}
 *{box-sizing:border-box}
@@ -228,7 +228,7 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
 <header class="topbar"> 
   <div class="brand">OPS <span>///</span> SBOROVNA</div>
   <div class="top-right">
-    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky" title="Ztlumit zvuky">🔊</button>
+    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky" title="Ztlumit zvuky">Zvuk</button>
     <a class="back" href="index.html">← Zpět na hry</a>
   </div>
 </header>
@@ -247,7 +247,7 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
       <div class="section-head"><h2>Pedagogický sbor</h2><span class="pill" id="rosterCount">0 / 0 získáno</span></div>
       <div class="roster" id="roster"></div>
       <div class="lb-head">
-        <h2>🏆 Žebříček sborovny</h2>
+        <h2>Žebříček sborovny</h2>
         <div class="lb-tools">
           <button class="lb-tab active" data-mode="pulls" type="button">Podle zápisů</button>
           <button class="lb-tab" data-mode="collection" type="button">Podle sbírky</button>
@@ -259,7 +259,7 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
     </section>
     <aside>
       <div class="panel">
-        <div class="currency"><span>Školní body</span><strong>◆ <span id="tokens">1600</span></strong></div>
+        <div class="currency"><span>Školní body</span><strong>[B] <span id="tokens">1600</span></strong></div>
         <div class="stats">
           <div class="stat wide"><small>Z-Rank pity</small><strong id="zPity">0 / 200</strong><div class="meter z"><i id="zMeter"></i></div></div>
           <div class="stat"><small>S-Rank pity</small><strong id="sPity">0 / 90</strong><div class="meter"><i id="sMeter"></i></div></div>
@@ -275,18 +275,18 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
         </div>
       </div>
       <div class="panel" style="margin-top:16px">
-        <div class="section-head" style="margin:0 0 14px"><h3>🛒 Obchod</h3><span class="pill" id="shopCookies">🍪 0</span></div>
+        <div class="section-head" style="margin:0 0 14px"><h3>Obchod se sušenkami</h3><span class="pill" id="shopCookies">0 sušenek</span></div>
         <div class="shop">
           <div class="shop-item">
-            <div class="shop-info"><b>◆ 160 bodů</b><small>Základní balíček</small></div>
-            <button class="btn shop-btn" id="shopBuy1">🍪 1 000</button>
+            <div class="shop-info"><b>160 bodů</b><small>Základní balíček</small></div>
+            <button class="btn shop-btn" id="shopBuy1">1 000 sušenek</button>
           </div>
           <div class="shop-item">
-            <div class="shop-info"><b>◆ 1 600 bodů</b><small>Výhodný balíček · 10× zápis</small></div>
-            <button class="btn shop-btn" id="shopBuy2">🍪 10 000</button>
+            <div class="shop-info"><b>1 600 bodů</b><small>Výhodný balíček · 10× zápis</small></div>
+            <button class="btn shop-btn" id="shopBuy2">10 000 sušenek</button>
           </div>
           <div class="shop-item special">
-            <div class="shop-info"><b>◆ 1 600 bodů</b><small>Speciální nabídka · bez sušenek</small></div>
+            <div class="shop-info"><b>1 600 bodů</b><small>Speciální nabídka · bez sušenek</small></div>
             <button class="btn shop-btn" id="shopBuy3">ZDARMA</button>
           </div>
         </div>
