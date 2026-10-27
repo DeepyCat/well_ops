@@ -188,19 +188,19 @@ function draw(){
  ctx.fillStyle='#e9bfff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='1000 44px system-ui';ctx.fillText('OPS',c,c);
 }
 function stats(){return window.OPS_STATS?window.OPS_STATS.getStats():null}
-function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.gacha.tokens))?Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Number(s.gacha.tokens))):0}
-function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.min(Number.MAX_SAFE_INTEGER,Math.max(0,Math.floor(v)));window.OPS_STATS.saveStats(s);renderBalance();return true}
-function stake(){const v=Number($('stake').value);return Number.isSafeInteger(v)?v:0}
-function valid(){const s=stake(),b=balance();return Number.isSafeInteger(s)&&s>=10&&s<=b&&s<=Number.MAX_SAFE_INTEGER}
+function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.gacha.tokens))?Math.max(0,Number(s.gacha.tokens)):0}
+function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Math.floor(v));window.OPS_STATS.saveStats(s);renderBalance();return true}
+function stake(){const v=Number($('stake').value);return (Number.isFinite(v)&&v>0)?Math.floor(v):0}
+function valid(){const s=stake(),b=balance();return Number.isFinite(s)&&s>=10&&s<=b}
 function renderBalance(){ if($('balance'))$('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');if($('sideBalance'))$('sideBalance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updateUI()}
 function updateUI(){
  const b=stake(),bal=balance();
- if(!Number.isSafeInteger(b)||b<10){
+ if(!Number.isFinite(b)||b<10){
   $('preview').textContent='Zadej celé číslo alespoň 10.';
  }else if(b>bal){
   $('preview').textContent=`Nemáš dostatek tokenů (máš ${Math.floor(bal).toLocaleString('cs-CZ')}).`;
  }else{
-  const maxWin=Math.min(Number.MAX_SAFE_INTEGER, b*10);
+  const maxWin=b*10;
   $('preview').textContent=`Sázka ${b.toLocaleString('cs-CZ')} → odměna 0 až ${maxWin.toLocaleString('cs-CZ')} tokenů`;
  }
  $('spinBtn').disabled=spinning||!valid()||!window.OPS_STATS;
@@ -266,7 +266,7 @@ function spin(){
  rotation+=360*7+delta;canvas.style.transform=`rotate(${rotation}deg)`;
  message('Kolo se roztočilo…');
  setTimeout(()=>{
-  const prize=Math.min(Number.MAX_SAFE_INTEGER, Math.floor(bet*seg.m));
+  const prize=Math.floor(bet*seg.m);
   if(prize>0)saveBalance(balance()+prize);else renderBalance();
   recordRound(bet,prize,seg.m===10);refreshSide();
   $('result').textContent=seg.label+' '+(seg.m===10?'JACKPOT!':'');
@@ -284,13 +284,13 @@ $('halfStakeBtn').addEventListener('click', () => {
   sfx.tick();
   const max = Math.floor(balance());
   const half = Math.max(10, Math.floor(max / 2));
-  $('stake').value = Math.min(Number.MAX_SAFE_INTEGER, half);
+  $('stake').value = half;
   updateUI();
 });
 $('maxStakeBtn').addEventListener('click', () => {
   if (spinning) return;
   sfx.tick();
-  $('stake').value = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(balance())));
+  $('stake').value = Math.max(0, Math.floor(balance()));
   updateUI();
 });
 
@@ -312,7 +312,7 @@ function readCookies(){
  const s=window.OPS_STATS?window.OPS_STATS.getStats():null;
  const a=save&&Number.isFinite(Number(save.cookies))?Math.max(0,Number(save.cookies)):0;
  const b=s&&s.clicker&&Number.isFinite(Number(s.clicker.cookies))?Math.max(0,Number(s.clicker.cookies)):0;
- const available=Math.min(Number.MAX_SAFE_INTEGER,Math.max(a,b));
+ const available=Math.max(a,b);
  return {save,a,b,available};
 }
 const esc=v=>String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -343,7 +343,7 @@ function buyCookies(cost,gain){
  const s=window.OPS_STATS?window.OPS_STATS.getStats():null;
  if(s){
   s.clicker=s.clicker||{};s.clicker.cookies=remainingCookies;
-  s.gacha=s.gacha||{};s.gacha.tokens=Math.min(Number.MAX_SAFE_INTEGER,(Number(s.gacha.tokens)||0)+gain);
+  s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,(Number(s.gacha.tokens)||0)+gain);
   window.OPS_STATS.saveStats(s);
  }
  refreshSide();renderBalance();toast('Nakoupeno '+fmt(gain)+' bodů za '+fmt(cost)+' sušenek.');
@@ -391,8 +391,8 @@ async function loadLeaderboard(){
  }catch(e){box.innerHTML='<div class="notice">Žebříček se nepodařilo načíst. Zkontroluj cloudový sloupec wheel.</div>'}
 }
 function recordRound(stake,wonAmount,jackpot=false){
- const s=loadGameStats();s.spins++;s.totalWagered=Math.min(Number.MAX_SAFE_INTEGER,s.totalWagered+stake);s.totalWon=Math.min(Number.MAX_SAFE_INTEGER,s.totalWon+wonAmount);s.net=s.totalWon-s.totalWagered;
- if(wonAmount>0){s.wins++;s.biggest=Math.min(Number.MAX_SAFE_INTEGER,Math.max(s.biggest,wonAmount))}if(jackpot)s.jackpots++;
+ const s=loadGameStats();s.spins++;s.totalWagered=s.totalWagered+stake;s.totalWon=s.totalWon+wonAmount;s.net=s.totalWon-s.totalWagered;
+ if(wonAmount>0){s.wins++;s.biggest=Math.max(s.biggest,wonAmount)}if(jackpot)s.jackpots++;
  saveGameStats(s);renderStats();schedulePush();
 }
 $('shopBuy1').addEventListener('click',()=>buyCookies(1000,160));

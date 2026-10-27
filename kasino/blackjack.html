@@ -278,17 +278,17 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
   /* ---------- body (sdílené s gachou) ---------- */
   let fallbackTokens = 1600;
   function getTokens() {
-    if (!window.OPS_STATS) return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, fallbackTokens));
+    if (!window.OPS_STATS) return Math.max(0, fallbackTokens);
     const s = window.OPS_STATS.getStats();
     const t = s && s.gacha && typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 1600;
-    return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(t)));
+    return Math.max(0, Math.floor(t));
   }
   function addTokens(delta) {
-    if (!window.OPS_STATS) { fallbackTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, fallbackTokens + delta)); return; }
+    if (!window.OPS_STATS) { fallbackTokens = Math.max(0, fallbackTokens + delta); return; }
     const s = window.OPS_STATS.getStats();
     s.gacha = s.gacha || {};
     const cur = typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 1600;
-    s.gacha.tokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(cur + delta)));
+    s.gacha.tokens = Math.max(0, Math.floor(cur + delta));
     window.OPS_STATS.saveStats(s);
   }
 
@@ -430,8 +430,8 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
     setTotal($("dTotal"), dealer, !!holeEl);
   }
 
-  function maxAffordable() { return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(getTokens()))); }
-  function clampBet() { bet = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.min(bet, maxAffordable()))); }
+  function maxAffordable() { return Math.max(0, Math.floor(getTokens())); }
+  function clampBet() { bet = Math.max(0, Math.min(bet, maxAffordable())); }
 
   const esc = v => String(v).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 
@@ -504,9 +504,9 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
   function finish(outcome) {
     let payout = 0, title = "", kind = "lose";
     switch (outcome) {
-      case "blackjack": payout = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(roundBet * 2.5)); title = "Blackjack!"; kind = "bj"; break;
-      case "win":       payout = Math.min(Number.MAX_SAFE_INTEGER, roundBet * 2); title = "Výhra"; kind = "win"; break;
-      case "dealerBust":payout = Math.min(Number.MAX_SAFE_INTEGER, roundBet * 2); title = "Krupiér přetáhl"; kind = "win"; break;
+      case "blackjack": payout = Math.floor(roundBet * 2.5); title = "Blackjack!"; kind = "bj"; break;
+      case "win":       payout = roundBet * 2; title = "Výhra"; kind = "win"; break;
+      case "dealerBust":payout = roundBet * 2; title = "Krupiér přetáhl"; kind = "win"; break;
       case "push":      payout = roundBet; title = "Remíza"; kind = "push"; break;
       case "bust":      title = "Přetáhl jsi"; break;
       case "dealerBJ":  title = "Krupiér má blackjack"; break;
@@ -517,8 +517,8 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
 
     const st = loadStats();
     st.hands++;
-    st.net = Math.max(-Number.MAX_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, st.net + net));
-    if (net > 0) { st.wins++; st.best = Math.min(Number.MAX_SAFE_INTEGER, Math.max(st.best, net)); }
+    st.net = st.net + net;
+    if (net > 0) { st.wins++; st.best = Math.max(st.best, net); }
     else if (net < 0) st.losses++;
     else st.pushes++;
     if (outcome === "blackjack") st.blackjacks++;
@@ -597,7 +597,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
     const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
     const saveCookies = save && Number.isFinite(Number(save.cookies)) ? Math.max(0, Number(save.cookies)) : 0;
     const statCookies = stats && stats.clicker && Number.isFinite(Number(stats.clicker.cookies)) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
-    const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
+    const available = Math.max(saveCookies, statCookies);
     return { save, saveCookies, statCookies, available };
   }
 
@@ -633,7 +633,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
       s.clicker.cookies = remainingCookies;
       s.gacha = s.gacha || {};
       const cur = Math.max(0, Number(s.gacha.tokens) || 0);
-      s.gacha.tokens = Math.min(Number.MAX_SAFE_INTEGER, cur + gain);
+      s.gacha.tokens = Math.max(0, cur + gain);
       window.OPS_STATS.saveStats(s);
     } else {
       addTokens(gain);
@@ -749,7 +749,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
       if (busy || phase !== "bet") return;
       const v = Number(ch.dataset.v);
       if (bet + v > maxAffordable()) { sfx.error(); toast("Na tuhle sázku nemáš dost bodů."); return; }
-      bet = Math.min(Number.MAX_SAFE_INTEGER, bet + v);
+      bet = bet + v;
       sfx.chip();
       updateUI();
     });
@@ -758,7 +758,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
     if (busy || phase !== "bet") return;
     const max = maxAffordable();
     const half = Math.max(MIN_BET, Math.floor(max / 2));
-    bet = Math.min(Number.MAX_SAFE_INTEGER, half);
+    bet = half;
     sfx.chip();
     updateUI();
   });
@@ -782,7 +782,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
           customBetInput.value = val;
           toast("Sázka upravena na tvé maximum (" + fmt(val) + ").");
         }
-        bet = Math.min(Number.MAX_SAFE_INTEGER, val);
+        bet = val;
       }
       updateUI();
     });
@@ -800,7 +800,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
             bet = 0;
           }
         } else {
-          bet = Math.min(Number.MAX_SAFE_INTEGER, Math.min(val, maxAffordable()));
+          bet = Math.min(val, maxAffordable());
         }
       } else {
         bet = 0;

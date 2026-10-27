@@ -53,12 +53,12 @@
     const t = Number(g.tokens);
     const p = Number(g.totalPulls);
     return {
-      tokens: Number.isFinite(t) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(t))) : 1600,
+      tokens: Number.isFinite(t) ? Math.max(0, Math.floor(t)) : 1600,
       zPity: Math.max(0, Math.floor(Number(g.zPity) || 0)),
       sPity: Math.max(0, Math.floor(Number(g.sPity) || 0)),
       aPity: Math.max(0, Math.floor(Number(g.aPity) || 0)),
       guaranteed: !!g.guaranteed,
-      totalPulls: Number.isFinite(p) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(p))) : 0,
+      totalPulls: Number.isFinite(p) ? Math.max(0, Math.floor(p)) : 0,
       inventory: { ...(g.inventory || {}) }
     };
   }
@@ -67,12 +67,12 @@
     if (!window.OPS_STATS) return;
     const stats = window.OPS_STATS.getStats();
     stats.gacha = {
-      tokens: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(Number(s.tokens) || 0))),
+      tokens: Math.max(0, Math.floor(Number(s.tokens) || 0)),
       zPity: Math.max(0, Math.floor(Number(s.zPity) || 0)),
       sPity: Math.max(0, Math.floor(Number(s.sPity) || 0)),
       aPity: Math.max(0, Math.floor(Number(s.aPity) || 0)),
       guaranteed: !!s.guaranteed,
-      totalPulls: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(Number(s.totalPulls) || 0))),
+      totalPulls: Math.max(0, Math.floor(Number(s.totalPulls) || 0)),
       inventory: s.inventory
     };
     window.OPS_STATS.saveStats(stats);
@@ -189,7 +189,7 @@
     state.zPity++;
     state.sPity++;
     state.aPity++;
-    state.totalPulls = Math.min(Number.MAX_SAFE_INTEGER, state.totalPulls + 1);
+    state.totalPulls = state.totalPulls + 1;
     const zChance = state.zPity >= Z_SOFT ? Math.min(.1 + (state.zPity - Z_SOFT + 1) * 2, 100) : .1;
     const sChance = state.sPity >= S_SOFT ? Math.min(.6 + (state.sPity - S_SOFT + 1) * 6, 100) : .6;
     let rank;
@@ -507,7 +507,7 @@
     const stats = window.OPS_STATS ? window.OPS_STATS.getStats() : null;
     const saveCookies = save && Number.isFinite(Number(save.cookies)) ? Math.max(0, Number(save.cookies)) : 0;
     const statCookies = stats && stats.clicker && Number.isFinite(Number(stats.clicker.cookies)) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
-    const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
+    const available = Math.max(saveCookies, statCookies);
     return { save, saveCookies, statCookies, available };
   }
 
@@ -528,7 +528,7 @@
     if (stats) {
       stats.gacha = stats.gacha || {};
       const cur = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : 2000;
-      stats.gacha.tokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, cur + gain));
+      stats.gacha.tokens = Math.max(0, cur + gain);
       window.OPS_STATS.saveStats(stats);
     }
   }
