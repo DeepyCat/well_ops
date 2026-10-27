@@ -433,7 +433,7 @@
   }
   function addCookies(amount) {
     const c = readCookiesData();
-    const newCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(c.available + amount));
+    const newCookies = Math.max(0, Math.floor(c.available + amount));
     if (c.save) {
       c.save.cookies = newCookies;
       if (Number(c.save.totalCookies || 0) < newCookies) c.save.totalCookies = newCookies;

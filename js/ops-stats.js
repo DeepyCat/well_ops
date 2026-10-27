@@ -348,18 +348,18 @@
         if (!saveData || typeof saveData !== "object") {
             return { ...DEFAULT_STATS.clicker, playTime: existingPlayTime };
         }
-        const totalCookies = typeof saveData.totalCookies === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, saveData.totalCookies)) : 0;
-        const clicks = typeof saveData.clicks === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, saveData.clicks)) : 0;
+        const totalCookies = typeof saveData.totalCookies === "number" ? Math.max(0, saveData.totalCookies) : 0;
+        const clicks = typeof saveData.clicks === "number" ? Math.max(0, saveData.clicks) : 0;
         const bonuses = computeClickerBonuses(saveData.upgrades);
         const totalClickedCookies = typeof saveData.totalClickedCookies === "number"
             ? Math.min(totalCookies, Math.max(0, saveData.totalClickedCookies))
             : Math.min(totalCookies, clicks * bonuses.baseClick);
 
         return {
-            cookies: typeof saveData.cookies === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, saveData.cookies)) : 0,
+            cookies: typeof saveData.cookies === "number" ? Math.max(0, saveData.cookies) : 0,
             totalCookies: totalCookies,
             clicks: clicks,
-            totalClickedCookies: Math.min(Number.MAX_SAFE_INTEGER, totalClickedCookies),
+            totalClickedCookies: totalClickedCookies,
             clickPower: computeClickerClickPower(saveData),
             cps: computeClickerCps(saveData),
             clickCps: typeof saveData.clickCps === "number" ? Math.min(20, Math.max(0, saveData.clickCps)) : 0,
@@ -380,11 +380,11 @@
             if (rawSave) {
                 const s = JSON.parse(rawSave);
                 if (s && typeof s === "object") {
-                    const totalFromSave = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(s.totalCookies) || 0));
+                    const totalFromSave = Math.max(0, Number(s.totalCookies) || 0);
                     if (totalFromSave >= (clickerState.totalCookies || 0)) {
-                        clickerState.cookies = typeof s.cookies === "number" ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, s.cookies)) : clickerState.cookies;
+                        clickerState.cookies = typeof s.cookies === "number" ? Math.max(0, s.cookies) : clickerState.cookies;
                         clickerState.totalCookies = totalFromSave;
-                        clickerState.clicks = Math.min(Number.MAX_SAFE_INTEGER, Math.max(clickerState.clicks || 0, Number(s.clicks) || 0));
+                        clickerState.clicks = Math.max(clickerState.clicks || 0, Number(s.clicks) || 0);
                         if (typeof s.totalClickedCookies === "number") {
                             clickerState.totalClickedCookies = Math.min(clickerState.totalCookies || 0, Math.max(0, s.totalClickedCookies));
                         } else if (typeof clickerState.totalClickedCookies !== "number") {
@@ -536,9 +536,9 @@
                 achievements: Array.isArray(clickerParsed.achievements) ? [...clickerParsed.achievements] : []
             };
 
-            clickerState.cookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(clickerState.cookies) || 0));
-            clickerState.totalCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(clickerState.totalCookies) || 0));
-            clickerState.totalClickedCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(clickerState.totalClickedCookies) || 0));
+            clickerState.cookies = Math.max(0, Number(clickerState.cookies) || 0);
+            clickerState.totalCookies = Math.max(0, Number(clickerState.totalCookies) || 0);
+            clickerState.totalClickedCookies = Math.max(0, Number(clickerState.totalClickedCookies) || 0);
 
             const gachaParsed = parsed.gacha || {};
             const cleanInventory = { ...(gachaParsed.inventory || {}) };
@@ -548,7 +548,7 @@
             if (!Number.isFinite(tokensCandidate) || tokensCandidate < 0) {
                 tokensCandidate = DEFAULT_STATS.gacha.tokens;
             }
-            tokensCandidate = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(tokensCandidate));
+            tokensCandidate = Math.max(0, Math.floor(tokensCandidate));
 
             // Verify state integrity signature
             const expectedSig = computeStateSignature(
@@ -610,23 +610,15 @@
                 stats.auth = secureAuthForCloud(stats.auth);
             }
             if (stats.clicker) {
-                stats.clicker.cookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(stats.clicker.cookies) || 0));
-                stats.clicker.totalCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(stats.clicker.totalCookies) || 0));
-                stats.clicker.totalClickedCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(stats.clicker.totalClickedCookies) || 0));
+                stats.clicker.cookies = Math.max(0, Number(stats.clicker.cookies) || 0);
+                stats.clicker.totalCookies = Math.max(0, Number(stats.clicker.totalCookies) || 0);
+                stats.clicker.totalClickedCookies = Math.max(0, Number(stats.clicker.totalClickedCookies) || 0);
             }
 
             const prev = (lastVerifiedTokens !== null) ? lastVerifiedTokens : DEFAULT_STATS.gacha.tokens;
             let cand = Number(stats.gacha?.tokens);
             if (!Number.isFinite(cand) || cand < 0) cand = prev;
-            cand = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(cand));
-
-            // Sanity check against impossible balance jumps
-            const delta = cand - prev;
-            const maxAllowedGain = Math.max(100000, prev * 3000);
-            if (!allowLargeJump && delta > maxAllowedGain) {
-                console.warn("[OPS Security] Odmitnut nemozny skok zustatku z", prev, "na", cand);
-                cand = prev;
-            }
+            cand = Math.max(0, Math.floor(cand));
 
             stats.gacha = stats.gacha || {};
             stats.gacha.tokens = cand;
@@ -969,10 +961,10 @@
                             : (typeof localEffective.cookies === "number" ? localEffective.cookies : cloudClicker.cookies);
 
                         const mergedSaveObj = {
-                            cookies: Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Number(spendableCookies) || 0)),
-                            totalCookies: Math.min(Number.MAX_SAFE_INTEGER, higherTotalCookies),
-                            clicks: Math.min(Number.MAX_SAFE_INTEGER, higherClicks),
-                            totalClickedCookies: Math.min(Number.MAX_SAFE_INTEGER, higherTotalClicked),
+                            cookies: Math.max(0, Number(spendableCookies) || 0),
+                            totalCookies: higherTotalCookies,
+                            clicks: higherClicks,
+                            totalClickedCookies: higherTotalClicked,
                             buildings: mergedBuildings,
                             upgrades: mergedUpgrades,
                             achievements: mergedAchievements,
@@ -1075,7 +1067,7 @@
                         const cloudTime = Number(cloudStats.meta?.lastActive) || (rows[0].updated_at ? new Date(rows[0].updated_at).getTime() : 0);
                         const localHasActivity = localTime > 0 && ((local.meta?.totalPlayTime || 0) > 0 || (local.gacha?.totalPulls || 0) > 0 || (local.clicker?.clicks || 0) > 0);
                         const resolvedTok = (!localHasActivity || cloudTime > localTime) ? cloudTok : localTok;
-                        const safeTok = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(resolvedTok)));
+                        const safeTok = Math.max(0, Math.floor(resolvedTok));
                         return {
                             tokens: safeTok,
                             zPity: Math.max(local.gacha?.zPity ?? 0, cloudStats.gacha?.zPity ?? 0),
@@ -1915,7 +1907,7 @@
             const stats = loadLocalStats();
             stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
             const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
-            const newTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(curTokens + delta)));
+            const newTokens = Math.max(0, Math.floor(curTokens + delta));
             stats.gacha.tokens = newTokens;
             saveLocalStats(stats, allowLargeJump);
             if (!syncCloudDebounceTimer) {
@@ -1951,7 +1943,7 @@
             const stats = loadLocalStats();
             const saveCookies = (save && Number.isFinite(Number(save.cookies))) ? Math.max(0, Number(save.cookies)) : 0;
             const statCookies = (stats.clicker && Number.isFinite(Number(stats.clicker.cookies))) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
-            const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
+            const available = Math.max(saveCookies, statCookies);
 
             if (cost > 0 && available < cost) {
                 return { success: false, available, needed: cost };
@@ -1970,7 +1962,7 @@
 
             stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
             const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
-            const newTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(curTokens + gain)));
+            const newTokens = Math.max(0, Math.floor(curTokens + gain));
             stats.gacha.tokens = newTokens;
 
             saveLocalStats(stats, true);
@@ -2041,8 +2033,8 @@
 
             const saveCookies = (save && Number.isFinite(Number(save.cookies))) ? Math.max(0, Number(save.cookies)) : 0;
             const statCookies = (stats.clicker && Number.isFinite(Number(stats.clicker.cookies))) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
-            const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
-            const newCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(available + gain));
+            const available = Math.max(saveCookies, statCookies);
+            const newCookies = Math.max(0, Math.floor(available + gain));
 
             stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
             stats.clicker.cookies = newCookies;
