@@ -151,12 +151,12 @@
         .container {
             max-width: 1240px;
             margin: 0 auto;
-            padding: 32px 20px 0;
+            padding: 28px 20px 0;
         }
 
         /* Title Area */
         .page-header {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .page-header h1 {
@@ -170,7 +170,84 @@
         .page-header p {
             color: var(--muted);
             font-size: 14px;
-            max-width: 720px;
+            max-width: 760px;
+        }
+
+        /* Overview Profile Banner Card */
+        .overview-profile-banner {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background-color 0.15s ease;
+        }
+
+        .overview-profile-banner:hover {
+            border-color: var(--accent);
+            background: var(--raised);
+        }
+
+        .banner-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .banner-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-control);
+            background: var(--raised);
+            border: 1px solid var(--control);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .banner-user-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .banner-username {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .gamer-rank-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 2px 7px;
+            border-radius: var(--radius-chip);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .banner-meta-desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .banner-action-btn {
+            font-size: 12px;
+            padding: 6px 12px;
+            pointer-events: none;
+            white-space: nowrap;
         }
 
         /* KPI Strip (Unified divided container) */
@@ -267,6 +344,27 @@
             font-weight: 700;
         }
 
+        .tab-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1;
+            margin-left: 4px;
+            cursor: pointer;
+            padding: 1px 5px;
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s ease, background-color 0.15s ease;
+        }
+
+        .tab-close-btn:hover {
+            color: #ffffff;
+            background: var(--control);
+        }
+
         /* Cloud Notice */
         .cloud-notice {
             background: var(--surface);
@@ -282,7 +380,7 @@
             color: var(--accent);
         }
 
-        /* Card Frame */
+        /* Panel Frame */
         .app-panel {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -572,6 +670,7 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .btn-outline {
@@ -762,7 +861,7 @@
         }
 
         .level-item-name {
-            width: 110px;
+            width: 120px;
             color: var(--text);
             white-space: nowrap;
             overflow: hidden;
@@ -955,6 +1054,10 @@
             .container {
                 padding: 20px 14px 0;
             }
+            .overview-profile-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
             .kpi-strip {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -998,6 +1101,26 @@
             <p>Centrální přehled výsledků, globální žebříček studentů a podrobné profily hráčů v reálném čase.</p>
         </header>
 
+        <!-- Profile Quick Banner Card (Clickable to open user's detailed profile) -->
+        <section id="overviewProfileBanner" class="overview-profile-banner" onclick="openMyProfile()" role="button" tabindex="0" title="Klikněte pro zobrazení vašeho podrobného profilu">
+            <div class="banner-left">
+                <div id="overviewAvatarLetter" class="banner-avatar">?</div>
+                <div>
+                    <div class="banner-user-row">
+                        <strong id="overviewUsername" class="banner-username">Můj profil</strong>
+                        <span class="badge-me">tento profil</span>
+                        <span id="overviewGamerLevelBadge" class="gamer-rank-badge">LVL 1</span>
+                    </div>
+                    <div class="banner-meta-desc">
+                        Aktivní herní profil v tomto prohlížeči. Kliknutím otevřete kompletní statistiky všech her.
+                    </div>
+                </div>
+            </div>
+            <div class="banner-right">
+                <span class="btn-outline banner-action-btn">Zobrazit můj profil &rarr;</span>
+            </div>
+        </section>
+
         <!-- KPI Strip: 6 divided columns in one surface -->
         <section class="kpi-strip" aria-label="Klíčové metriky">
             <div class="kpi-cell">
@@ -1035,17 +1158,18 @@
         <!-- Primary Tab Bar -->
         <nav class="tab-bar-wrap" aria-label="Záložky statistiky">
             <div class="tab-buttons-group">
-                <button type="button" class="tab-btn active" id="tabBtnLeaderboard" onclick="switchMainTab('leaderboard')">
+                <button type="button" class="tab-btn active" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')">
                     Globální žebříček
                 </button>
-                <button type="button" class="tab-btn" id="tabBtnMyStats" onclick="switchMainTab('myStats')">
-                    Moje statistiky
+                <button type="button" class="tab-btn" id="tabBtnMyProfile" onclick="switchTab('myProfile')">
+                    Můj profil
                 </button>
-                <button type="button" class="tab-btn" id="tabBtnPlayerDetail" style="display:none;" onclick="switchMainTab('playerDetail')">
-                    Detail profilu <span id="tabPlayerDetailNameTag" class="tab-profile-tag"></span>
+                <button type="button" class="tab-btn" id="tabBtnInspected" style="display:none;" onclick="switchTab('inspected')">
+                    Detail: <span id="tabInspectedName" class="tab-profile-tag"></span>
+                    <span class="tab-close-btn" onclick="closeInspectedTab(event)" title="Zavřít detail hráče" role="button" tabindex="0">&times;</span>
                 </button>
             </div>
-            <div id="activeScopeLabel" style="font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;"></div>
+            <div id="activeScopeLabel" style="font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;">Globální žebříček studentů</div>
         </nav>
 
         <!-- TAB 1: GLOBÁLNÍ ŽEBŘÍČEK -->
@@ -1096,7 +1220,7 @@
             </div>
         </main>
 
-        <!-- TAB 2: DETAIL PROFILU HRÁČE -->
+        <!-- TAB 2 / PROFILE VIEW (Můj profil nebo Detail vybraného hráče) -->
         <section id="tabPlayerDetail" class="profile-view-wrap" style="display:none;">
             <!-- Profile Hero Panel -->
             <div class="profile-hero-panel">
@@ -1116,7 +1240,7 @@
                         </div>
                     </div>
                     <div class="profile-actions-right">
-                        <button type="button" class="btn-outline" onclick="switchMainTab('leaderboard')">
+                        <button type="button" class="btn-outline" onclick="switchTab('leaderboard')">
                             &larr; Zpět na žebříček
                         </button>
                         <button type="button" id="detailCompareBtn" class="btn-outline" onclick="toggleComparisonView()">
@@ -1386,13 +1510,6 @@
             </div>
         </section>
 
-        <!-- TAB 3: MOJE STATISTIKY (Místní profil) -->
-        <section id="tabMyStats" class="profile-view-wrap" style="display:none;">
-            <div id="myStatsContainer">
-                <!-- Rendered dynamically identically using renderPlayerProfileContent(localStats, myUser, container) -->
-            </div>
-        </section>
-
         <!-- Bottom Actions Strip -->
         <footer class="bottom-actions-row">
             <button type="button" class="btn-outline" onclick="OPS_STATS.promptUsernameModal()">
@@ -1443,8 +1560,19 @@
 
         let cachedLeaderboardData = [];
         let currentLeaderboardMetric = 'total_play_time';
+        let inspectedPlayerRecord = null;
         let inspectedPlayerStats = null;
         let inspectedPlayerName = '';
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
         function formatDuration(sec) {
             sec = Math.floor(sec || 0);
@@ -1471,13 +1599,17 @@
             return (num / 1e18).toFixed(1).replace(".", ",") + " tril.";
         }
 
-        function calculateGamerLevel(stats) {
-            if (!stats) return "LVL 1";
-            const timeXp = Math.floor((stats.meta?.totalPlayTime || 0) / 30);
-            const heroXp = (stats.stratagem?.highScore || 0) * 15;
-            const gdXp = (stats.gd?.completedLevels?.length || 0) * 100 + Math.floor((stats.gd?.jumps || 0) / 10);
-            const clickerXp = Math.min(1000, Math.floor(Math.sqrt(stats.clicker?.totalCookies || 0) / 5));
-            const gachaXp = (stats.gacha?.totalPulls || 0) * 5;
+        function calculateGamerLevel(stats, playerRecord) {
+            if (!stats && !playerRecord) return "LVL 1";
+            const playTime = Number(playerRecord?.total_play_time) || Number(stats?.meta?.totalPlayTime) || 0;
+            const timeXp = Math.floor(playTime / 30);
+            const heroScore = Number(playerRecord?.stratagem_highscore) || Number(stats?.stratagem?.highScore) || 0;
+            const heroXp = heroScore * 15;
+            const gdCompleted = Number(playerRecord?.gd_completed_levels) || (stats?.gd?.completedLevels && Array.isArray(stats.gd.completedLevels) ? stats.gd.completedLevels.length : 0);
+            const gdJumps = Number(playerRecord?.gd_total_jumps) || Number(stats?.gd?.jumps) || 0;
+            const gdXp = gdCompleted * 100 + Math.floor(gdJumps / 10);
+            const clickerXp = Math.min(1000, Math.floor(Math.sqrt(Number(stats?.clicker?.totalCookies) || 0) / 5));
+            const gachaXp = (Number(stats?.gacha?.totalPulls) || 0) * 5;
             const totalXp = timeXp + heroXp + gdXp + clickerXp + gachaXp;
             const level = Math.max(1, Math.floor(Math.sqrt(totalXp / 10)) + 1);
             return `LVL ${level}`;
@@ -1491,10 +1623,23 @@
             return rawStats;
         }
 
-        /* Top KPI Bar */
+        /* Top KPI Bar & Overview Banner */
         function updateTopKpis(stats) {
+            const myUser = (OPS_STATS.getUsername() || "Hráč").trim();
+            const initial = (myUser[0] || "?").toUpperCase();
+            const gamerLvl = calculateGamerLevel(stats);
+
+            // Overview Banner
+            const bannerInitialEl = document.getElementById('overviewAvatarLetter');
+            if (bannerInitialEl) bannerInitialEl.textContent = initial;
+            const bannerUserEl = document.getElementById('overviewUsername');
+            if (bannerUserEl) bannerUserEl.textContent = myUser;
+            const bannerRankEl = document.getElementById('overviewGamerLevelBadge');
+            if (bannerRankEl) bannerRankEl.textContent = gamerLvl;
+
+            // KPI Strip
             document.getElementById('kpiTotalTime').textContent = formatDuration(stats.meta?.totalPlayTime || 0);
-            document.getElementById('kpiGamerLevel').textContent = calculateGamerLevel(stats);
+            document.getElementById('kpiGamerLevel').textContent = gamerLvl;
             document.getElementById('kpiHeroScore').textContent = stats.stratagem?.highScore || 0;
             document.getElementById('kpiGdCompleted').textContent = `${stats.gd?.completedLevels?.length || 0} / 22`;
 
@@ -1510,33 +1655,74 @@
             document.getElementById('kpiGachaSub').textContent = `${uniqueChars} postav ve sbírce`;
         }
 
-        /* Tabs Switching */
-        function switchMainTab(tabKey) {
+        /* Tab Switching */
+        function switchTab(tabKey) {
             const tabLb = document.getElementById('tabLeaderboard');
             const tabProf = document.getElementById('tabPlayerDetail');
-            const tabMy = document.getElementById('tabMyStats');
 
             const btnLb = document.getElementById('tabBtnLeaderboard');
-            const btnProf = document.getElementById('tabBtnPlayerDetail');
-            const btnMy = document.getElementById('tabBtnMyStats');
-
-            tabLb.style.display = tabKey === 'leaderboard' ? 'block' : 'none';
-            tabProf.style.display = tabKey === 'playerDetail' ? 'flex' : 'none';
-            tabMy.style.display = tabKey === 'myStats' ? 'flex' : 'none';
-
-            btnLb.classList.toggle('active', tabKey === 'leaderboard');
-            btnProf.classList.toggle('active', tabKey === 'playerDetail');
-            btnMy.classList.toggle('active', tabKey === 'myStats');
-
+            const btnMy = document.getElementById('tabBtnMyProfile');
+            const btnInspected = document.getElementById('tabBtnInspected');
             const scopeLabel = document.getElementById('activeScopeLabel');
+
             if (tabKey === 'leaderboard') {
-                scopeLabel.textContent = `Zobrazen globální žebříček`;
-            } else if (tabKey === 'myStats') {
-                scopeLabel.textContent = `Zobrazeny statistiky tohoto zařízení`;
-                renderMyStatsTab();
-            } else if (tabKey === 'playerDetail') {
-                scopeLabel.textContent = `Zobrazen detail hráče ${inspectedPlayerName}`;
+                tabLb.style.display = 'block';
+                tabProf.style.display = 'none';
+
+                btnLb.classList.add('active');
+                btnMy.classList.remove('active');
+                btnInspected.classList.remove('active');
+
+                scopeLabel.textContent = 'Globální žebříček studentů';
+                if (typeof window !== 'undefined' && window.history && window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.pathname);
+                }
+            } else if (tabKey === 'myProfile') {
+                tabLb.style.display = 'none';
+                tabProf.style.display = 'flex';
+
+                btnLb.classList.remove('active');
+                btnMy.classList.add('active');
+                btnInspected.classList.remove('active');
+
+                scopeLabel.textContent = 'Váš osobní profil (toto zařízení)';
+                const myUser = (OPS_STATS.getUsername() || 'Můj profil').trim();
+                const localStats = OPS_STATS.getStats();
+                inspectedPlayerRecord = null;
+                inspectedPlayerStats = localStats;
+                renderProfileData(myUser, localStats, localStats.meta?.totalPlayTime || 0, new Date().toISOString(), true, null);
+
+                if (typeof window !== 'undefined' && window.history && window.history.replaceState) {
+                    window.history.replaceState(null, null, '#my-profile');
+                }
+            } else if (tabKey === 'inspected') {
+                tabLb.style.display = 'none';
+                tabProf.style.display = 'flex';
+
+                btnLb.classList.remove('active');
+                btnMy.classList.remove('active');
+                btnInspected.classList.add('active');
+                btnInspected.style.display = 'inline-flex';
+
+                scopeLabel.textContent = `Detail hráče ${inspectedPlayerName}`;
+                if (typeof window !== 'undefined' && window.history && window.history.replaceState && inspectedPlayerName) {
+                    window.history.replaceState(null, null, `#player=${encodeURIComponent(inspectedPlayerName)}`);
+                }
             }
+        }
+
+        function openMyProfile() {
+            switchTab('myProfile');
+        }
+
+        function closeInspectedTab(e) {
+            if (e) e.stopPropagation();
+            const btnInspected = document.getElementById('tabBtnInspected');
+            btnInspected.style.display = 'none';
+            inspectedPlayerName = '';
+            inspectedPlayerRecord = null;
+            inspectedPlayerStats = null;
+            switchTab('leaderboard');
         }
 
         /* Leaderboard Metric Filter */
@@ -1589,7 +1775,6 @@
             const col = currentLeaderboardMetric;
 
             if (!data || data.length === 0) {
-                // Lokální data jako fallback pro aktuálního uživatele
                 const localStats = OPS_STATS.getStats();
                 let myValPrimary = '0';
                 let myValSub = '';
@@ -1606,32 +1791,46 @@
                     myValPrimary = formatDuration(localStats.meta?.totalPlayTime || 0);
                 }
 
+                const displayName = myUser || 'Ty';
+                const initialLetter = (displayName[0] || 'T').toUpperCase();
+
                 tbody.innerHTML = `
-                    <tr class="clickable-row row-is-me" onclick="openPlayerDetail('${myUser || 'Ty'}')">
+                    <tr class="clickable-row row-is-me" id="fallbackLocalRow">
                         <td class="rank-number top-1">1.</td>
                         <td>
                             <div class="player-identity-cell">
-                                <div class="player-avatar-letter">${(myUser || 'T')[0].toUpperCase()}</div>
+                                <div class="player-avatar-letter">${escapeHtml(initialLetter)}</div>
                                 <div>
-                                    <span class="player-name-text">${myUser || 'Ty'}</span>
+                                    <span class="player-name-text">${escapeHtml(displayName)}</span>
                                     <span class="badge-me">tento profil</span>
                                 </div>
                             </div>
                         </td>
                         <td style="text-align:right;">
-                            <div class="metric-primary-val" style="color:var(--accent);">${myValPrimary}</div>
-                            ${myValSub ? `<div class="metric-sub-val">${myValSub}</div>` : ''}
+                            <div class="metric-primary-val" style="color:var(--accent);">${escapeHtml(myValPrimary)}</div>
+                            ${myValSub ? `<div class="metric-sub-val">${escapeHtml(myValSub)}</div>` : ''}
                         </td>
                         <td style="text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;">Právě teď</td>
                         <td style="text-align:center;">
-                            <button type="button" class="action-inspect-btn" onclick="event.stopPropagation();openPlayerDetail('${myUser || 'Ty'}')">Zobrazit &rarr;</button>
+                            <button type="button" class="action-inspect-btn">Zobrazit &rarr;</button>
                         </td>
                     </tr>
                 `;
+
+                const fallbackRow = document.getElementById('fallbackLocalRow');
+                if (fallbackRow) {
+                    fallbackRow.addEventListener('click', () => openMyProfile());
+                    const btn = fallbackRow.querySelector('.action-inspect-btn');
+                    if (btn) {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            openMyProfile();
+                        });
+                    }
+                }
                 return;
             }
 
-            // Client-side sorting pro clicker pokud je potřeba
             let rowsToDisplay = [...data];
             if (col === 'clicker_total_cookies') {
                 rowsToDisplay.sort((a, b) => {
@@ -1643,7 +1842,6 @@
                 });
             }
 
-            // Vyhledávací filtr
             if (searchFilter) {
                 rowsToDisplay = rowsToDisplay.filter(r => (r.username || '').toLowerCase().includes(searchFilter));
             }
@@ -1693,90 +1891,112 @@
 
                 const tr = document.createElement('tr');
                 tr.className = `clickable-row ${isMe ? 'row-is-me' : ''}`;
-                tr.onclick = () => openPlayerDetail(row.username);
+                tr.tabIndex = 0;
+                tr.setAttribute('role', 'button');
+                tr.setAttribute('aria-label', `Zobrazit detail profilu ${row.username || 'Anonym'}`);
 
                 tr.innerHTML = `
                     <td class="rank-number ${rankClass}">${rank}.</td>
                     <td>
                         <div class="player-identity-cell">
-                            <div class="player-avatar-letter">${initialLetter}</div>
+                            <div class="player-avatar-letter">${escapeHtml(initialLetter)}</div>
                             <div>
-                                <span class="player-name-text">${row.username || 'Anonym'}</span>
+                                <span class="player-name-text">${escapeHtml(row.username || 'Anonym')}</span>
                                 ${isMe ? '<span class="badge-me">tento profil</span>' : ''}
                             </div>
                         </div>
                     </td>
                     <td style="text-align:right;">
-                        <div class="metric-primary-val" style="color:${rank === 1 ? 'var(--warning)' : '#ffffff'};">${primaryVal}</div>
-                        ${subVal ? `<div class="metric-sub-val">${subVal}</div>` : ''}
+                        <div class="metric-primary-val" style="color:${rank === 1 ? 'var(--warning)' : '#ffffff'};">${escapeHtml(primaryVal)}</div>
+                        ${subVal ? `<div class="metric-sub-val">${escapeHtml(subVal)}</div>` : ''}
                     </td>
-                    <td style="text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;">${dateStr}</td>
+                    <td style="text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;">${escapeHtml(dateStr)}</td>
                     <td style="text-align:center;">
-                        <button type="button" class="action-inspect-btn" onclick="event.stopPropagation();openPlayerDetail('${encodeURIComponent(row.username)}')">Zobrazit &rarr;</button>
+                        <button type="button" class="action-inspect-btn">Zobrazit &rarr;</button>
                     </td>
                 `;
+
+                tr.addEventListener('click', () => openPlayerDetail(row.username));
+                tr.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openPlayerDetail(row.username);
+                    }
+                });
+
+                const btn = tr.querySelector('.action-inspect-btn');
+                if (btn) {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openPlayerDetail(row.username);
+                    });
+                }
+
                 tbody.appendChild(tr);
             });
         }
 
-        /* Open Player Detail */
+        /* Open Player Detail (Loads from Supabase or Cache) */
         async function openPlayerDetail(username) {
-            username = decodeURIComponent(username || '').trim();
+            username = (username || '').trim();
             if (!username) return;
 
-            inspectedPlayerName = username;
             const myUser = (OPS_STATS.getUsername() || '').trim();
-            const isMe = username.toLowerCase() === myUser.toLowerCase();
-
-            // Zkusíme najít v cachedLeaderboardData
-            let playerRecord = cachedLeaderboardData.find(r => r.username && r.username.toLowerCase() === username.toLowerCase());
-
-            // Pokud není nebo chceme nejčerstvější data, vytáhneme ze Supabase
-            if (!playerRecord && !isMe) {
-                playerRecord = await OPS_STATS.fetchPlayerStats(username);
-            }
-
-            let statsObj = {};
-            let totalPlayTime = 0;
-            let updatedAt = null;
+            const isMe = username.toLowerCase() === myUser.toLowerCase() || username.toLowerCase() === 'ty';
 
             if (isMe) {
-                statsObj = OPS_STATS.getStats();
-                totalPlayTime = statsObj.meta?.totalPlayTime || 0;
-                updatedAt = new Date().toISOString();
-            } else if (playerRecord) {
-                statsObj = getSafeStatsObject(playerRecord.stats);
-                totalPlayTime = playerRecord.total_play_time || statsObj.meta?.totalPlayTime || 0;
-                updatedAt = playerRecord.updated_at;
-            } else {
-                // Zkusíme ještě přímý fetch
-                playerRecord = await OPS_STATS.fetchPlayerStats(username);
-                if (playerRecord) {
-                    statsObj = getSafeStatsObject(playerRecord.stats);
-                    totalPlayTime = playerRecord.total_play_time || statsObj.meta?.totalPlayTime || 0;
-                    updatedAt = playerRecord.updated_at;
-                }
+                switchTab('myProfile');
+                return;
             }
 
+            inspectedPlayerName = username;
+
+            // Set dynamic tab for inspected player
+            const btnInspected = document.getElementById('tabBtnInspected');
+            const inspectedNameEl = document.getElementById('tabInspectedName');
+            btnInspected.style.display = 'inline-flex';
+            inspectedNameEl.textContent = username;
+
+            switchTab('inspected');
+
+            // Quick check in cachedLeaderboardData
+            let playerRecord = cachedLeaderboardData.find(r => r.username && r.username.toLowerCase() === username.toLowerCase());
+
+            // If not found in cache, display loading state and fetch from Supabase
+            if (!playerRecord) {
+                document.getElementById('detailAvatarLetter').textContent = (username[0] || '?').toUpperCase();
+                document.getElementById('detailUsernameDisplay').textContent = `${username} (načítám...)`;
+                document.getElementById('detailIsMeBadge').style.display = 'none';
+                document.getElementById('detailCompareBtn').style.display = 'none';
+                document.getElementById('profileComparePanel').style.display = 'none';
+
+                playerRecord = await OPS_STATS.fetchPlayerStats(username);
+            }
+
+            if (!playerRecord) {
+                document.getElementById('detailAvatarLetter').textContent = (username[0] || '?').toUpperCase();
+                document.getElementById('detailUsernameDisplay').textContent = username;
+                document.getElementById('detailIsMeBadge').style.display = 'none';
+                document.getElementById('detailCompareBtn').style.display = 'none';
+                document.getElementById('profileComparePanel').style.display = 'none';
+                document.getElementById('detailGamerRank').textContent = 'LVL 1';
+                document.getElementById('detailLastActive').textContent = 'Nenalezeno v databázi';
+                document.getElementById('detailLastGame').textContent = 'Žádná data';
+                return;
+            }
+
+            const statsObj = getSafeStatsObject(playerRecord.stats);
+            const totalPlayTime = Number(playerRecord.total_play_time) || Number(statsObj.meta?.totalPlayTime) || 0;
+            const updatedAt = playerRecord.updated_at;
+
+            inspectedPlayerRecord = playerRecord;
             inspectedPlayerStats = statsObj;
 
-            // Zobrazení záložky v tab bar
-            const tabBtn = document.getElementById('tabBtnPlayerDetail');
-            const nameTag = document.getElementById('tabPlayerDetailNameTag');
-            tabBtn.style.display = 'inline-flex';
-            nameTag.textContent = username;
-
-            renderInspectedPlayerDOM(username, statsObj, totalPlayTime, updatedAt, isMe);
-            switchMainTab('playerDetail');
-
-            // Aktualizace URL hash bez přebíjení historie
-            if (history.replaceState) {
-                history.replaceState(null, null, `#player=${encodeURIComponent(username)}`);
-            }
+            renderProfileData(playerRecord.username || username, statsObj, totalPlayTime, updatedAt, false, playerRecord);
         }
 
-        /* Render Profile Detail into DOM */
-        function renderInspectedPlayerDOM(username, stats, totalPlayTime, updatedAt, isMe) {
+        /* Render Profile Data into DOM */
+        function renderProfileData(username, stats, totalPlayTime, updatedAt, isMe, playerRecord) {
             document.getElementById('detailAvatarLetter').textContent = (username || '?')[0].toUpperCase();
             document.getElementById('detailUsernameDisplay').textContent = username;
             document.getElementById('detailIsMeBadge').style.display = isMe ? 'inline-block' : 'none';
@@ -1784,7 +2004,7 @@
             document.getElementById('profileComparePanel').style.display = 'none';
 
             // Meta
-            document.getElementById('detailGamerRank').textContent = calculateGamerLevel(stats);
+            document.getElementById('detailGamerRank').textContent = calculateGamerLevel(stats, playerRecord);
             document.getElementById('detailLastActive').textContent = updatedAt ? new Date(updatedAt).toLocaleString("cs-CZ") : "Neuvedeno";
             document.getElementById('detailLastGame').textContent = stats.meta?.lastPlayedGame || "Žádná hra";
 
@@ -1793,11 +2013,15 @@
             const clicker = stats.clicker || {};
             const totalCookies = Math.max(Number(clicker.totalCookies) || 0, Number(clicker.cookies) || 0);
             document.getElementById('detailClickerTotal').textContent = formatCompactNumber(totalCookies);
-            document.getElementById('detailHeroScore').textContent = stats.stratagem?.highScore || 0;
-            document.getElementById('detailGdLevels').textContent = `${stats.gd?.completedLevels?.length || 0} / 22`;
+
+            const heroHighScore = Number(playerRecord?.stratagem_highscore) || Number(stats.stratagem?.highScore) || 0;
+            document.getElementById('detailHeroScore').textContent = heroHighScore;
+
+            const gdLevelsCount = Number(playerRecord?.gd_completed_levels) || (stats.gd?.completedLevels && Array.isArray(stats.gd.completedLevels) ? stats.gd.completedLevels.length : 0);
+            document.getElementById('detailGdLevels').textContent = `${gdLevelsCount} / 22`;
             document.getElementById('detailGachaPulls').textContent = stats.gacha?.totalPulls || 0;
 
-            // Clicker
+            // Clicker Details
             document.getElementById('detClickerTotalExact').textContent = formatNumber(totalCookies);
             document.getElementById('detClickerCurrent').textContent = formatNumber(clicker.cookies || 0);
             document.getElementById('detClickerCps').textContent = `${formatCompactNumber(Number(clicker.cps) || 0)} /s`;
@@ -1806,7 +2030,7 @@
             document.getElementById('detClickerClicks').textContent = formatNumber(clicker.clicks || 0);
             document.getElementById('detClickerPower').textContent = formatNumber(clicker.clickPower || 1);
 
-            // Clicker Budovy
+            // Clicker Buildings List
             const bldListEl = document.getElementById('detClickerBuildingsList');
             bldListEl.innerHTML = '';
             const bldObj = clicker.buildings || {};
@@ -1817,21 +2041,22 @@
                 const row = document.createElement('div');
                 row.className = 'clicker-bld-item';
                 row.innerHTML = `
-                    <span class="clicker-bld-name">${label}</span>
+                    <span class="clicker-bld-name">${escapeHtml(label)}</span>
                     <span class="clicker-bld-count" style="color:${count > 0 ? '#ffffff' : 'var(--faint)'};">${formatNumber(count)}</span>
                 `;
                 bldListEl.appendChild(row);
             }
             document.getElementById('detClickerBldCount').textContent = formatNumber(totalBldCount);
 
-            // Juchelka Dash
+            // Juchelka Dash Details
             const gd = stats.gd || {};
-            document.getElementById('detGdCompleted').textContent = `${gd.completedLevels?.length || 0} / 22`;
+            document.getElementById('detGdCompleted').textContent = `${gdLevelsCount} / 22`;
             document.getElementById('detGdAttempts').textContent = formatNumber(gd.attempts || 0);
-            document.getElementById('detGdJumps').textContent = formatNumber(gd.jumps || 0);
+            const gdJumps = Number(playerRecord?.gd_total_jumps) || Number(gd.jumps) || 0;
+            document.getElementById('detGdJumps').textContent = formatNumber(gdJumps);
             document.getElementById('detGdTime').textContent = formatDuration(gd.playTime || 0);
 
-            // GD Levels
+            // GD Levels progress bars
             const gdListEl = document.getElementById('detGdLevelsList');
             gdListEl.innerHTML = '';
             let sumPercent = 0;
@@ -1844,7 +2069,7 @@
                 const row = document.createElement('div');
                 row.className = 'level-item-row';
                 row.innerHTML = `
-                    <div class="level-item-name" title="${GD_LEVEL_NAMES[i-1]}">${GD_LEVEL_NAMES[i-1]}</div>
+                    <div class="level-item-name" title="${escapeHtml(GD_LEVEL_NAMES[i-1])}">${escapeHtml(GD_LEVEL_NAMES[i-1])}</div>
                     <div class="level-bar-track">
                         <div class="level-bar-fill ${isDone ? 'complete' : ''}" style="width: ${percent}%;"></div>
                     </div>
@@ -1854,14 +2079,14 @@
             }
             document.getElementById('detGdAvgPercent').textContent = `Průměr: ${Math.round(sumPercent / 22)}%`;
 
-            // Juchelka Hero
+            // Juchelka Hero Details
             const hero = stats.stratagem || {};
-            document.getElementById('detHeroScore').textContent = hero.highScore || 0;
+            document.getElementById('detHeroScore').textContent = heroHighScore;
             document.getElementById('detHeroGames').textContent = formatNumber(hero.totalGames || 0);
             document.getElementById('detHeroSequences').textContent = formatNumber(hero.totalSequences || 0);
             document.getElementById('detHeroTime').textContent = formatDuration(hero.playTime || 0);
 
-            // Gacha
+            // Gacha Details
             const gacha = stats.gacha || {};
             document.getElementById('detGachaPullsVal').textContent = formatNumber(gacha.totalPulls || 0);
             document.getElementById('detGachaTokensVal').textContent = formatCompactNumber(gacha.tokens || 0);
@@ -1880,17 +2105,17 @@
                 card.className = `gacha-char-card ${count > 0 ? 'owned' : ''}`;
                 card.innerHTML = `
                     <div class="gacha-char-top">
-                        <span class="gacha-rank-badge rank-${agent.rank}">[${agent.rank}]</span>
+                        <span class="gacha-rank-badge rank-${escapeHtml(agent.rank)}">[${escapeHtml(agent.rank)}]</span>
                         <span class="gacha-char-count" style="color:${count > 0 ? 'var(--positive)' : 'var(--faint)'};">${count} ks</span>
                     </div>
-                    <div class="gacha-char-name">${agent.name}</div>
-                    <div class="gacha-char-desc">${agent.type}</div>
+                    <div class="gacha-char-name">${escapeHtml(agent.name)}</div>
+                    <div class="gacha-char-desc">${escapeHtml(agent.type)}</div>
                 `;
                 rosterEl.appendChild(card);
             });
             document.getElementById('detGachaUniqueVal').textContent = `${uniqueCount} / ${agents.length}`;
 
-            // Ostatní hry
+            // Secondary Games Details
             const race = stats.hyperdrive || {};
             document.getElementById('detRaceSessions').textContent = `${formatNumber(race.sessions || 0)} jízd`;
             document.getElementById('detRaceTime').textContent = `${formatDuration(race.playTime || 0)} na trati`;
@@ -1922,57 +2147,128 @@
 
             const myStats = OPS_STATS.getStats();
             const theirStats = inspectedPlayerStats || {};
+            const theirRecord = inspectedPlayerRecord || {};
 
-            const myTime = myStats.meta?.totalPlayTime || 0;
-            const theirTime = theirStats.meta?.totalPlayTime || 0;
+            const myTime = Number(myStats.meta?.totalPlayTime) || 0;
+            const theirTime = Number(theirRecord.total_play_time) || Number(theirStats.meta?.totalPlayTime) || 0;
 
             const myCookies = Math.max(Number(myStats.clicker?.totalCookies) || 0, Number(myStats.clicker?.cookies) || 0);
             const theirCookies = Math.max(Number(theirStats.clicker?.totalCookies) || 0, Number(theirStats.clicker?.cookies) || 0);
 
-            const myHero = myStats.stratagem?.highScore || 0;
-            const theirHero = theirStats.stratagem?.highScore || 0;
+            const myCps = Number(myStats.clicker?.cps) || 0;
+            const theirCps = Number(theirStats.clicker?.cps) || 0;
 
-            const myGd = myStats.gd?.completedLevels?.length || 0;
-            const theirGd = theirStats.gd?.completedLevels?.length || 0;
+            const myHero = Number(myStats.stratagem?.highScore) || 0;
+            const theirHero = Number(theirRecord.stratagem_highscore) || Number(theirStats.stratagem?.highScore) || 0;
 
-            const myGacha = myStats.gacha?.totalPulls || 0;
-            const theirGacha = theirStats.gacha?.totalPulls || 0;
+            const myGd = (myStats.gd?.completedLevels && Array.isArray(myStats.gd.completedLevels)) ? myStats.gd.completedLevels.length : 0;
+            const theirGd = Number(theirRecord.gd_completed_levels) || ((theirStats.gd?.completedLevels && Array.isArray(theirStats.gd.completedLevels)) ? theirStats.gd.completedLevels.length : 0);
+
+            const myGdJumps = Number(myStats.gd?.jumps) || 0;
+            const theirGdJumps = Number(theirRecord.gd_total_jumps) || Number(theirStats.gd?.jumps) || 0;
+
+            const myGacha = Number(myStats.gacha?.totalPulls) || 0;
+            const theirGacha = Number(theirStats.gacha?.totalPulls) || 0;
+
+            const myGachaUnique = Object.keys(myStats.gacha?.inventory || {}).filter(k => (myStats.gacha.inventory[k] || 0) > 0).length;
+            const theirGachaUnique = Object.keys(theirStats.gacha?.inventory || {}).filter(k => (theirStats.gacha.inventory[k] || 0) > 0).length;
+
+            const myRace = Number(myStats.hyperdrive?.sessions) || 0;
+            const theirRace = Number(theirStats.hyperdrive?.sessions) || 0;
+
+            const myMcTime = Number(myStats.mc?.playTime) || 0;
+            const theirMcTime = Number(theirStats.mc?.playTime) || 0;
+
+            const myMatScore = Number(myStats.maturita?.highScore) || 0;
+            const theirMatScore = Number(theirStats.maturita?.highScore) || 0;
+
+            const myR404Score = Math.max(Number(myStats.runner404?.hunterHighScore) || 0, Number(myStats.runner404?.runnerHighScore) || 0);
+            const theirR404Score = Math.max(Number(theirStats.runner404?.hunterHighScore) || 0, Number(theirStats.runner404?.runnerHighScore) || 0);
 
             const rows = [
                 {
-                    metric: "Odehraný čas",
+                    metric: "Celkový herní čas",
                     myVal: formatDuration(myTime),
                     theirVal: formatDuration(theirTime),
                     diff: (myTime - theirTime) >= 0 ? `+${formatDuration(myTime - theirTime)}` : `-${formatDuration(theirTime - myTime)}`,
-                    isPositive: (myTime - theirTime) >= 0
+                    status: (myTime - theirTime) > 0 ? "positive" : ((myTime - theirTime) < 0 ? "negative" : "neutral")
                 },
                 {
-                    metric: "Maturita Clicker (MCoiny)",
+                    metric: "Maturita Clicker (MCoiny celkem)",
                     myVal: formatCompactNumber(myCookies),
                     theirVal: formatCompactNumber(theirCookies),
                     diff: (myCookies - theirCookies) >= 0 ? `+${formatCompactNumber(myCookies - theirCookies)}` : `-${formatCompactNumber(theirCookies - myCookies)}`,
-                    isPositive: (myCookies - theirCookies) >= 0
+                    status: (myCookies - theirCookies) > 0 ? "positive" : ((myCookies - theirCookies) < 0 ? "negative" : "neutral")
                 },
                 {
-                    metric: "Juchelka Hero (Kódy)",
+                    metric: "Maturita Clicker (Pasivní CPS)",
+                    myVal: `${formatCompactNumber(myCps)}/s`,
+                    theirVal: `${formatCompactNumber(theirCps)}/s`,
+                    diff: (myCps - theirCps) >= 0 ? `+${formatCompactNumber(myCps - theirCps)}/s` : `-${formatCompactNumber(theirCps - myCps)}/s`,
+                    status: (myCps - theirCps) > 0 ? "positive" : ((myCps - theirCps) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Juchelka Hero (Rekord kódů)",
                     myVal: `${myHero}`,
                     theirVal: `${theirHero}`,
                     diff: (myHero - theirHero) >= 0 ? `+${myHero - theirHero}` : `${myHero - theirHero}`,
-                    isPositive: (myHero - theirHero) >= 0
+                    status: (myHero - theirHero) > 0 ? "positive" : ((myHero - theirHero) < 0 ? "negative" : "neutral")
                 },
                 {
-                    metric: "Juchelka Dash (Levely)",
+                    metric: "Juchelka Dash (Levelů 100%)",
                     myVal: `${myGd} / 22`,
                     theirVal: `${theirGd} / 22`,
                     diff: (myGd - theirGd) >= 0 ? `+${myGd - theirGd}` : `${myGd - theirGd}`,
-                    isPositive: (myGd - theirGd) >= 0
+                    status: (myGd - theirGd) > 0 ? "positive" : ((myGd - theirGd) < 0 ? "negative" : "neutral")
                 },
                 {
-                    metric: "Gacha (Celkem pullů)",
+                    metric: "Juchelka Dash (Celkem skoků)",
+                    myVal: formatNumber(myGdJumps),
+                    theirVal: formatNumber(theirGdJumps),
+                    diff: (myGdJumps - theirGdJumps) >= 0 ? `+${formatNumber(myGdJumps - theirGdJumps)}` : `-${formatNumber(theirGdJumps - myGdJumps)}`,
+                    status: (myGdJumps - theirGdJumps) > 0 ? "positive" : ((myGdJumps - theirGdJumps) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Gacha sbor (Pullů celkem)",
                     myVal: `${myGacha}`,
                     theirVal: `${theirGacha}`,
                     diff: (myGacha - theirGacha) >= 0 ? `+${myGacha - theirGacha}` : `${myGacha - theirGacha}`,
-                    isPositive: (myGacha - theirGacha) >= 0
+                    status: (myGacha - theirGacha) > 0 ? "positive" : ((myGacha - theirGacha) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Gacha sbor (Postav ve sbírce)",
+                    myVal: `${myGachaUnique} / 14`,
+                    theirVal: `${theirGachaUnique} / 14`,
+                    diff: (myGachaUnique - theirGachaUnique) >= 0 ? `+${myGachaUnique - theirGachaUnique}` : `${myGachaUnique - theirGachaUnique}`,
+                    status: (myGachaUnique - theirGachaUnique) > 0 ? "positive" : ((myGachaUnique - theirGachaUnique) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Race with Kokeš (Jízd)",
+                    myVal: `${myRace}`,
+                    theirVal: `${theirRace}`,
+                    diff: (myRace - theirRace) >= 0 ? `+${myRace - theirRace}` : `${myRace - theirRace}`,
+                    status: (myRace - theirRace) > 0 ? "positive" : ((myRace - theirRace) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Minecraft 1.8.8 (Čas ve světě)",
+                    myVal: formatDuration(myMcTime),
+                    theirVal: formatDuration(theirMcTime),
+                    diff: (myMcTime - theirMcTime) >= 0 ? `+${formatDuration(myMcTime - theirMcTime)}` : `-${formatDuration(theirMcTime - myMcTime)}`,
+                    status: (myMcTime - theirMcTime) > 0 ? "positive" : ((myMcTime - theirMcTime) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Run From Maturita (Max skóre)",
+                    myVal: formatNumber(myMatScore),
+                    theirVal: formatNumber(theirMatScore),
+                    diff: (myMatScore - theirMatScore) >= 0 ? `+${formatNumber(myMatScore - theirMatScore)}` : `-${formatNumber(theirMatScore - myMatScore)}`,
+                    status: (myMatScore - theirMatScore) > 0 ? "positive" : ((myMatScore - theirMatScore) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Runner 404 (Max skóre)",
+                    myVal: formatNumber(myR404Score),
+                    theirVal: formatNumber(theirR404Score),
+                    diff: (myR404Score - theirR404Score) >= 0 ? `+${formatNumber(myR404Score - theirR404Score)}` : `-${formatNumber(theirR404Score - myR404Score)}`,
+                    status: (myR404Score - theirR404Score) > 0 ? "positive" : ((myR404Score - theirR404Score) < 0 ? "negative" : "neutral")
                 }
             ];
 
@@ -1980,29 +2276,18 @@
             tbody.innerHTML = '';
             rows.forEach(r => {
                 const tr = document.createElement('tr');
+                const color = r.status === 'positive' ? 'var(--positive)' : (r.status === 'negative' ? 'var(--negative)' : 'var(--muted)');
                 tr.innerHTML = `
-                    <td style="font-weight:600;">${r.metric}</td>
-                    <td style="text-align:right;" class="num">${r.myVal}</td>
-                    <td style="text-align:right;" class="num">${r.theirVal}</td>
-                    <td style="text-align:right;font-weight:700;color:${r.isPositive ? 'var(--positive)' : 'var(--negative)'};" class="num">${r.diff}</td>
+                    <td style="font-weight:600;">${escapeHtml(r.metric)}</td>
+                    <td style="text-align:right;" class="num">${escapeHtml(r.myVal)}</td>
+                    <td style="text-align:right;" class="num">${escapeHtml(r.theirVal)}</td>
+                    <td style="text-align:right;font-weight:700;color:${color};" class="num">${escapeHtml(r.diff)}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        /* Render "Moje statistiky" tab */
-        function renderMyStatsTab() {
-            const container = document.getElementById('myStatsContainer');
-            const localStats = OPS_STATS.getStats();
-            const myUser = OPS_STATS.getUsername() || "Můj profil";
-
-            // Využijeme stejnou logiku pro vykreslení
-            renderInspectedPlayerDOM(myUser, localStats, localStats.meta?.totalPlayTime || 0, new Date().toISOString(), true);
-            // Přepneme obsah
-            switchMainTab('playerDetail');
-        }
-
-        /* Init */
+        /* Initial Load */
         window.addEventListener('DOMContentLoaded', () => {
             const myUser = OPS_STATS.getUsername() || "Neznámý";
             const topUserEl = document.getElementById('topUsernameDisplay');
@@ -2013,11 +2298,15 @@
 
             loadLeaderboard('total_play_time');
 
-            // Kontrola URL hash např. #player=JayQ
-            if (window.location.hash && window.location.hash.startsWith('#player=')) {
-                const pName = decodeURIComponent(window.location.hash.slice('#player='.length));
-                if (pName) {
-                    setTimeout(() => openPlayerDetail(pName), 200);
+            // Check URL hash navigation
+            if (window.location.hash) {
+                if (window.location.hash.startsWith('#player=')) {
+                    const pName = decodeURIComponent(window.location.hash.slice('#player='.length));
+                    if (pName) {
+                        openPlayerDetail(pName);
+                    }
+                } else if (window.location.hash === '#my-profile') {
+                    openMyProfile();
                 }
             }
         });

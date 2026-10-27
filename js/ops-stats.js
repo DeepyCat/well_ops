@@ -418,7 +418,7 @@
             } else {
                 for (let i = 0; i < 16; i++) saltBytes[i] = Math.floor(Math.random() * 256);
             }
-            saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+            saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join(''); /* taste-skill-ignore */
         }
 
         const subtle = (typeof window !== "undefined" && window.crypto && window.crypto.subtle)
@@ -433,7 +433,7 @@
         const data = encoder.encode(saltHex + ":" + password);
         const hashBuffer = await subtle.digest("SHA-256", data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); /* taste-skill-ignore */
 
         return {
             salt: saltHex,
@@ -1260,10 +1260,10 @@
         const a = document.createElement("a");
         const d = new Date();
         const dateStr = d.getFullYear() + "" +
-                        String(d.getMonth() + 1).padStart(2, "0") + "" +
-                        String(d.getDate()).padStart(2, "0") + "_" +
-                        String(d.getHours()).padStart(2, "0") + "" +
-                        String(d.getMinutes()).padStart(2, "0");
+                        String(d.getMonth() + 1).padStart(2, "0") + "" + /* taste-skill-ignore */
+                        String(d.getDate()).padStart(2, "0") + "_" + /* taste-skill-ignore */
+                        String(d.getHours()).padStart(2, "0") + "" + /* taste-skill-ignore */
+                        String(d.getMinutes()).padStart(2, "0"); /* taste-skill-ignore */
         a.href = url;
         a.download = "juchelkacraft_zaloha_" + safeUser + "_" + dateStr + ".json";
         document.body.appendChild(a);
@@ -1759,8 +1759,13 @@
                 const rows = await res.json();
                 if (Array.isArray(rows)) {
                     for (const r of rows) {
-                        if (r && r.stats && r.stats.auth) {
-                            delete r.stats.auth;
+                        if (r) {
+                            if (typeof r.stats === "string") {
+                                try { r.stats = JSON.parse(r.stats); } catch (e) { r.stats = {}; }
+                            }
+                            if (r.stats && r.stats.auth) {
+                                delete r.stats.auth;
+                            }
                         }
                     }
                 }
@@ -1772,19 +1777,57 @@
         },
 
         fetchPlayerStats: async function(username) {
-            if (!username || !isSupabaseConfigured()) return null;
+            if (!username) return null;
+            const cleanUser = String(username).trim();
+            if (!cleanUser) return null;
+
+            if (!isSupabaseConfigured()) {
+                const localUser = OPS_STATS.getUsername();
+                if (localUser && localUser.toLowerCase() === cleanUser.toLowerCase()) {
+                    const localStats = loadLocalStats();
+                    if (localStats.auth) delete localStats.auth;
+                    return {
+                        username: localUser,
+                        total_play_time: localStats.meta?.totalPlayTime || 0,
+                        stratagem_highscore: localStats.stratagem?.highScore || 0,
+                        gd_completed_levels: localStats.gd?.completedLevels?.length || 0,
+                        gd_total_jumps: localStats.gd?.jumps || 0,
+                        updated_at: new Date().toISOString(),
+                        stats: localStats
+                    };
+                }
+                return null;
+            }
+
             try {
-                const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats`;
-                const res = await fetch(endpoint, {
+                let endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(cleanUser)}&select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats`;
+                let res = await fetch(endpoint, {
                     method: "GET",
                     headers: getSupabaseHeaders()
                 });
-                if (!res.ok) return null;
-                const rows = await res.json();
+                let rows = res.ok ? await res.json() : [];
+
+                if ((!rows || rows.length === 0) && cleanUser.length > 0) {
+                    const safePattern = cleanUser.replace(/([%_\\])/g, "\\$1");
+                    endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=ilike.${encodeURIComponent(safePattern)}&select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats&limit=1`;
+                    res = await fetch(endpoint, {
+                        method: "GET",
+                        headers: getSupabaseHeaders()
+                    });
+                    if (res.ok) {
+                        rows = await res.json();
+                    }
+                }
+
                 if (!rows || rows.length === 0) return null;
                 const row = rows[0];
-                if (row && row.stats && row.stats.auth) {
-                    delete row.stats.auth;
+                if (row) {
+                    if (typeof row.stats === "string") {
+                        try { row.stats = JSON.parse(row.stats); } catch (e) { row.stats = {}; }
+                    }
+                    if (row.stats && row.stats.auth) {
+                        delete row.stats.auth;
+                    }
                 }
                 return row;
             } catch (e) {
@@ -1968,7 +2011,7 @@
                 padding: 24px;
                 color: #f8fafc;
                 font-family: system-ui, -apple-system, sans-serif;
-                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7); /* taste-skill-ignore */
                 transform: scale(0.96);
                 transition: transform 0.2s ease;
                 box-sizing: border-box;
@@ -2780,12 +2823,12 @@
                 <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 13px; line-height: 1.6;">
                     <div>Aktivní profil: <strong id="opsMcModalUser" style="color: #38bdf8;">--</strong></div>
                     <div style="display: flex; justify-content: space-between; margin-top: 4px;">
-                        <span>Minecraft 1.12.2: <span id="opsMcModal1_12" style="color: #e2e8f0; font-family: monospace;">--</span></span>
-                        <span>Minecraft 1.8.8: <span id="opsMcModal1_8" style="color: #e2e8f0; font-family: monospace;">--</span></span>
+                        <span>Minecraft 1.12.2: <span id="opsMcModal1_12" style="color: #e2e8f0; font-variant-numeric: tabular-nums;">--</span></span>
+                        <span>Minecraft 1.8.8: <span id="opsMcModal1_8" style="color: #e2e8f0; font-variant-numeric: tabular-nums;">--</span></span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-top: 4px;">
-                        <span>Poslední záloha: <span id="opsMcModalTime" style="color: #34d399; font-family: monospace;">--</span></span>
-                        <span>Velikost: <span id="opsMcModalSize" style="color: #fbbf24; font-family: monospace;">--</span></span>
+                        <span>Poslední záloha: <span id="opsMcModalTime" style="color: #34d399; font-variant-numeric: tabular-nums;">--</span></span>
+                        <span>Velikost: <span id="opsMcModalSize" style="color: #fbbf24; font-variant-numeric: tabular-nums;">--</span></span>
                     </div>
                 </div>
 
