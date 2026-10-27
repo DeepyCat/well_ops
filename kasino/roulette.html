@@ -30,7 +30,7 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 .history{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.history span{display:grid;place-items:center;width:32px;height:32px;border-radius:7px;font-weight:900;border:1px solid #ffffff30}.red{background:#b51f35}.black{background:#171923}.green{background:#176044}
 .paytable{font-size:.84rem;color:var(--muted);line-height:1.7;margin-top:16px}.paytable b{color:var(--text)}
 .notice{color:#c6c9d6;font-size:.83rem;margin-top:12px}
-.currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}.currency strong{color:var(--gold);font-size:1.5rem}
+.currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}.currency strong{color:var(--gold);font-size:1.5rem;display:inline-flex;align-items:center;gap:4px}
 .who{color:var(--muted);font-size:.82rem;margin:10px 0 0;line-height:1.5}.who button{background:none;border:0;color:var(--red);font-weight:700;padding:0}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:#ffffff06;border:1px solid #ffffff0e;border-radius:12px;padding:11px 12px}
@@ -73,7 +73,7 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 <div class="layout">
   <div class="panels-sidebar">
     <div class="panel">
-      <div class="currency"><span>Skolni body</span><strong>[B] <span id="sideBalance">0</span></strong></div>
+      <div class="currency"><span>Skolni body</span><strong><svg class="school-points-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-0.18em;margin-right:2px;filter:drop-shadow(0 0 4px rgba(255,212,119,0.45));flex-shrink:0;" aria-hidden="true"><path d="M12 2L2 9L12 22L22 9L12 2Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="0.8" stroke-linejoin="round"/><path d="M12 2L6 9H18L12 2Z" fill="#FDE68A"/><path d="M2 9L6 9L12 22L2 9Z" fill="#D97706"/><path d="M18 9L22 9L12 22L18 9Z" fill="#B45309"/><path d="M6 9L18 9L12 22L6 9Z" fill="#FBBF24"/><path d="M9 5.5L12 2L15 5.5" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/></svg><span id="sideBalance">0</span></strong></div>
       <p class="who" id="who"></p>
       <p class="notice hide" id="broke" style="color:var(--red)">Dosly ti body! Kup si dalsi v obchodu se susenkami.</p>
     </div>
@@ -402,7 +402,7 @@ async function loadLeaderboard(){
   const rows=(await r.json()).filter(x=>x.roulette&&(Number(x.roulette.spins)||0)>0);
   if(!rows.length){box.innerHTML='<div class="notice">Zatim nikdo nehral. Bud prvni!</div>';return}
   const me=cloudUser(),medal=i=>'#'+(i+1);
-  box.innerHTML=rows.map((x,i)=>{const s=x.roulette,n=Number(s.net)||0;return `<div class="lb-row${x.username===me?' me':''}"><span>${medal(i)}</span><span class="lb-name">${esc(x.username)}</span><span class="lb-net ${n>0?'pos':n<0?'neg':''}">${signed(n)}</span><span class="lb-sub">${fmt(s.spins)} her - max vyhra ${fmt(s.biggest)} [B]</span></div>`}).join('');
+  box.innerHTML=rows.map((x,i)=>{const s=x.roulette,n=Number(s.net)||0;return `<div class="lb-row${x.username===me?' me':''}"><span>${medal(i)}</span><span class="lb-name">${esc(x.username)}</span><span class="lb-net ${n>0?'pos':n<0?'neg':''}">${signed(n)}</span><span class="lb-sub">${fmt(s.spins)} her - max vyhra ${fmt(s.biggest)} <svg class="school-points-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-0.18em;margin-left:2px;filter:drop-shadow(0 0 2px rgba(255,212,119,0.4));flex-shrink:0;" aria-hidden="true"><path d="M12 2L2 9L12 22L22 9L12 2Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="0.8" stroke-linejoin="round"/><path d="M12 2L6 9H18L12 2Z" fill="#FDE68A"/><path d="M2 9L6 9L12 22L2 9Z" fill="#D97706"/><path d="M18 9L22 9L12 22L18 9Z" fill="#B45309"/><path d="M6 9L18 9L12 22L6 9Z" fill="#FBBF24"/><path d="M9 5.5L12 2L15 5.5" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/></svg></span></div>`}).join('');
  }catch(e){box.innerHTML='<div class="notice">Zebricek se nepodarilo nacist. Zkontroluj cloudovy sloupec roulette.</div>'}
 }
 function recordRound(stake,wonAmount,jackpot=false){
