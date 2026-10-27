@@ -3,34 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Herní Statistiky &amp; Žebříček | OPS</title>
+    <title>Herní statistiky a žebříček | OPS</title>
     <link rel="icon" type="image/x-icon" href="img/bird.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #070a12;
-            --bg-surface: rgba(15, 23, 42, 0.78);
-            --bg-card: rgba(18, 26, 47, 0.82);
-            --bg-card-hover: rgba(24, 34, 61, 0.9);
-            --border-subtle: rgba(56, 189, 248, 0.16);
-            --border-hover: rgba(56, 189, 248, 0.4);
-            
-            --accent-cyan: #38bdf8;
-            --accent-blue: #3b82f6;
-            --accent-indigo: #6366f1;
-            --accent-amber: #f59e0b;
-            --accent-emerald: #10b981;
-            --accent-rose: #f43f5e;
-            --accent-purple: #a855f7;
+            --ground: #0d1117;
+            --surface: #121824;
+            --raised: #182030;
+            --raised-hover: #1f2a3e;
+            --border: #222d3d;
+            --rule: #1b2432;
+            --control: #28364b;
 
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --text-tertiary: #64748b;
+            --text: #f0f3f6;
+            --muted: #8b949e;
+            --faint: #656d76;
 
-            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            --font-mono: 'JetBrains Mono', Consolas, monospace;
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.12);
+            --positive: #34d399;
+            --positive-soft: rgba(52, 211, 153, 0.12);
+            --negative: #f87171;
+            --negative-soft: rgba(248, 113, 113, 0.12);
+            --warning: #fbbf24;
+            --warning-soft: rgba(251, 191, 36, 0.12);
+
+            --radius-card: 8px;
+            --radius-control: 6px;
+            --radius-chip: 4px;
+
+            --font-sans: 'Public Sans', system-ui, -apple-system, sans-serif;
         }
 
         * {
@@ -40,1137 +45,1369 @@
         }
 
         body {
-            background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(circle at 10% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 45%),
-                radial-gradient(circle at 85% 25%, rgba(168, 85, 247, 0.09) 0%, transparent 45%),
-                radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.07) 0%, transparent 50%),
-                linear-gradient(180deg, #070a12 0%, #0b1120 100%);
-            background-attachment: fixed;
-            color: var(--text-primary);
+            background-color: var(--ground);
+            color: var(--text);
             font-family: var(--font-sans);
+            font-size: 14px;
+            line-height: 1.5;
             min-height: 100vh;
-            padding-bottom: 70px;
+            padding-bottom: 72px;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Top navigation bar */
+        .num {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Top Navigation Bar */
         .ops-topbar {
             position: sticky;
             top: 0;
-            z-index: 999;
-            background: rgba(11, 17, 32, 0.88);
-            border-bottom: 1px solid var(--border-subtle);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            padding: 12px 28px;
+            z-index: 100;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 16px;
         }
 
-        .back-btn {
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-back-link {
             text-decoration: none;
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(59, 130, 246, 0.2));
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 9px;
-            font-family: var(--font-mono);
+            color: var(--text);
+            background: var(--raised);
+            border: 1px solid var(--control);
+            padding: 6px 14px;
+            border-radius: var(--radius-control);
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s ease;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
         }
 
-        .back-btn:hover {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.28), rgba(59, 130, 246, 0.38));
-            transform: translateY(-1px);
-            box-shadow: 0 4px 18px rgba(56, 189, 248, 0.25);
-            border-color: var(--accent-cyan);
+        .nav-back-link:hover {
+            background: var(--raised-hover);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .topbar-brand {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .topbar-brand span {
+            color: var(--accent);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .user-badge-btn {
-            background: rgba(30, 41, 59, 0.85);
-            border: 1px solid rgba(56, 189, 248, 0.35);
-            color: #e2e8f0;
-            padding: 7px 16px;
-            border-radius: 9999px;
-            font-family: var(--font-mono);
+            background: var(--raised);
+            border: 1px solid var(--control);
+            color: var(--text);
+            padding: 6px 14px;
+            border-radius: var(--radius-control);
             font-size: 13px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.15s ease, border-color 0.15s ease;
         }
 
         .user-badge-btn:hover {
-            border-color: var(--accent-cyan);
-            background: rgba(51, 65, 85, 0.95);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(56, 189, 248, 0.22);
+            background: var(--raised-hover);
+            border-color: var(--accent);
         }
 
-        .user-name {
-            color: var(--accent-cyan);
-            font-weight: 800;
+        .user-name-highlight {
+            color: var(--accent);
+            font-weight: 700;
         }
 
-        /* Container */
+        .user-edit-hint {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* Main Container */
         .container {
             max-width: 1240px;
             margin: 0 auto;
-            padding: 36px 20px 0;
+            padding: 32px 20px 0;
         }
 
-        .header-title-box {
-            text-align: center;
-            margin-bottom: 34px;
+        /* Title Area */
+        .page-header {
+            margin-bottom: 24px;
         }
 
-        .header-title-box .badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 14px;
-            border-radius: 9999px;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.28);
-            color: var(--accent-cyan);
-            font-family: var(--font-mono);
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-        }
-
-        .header-title-box h1 {
-            font-size: 2.6rem;
-            font-weight: 900;
-            letter-spacing: -0.8px;
-            background: linear-gradient(135deg, #ffffff 25%, #7dd3fc 65%, #c084fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-            line-height: 1.15;
-        }
-
-        .header-title-box p {
-            color: var(--text-secondary);
-            font-size: 1.05rem;
-            max-width: 580px;
-            margin: 0 auto;
-        }
-
-        /* Hero Highlights Grid */
-        .highlights-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 36px;
-        }
-
-        .highlight-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 20px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-            transition: all 0.25s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .highlight-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.4), transparent);
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-
-        .highlight-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--border-hover);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
-        }
-
-        .highlight-card:hover::before {
-            opacity: 1;
-        }
-
-        .highlight-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .highlight-icon.cyan { background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); }
-        .highlight-icon.amber { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .highlight-icon.rose { background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); }
-        .highlight-icon.emerald { background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .highlight-icon.purple { background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); }
-
-        .highlight-content h3 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            margin-bottom: 4px;
-            font-weight: 700;
-        }
-
-        .highlight-val {
-            font-family: var(--font-mono);
-            font-size: 1.45rem;
+        .page-header h1 {
+            font-size: 24px;
             font-weight: 800;
-            color: #fff;
-            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            margin-bottom: 6px;
         }
 
-        .highlight-sub {
-            font-size: 0.75rem;
-            color: var(--text-tertiary);
-            font-family: var(--font-mono);
-            margin-top: 2px;
+        .page-header p {
+            color: var(--muted);
+            font-size: 14px;
+            max-width: 720px;
         }
 
-        /* Segmented Tab Bar */
-        .tab-bar-container {
+        /* KPI Strip (Unified divided container) */
+        .kpi-strip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            margin-bottom: 24px;
+        }
+
+        .kpi-cell {
+            padding: 16px 18px;
+            border-right: 1px solid var(--rule);
             display: flex;
+            flex-direction: column;
             justify-content: center;
-            margin-bottom: 28px;
         }
 
-        .tab-bar {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 5px;
-            display: inline-flex;
-            gap: 6px;
+        .kpi-cell:last-child {
+            border-right: none;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.15;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Primary Tab Bar */
+        .tab-bar-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-buttons-group {
+            display: flex;
+            gap: 4px;
         }
 
         .tab-btn {
             background: transparent;
             border: none;
-            color: var(--text-secondary);
-            font-family: var(--font-sans);
-            font-size: 0.95rem;
-            font-weight: 700;
-            padding: 9px 24px;
-            border-radius: 9px;
+            border-bottom: 2px solid transparent;
+            color: var(--muted);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 10px 18px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: color 0.15s ease, border-color 0.15s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
 
         .tab-btn:hover {
-            color: #fff;
+            color: #ffffff;
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(59, 130, 246, 0.25));
-            border: 1px solid rgba(56, 189, 248, 0.45);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+            color: var(--accent);
+            border-bottom-color: var(--accent);
         }
 
-        /* Leaderboard Section */
-        .leaderboard-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 18px;
-            padding: 26px;
-            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
-            margin-bottom: 40px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+        .tab-profile-tag {
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: var(--radius-chip);
+            font-weight: 700;
         }
 
-        .lb-filter-row {
+        /* Cloud Notice */
+        .cloud-notice {
+            background: var(--surface);
+            border: 1px solid var(--control);
+            border-radius: var(--radius-card);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .cloud-notice strong {
+            color: var(--accent);
+        }
+
+        /* Card Frame */
+        .app-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .panel-header {
             display: flex;
-            gap: 10px;
-            margin-bottom: 22px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
-        .lb-filter-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #cbd5e1;
-            padding: 8px 18px;
-            border-radius: 9px;
-            font-family: var(--font-mono);
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .panel-meta {
             font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            color: var(--muted);
         }
 
-        .lb-filter-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.25);
-        }
-
-        .lb-filter-btn.active {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(59, 130, 246, 0.35));
-            border-color: var(--accent-cyan);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.25);
-        }
-
-        .lb-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-
-        .lb-table thead th {
-            color: var(--text-tertiary);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            font-weight: 700;
-            padding: 8px 16px;
-            border: none;
-        }
-
-        .lb-table tbody tr {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 10px;
-            transition: all 0.2s ease;
-        }
-
-        .lb-table tbody tr:hover {
-            background: rgba(30, 41, 59, 0.7);
-            transform: scale(1.003);
-        }
-
-        .lb-table td {
-            padding: 14px 16px;
-            font-size: 0.95rem;
-            vertical-align: middle;
-            border: none;
-        }
-
-        .lb-table td:first-child {
-            border-top-left-radius: 10px;
-            border-bottom-left-radius: 10px;
-        }
-
-        .lb-table td:last-child {
-            border-top-right-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
-
-        .rank-medal {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            font-family: var(--font-mono);
-            font-weight: 800;
-            font-size: 14px;
-        }
-
-        .rank-1 {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(251, 191, 36, 0.35));
-            color: #fbbf24;
-            border: 1px solid #fbbf24;
-            box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
-        }
-
-        .rank-2 {
-            background: linear-gradient(135deg, rgba(148, 163, 184, 0.25), rgba(226, 232, 240, 0.35));
-            color: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 0 10px rgba(226, 232, 240, 0.2);
-        }
-
-        .rank-3 {
-            background: linear-gradient(135deg, rgba(217, 119, 6, 0.25), rgba(180, 83, 9, 0.35));
-            color: #f97316;
-            border: 1px solid #ea580c;
-            box-shadow: 0 0 10px rgba(234, 88, 12, 0.2);
-        }
-
-        .rank-default {
-            color: var(--text-tertiary);
-            font-family: var(--font-mono);
-            font-weight: 700;
-            padding-left: 8px;
-        }
-
-        .lb-player-active {
-            color: var(--accent-cyan);
-            font-weight: 800;
-        }
-
-        .lb-player-tag {
-            font-size: 11px;
-            padding: 2px 7px;
-            border-radius: 5px;
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: var(--accent-cyan);
-            margin-left: 6px;
-            font-family: var(--font-mono);
-        }
-
-        .lb-metric-primary {
-            font-family: var(--font-mono);
-            font-weight: 800;
-            font-size: 1.05rem;
-            color: #fff;
-        }
-
-        .lb-metric-sub {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        /* Games Grid (My Stats) */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-
-        .game-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 18px;
-            padding: 24px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.25s ease;
-        }
-
-        .game-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--border-hover);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        .game-card-header {
+        /* Leaderboard Toolbar */
+        .lb-toolbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 18px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
         }
 
-        .game-title-group {
+        .lb-filters {
             display: flex;
-            align-items: center;
-            gap: 14px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
-        .game-icon-img {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.3);
-            flex-shrink: 0;
-        }
-
-        .game-title {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: -0.3px;
-        }
-
-        .game-tag {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .game-play-link {
-            text-decoration: none;
-            font-family: var(--font-mono);
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--accent-cyan);
-            background: rgba(56, 189, 248, 0.12);
-            border: 1px solid rgba(56, 189, 248, 0.35);
+        .filter-btn {
+            background: var(--ground);
+            border: 1px solid var(--border);
+            color: var(--muted);
             padding: 6px 14px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            border-radius: var(--radius-control);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+
+        .filter-btn:hover {
+            color: #ffffff;
+            border-color: var(--control);
+        }
+
+        .filter-btn.active {
+            background: var(--raised);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .search-box-wrap {
+            position: relative;
+            min-width: 240px;
+        }
+
+        .search-input {
+            width: 100%;
+            background: var(--ground);
+            border: 1px solid var(--border);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: var(--radius-control);
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+        }
+
+        .search-input::placeholder {
+            color: var(--faint);
+        }
+
+        /* Leaderboard Table */
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            background: var(--ground);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .data-table thead th {
+            padding: 10px 14px;
+            background: var(--surface);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
 
-        .game-play-link:hover {
-            background: rgba(56, 189, 248, 0.28);
-            border-color: var(--accent-cyan);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.25);
+        .data-table tbody td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--rule);
+            color: var(--text);
+            vertical-align: middle;
         }
 
-        /* Primary Banner for Clicker Card */
-        .stat-featured-banner {
-            background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.05));
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr.clickable-row {
+            cursor: pointer;
+            transition: background-color 0.12s ease;
+        }
+
+        .data-table tbody tr.clickable-row:hover {
+            background: var(--raised);
+        }
+
+        .data-table tbody tr.row-is-me {
+            background: rgba(56, 189, 248, 0.04);
+        }
+
+        .data-table tbody tr.row-is-me:hover {
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        .rank-number {
+            font-weight: 700;
+            color: var(--muted);
+            width: 38px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rank-number.top-1 { color: var(--warning); }
+        .rank-number.top-2 { color: #cbd5e1; }
+        .rank-number.top-3 { color: #f97316; }
+
+        .player-identity-cell {
             display: flex;
             align-items: center;
+            gap: 10px;
+        }
+
+        .player-avatar-letter {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-control);
+            background: var(--raised);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .player-name-text {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .badge-me {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: var(--radius-chip);
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-weight: 600;
+        }
+
+        .metric-primary-val {
+            font-weight: 700;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-sub-val {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .action-inspect-btn {
+            background: var(--raised);
+            border: 1px solid var(--control);
+            color: var(--text);
+            padding: 4px 10px;
+            border-radius: var(--radius-chip);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .action-inspect-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #0b1120;
+        }
+
+        /* Detail Profile View */
+        .profile-view-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-hero-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 24px;
+        }
+
+        .profile-hero-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .profile-user-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .profile-avatar-large {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-card);
+            background: var(--raised);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .profile-title-group h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1.2;
+        }
+
+        .profile-meta-line {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .profile-actions-right {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-outline {
+            background: var(--raised);
+            border: 1px solid var(--control);
+            color: var(--text);
+            padding: 7px 14px;
+            border-radius: var(--radius-control);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline:hover {
+            background: var(--raised-hover);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            border: 1px solid var(--accent);
+            color: #0b1120;
+            padding: 7px 16px;
+            border-radius: var(--radius-control);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary:hover {
+            background: #7dd3fc;
+        }
+
+        /* Profile KPI sub-strip */
+        .profile-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            background: var(--ground);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-control);
+            padding: 12px;
+        }
+
+        .prof-metric-item {
+            padding: 8px 12px;
+        }
+
+        .prof-metric-label {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .prof-metric-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: 3px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Game Detail Cards Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .game-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
             justify-content: space-between;
         }
 
-        .stat-featured-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #fcd34d;
+        .game-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--rule);
+            gap: 12px;
+        }
+
+        .game-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .game-icon-thumb {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-control);
+            object-fit: cover;
+            border: 1px solid var(--border);
+            background: var(--ground);
+            flex-shrink: 0;
+        }
+
+        .game-title-text {
+            font-size: 15px;
             font-weight: 700;
-            margin-bottom: 2px;
+            color: #ffffff;
         }
 
-        .stat-featured-val {
-            font-family: var(--font-mono);
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: #fbbf24;
-            line-height: 1.1;
+        .game-subtitle-text {
+            font-size: 12px;
+            color: var(--muted);
         }
 
-        /* Stat Grid Chips */
-        .stat-chips-grid {
+        /* Metric Chips */
+        .chips-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-bottom: 16px;
         }
 
-        .stat-chip {
-            background: rgba(255, 255, 255, 0.035);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 10px;
+        .chip-box {
+            background: var(--ground);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-control);
             padding: 10px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
         }
 
-        .stat-chip-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 600;
+        .chip-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 4px;
         }
 
-        .stat-chip-val {
-            font-family: var(--font-mono);
+        .chip-val {
+            font-size: 15px;
             font-weight: 700;
-            font-size: 1rem;
-            color: #fff;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
         }
 
-        /* Level Bars for Geometry Dash */
-        .gd-levels-container {
-            margin-top: 14px;
+        /* GD Level Progress Bars */
+        .level-progress-section {
+            border-top: 1px solid var(--rule);
             padding-top: 14px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 14px;
         }
 
-        .gd-levels-title {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
+        .level-progress-header {
             display: flex;
             justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
             font-weight: 600;
         }
 
-        .gd-levels-scroll {
-            max-height: 190px;
+        .level-progress-list {
+            max-height: 220px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             padding-right: 6px;
         }
 
-        .gd-levels-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-        .gd-levels-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-
-        .gd-lvl-item {
+        .level-item-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
+            gap: 8px;
+            font-size: 12px;
         }
 
-        .gd-lvl-name {
-            width: 78px;
-            color: #cbd5e1;
-            font-family: var(--font-mono);
+        .level-item-name {
+            width: 110px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-size: 11px;
+        }
+
+        .level-bar-track {
+            flex: 1;
+            height: 6px;
+            background: var(--ground);
+            border: 1px solid var(--rule);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .level-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .level-bar-fill.complete {
+            background: var(--positive);
+        }
+
+        .level-item-num {
+            width: 44px;
+            text-align: right;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .level-item-num.complete {
+            color: var(--positive);
+        }
+
+        /* Gacha Characters Grid */
+        .gacha-roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 8px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .gacha-char-card {
+            background: var(--ground);
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-chip);
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .gacha-char-card.owned {
+            border-color: var(--control);
+        }
+
+        .gacha-char-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gacha-rank-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 1px 4px;
+            border-radius: 3px;
+            background: var(--raised);
+            color: var(--muted);
+        }
+
+        .gacha-rank-badge.rank-Z { color: var(--warning); background: var(--warning-soft); }
+        .gacha-rank-badge.rank-S { color: var(--accent); background: var(--accent-soft); }
+        .gacha-rank-badge.rank-A { color: var(--positive); background: var(--positive-soft); }
+        .gacha-rank-badge.rank-B { color: #94a3b8; }
+
+        .gacha-char-count {
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .gacha-char-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffffff;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .gd-lvl-bar-bg {
-            flex: 1;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 4px;
+        .gacha-char-desc {
+            font-size: 10px;
+            color: var(--muted);
+            white-space: nowrap;
             overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .gd-lvl-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
-            border-radius: 4px;
-            transition: width 0.5s ease;
+        /* Clicker Buildings List */
+        .clicker-buildings-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 6px;
+            max-height: 180px;
+            overflow-y: auto;
+            border: 1px solid var(--rule);
+            border-radius: var(--radius-control);
+            padding: 8px;
+            background: var(--ground);
         }
 
-        .gd-lvl-bar-fill.complete {
-            background: linear-gradient(90deg, #10b981, #22c55e);
+        .clicker-bld-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 6px;
+            font-size: 11px;
+            border-bottom: 1px solid var(--rule);
         }
 
-        .gd-lvl-percent {
-            width: 48px;
-            text-align: right;
-            font-family: var(--font-mono);
+        .clicker-bld-item:last-child {
+            border-bottom: none;
+        }
+
+        .clicker-bld-name {
+            color: var(--muted);
+        }
+
+        .clicker-bld-count {
             font-weight: 700;
-            color: var(--accent-cyan);
-            font-size: 12px;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
         }
 
-        /* Cloud Notice Box */
-        .cloud-notice-box {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
-            border: 1px dashed rgba(56, 189, 248, 0.4);
-            border-radius: 14px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .cloud-notice-title {
-            color: var(--accent-cyan);
-            font-weight: 700;
-            margin-bottom: 6px;
-            font-size: 1rem;
-        }
-
-        /* Action Buttons */
-        .bottom-actions {
+        /* Bottom Actions Strip */
+        .bottom-actions-row {
             display: flex;
             justify-content: center;
-            gap: 14px;
+            gap: 12px;
+            margin-top: 32px;
             flex-wrap: wrap;
-            margin-top: 36px;
         }
 
-        .action-btn {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.16);
-            color: #cbd5e1;
-            padding: 10px 22px;
-            border-radius: 10px;
-            font-family: var(--font-mono);
+        .btn-danger {
+            background: var(--negative-soft);
+            border: 1px solid rgba(248, 113, 113, 0.4);
+            color: var(--negative);
+            padding: 7px 14px;
+            border-radius: var(--radius-control);
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            transition: background-color 0.15s ease;
         }
 
-        .action-btn:hover {
-            background: rgba(255, 255, 255, 0.14);
-            color: #fff;
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.3);
+        .btn-danger:hover {
+            background: rgba(248, 113, 113, 0.25);
+            color: #ffffff;
         }
 
-        .action-btn.danger {
-            border-color: rgba(244, 63, 94, 0.35);
-            color: #fca5a5;
-        }
-
-        .action-btn.danger:hover {
-            background: rgba(244, 63, 94, 0.2);
-            border-color: var(--accent-rose);
-            color: #fff;
-        }
-
-        @media (max-width: 768px) {
-            .header-title-box h1 {
-                font-size: 2rem;
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .kpi-strip {
+                grid-template-columns: repeat(3, 1fr);
             }
-            .highlights-grid {
-                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-                gap: 12px;
+            .kpi-cell {
+                border-bottom: 1px solid var(--rule);
+            }
+            .kpi-cell:nth-child(3n) {
+                border-right: none;
             }
             .games-grid {
                 grid-template-columns: 1fr;
             }
+        }
+
+        @media (max-width: 640px) {
             .ops-topbar {
-                padding: 10px 16px;
+                padding: 10px 14px;
+            }
+            .container {
+                padding: 20px 14px 0;
+            }
+            .kpi-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .kpi-cell:nth-child(2n) {
+                border-right: none;
+            }
+            .chips-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-box-wrap {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Top bar -->
+    <!-- Top Navigation Bar -->
     <header class="ops-topbar">
-        <a href="games.html" class="back-btn">
-            <span>&larr;</span> Rozcestník her
-        </a>
-        <button type="button" id="opsUserBadge" class="user-badge-btn" onclick="OPS_STATS.promptUsernameModal()">
-            <span id="topUsernameDisplay" class="user-name">...</span> <span style="opacity:0.6;font-size:11px;">[upravit]</span>
-        </button>
+        <div class="topbar-left">
+            <a href="games.html" class="nav-back-link">
+                <span>&larr;</span> Rozcestník her
+            </a>
+            <div class="topbar-brand">
+                OPS <span>Telemetrie</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <span id="opsCloudSyncBadge" class="ops-cloud-sync-badge"></span>
+            <button type="button" id="opsUserBadge" class="user-badge-btn" onclick="OPS_STATS.promptUsernameModal()">
+                <span id="topUsernameDisplay" class="user-name-highlight">...</span>
+                <span class="user-edit-hint">[upravit]</span>
+            </button>
+        </div>
     </header>
 
     <div class="container">
-        <div class="header-title-box">
-            <div class="badge-pill">OPS Telemetrie &amp; Zábava</div>
-            <h1>Herní Statistiky &amp; Žebříček</h1>
-            <p>Přehledné výsledky, porovnání prokrastinace a žebříček studentů OPS portálu.</p>
-        </div>
+        <!-- Page Title & Scope -->
+        <header class="page-header">
+            <h1>Herní statistiky a telemetrie OPS</h1>
+            <p>Centrální přehled výsledků, globální žebříček studentů a podrobné profily hráčů v reálném čase.</p>
+        </header>
 
-        <!-- Hero Highlights -->
-        <div class="highlights-grid">
-            <div class="highlight-card">
-                <div class="highlight-icon cyan">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-                <div class="highlight-content">
-                    <h3>Celkový čas</h3>
-                    <div id="statTotalTime" class="highlight-val">0m</div>
-                    <div class="highlight-sub">Všechny hry</div>
-                </div>
+        <!-- KPI Strip: 6 divided columns in one surface -->
+        <section class="kpi-strip" aria-label="Klíčové metriky">
+            <div class="kpi-cell">
+                <span class="kpi-label">Celkový čas</span>
+                <span id="kpiTotalTime" class="kpi-value num">0m</span>
+                <span class="kpi-sub">Všechny hry</span>
             </div>
-
-            <div class="highlight-card">
-                <div class="highlight-icon purple">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                </div>
-                <div class="highlight-content">
-                    <h3>Juchelka Gamer Level</h3>
-                    <div id="statGamerLevel" class="highlight-val">LVL 1</div>
-                    <div class="highlight-sub">Celková hodnost</div>
-                </div>
+            <div class="kpi-cell">
+                <span class="kpi-label">Hráčský level</span>
+                <span id="kpiGamerLevel" class="kpi-value num">LVL 1</span>
+                <span id="kpiGamerSub" class="kpi-sub">Hodnost studenta</span>
             </div>
-
-            <div class="highlight-card">
-                <div class="highlight-icon amber">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></svg>
-                </div>
-                <div class="highlight-content">
-                    <h3>Maturita MCoiny / Mpoints</h3>
-                    <div id="statClickerMpoints" class="highlight-val">0</div>
-                    <div id="statClickerCpsSub" class="highlight-sub">0 CPS rekord</div>
-                </div>
+            <div class="kpi-cell">
+                <span class="kpi-label">Maturita Clicker</span>
+                <span id="kpiClickerTotal" class="kpi-value num">0</span>
+                <span id="kpiClickerSub" class="kpi-sub">0/s pasivně</span>
             </div>
-
-            <div class="highlight-card">
-                <div class="highlight-icon rose">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
-                </div>
-                <div class="highlight-content">
-                    <h3>Stratagem Rekord</h3>
-                    <div id="statHeroScore" class="highlight-val">0</div>
-                    <div class="highlight-sub">Max kódů</div>
-                </div>
+            <div class="kpi-cell">
+                <span class="kpi-label">Juchelka Hero</span>
+                <span id="kpiHeroScore" class="kpi-value num">0</span>
+                <span class="kpi-sub">Rekord kódů</span>
             </div>
-
-            <div class="highlight-card">
-                <div class="highlight-icon emerald">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                </div>
-                <div class="highlight-content">
-                    <h3>GD Dokončeno</h3>
-                    <div id="statGdCompleted" class="highlight-val">0 / 22</div>
-                    <div class="highlight-sub">Levelů 100%</div>
-                </div>
+            <div class="kpi-cell">
+                <span class="kpi-label">Juchelka Dash</span>
+                <span id="kpiGdCompleted" class="kpi-value num">0 / 22</span>
+                <span class="kpi-sub">Dokončeno levelů</span>
             </div>
-        </div>
+            <div class="kpi-cell">
+                <span class="kpi-label">Gacha sbírka</span>
+                <span id="kpiGachaPulls" class="kpi-value num">0</span>
+                <span id="kpiGachaSub" class="kpi-sub">0 postav ve sbírce</span>
+            </div>
+        </section>
 
-        <!-- Navigation Tabs -->
-        <div class="tab-bar-container">
-            <div class="tab-bar">
-                <button type="button" class="tab-btn active" id="tabBtnLeaderboard" onclick="switchTab('leaderboard')">
+        <!-- Primary Tab Bar -->
+        <nav class="tab-bar-wrap" aria-label="Záložky statistiky">
+            <div class="tab-buttons-group">
+                <button type="button" class="tab-btn active" id="tabBtnLeaderboard" onclick="switchMainTab('leaderboard')">
                     Globální žebříček
                 </button>
-                <button type="button" class="tab-btn" id="tabBtnMyStats" onclick="switchTab('myStats')">
+                <button type="button" class="tab-btn" id="tabBtnMyStats" onclick="switchMainTab('myStats')">
                     Moje statistiky
                 </button>
+                <button type="button" class="tab-btn" id="tabBtnPlayerDetail" style="display:none;" onclick="switchMainTab('playerDetail')">
+                    Detail profilu <span id="tabPlayerDetailNameTag" class="tab-profile-tag"></span>
+                </button>
             </div>
-        </div>
+            <div id="activeScopeLabel" style="font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;"></div>
+        </nav>
 
         <!-- TAB 1: GLOBÁLNÍ ŽEBŘÍČEK -->
-        <div id="tabLeaderboard">
-            <div id="cloudNotice" class="cloud-notice-box" style="display:none;">
-                <div class="cloud-notice-title">
-                    Synchronizace do cloudu
-                </div>
-                <p style="color:#94a3b8;font-size:0.9rem;">
-                    Pro zobrazení online žebříčku stačí v <code style="color:#38bdf8;">js/ops-stats.js</code> vyplnit adresu a klíč projektu Supabase. Vaše lokální výsledky jsou již zaznamenávány!
-                </p>
+        <main id="tabLeaderboard" class="app-panel">
+            <div id="cloudNotice" class="cloud-notice" style="display:none;">
+                <strong>Upozornění:</strong> Spojení se serverem Supabase není konfigurováno. Zobrazují se lokální data z tohoto prohlížeče.
             </div>
 
-            <div class="leaderboard-card">
-                <div class="lb-filter-row">
-                    <button type="button" class="lb-filter-btn active" id="lbFilterTime" onclick="loadLeaderboard('total_play_time', this)">
-                        Celkový herní čas
+            <div class="lb-toolbar">
+                <div class="lb-filters">
+                    <button type="button" class="filter-btn active" id="filterTime" onclick="setLeaderboardMetric('total_play_time', this)">
+                        Celkový čas
                     </button>
-                    <button type="button" class="lb-filter-btn" id="lbFilterClicker" onclick="loadLeaderboard('clicker_total_cookies', this)">
-                        Maturita Clicker (MCoiny / Mpoints)
+                    <button type="button" class="filter-btn" id="filterClicker" onclick="setLeaderboardMetric('clicker_total_cookies', this)">
+                        Maturita Clicker
                     </button>
-                    <button type="button" class="lb-filter-btn" id="lbFilterHero" onclick="loadLeaderboard('stratagem_highscore', this)">
-                        Juchelka Hero (Skóre)
+                    <button type="button" class="filter-btn" id="filterHero" onclick="setLeaderboardMetric('stratagem_highscore', this)">
+                        Juchelka Hero
                     </button>
-                    <button type="button" class="lb-filter-btn" id="lbFilterGd" onclick="loadLeaderboard('gd_completed_levels', this)">
-                        Juchelka Dash (Levely)
+                    <button type="button" class="filter-btn" id="filterGd" onclick="setLeaderboardMetric('gd_completed_levels', this)">
+                        Juchelka Dash
                     </button>
                 </div>
-
-                <div style="overflow-x:auto;">
-                    <table class="lb-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 70px;">Pořadí</th>
-                                <th>Hráč</th>
-                                <th id="lbMetricColHeader" style="text-align:right;">Hodnota</th>
-                                <th style="text-align:right;width:150px;">Naposledy aktivní</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lbTableBody">
-                            <tr>
-                                <td colspan="4" style="text-align:center;padding:34px;color:#94a3b8;">
-                                    Načítám data žebříčku...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="search-box-wrap">
+                    <input type="search" id="lbSearchInput" class="search-input" placeholder="Hledat hráče..." oninput="handleLeaderboardSearch(this.value)">
                 </div>
             </div>
-        </div>
 
-        <!-- TAB 2: MOJE STATISTIKY -->
-        <div id="tabMyStats" style="display: none;">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Pořadí</th>
+                            <th>Hráč</th>
+                            <th id="colMetricHeader" style="text-align:right;">Hodnota</th>
+                            <th style="text-align:right;width:150px;">Naposledy aktivní</th>
+                            <th style="width:110px;text-align:center;">Detail profilu</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lbTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center;padding:28px;color:var(--muted);">
+                                Načítám data žebříčku...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- TAB 2: DETAIL PROFILU HRÁČE -->
+        <section id="tabPlayerDetail" class="profile-view-wrap" style="display:none;">
+            <!-- Profile Hero Panel -->
+            <div class="profile-hero-panel">
+                <div class="profile-hero-top">
+                    <div class="profile-user-left">
+                        <div id="detailAvatarLetter" class="profile-avatar-large">?</div>
+                        <div class="profile-title-group">
+                            <h2>
+                                <span id="detailUsernameDisplay">Hráč</span>
+                                <span id="detailIsMeBadge" class="badge-me" style="display:none;">tento profil</span>
+                            </h2>
+                            <div class="profile-meta-line">
+                                Hodnost: <strong id="detailGamerRank" style="color:var(--accent);">LVL 1</strong> &middot;
+                                Naposledy aktivní: <span id="detailLastActive" class="num">-</span> &middot;
+                                Poslední hra: <span id="detailLastGame">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-actions-right">
+                        <button type="button" class="btn-outline" onclick="switchMainTab('leaderboard')">
+                            &larr; Zpět na žebříček
+                        </button>
+                        <button type="button" id="detailCompareBtn" class="btn-outline" onclick="toggleComparisonView()">
+                            Porovnat se mnou
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Profile KPI Row -->
+                <div class="profile-metrics-grid">
+                    <div class="prof-metric-item">
+                        <div class="prof-metric-label">Odehraný čas</div>
+                        <div id="detailTotalTime" class="prof-metric-val">0m</div>
+                    </div>
+                    <div class="prof-metric-item">
+                        <div class="prof-metric-label">Maturita MCoiny</div>
+                        <div id="detailClickerTotal" class="prof-metric-val">0</div>
+                    </div>
+                    <div class="prof-metric-item">
+                        <div class="prof-metric-label">Hero max kódů</div>
+                        <div id="detailHeroScore" class="prof-metric-val">0</div>
+                    </div>
+                    <div class="prof-metric-item">
+                        <div class="prof-metric-label">Dash levely (100%)</div>
+                        <div id="detailGdLevels" class="prof-metric-val">0 / 22</div>
+                    </div>
+                    <div class="prof-metric-item">
+                        <div class="prof-metric-label">Gacha celkem pullů</div>
+                        <div id="detailGachaPulls" class="prof-metric-val">0</div>
+                    </div>
+                </div>
+
+                <!-- Comparison View (When toggled) -->
+                <div id="profileComparePanel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+                    <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">
+                        Porovnání tvého profilu vs <span id="compareTargetName"></span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Metrika</th>
+                                    <th style="text-align:right;">Tvoje hodnota</th>
+                                    <th style="text-align:right;">Hodnota hráče</th>
+                                    <th style="text-align:right;">Rozdíl</th>
+                                </tr>
+                            </thead>
+                            <tbody id="compareTableBody">
+                                <!-- Injected dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Games Breakdown for this Player -->
             <div class="games-grid">
-                
-                <!-- Maturita click -->
-                <div class="game-card" style="border-color: rgba(245, 158, 11, 0.35);">
+                <!-- Maturita Clicker -->
+                <div class="game-panel">
                     <div>
-                        <div class="game-card-header">
-                            <div class="game-title-group">
-                                <img src="clicker/02_.png" class="game-icon-img" alt="Maturita click">
+                        <div class="game-panel-header">
+                            <div class="game-title-row">
+                                <img src="clicker/02_.png" class="game-icon-thumb" alt="Clicker">
                                 <div>
-                                    <div class="game-title" style="color: #fbbf24;">Maturita click</div>
-                                    <div class="game-tag">Klikací simulátor maturity</div>
+                                    <div class="game-title-text">Maturita click</div>
+                                    <div class="game-subtitle-text">Klikací simulátor maturity</div>
                                 </div>
                             </div>
-                            <a href="clicker/index.html" class="game-play-link" style="color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.12);">Spustit</a>
+                            <a href="clicker/index.html" class="btn-outline" style="font-size:12px;padding:4px 10px;">Spustit</a>
                         </div>
 
-                        <!-- Featured Banner -->
-                        <div class="stat-featured-banner">
-                            <div>
-                                <div class="stat-featured-label">Celkem získáno MCoinů / Mpoints</div>
-                                <div id="clickerTotalCookiesText" class="stat-featured-val">0</div>
+                        <div class="chips-grid">
+                            <div class="chip-box">
+                                <div class="chip-label">Celkem MCoinů / Mpoints</div>
+                                <div id="detClickerTotalExact" class="chip-val">0</div>
                             </div>
-                            <div style="text-align: right;">
-                                <div class="stat-featured-label">Aktuální stav</div>
-                                <div id="clickerCookiesText" class="stat-featured-val" style="font-size: 1.3rem; color: #fff;">0</div>
+                            <div class="chip-box">
+                                <div class="chip-label">Aktuální stav</div>
+                                <div id="detClickerCurrent" class="chip-val">0</div>
+                            </div>
+                            <div class="chip-box">
+                                <div class="chip-label">Pasivní produkce (CPS)</div>
+                                <div id="detClickerCps" class="chip-val" style="color:var(--positive);">0 /s</div>
+                            </div>
+                            <div class="chip-box">
+                                <div class="chip-label">Rekord klikání (Peak CPS)</div>
+                                <div id="detClickerPeak" class="chip-val" style="color:var(--warning);">0 CPS</div>
+                            </div>
+                            <div class="chip-box">
+                                <div class="chip-label">Ruční kliknutí</div>
+                                <div id="detClickerClicks" class="chip-val">0</div>
+                            </div>
+                            <div class="chip-box">
+                                <div class="chip-label">Klikací síla</div>
+                                <div id="detClickerPower" class="chip-val">1</div>
                             </div>
                         </div>
 
-                        <!-- Stat Chips -->
-                        <div class="stat-chips-grid">
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Pasivní produkce</span>
-                                <span id="clickerCpsText" class="stat-chip-val" style="color: #34d399;">0 /s</span>
+                        <!-- Buildings breakdown -->
+                        <div style="margin-top:12px;">
+                            <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">
+                                Vlastněné budovy (<span id="detClickerBldCount">0</span> ks celkem):
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Rekord klikání (CPS)</span>
-                                <span id="clickerPeakCpsText" class="stat-chip-val" style="color: #fbbf24;">0 CPS</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Ruční kliknutí</span>
-                                <span id="clickerClicksText" class="stat-chip-val">0</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Vlastněné budovy</span>
-                                <span id="clickerBuildingsText" class="stat-chip-val">0 ks</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Zakoupená vylepšení</span>
-                                <span id="clickerUpgradesText" class="stat-chip-val">0 ks</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Odehraný čas</span>
-                                <span id="clickerTimeText" class="stat-chip-val">0m</span>
+                            <div id="detClickerBuildingsList" class="clicker-buildings-list">
+                                <!-- Injected -->
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Juchelka Dash -->
-                <div class="game-card">
+                <div class="game-panel">
                     <div>
-                        <div class="game-card-header">
-                            <div class="game-title-group">
-                                <img src="gd/assets/juchelkaD.png" class="game-icon-img" alt="GD">
+                        <div class="game-panel-header">
+                            <div class="game-title-row">
+                                <img src="gd/assets/juchelkaD.png" class="game-icon-thumb" alt="GD">
                                 <div>
-                                    <div class="game-title">Juchelka Dash</div>
-                                    <div class="game-tag">Rytmická skákačka</div>
+                                    <div class="game-title-text">Juchelka Dash</div>
+                                    <div class="game-subtitle-text">Rytmická skákačka</div>
                                 </div>
                             </div>
-                            <a href="gd/index.html" class="game-play-link">Spustit</a>
+                            <a href="gd/index.html" class="btn-outline" style="font-size:12px;padding:4px 10px;">Spustit</a>
                         </div>
 
-                        <div class="stat-chips-grid">
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Dokončené levely</span>
-                                <span id="gdCompletedText" class="stat-chip-val" style="color: #34d399;">0</span>
+                        <div class="chips-grid">
+                            <div class="chip-box">
+                                <div class="chip-label">Dokončené levely</div>
+                                <div id="detGdCompleted" class="chip-val" style="color:var(--positive);">0 / 22</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Celkem pokusů</span>
-                                <span id="gdAttemptsText" class="stat-chip-val">0</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Celkem pokusů</div>
+                                <div id="detGdAttempts" class="chip-val">0</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Celkem skoků</span>
-                                <span id="gdJumpsText" class="stat-chip-val">0</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Celkem skoků</div>
+                                <div id="detGdJumps" class="chip-val">0</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Odehraný čas</span>
-                                <span id="gdTimeText" class="stat-chip-val">0m</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Odehraný čas</div>
+                                <div id="detGdTime" class="chip-val">0m</div>
                             </div>
                         </div>
 
-                        <!-- Level List Preview -->
-                        <div class="gd-levels-container">
-                            <div class="gd-levels-title">
-                                <span>Postup v jednotlivých levelech</span>
-                                <span id="gdAvgPercentText">Průměr: 0%</span>
+                        <div class="level-progress-section">
+                            <div class="level-progress-header">
+                                <span>Postup v levelech (1 až 22)</span>
+                                <span id="detGdAvgPercent">Průměr: 0%</span>
                             </div>
-                            <div id="gdLevelsList" class="gd-levels-scroll">
-                                <!-- Injected dynamically -->
+                            <div id="detGdLevelsList" class="level-progress-list">
+                                <!-- Injected -->
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Juchelka Hero -->
-                <div class="game-card">
+                <!-- Juchelka Hero (Stratagem) -->
+                <div class="game-panel">
                     <div>
-                        <div class="game-card-header">
-                            <div class="game-title-group">
-                                <img src="stratagem/data/Images/heroJ.png" class="game-icon-img" alt="Hero">
+                        <div class="game-panel-header">
+                            <div class="game-title-row">
+                                <img src="stratagem/data/Images/heroJ.png" class="game-icon-thumb" alt="Hero">
                                 <div>
-                                    <div class="game-title">Juchelka Hero</div>
-                                    <div class="game-tag">Kódovací reakce</div>
+                                    <div class="game-title-text">Juchelka Hero</div>
+                                    <div class="game-subtitle-text">Kódovací reakce Stratagem</div>
                                 </div>
                             </div>
-                            <a href="stratagem/index.html" class="game-play-link">Spustit</a>
+                            <a href="stratagem/index.html" class="btn-outline" style="font-size:12px;padding:4px 10px;">Spustit</a>
                         </div>
 
-                        <div class="stat-chips-grid">
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Nejvyšší skóre (Rekord)</span>
-                                <span id="heroHighScoreText" class="stat-chip-val" style="color: var(--accent-cyan); font-size: 1.25rem;">0</span>
+                        <div class="chips-grid">
+                            <div class="chip-box">
+                                <div class="chip-label">Rekord kódů (Highscore)</div>
+                                <div id="detHeroScore" class="chip-val" style="color:var(--accent);">0</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Odehraných her</span>
-                                <span id="heroGamesText" class="stat-chip-val">0</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Celkem odehraných her</div>
+                                <div id="detHeroGames" class="chip-val">0</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Zadané sekvence</span>
-                                <span id="heroSequencesText" class="stat-chip-val">0</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Zadané sekvence</div>
+                                <div id="detHeroSequences" class="chip-val">0</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Odehraný čas</span>
-                                <span id="heroTimeText" class="stat-chip-val">0m</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Odehraný čas</div>
+                                <div id="detHeroTime" class="chip-val">0m</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Race with Kokeš -->
-                <div class="game-card">
+                <!-- Gacha Sbírka Postav -->
+                <div class="game-panel">
                     <div>
-                        <div class="game-card-header">
-                            <div class="game-title-group">
-                                <img src="hyperdrive/kokes_race.gif" class="game-icon-img" alt="Race">
+                        <div class="game-panel-header">
+                            <div class="game-title-row">
+                                <div class="game-icon-thumb" style="display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);">G</div>
                                 <div>
-                                    <div class="game-title">Race with Kokeš</div>
-                                    <div class="game-tag">Retro závodění</div>
+                                    <div class="game-title-text">Gacha sbírka učitelů</div>
+                                    <div class="game-subtitle-text">Školní sbor a inventář</div>
                                 </div>
                             </div>
-                            <a href="hyperdrive/index.html" class="game-play-link">Spustit</a>
+                            <a href="kasino/index.html" class="btn-outline" style="font-size:12px;padding:4px 10px;">Kasino</a>
                         </div>
 
-                        <div class="stat-chips-grid">
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Počet jízd (Sessions)</span>
-                                <span id="raceSessionsText" class="stat-chip-val">0</span>
+                        <div class="chips-grid">
+                            <div class="chip-box">
+                                <div class="chip-label">Celkem pullů</div>
+                                <div id="detGachaPullsVal" class="chip-val">0</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Čas strávený na trati</span>
-                                <span id="raceTimeText" class="stat-chip-val">0m</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Tokeny hráče</div>
+                                <div id="detGachaTokensVal" class="chip-val">0</div>
                             </div>
+                            <div class="chip-box">
+                                <div class="chip-label">Pity Z / S / A</div>
+                                <div id="detGachaPityVal" class="chip-val">0 / 0 / 0</div>
+                            </div>
+                            <div class="chip-box">
+                                <div class="chip-label">Unikátních postav</div>
+                                <div id="detGachaUniqueVal" class="chip-val" style="color:var(--positive);">0 / 14</div>
+                            </div>
+                        </div>
+
+                        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;">
+                            Inventář postav ve sbírce:
+                        </div>
+                        <div id="detGachaRosterList" class="gacha-roster-grid">
+                            <!-- Injected -->
                         </div>
                     </div>
                 </div>
 
-                <!-- JuchelkaCraft -->
-                <div class="game-card">
+                <!-- Další hry hráče -->
+                <div class="game-panel" style="grid-column: 1 / -1;">
                     <div>
-                        <div class="game-card-header">
-                            <div class="game-title-group">
-                                <img src="mc/juchelka_craft.png" class="game-icon-img" alt="Craft">
-                                <div>
-                                    <div class="game-title">JuchelkaCraft</div>
-                                    <div class="game-tag">Eaglercraft 1.8.8</div>
-                                </div>
-                            </div>
-                            <a href="mc/index.html" class="game-play-link">Spustit</a>
-                        </div>
-
-                        <div class="stat-chips-grid">
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Počet spuštění</span>
-                                <span id="mcSessionsText" class="stat-chip-val">0</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Čas ve světě</span>
-                                <span id="mcTimeText" class="stat-chip-val">0m</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Uložených souborů</span>
-                                <span id="mcBackupFilesText" class="stat-chip-val">0</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Velikost zálohy</span>
-                                <span id="mcBackupSizeText" class="stat-chip-val">0 KB</span>
+                        <div class="panel-header">
+                            <div>
+                                <div class="panel-title">Ostatní herní aktivity hráče</div>
+                                <div class="panel-meta">Race with Kokeš, JuchelkaCraft, Run From Maturita a Runner 404</div>
                             </div>
                         </div>
 
-                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px;">
-                            Poslední záloha: <span id="mcBackupTimeText" style="color: #fff; font-family: var(--font-mono);">Zatím neprovedena</span>
-                        </div>
-
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <button type="button" class="action-btn" style="padding: 7px 14px; font-size: 12px;" onclick="if(window.OPS_STATS)window.OPS_STATS.openMinecraftBackupModal();">
-                                Správa záloh
-                            </button>
-                            <button type="button" class="action-btn" style="padding: 7px 14px; font-size: 12px; border-color: rgba(56, 189, 248, 0.4); color: var(--accent-cyan);" onclick="if(window.OPS_STATS)window.OPS_STATS.exportMinecraftBackup();">
-                                Stáhnout .json
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Run From Maturita -->
-                <div class="game-card">
-                    <div>
-                        <div class="game-card-header">
-                            <div class="game-title-group">
-                                <img src="barina_run.png" class="game-icon-img" alt="Maturita">
-                                <div>
-                                    <div class="game-title">Run From Maturita</div>
-                                    <div class="game-tag">Nekonečný úprk</div>
-                                </div>
+                        <div class="chips-grid" style="grid-template-columns: repeat(4, 1fr);">
+                            <div class="chip-box">
+                                <div class="chip-label">Race with Kokeš</div>
+                                <div id="detRaceSessions" class="chip-val">0 jízd</div>
+                                <div id="detRaceTime" class="kpi-sub">0m na trati</div>
                             </div>
-                            <a href="maturita/index.html" class="game-play-link">Spustit</a>
-                        </div>
-
-                        <div class="stat-chips-grid">
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Nejvyšší skóre</span>
-                                <span id="maturitaHighScoreText" class="stat-chip-val" style="color: var(--accent-cyan);">0</span>
+                            <div class="chip-box">
+                                <div class="chip-label">JuchelkaCraft (MC)</div>
+                                <div id="detMcSessions" class="chip-val">0 spuštění</div>
+                                <div id="detMcTime" class="kpi-sub">0m ve světě</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Max vzdálenost</span>
-                                <span id="maturitaDistanceText" class="stat-chip-val">0m</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Run From Maturita</div>
+                                <div id="detMaturitaScore" class="chip-val">0 bodů</div>
+                                <div id="detMaturitaDist" class="kpi-sub">Max: 0m</div>
                             </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Odehráno her</span>
-                                <span id="maturitaGamesText" class="stat-chip-val">0</span>
-                            </div>
-                            <div class="stat-chip">
-                                <span class="stat-chip-label">Čas útěku</span>
-                                <span id="maturitaTimeText" class="stat-chip-val">0m</span>
+                            <div class="chip-box">
+                                <div class="chip-label">Runner 404</div>
+                                <div id="detRunnerScore" class="chip-val">0 rekord</div>
+                                <div id="detRunnerTime" class="kpi-sub">0m hraní</div>
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-        </div>
+        </section>
 
-        <!-- Spodní akce -->
-        <div class="bottom-actions">
-            <button type="button" class="action-btn" onclick="OPS_STATS.promptUsernameModal()">
+        <!-- TAB 3: MOJE STATISTIKY (Místní profil) -->
+        <section id="tabMyStats" class="profile-view-wrap" style="display:none;">
+            <div id="myStatsContainer">
+                <!-- Rendered dynamically identically using renderPlayerProfileContent(localStats, myUser, container) -->
+            </div>
+        </section>
+
+        <!-- Bottom Actions Strip -->
+        <footer class="bottom-actions-row">
+            <button type="button" class="btn-outline" onclick="OPS_STATS.promptUsernameModal()">
                 Změnit přezdívku / Přihlásit se
             </button>
-            <button type="button" class="action-btn" onclick="OPS_STATS.exportStatsJSON()">
+            <button type="button" class="btn-outline" onclick="OPS_STATS.exportStatsJSON()">
                 Exportovat statistiky (JSON)
             </button>
-            <button type="button" class="action-btn danger" onclick="OPS_STATS.resetLocalStats()">
+            <button type="button" class="btn-danger" onclick="OPS_STATS.resetLocalStats()">
                 Resetovat lokální statistiky
             </button>
-        </div>
+        </footer>
     </div>
 
-    <!-- Scripty -->
+    <!-- Scripts -->
     <script src="js/ops-stats.js"></script>
     <script>
         const GD_LEVEL_NAMES = [
@@ -1181,6 +1418,33 @@
             "17. Blast Processing", "18. Theory of Everything 2", "19. Geometrical Dominator",
             "20. Deadlocked", "21. Fingerdash", "22. Dash"
         ];
+
+        const CLICKER_BUILDING_LABELS = {
+            cursor: "Kurzor",
+            grandma: "Babička",
+            farm: "Farma",
+            steroids: "Steroidy",
+            factory: "Továrna",
+            mine: "Důl",
+            shipment: "Zásilka",
+            lab: "Laboratoř",
+            portal: "Portál",
+            timemachine: "Stroj času",
+            antimatter: "Antihmota",
+            prism: "Hranol",
+            chancemaker: "Chancemaker",
+            fractal: "Fraktál",
+            javascript: "JavaScript konzole",
+            idleverse: "Idleverse",
+            cortex: "Kortikální mozek",
+            quantum_server: "Kvantový server",
+            maturita_singularity: "Singularita maturity"
+        };
+
+        let cachedLeaderboardData = [];
+        let currentLeaderboardMetric = 'total_play_time';
+        let inspectedPlayerStats = null;
+        let inspectedPlayerName = '';
 
         function formatDuration(sec) {
             sec = Math.floor(sec || 0);
@@ -1208,184 +1472,101 @@
         }
 
         function calculateGamerLevel(stats) {
+            if (!stats) return "LVL 1";
             const timeXp = Math.floor((stats.meta?.totalPlayTime || 0) / 30);
             const heroXp = (stats.stratagem?.highScore || 0) * 15;
             const gdXp = (stats.gd?.completedLevels?.length || 0) * 100 + Math.floor((stats.gd?.jumps || 0) / 10);
             const clickerXp = Math.min(1000, Math.floor(Math.sqrt(stats.clicker?.totalCookies || 0) / 5));
-            const totalXp = timeXp + heroXp + gdXp + clickerXp;
+            const gachaXp = (stats.gacha?.totalPulls || 0) * 5;
+            const totalXp = timeXp + heroXp + gdXp + clickerXp + gachaXp;
             const level = Math.max(1, Math.floor(Math.sqrt(totalXp / 10)) + 1);
             return `LVL ${level}`;
         }
 
-        function renderStats(statsParam) {
-            const user = OPS_STATS.getUsername() || "Neznámý hráč";
-            const topUserEl = document.getElementById('topUsernameDisplay');
-            if (topUserEl) topUserEl.textContent = user;
+        function getSafeStatsObject(rawStats) {
+            if (!rawStats) return {};
+            if (typeof rawStats === 'string') {
+                try { return JSON.parse(rawStats); } catch(e) { return {}; }
+            }
+            return rawStats;
+        }
 
-            const stats = statsParam || OPS_STATS.getStats();
-
-            // Highlights
-            document.getElementById('statTotalTime').textContent = formatDuration(stats.meta?.totalPlayTime || 0);
-            document.getElementById('statGamerLevel').textContent = calculateGamerLevel(stats);
-            document.getElementById('statHeroScore').textContent = stats.stratagem?.highScore || 0;
-            document.getElementById('statGdCompleted').textContent = `${stats.gd?.completedLevels?.length || 0} / 22`;
+        /* Top KPI Bar */
+        function updateTopKpis(stats) {
+            document.getElementById('kpiTotalTime').textContent = formatDuration(stats.meta?.totalPlayTime || 0);
+            document.getElementById('kpiGamerLevel').textContent = calculateGamerLevel(stats);
+            document.getElementById('kpiHeroScore').textContent = stats.stratagem?.highScore || 0;
+            document.getElementById('kpiGdCompleted').textContent = `${stats.gd?.completedLevels?.length || 0} / 22`;
 
             const clicker = stats.clicker || {};
-            const clickerMpointsEl = document.getElementById('statClickerMpoints');
-            if (clickerMpointsEl) {
-                clickerMpointsEl.textContent = formatCompactNumber(clicker.totalCookies || 0);
-            }
-            const clickerCpsSubEl = document.getElementById('statClickerCpsSub');
-            if (clickerCpsSubEl) {
-                const peakCps = Math.min(20, Number(clicker.peakClickCps) || 0);
-                const passiveCps = Number(clicker.cps) || 0;
-                clickerCpsSubEl.textContent = `${peakCps} CPS klik (pasiv: ${formatCompactNumber(passiveCps)}/s)`;
-            }
+            const totalCookies = Math.max(Number(clicker.totalCookies) || 0, Number(clicker.cookies) || 0);
+            document.getElementById('kpiClickerTotal').textContent = formatCompactNumber(totalCookies);
+            const passiveCps = Number(clicker.cps) || 0;
+            document.getElementById('kpiClickerSub').textContent = `${formatCompactNumber(passiveCps)}/s pasivně`;
 
-            // Juchelka Dash
-            document.getElementById('gdCompletedText').textContent = stats.gd?.completedLevels?.length || 0;
-            document.getElementById('gdAttemptsText').textContent = stats.gd?.attempts || 0;
-            document.getElementById('gdJumpsText').textContent = stats.gd?.jumps || 0;
-            document.getElementById('gdTimeText').textContent = formatDuration(stats.gd?.playTime || 0);
-
-            // GD Level list
-            const gdList = document.getElementById('gdLevelsList');
-            if (gdList) {
-                gdList.innerHTML = '';
-                let sumPercent = 0;
-
-                for (let i = 1; i <= 22; i++) {
-                    const lvlKey = String(i);
-                    const percent = stats.gd?.bestPercent?.[lvlKey] || 0;
-                    sumPercent += percent;
-                    const isComplete = percent >= 100;
-
-                    const item = document.createElement('div');
-                    item.className = 'gd-lvl-item';
-                    item.innerHTML = `
-                        <div class="gd-lvl-name" title="${GD_LEVEL_NAMES[i-1]}">${i}. ${GD_LEVEL_NAMES[i-1].split('. ')[1].slice(0, 8)}..</div>
-                        <div class="gd-lvl-bar-bg">
-                            <div class="gd-lvl-bar-fill ${isComplete ? 'complete' : ''}" style="width: ${percent}%;"></div>
-                        </div>
-                        <div class="gd-lvl-percent">${percent}%</div>
-                    `;
-                    gdList.appendChild(item);
-                }
-                const avgPercentEl = document.getElementById('gdAvgPercentText');
-                if (avgPercentEl) avgPercentEl.textContent = `Průměr: ${Math.round(sumPercent / 22)}%`;
-            }
-
-            // Juchelka Hero
-            document.getElementById('heroHighScoreText').textContent = stats.stratagem?.highScore || 0;
-            document.getElementById('heroGamesText').textContent = stats.stratagem?.totalGames || 0;
-            document.getElementById('heroSequencesText').textContent = stats.stratagem?.totalSequences || 0;
-            document.getElementById('heroTimeText').textContent = formatDuration(stats.stratagem?.playTime || 0);
-
-            // Race & MC & Maturita
-            document.getElementById('raceSessionsText').textContent = stats.hyperdrive?.sessions || 0;
-            document.getElementById('raceTimeText').textContent = formatDuration(stats.hyperdrive?.playTime || 0);
-            document.getElementById('mcSessionsText').textContent = stats.mc?.sessions || 0;
-            document.getElementById('mcTimeText').textContent = formatDuration(stats.mc?.playTime || 0);
-
-            // Minecraft zálohy
-            const mcBackupTime = stats.mc?.lastBackup ? new Date(stats.mc.lastBackup).toLocaleString("cs-CZ") : "Zatím neprovedena";
-            const mcBackupFiles = stats.mc?.backupFilesCount || 0;
-            const mcBackupBytes = stats.mc?.backupSizeBytes || 0;
-            const mcBackupSizeStr = mcBackupBytes > 1048576 
-                ? (mcBackupBytes / (1024 * 1024)).toFixed(2) + " MB" 
-                : (mcBackupBytes / 1024).toFixed(1) + " KB";
-
-            const mcBackupTimeEl = document.getElementById('mcBackupTimeText');
-            if (mcBackupTimeEl) mcBackupTimeEl.textContent = mcBackupTime;
-            const mcBackupFilesEl = document.getElementById('mcBackupFilesText');
-            if (mcBackupFilesEl) mcBackupFilesEl.textContent = mcBackupFiles;
-            const mcBackupSizeEl = document.getElementById('mcBackupSizeText');
-            if (mcBackupSizeEl) mcBackupSizeEl.textContent = mcBackupSizeStr;
-
-            if (window.OPS_STATS && window.OPS_STATS.getMinecraftBackupMeta) {
-                window.OPS_STATS.getMinecraftBackupMeta().then(meta => {
-                    if (meta && meta.timestamp) {
-                        if (mcBackupTimeEl) mcBackupTimeEl.textContent = new Date(meta.timestamp).toLocaleString("cs-CZ");
-                        if (mcBackupFilesEl) mcBackupFilesEl.textContent = meta.filesCount || 0;
-                        if (mcBackupSizeEl) {
-                            const b = meta.totalBytes || 0;
-                            mcBackupSizeEl.textContent = b > 1048576 ? (b / (1024 * 1024)).toFixed(2) + " MB" : (b / 1024).toFixed(1) + " KB";
-                        }
-                    }
-                });
-            }
-
-            document.getElementById('maturitaHighScoreText').textContent = stats.maturita?.highScore || 0;
-            document.getElementById('maturitaDistanceText').textContent = `${stats.maturita?.bestDistance || 0}m`;
-            document.getElementById('maturitaGamesText').textContent = stats.maturita?.totalGames || 0;
-            document.getElementById('maturitaTimeText').textContent = formatDuration(stats.maturita?.playTime || 0);
-
-            // Maturita click
-            const clickerBuildingsTotal = Object.values(clicker.buildings || {}).reduce((sum, n) => sum + (Number(n) || 0), 0);
-            const clickerUpgradesTotal = Array.isArray(clicker.upgrades) ? clicker.upgrades.length : 0;
-
-            const clickerTotalEl = document.getElementById('clickerTotalCookiesText');
-            if (clickerTotalEl) clickerTotalEl.textContent = formatCompactNumber(clicker.totalCookies || 0);
-
-            const clickerCurrentEl = document.getElementById('clickerCookiesText');
-            if (clickerCurrentEl) clickerCurrentEl.textContent = formatCompactNumber(clicker.cookies || 0);
-
-            const clickerClicksEl = document.getElementById('clickerClicksText');
-            if (clickerClicksEl) clickerClicksEl.textContent = formatNumber(clicker.clicks || 0);
-
-            const clickerBuildingsEl = document.getElementById('clickerBuildingsText');
-            if (clickerBuildingsEl) clickerBuildingsEl.textContent = `${formatNumber(clickerBuildingsTotal)} ks`;
-
-            const clickerUpgradesEl = document.getElementById('clickerUpgradesText');
-            if (clickerUpgradesEl) clickerUpgradesEl.textContent = `${clickerUpgradesTotal} ks`;
-
-            const clickerCpsEl = document.getElementById('clickerCpsText');
-            if (clickerCpsEl) {
-                const cpsVal = Number(clicker.cps) || 0;
-                clickerCpsEl.textContent = `${formatCompactNumber(cpsVal)} /s`;
-            }
-
-            const clickerPeakCpsEl = document.getElementById('clickerPeakCpsText');
-            if (clickerPeakCpsEl) {
-                const peakCps = Math.min(20, Number(clicker.peakClickCps) || 0);
-                clickerPeakCpsEl.textContent = `${peakCps} CPS (max 20)`;
-            }
-
-            const clickerTimeEl = document.getElementById('clickerTimeText');
-            if (clickerTimeEl) clickerTimeEl.textContent = formatDuration(clicker.playTime || 0);
+            const gacha = stats.gacha || {};
+            document.getElementById('kpiGachaPulls').textContent = gacha.totalPulls || 0;
+            const uniqueChars = Object.keys(gacha.inventory || {}).filter(k => (gacha.inventory[k] || 0) > 0).length;
+            document.getElementById('kpiGachaSub').textContent = `${uniqueChars} postav ve sbírce`;
         }
 
-        function switchTab(tabId) {
-            document.getElementById('tabMyStats').style.display = tabId === 'myStats' ? 'block' : 'none';
-            document.getElementById('tabLeaderboard').style.display = tabId === 'leaderboard' ? 'block' : 'none';
-            document.getElementById('tabBtnMyStats').classList.toggle('active', tabId === 'myStats');
-            document.getElementById('tabBtnLeaderboard').classList.toggle('active', tabId === 'leaderboard');
+        /* Tabs Switching */
+        function switchMainTab(tabKey) {
+            const tabLb = document.getElementById('tabLeaderboard');
+            const tabProf = document.getElementById('tabPlayerDetail');
+            const tabMy = document.getElementById('tabMyStats');
 
-            if (tabId === 'leaderboard') {
-                const activeBtn = document.querySelector('.lb-filter-btn.active') || document.getElementById('lbFilterTime');
-                const col = activeBtn.id === 'lbFilterClicker' ? 'clicker_total_cookies' :
-                            activeBtn.id === 'lbFilterHero' ? 'stratagem_highscore' :
-                            activeBtn.id === 'lbFilterGd' ? 'gd_completed_levels' : 'total_play_time';
-                loadLeaderboard(col, activeBtn);
+            const btnLb = document.getElementById('tabBtnLeaderboard');
+            const btnProf = document.getElementById('tabBtnPlayerDetail');
+            const btnMy = document.getElementById('tabBtnMyStats');
+
+            tabLb.style.display = tabKey === 'leaderboard' ? 'block' : 'none';
+            tabProf.style.display = tabKey === 'playerDetail' ? 'flex' : 'none';
+            tabMy.style.display = tabKey === 'myStats' ? 'flex' : 'none';
+
+            btnLb.classList.toggle('active', tabKey === 'leaderboard');
+            btnProf.classList.toggle('active', tabKey === 'playerDetail');
+            btnMy.classList.toggle('active', tabKey === 'myStats');
+
+            const scopeLabel = document.getElementById('activeScopeLabel');
+            if (tabKey === 'leaderboard') {
+                scopeLabel.textContent = `Zobrazen globální žebříček`;
+            } else if (tabKey === 'myStats') {
+                scopeLabel.textContent = `Zobrazeny statistiky tohoto zařízení`;
+                renderMyStatsTab();
+            } else if (tabKey === 'playerDetail') {
+                scopeLabel.textContent = `Zobrazen detail hráče ${inspectedPlayerName}`;
             }
         }
 
-        async function loadLeaderboard(column, btnElement) {
+        /* Leaderboard Metric Filter */
+        function setLeaderboardMetric(metricKey, btnElement) {
+            currentLeaderboardMetric = metricKey;
             if (btnElement) {
-                document.querySelectorAll('.lb-filter-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.lb-filters .filter-btn').forEach(b => b.classList.remove('active'));
                 btnElement.classList.add('active');
             }
+            loadLeaderboard(metricKey);
+        }
 
+        /* Leaderboard Search */
+        function handleLeaderboardSearch(query) {
+            renderLeaderboardRows(cachedLeaderboardData, query.trim().toLowerCase());
+        }
+
+        /* Load Leaderboard from Supabase / Local */
+        async function loadLeaderboard(column) {
+            column = column || currentLeaderboardMetric;
             const headerMap = {
                 'clicker_total_cookies': 'MCoiny / Mpoints (Celkem / CPS)',
                 'stratagem_highscore': 'Max kódů',
                 'gd_completed_levels': 'Levelů (100%)',
                 'total_play_time': 'Odehraný čas'
             };
-            document.getElementById('lbMetricColHeader').textContent = headerMap[column] || 'Hodnota';
+            document.getElementById('colMetricHeader').textContent = headerMap[column] || 'Hodnota';
 
             const tbody = document.getElementById('lbTableBody');
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:34px;color:#94a3b8;">Načítám data žebříčku...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--muted);">Načítám data žebříčku...</td></tr>`;
 
             const notice = document.getElementById('cloudNotice');
             if (!OPS_STATS.config.url || !OPS_STATS.config.anonKey) {
@@ -1394,102 +1575,451 @@
                 notice.style.display = 'none';
             }
 
-            const data = await OPS_STATS.fetchLeaderboard(column, 15);
-            const myUser = OPS_STATS.getUsername();
+            const data = await OPS_STATS.fetchLeaderboard(column, 50);
+            cachedLeaderboardData = Array.isArray(data) ? data : [];
+
+            const searchVal = document.getElementById('lbSearchInput')?.value || '';
+            renderLeaderboardRows(cachedLeaderboardData, searchVal.trim().toLowerCase());
+        }
+
+        /* Render Rows into Table */
+        function renderLeaderboardRows(data, searchFilter) {
+            const tbody = document.getElementById('lbTableBody');
+            const myUser = (OPS_STATS.getUsername() || '').trim();
+            const col = currentLeaderboardMetric;
 
             if (!data || data.length === 0) {
-                // Lokální ukázkový řádek pro aktuálního hráče
+                // Lokální data jako fallback pro aktuálního uživatele
                 const localStats = OPS_STATS.getStats();
                 let myValPrimary = '0';
                 let myValSub = '';
-                if (column === 'stratagem_highscore') {
+                if (col === 'stratagem_highscore') {
                     myValPrimary = (localStats.stratagem?.highScore || 0).toString();
-                } else if (column === 'gd_completed_levels') {
+                } else if (col === 'gd_completed_levels') {
                     myValPrimary = `${localStats.gd?.completedLevels?.length || 0} / 22`;
-                } else if (column === 'clicker_total_cookies') {
+                } else if (col === 'clicker_total_cookies') {
                     const totalLocal = Math.max(Number(localStats.clicker?.totalCookies) || 0, Number(localStats.clicker?.cookies) || 0);
-                    myValPrimary = formatCompactNumber(totalLocal) + ' MCoinů (Mpoints)';
+                    myValPrimary = formatCompactNumber(totalLocal) + ' MCoinů';
                     const peak = Math.min(20, Number(localStats.clicker?.peakClickCps) || 0);
-                    myValSub = `CPS: ${formatCompactNumber(localStats.clicker?.cps || 0)} | Klik: ${peak} CPS`;
+                    myValSub = `CPS: ${formatCompactNumber(localStats.clicker?.cps || 0)} | Klik: ${peak}`;
                 } else {
                     myValPrimary = formatDuration(localStats.meta?.totalPlayTime || 0);
                 }
 
                 tbody.innerHTML = `
-                    <tr>
-                        <td><span class="rank-medal rank-1">1</span></td>
-                        <td class="lb-player-active">${myUser || "Ty"} <span class="lb-player-tag">tento prohlížeč</span></td>
-                        <td style="text-align:right;">
-                            <div class="lb-metric-primary" style="color:#38bdf8;">${myValPrimary}</div>
-                            ${myValSub ? `<div class="lb-metric-sub">${myValSub}</div>` : ''}
+                    <tr class="clickable-row row-is-me" onclick="openPlayerDetail('${myUser || 'Ty'}')">
+                        <td class="rank-number top-1">1.</td>
+                        <td>
+                            <div class="player-identity-cell">
+                                <div class="player-avatar-letter">${(myUser || 'T')[0].toUpperCase()}</div>
+                                <div>
+                                    <span class="player-name-text">${myUser || 'Ty'}</span>
+                                    <span class="badge-me">tento profil</span>
+                                </div>
+                            </div>
                         </td>
-                        <td style="text-align:right;color:#94a3b8;font-size:12px;font-family:var(--font-mono);">Právě teď</td>
+                        <td style="text-align:right;">
+                            <div class="metric-primary-val" style="color:var(--accent);">${myValPrimary}</div>
+                            ${myValSub ? `<div class="metric-sub-val">${myValSub}</div>` : ''}
+                        </td>
+                        <td style="text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;">Právě teď</td>
+                        <td style="text-align:center;">
+                            <button type="button" class="action-inspect-btn" onclick="event.stopPropagation();openPlayerDetail('${myUser || 'Ty'}')">Zobrazit &rarr;</button>
+                        </td>
                     </tr>
                 `;
                 return;
             }
 
-            if (column === 'clicker_total_cookies' && Array.isArray(data)) {
-                data.sort((a, b) => {
-                    const statsA = typeof a.stats === 'string' ? JSON.parse(a.stats || '{}') : (a.stats || {});
-                    const statsB = typeof b.stats === 'string' ? JSON.parse(b.stats || '{}') : (b.stats || {});
+            // Client-side sorting pro clicker pokud je potřeba
+            let rowsToDisplay = [...data];
+            if (col === 'clicker_total_cookies') {
+                rowsToDisplay.sort((a, b) => {
+                    const statsA = getSafeStatsObject(a.stats);
+                    const statsB = getSafeStatsObject(b.stats);
                     const valA = Math.max(Number(statsA?.clicker?.totalCookies) || 0, Number(statsA?.clicker?.cookies) || 0);
                     const valB = Math.max(Number(statsB?.clicker?.totalCookies) || 0, Number(statsB?.clicker?.cookies) || 0);
                     return valB - valA;
                 });
             }
 
+            // Vyhledávací filtr
+            if (searchFilter) {
+                rowsToDisplay = rowsToDisplay.filter(r => (r.username || '').toLowerCase().includes(searchFilter));
+            }
+
+            if (rowsToDisplay.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);">Žádný hráč neodpovídá filtru vyhledávání.</td></tr>`;
+                return;
+            }
+
             tbody.innerHTML = '';
-            data.forEach((row, idx) => {
+            rowsToDisplay.forEach((row, idx) => {
                 const rank = idx + 1;
-                let medalHtml = '';
-                if (rank === 1) medalHtml = `<span class="rank-medal rank-1">1</span>`;
-                else if (rank === 2) medalHtml = `<span class="rank-medal rank-2">2</span>`;
-                else if (rank === 3) medalHtml = `<span class="rank-medal rank-3">3</span>`;
-                else medalHtml = `<span class="rank-default">${rank}.</span>`;
+                let rankClass = '';
+                if (rank === 1) rankClass = 'top-1';
+                else if (rank === 2) rankClass = 'top-2';
+                else if (rank === 3) rankClass = 'top-3';
 
                 const isMe = row.username && row.username.toLowerCase() === myUser.toLowerCase();
+                const rawStats = getSafeStatsObject(row.stats);
 
                 let primaryVal = '0';
                 let subVal = '';
 
-                if (column === 'clicker_total_cookies') {
-                    const rawStats = typeof row.stats === 'string' ? JSON.parse(row.stats || '{}') : (row.stats || {});
+                if (col === 'clicker_total_cookies') {
                     const clickerObj = rawStats.clicker || {};
                     const totalMpoints = Math.max(Number(clickerObj.totalCookies) || 0, Number(clickerObj.cookies) || 0);
-                    primaryVal = formatCompactNumber(totalMpoints) + ' MCoinů (Mpoints)';
+                    primaryVal = formatCompactNumber(totalMpoints) + ' MCoinů';
                     const passive = Number(clickerObj.cps) || 0;
                     const peak = Math.min(20, Number(clickerObj.peakClickCps) || 0);
-                    subVal = `CPS: ${formatCompactNumber(passive)}/s | Klik: ${peak} CPS`;
-                } else if (column === 'total_play_time') {
+                    subVal = `CPS: ${formatCompactNumber(passive)}/s | Klik: ${peak}`;
+                } else if (col === 'total_play_time') {
                     primaryVal = formatDuration(row.total_play_time || 0);
-                } else if (column === 'stratagem_highscore') {
-                    primaryVal = (row.stratagem_highscore || 0).toString();
-                } else if (column === 'gd_completed_levels') {
+                    const lastGame = rawStats.meta?.lastPlayedGame;
+                    if (lastGame) subVal = `Naposledy: ${lastGame}`;
+                } else if (col === 'stratagem_highscore') {
+                    primaryVal = (row.stratagem_highscore || 0).toString() + ' kódů';
+                    const games = rawStats.stratagem?.totalGames || 0;
+                    if (games > 0) subVal = `${games} her odehráno`;
+                } else if (col === 'gd_completed_levels') {
                     primaryVal = `${row.gd_completed_levels || 0} / 22`;
+                    const jumps = row.gd_total_jumps || rawStats.gd?.jumps || 0;
+                    subVal = `${formatNumber(jumps)} skoků`;
                 }
 
-                const timeAgo = row.updated_at ? new Date(row.updated_at).toLocaleDateString("cs-CZ") : "-";
+                const dateStr = row.updated_at ? new Date(row.updated_at).toLocaleDateString("cs-CZ") : "-";
+                const initialLetter = (row.username || 'A')[0].toUpperCase();
 
                 const tr = document.createElement('tr');
+                tr.className = `clickable-row ${isMe ? 'row-is-me' : ''}`;
+                tr.onclick = () => openPlayerDetail(row.username);
+
                 tr.innerHTML = `
-                    <td>${medalHtml}</td>
-                    <td class="${isMe ? 'lb-player-active' : ''}">
-                        ${row.username || 'Anonym'} ${isMe ? '<span class="lb-player-tag">ty</span>' : ''}
+                    <td class="rank-number ${rankClass}">${rank}.</td>
+                    <td>
+                        <div class="player-identity-cell">
+                            <div class="player-avatar-letter">${initialLetter}</div>
+                            <div>
+                                <span class="player-name-text">${row.username || 'Anonym'}</span>
+                                ${isMe ? '<span class="badge-me">tento profil</span>' : ''}
+                            </div>
+                        </div>
                     </td>
                     <td style="text-align:right;">
-                        <div class="lb-metric-primary" style="color:${rank === 1 ? '#fbbf24' : '#fff'};">${primaryVal}</div>
-                        ${subVal ? `<div class="lb-metric-sub">${subVal}</div>` : ''}
+                        <div class="metric-primary-val" style="color:${rank === 1 ? 'var(--warning)' : '#ffffff'};">${primaryVal}</div>
+                        ${subVal ? `<div class="metric-sub-val">${subVal}</div>` : ''}
                     </td>
-                    <td style="text-align:right;color:#94a3b8;font-size:12px;font-family:var(--font-mono);">${timeAgo}</td>
+                    <td style="text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;">${dateStr}</td>
+                    <td style="text-align:center;">
+                        <button type="button" class="action-inspect-btn" onclick="event.stopPropagation();openPlayerDetail('${encodeURIComponent(row.username)}')">Zobrazit &rarr;</button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
+        /* Open Player Detail */
+        async function openPlayerDetail(username) {
+            username = decodeURIComponent(username || '').trim();
+            if (!username) return;
+
+            inspectedPlayerName = username;
+            const myUser = (OPS_STATS.getUsername() || '').trim();
+            const isMe = username.toLowerCase() === myUser.toLowerCase();
+
+            // Zkusíme najít v cachedLeaderboardData
+            let playerRecord = cachedLeaderboardData.find(r => r.username && r.username.toLowerCase() === username.toLowerCase());
+
+            // Pokud není nebo chceme nejčerstvější data, vytáhneme ze Supabase
+            if (!playerRecord && !isMe) {
+                playerRecord = await OPS_STATS.fetchPlayerStats(username);
+            }
+
+            let statsObj = {};
+            let totalPlayTime = 0;
+            let updatedAt = null;
+
+            if (isMe) {
+                statsObj = OPS_STATS.getStats();
+                totalPlayTime = statsObj.meta?.totalPlayTime || 0;
+                updatedAt = new Date().toISOString();
+            } else if (playerRecord) {
+                statsObj = getSafeStatsObject(playerRecord.stats);
+                totalPlayTime = playerRecord.total_play_time || statsObj.meta?.totalPlayTime || 0;
+                updatedAt = playerRecord.updated_at;
+            } else {
+                // Zkusíme ještě přímý fetch
+                playerRecord = await OPS_STATS.fetchPlayerStats(username);
+                if (playerRecord) {
+                    statsObj = getSafeStatsObject(playerRecord.stats);
+                    totalPlayTime = playerRecord.total_play_time || statsObj.meta?.totalPlayTime || 0;
+                    updatedAt = playerRecord.updated_at;
+                }
+            }
+
+            inspectedPlayerStats = statsObj;
+
+            // Zobrazení záložky v tab bar
+            const tabBtn = document.getElementById('tabBtnPlayerDetail');
+            const nameTag = document.getElementById('tabPlayerDetailNameTag');
+            tabBtn.style.display = 'inline-flex';
+            nameTag.textContent = username;
+
+            renderInspectedPlayerDOM(username, statsObj, totalPlayTime, updatedAt, isMe);
+            switchMainTab('playerDetail');
+
+            // Aktualizace URL hash bez přebíjení historie
+            if (history.replaceState) {
+                history.replaceState(null, null, `#player=${encodeURIComponent(username)}`);
+            }
+        }
+
+        /* Render Profile Detail into DOM */
+        function renderInspectedPlayerDOM(username, stats, totalPlayTime, updatedAt, isMe) {
+            document.getElementById('detailAvatarLetter').textContent = (username || '?')[0].toUpperCase();
+            document.getElementById('detailUsernameDisplay').textContent = username;
+            document.getElementById('detailIsMeBadge').style.display = isMe ? 'inline-block' : 'none';
+            document.getElementById('detailCompareBtn').style.display = isMe ? 'none' : 'inline-flex';
+            document.getElementById('profileComparePanel').style.display = 'none';
+
+            // Meta
+            document.getElementById('detailGamerRank').textContent = calculateGamerLevel(stats);
+            document.getElementById('detailLastActive').textContent = updatedAt ? new Date(updatedAt).toLocaleString("cs-CZ") : "Neuvedeno";
+            document.getElementById('detailLastGame').textContent = stats.meta?.lastPlayedGame || "Žádná hra";
+
+            // KPI strip
+            document.getElementById('detailTotalTime').textContent = formatDuration(totalPlayTime);
+            const clicker = stats.clicker || {};
+            const totalCookies = Math.max(Number(clicker.totalCookies) || 0, Number(clicker.cookies) || 0);
+            document.getElementById('detailClickerTotal').textContent = formatCompactNumber(totalCookies);
+            document.getElementById('detailHeroScore').textContent = stats.stratagem?.highScore || 0;
+            document.getElementById('detailGdLevels').textContent = `${stats.gd?.completedLevels?.length || 0} / 22`;
+            document.getElementById('detailGachaPulls').textContent = stats.gacha?.totalPulls || 0;
+
+            // Clicker
+            document.getElementById('detClickerTotalExact').textContent = formatNumber(totalCookies);
+            document.getElementById('detClickerCurrent').textContent = formatNumber(clicker.cookies || 0);
+            document.getElementById('detClickerCps').textContent = `${formatCompactNumber(Number(clicker.cps) || 0)} /s`;
+            const peakCps = Math.min(20, Number(clicker.peakClickCps) || 0);
+            document.getElementById('detClickerPeak').textContent = `${peakCps} CPS`;
+            document.getElementById('detClickerClicks').textContent = formatNumber(clicker.clicks || 0);
+            document.getElementById('detClickerPower').textContent = formatNumber(clicker.clickPower || 1);
+
+            // Clicker Budovy
+            const bldListEl = document.getElementById('detClickerBuildingsList');
+            bldListEl.innerHTML = '';
+            const bldObj = clicker.buildings || {};
+            let totalBldCount = 0;
+            for (const [id, label] of Object.entries(CLICKER_BUILDING_LABELS)) {
+                const count = Number(bldObj[id]) || 0;
+                totalBldCount += count;
+                const row = document.createElement('div');
+                row.className = 'clicker-bld-item';
+                row.innerHTML = `
+                    <span class="clicker-bld-name">${label}</span>
+                    <span class="clicker-bld-count" style="color:${count > 0 ? '#ffffff' : 'var(--faint)'};">${formatNumber(count)}</span>
+                `;
+                bldListEl.appendChild(row);
+            }
+            document.getElementById('detClickerBldCount').textContent = formatNumber(totalBldCount);
+
+            // Juchelka Dash
+            const gd = stats.gd || {};
+            document.getElementById('detGdCompleted').textContent = `${gd.completedLevels?.length || 0} / 22`;
+            document.getElementById('detGdAttempts').textContent = formatNumber(gd.attempts || 0);
+            document.getElementById('detGdJumps').textContent = formatNumber(gd.jumps || 0);
+            document.getElementById('detGdTime').textContent = formatDuration(gd.playTime || 0);
+
+            // GD Levels
+            const gdListEl = document.getElementById('detGdLevelsList');
+            gdListEl.innerHTML = '';
+            let sumPercent = 0;
+            for (let i = 1; i <= 22; i++) {
+                const lvlKey = String(i);
+                const percent = Math.min(100, Math.max(0, gd.bestPercent?.[lvlKey] || 0));
+                sumPercent += percent;
+                const isDone = percent >= 100;
+
+                const row = document.createElement('div');
+                row.className = 'level-item-row';
+                row.innerHTML = `
+                    <div class="level-item-name" title="${GD_LEVEL_NAMES[i-1]}">${GD_LEVEL_NAMES[i-1]}</div>
+                    <div class="level-bar-track">
+                        <div class="level-bar-fill ${isDone ? 'complete' : ''}" style="width: ${percent}%;"></div>
+                    </div>
+                    <div class="level-item-num ${isDone ? 'complete' : ''}">${percent}%</div>
+                `;
+                gdListEl.appendChild(row);
+            }
+            document.getElementById('detGdAvgPercent').textContent = `Průměr: ${Math.round(sumPercent / 22)}%`;
+
+            // Juchelka Hero
+            const hero = stats.stratagem || {};
+            document.getElementById('detHeroScore').textContent = hero.highScore || 0;
+            document.getElementById('detHeroGames').textContent = formatNumber(hero.totalGames || 0);
+            document.getElementById('detHeroSequences').textContent = formatNumber(hero.totalSequences || 0);
+            document.getElementById('detHeroTime').textContent = formatDuration(hero.playTime || 0);
+
+            // Gacha
+            const gacha = stats.gacha || {};
+            document.getElementById('detGachaPullsVal').textContent = formatNumber(gacha.totalPulls || 0);
+            document.getElementById('detGachaTokensVal').textContent = formatCompactNumber(gacha.tokens || 0);
+            document.getElementById('detGachaPityVal').textContent = `${gacha.zPity || 0} / ${gacha.sPity || 0} / ${gacha.aPity || 0}`;
+
+            const rosterEl = document.getElementById('detGachaRosterList');
+            rosterEl.innerHTML = '';
+            const inv = gacha.inventory || {};
+            const agents = OPS_STATS.getAgentsList ? OPS_STATS.getAgentsList() : [];
+            let uniqueCount = 0;
+
+            agents.forEach(agent => {
+                const count = Number(inv[agent.id]) || 0;
+                if (count > 0) uniqueCount++;
+                const card = document.createElement('div');
+                card.className = `gacha-char-card ${count > 0 ? 'owned' : ''}`;
+                card.innerHTML = `
+                    <div class="gacha-char-top">
+                        <span class="gacha-rank-badge rank-${agent.rank}">[${agent.rank}]</span>
+                        <span class="gacha-char-count" style="color:${count > 0 ? 'var(--positive)' : 'var(--faint)'};">${count} ks</span>
+                    </div>
+                    <div class="gacha-char-name">${agent.name}</div>
+                    <div class="gacha-char-desc">${agent.type}</div>
+                `;
+                rosterEl.appendChild(card);
+            });
+            document.getElementById('detGachaUniqueVal').textContent = `${uniqueCount} / ${agents.length}`;
+
+            // Ostatní hry
+            const race = stats.hyperdrive || {};
+            document.getElementById('detRaceSessions').textContent = `${formatNumber(race.sessions || 0)} jízd`;
+            document.getElementById('detRaceTime').textContent = `${formatDuration(race.playTime || 0)} na trati`;
+
+            const mc = stats.mc || {};
+            document.getElementById('detMcSessions').textContent = `${formatNumber(mc.sessions || 0)} spuštění`;
+            document.getElementById('detMcTime').textContent = `${formatDuration(mc.playTime || 0)} ve světě`;
+
+            const mat = stats.maturita || {};
+            document.getElementById('detMaturitaScore').textContent = `${formatNumber(mat.highScore || 0)} bodů`;
+            document.getElementById('detMaturitaDist').textContent = `Max: ${formatNumber(mat.bestDistance || 0)}m`;
+
+            const r404 = stats.runner404 || {};
+            const rScore = Math.max(r404.hunterHighScore || 0, r404.runnerHighScore || 0);
+            document.getElementById('detRunnerScore').textContent = `${formatNumber(rScore)} rekord`;
+            document.getElementById('detRunnerTime').textContent = `${formatDuration(r404.playTime || 0)} hraní`;
+        }
+
+        /* Toggle Comparison View */
+        function toggleComparisonView() {
+            const panel = document.getElementById('profileComparePanel');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                return;
+            }
+
+            panel.style.display = 'block';
+            document.getElementById('compareTargetName').textContent = inspectedPlayerName;
+
+            const myStats = OPS_STATS.getStats();
+            const theirStats = inspectedPlayerStats || {};
+
+            const myTime = myStats.meta?.totalPlayTime || 0;
+            const theirTime = theirStats.meta?.totalPlayTime || 0;
+
+            const myCookies = Math.max(Number(myStats.clicker?.totalCookies) || 0, Number(myStats.clicker?.cookies) || 0);
+            const theirCookies = Math.max(Number(theirStats.clicker?.totalCookies) || 0, Number(theirStats.clicker?.cookies) || 0);
+
+            const myHero = myStats.stratagem?.highScore || 0;
+            const theirHero = theirStats.stratagem?.highScore || 0;
+
+            const myGd = myStats.gd?.completedLevels?.length || 0;
+            const theirGd = theirStats.gd?.completedLevels?.length || 0;
+
+            const myGacha = myStats.gacha?.totalPulls || 0;
+            const theirGacha = theirStats.gacha?.totalPulls || 0;
+
+            const rows = [
+                {
+                    metric: "Odehraný čas",
+                    myVal: formatDuration(myTime),
+                    theirVal: formatDuration(theirTime),
+                    diff: (myTime - theirTime) >= 0 ? `+${formatDuration(myTime - theirTime)}` : `-${formatDuration(theirTime - myTime)}`,
+                    isPositive: (myTime - theirTime) >= 0
+                },
+                {
+                    metric: "Maturita Clicker (MCoiny)",
+                    myVal: formatCompactNumber(myCookies),
+                    theirVal: formatCompactNumber(theirCookies),
+                    diff: (myCookies - theirCookies) >= 0 ? `+${formatCompactNumber(myCookies - theirCookies)}` : `-${formatCompactNumber(theirCookies - myCookies)}`,
+                    isPositive: (myCookies - theirCookies) >= 0
+                },
+                {
+                    metric: "Juchelka Hero (Kódy)",
+                    myVal: `${myHero}`,
+                    theirVal: `${theirHero}`,
+                    diff: (myHero - theirHero) >= 0 ? `+${myHero - theirHero}` : `${myHero - theirHero}`,
+                    isPositive: (myHero - theirHero) >= 0
+                },
+                {
+                    metric: "Juchelka Dash (Levely)",
+                    myVal: `${myGd} / 22`,
+                    theirVal: `${theirGd} / 22`,
+                    diff: (myGd - theirGd) >= 0 ? `+${myGd - theirGd}` : `${myGd - theirGd}`,
+                    isPositive: (myGd - theirGd) >= 0
+                },
+                {
+                    metric: "Gacha (Celkem pullů)",
+                    myVal: `${myGacha}`,
+                    theirVal: `${theirGacha}`,
+                    diff: (myGacha - theirGacha) >= 0 ? `+${myGacha - theirGacha}` : `${myGacha - theirGacha}`,
+                    isPositive: (myGacha - theirGacha) >= 0
+                }
+            ];
+
+            const tbody = document.getElementById('compareTableBody');
+            tbody.innerHTML = '';
+            rows.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:600;">${r.metric}</td>
+                    <td style="text-align:right;" class="num">${r.myVal}</td>
+                    <td style="text-align:right;" class="num">${r.theirVal}</td>
+                    <td style="text-align:right;font-weight:700;color:${r.isPositive ? 'var(--positive)' : 'var(--negative)'};" class="num">${r.diff}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        /* Render "Moje statistiky" tab */
+        function renderMyStatsTab() {
+            const container = document.getElementById('myStatsContainer');
+            const localStats = OPS_STATS.getStats();
+            const myUser = OPS_STATS.getUsername() || "Můj profil";
+
+            // Využijeme stejnou logiku pro vykreslení
+            renderInspectedPlayerDOM(myUser, localStats, localStats.meta?.totalPlayTime || 0, new Date().toISOString(), true);
+            // Přepneme obsah
+            switchMainTab('playerDetail');
+        }
+
+        /* Init */
         window.addEventListener('DOMContentLoaded', () => {
-            renderStats();
-            loadLeaderboard('total_play_time', document.getElementById('lbFilterTime'));
+            const myUser = OPS_STATS.getUsername() || "Neznámý";
+            const topUserEl = document.getElementById('topUsernameDisplay');
+            if (topUserEl) topUserEl.textContent = myUser;
+
+            const stats = OPS_STATS.getStats();
+            updateTopKpis(stats);
+
+            loadLeaderboard('total_play_time');
+
+            // Kontrola URL hash např. #player=JayQ
+            if (window.location.hash && window.location.hash.startsWith('#player=')) {
+                const pName = decodeURIComponent(window.location.hash.slice('#player='.length));
+                if (pName) {
+                    setTimeout(() => openPlayerDetail(pName), 200);
+                }
+            }
         });
     </script>
 </body>
