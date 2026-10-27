@@ -350,11 +350,9 @@
     const user = OPS_STATS && OPS_STATS.getUsername ? OPS_STATS.getUsername() : '';
     if ($('username')) {
       $('username').textContent = user || 'Bez přezdívky';
-      $('username').title = user ? 'Přezdívka hráče' : 'Kliknutím nastav přezdívku';
-      if (!user) {
-        $('username').style.cursor = 'pointer';
-        $('username').addEventListener('click', () => OPS_STATS && OPS_STATS.promptUsernameModal && OPS_STATS.promptUsernameModal());
-      }
+      $('username').title = 'Kliknutím změnit přezdívku';
+      $('username').style.cursor = 'pointer';
+      $('username').addEventListener('click', () => OPS_STATS && OPS_STATS.promptUsernameModal && OPS_STATS.promptUsernameModal());
     }
     const inv = g.inventory;
     const count = Array.isArray(inv) ? inv.length : inv && typeof inv === 'object' ? Object.keys(inv).length : Number(g.inventoryCount || g.uniqueCharacters || 0);

@@ -436,7 +436,9 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
 
     const user = window.OPS_STATS ? window.OPS_STATS.getUsername() : "";
     if (user && !user.startsWith("Host")) {
-      $("who").innerHTML = `Hraješ jako <b>${user.replace(/[<>&"]/g, "")}</b>. Body se ukládají do cloudu.`;
+      $("who").innerHTML = `Hraješ jako <b>${user.replace(/[<>&"]/g, "")}</b>. Body se ukládají do cloudu. <button type="button" id="setName" style="background:none;border:none;color:var(--gold);cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;margin-left:6px">[změnit]</button>`;
+      const b = $("setName");
+      if (b) b.addEventListener("click", () => window.OPS_STATS && window.OPS_STATS.promptUsernameModal());
     } else {
       $("who").innerHTML = `Hraješ bez přezdívky, body se ukládají jen v tomto prohlížeči. <button type="button" id="setName">Zadat přezdívku</button>`;
       const b = $("setName");

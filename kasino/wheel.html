@@ -221,8 +221,9 @@ function refreshSide(){
  $('broke').classList.toggle('hide',b>=10);
  $('shopCookies').textContent='🍪 '+fmt(readCookies().available);
  const user=window.OPS_STATS?window.OPS_STATS.getUsername():'';
- if(user&&!user.startsWith('Host'))$('who').textContent='Hraješ jako '+user+'. Body se sdílí s ostatními hrami OPS.';
- else {$('who').innerHTML='Hraješ bez přezdívky, body se ukládají lokálně. <button type="button" id="setName">Zadat přezdívku</button>';const x=$('setName');if(x)x.onclick=()=>window.OPS_STATS&&window.OPS_STATS.promptUsernameModal();}
+ if(user&&!user.startsWith('Host'))$('who').innerHTML='Hraješ jako '+user+'. Body se sdílí s ostatními hrami OPS. <button type="button" id="setName" style="background:none;border:none;color:var(--gold);cursor:pointer;text-decoration:underline;font-size:inherit;padding:0;margin-left:6px">[změnit]</button>';
+ else $('who').innerHTML='Hraješ bez přezdívky, body se ukládají lokálně. <button type="button" id="setName">Zadat přezdívku</button>';
+ const x=$('setName');if(x)x.onclick=()=>window.OPS_STATS&&window.OPS_STATS.promptUsernameModal();
  $('shopBuy1').disabled=spinning;$('shopBuy2').disabled=spinning;
 }
 function buyCookies(cost,gain){

@@ -1407,23 +1407,40 @@
             if (!clean) return false;
 
             const oldUser = OPS_STATS.getUsername();
-            if (oldUser && oldUser !== clean) {
-                try {
-                    await backupMinecraft(oldUser, "auto");
-                } catch (e) {
-                    console.warn("[OPS Stats] Auto-backup při přepnutí uživatele selhal:", e);
+            const isChanged = oldUser !== clean;
+
+            if (isChanged) {
+                if (oldUser) {
+                    try {
+                        await backupMinecraft(oldUser, "auto");
+                    } catch (e) {
+                        console.warn("[OPS Stats] Auto-backup při přepnutí uživatele selhal:", e);
+                    }
                 }
+                if (syncCloudDebounceTimer) {
+                    clearTimeout(syncCloudDebounceTimer);
+                    syncCloudDebounceTimer = null;
+                }
+                localStorage.clear();
             }
 
             localStorage.setItem(STORAGE_KEY_USER, clean);
             updatePlayerBadgeUI();
 
-            if (isSupabaseConfigured()) {
-                await syncFromCloud(clean);
-                await syncToCloud();
+            if (isChanged) {
+                saveLocalStats(DEFAULT_STATS);
             }
 
-            if (window.location.pathname.includes("/mc/") || window.location.pathname.includes("/clicker/")) {
+            if (isSupabaseConfigured()) {
+                try {
+                    await syncFromCloud(clean);
+                    await syncToCloud();
+                } catch (e) {
+                    console.warn("[OPS Stats] Chyba při synchronizaci po změně uživatele:", e);
+                }
+            }
+
+            if (isChanged) {
                 window.location.reload();
             }
 
@@ -1863,6 +1880,11 @@
         backdrop.addEventListener("click", (e) => {
             if (e.target === backdrop) backdrop.classList.remove("open");
         });
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && backdrop.classList.contains("open")) {
+                backdrop.classList.remove("open");
+            }
+        });
     }
 
     function showUsernameModal(allowCancel = true) {
@@ -2133,26 +2155,22 @@
             });
         }
 
-        const isGamesHub = window.location.pathname.endsWith("games.html") || 
-                          window.location.pathname.includes("games.html") || 
-                          !!document.querySelector(".landing-page");
+        const isGameOrHub = window.location.pathname.endsWith("games.html") || 
+                            window.location.pathname.includes("games.html") || 
+                            !!document.querySelector(".landing-page") ||
+                            window.location.pathname.includes("statistika.html") || 
+                            window.location.pathname.includes("/gd/") || 
+                            window.location.pathname.includes("/stratagem/") || 
+                            window.location.pathname.includes("/hyperdrive/") || 
+                            window.location.pathname.includes("/mc/") ||
+                            window.location.pathname.includes("/maturita/") ||
+                            window.location.pathname.includes("/clicker/") ||
+                            window.location.pathname.includes("/kasino/");
 
-        if (isGamesHub) {
-            setTimeout(() => showUsernameModal(true), 350);
-        } else {
-            const isGameOrHub = window.location.pathname.includes("statistika.html") || 
-                                window.location.pathname.includes("/gd/") || 
-                                window.location.pathname.includes("/stratagem/") || 
-                                window.location.pathname.includes("/hyperdrive/") || 
-                                window.location.pathname.includes("/mc/") ||
-                                window.location.pathname.includes("/maturita/") ||
-                                window.location.pathname.includes("/clicker/");
-
-            if (isGameOrHub) {
-                const user = OPS_STATS.getUsername();
-                if (!user) {
-                    setTimeout(() => showUsernameModal(true), 500);
-                }
+        if (isGameOrHub) {
+            const user = OPS_STATS.getUsername();
+            if (!user) {
+                setTimeout(() => showUsernameModal(true), 500);
             }
         }
 
