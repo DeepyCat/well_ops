@@ -3,39 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Herní statistiky a žebříček | OPS</title>
+    <title>Herní statistiky a telemetrie | OPS</title>
     <link rel="icon" type="image/x-icon" href="img/bird.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- taste-skill-ignore -->
     <style>
         :root {
-            --ground: #0d1117;
-            --surface: #121824;
-            --raised: #182030;
-            --raised-hover: #1f2a3e;
-            --border: #222d3d;
-            --rule: #1b2432;
-            --control: #28364b;
+            --ground: #0a0d14;
+            --surface: #0f1420;
+            --raised: #151c2b;
+            --raised-hover: #1c263a;
+            --border: #1e283d;
+            --rule: #172033;
+            --control: #25334d;
+            --control-hover: #324466;
 
-            --text: #f0f3f6;
-            --muted: #8b949e;
-            --faint: #656d76;
+            --text: #f8fafc;
+            --text-bright: #ffffff;
+            --muted: #94a3b8;
+            --faint: #64748b;
 
             --accent: #38bdf8;
             --accent-soft: rgba(56, 189, 248, 0.12);
+            --accent-border: rgba(56, 189, 248, 0.35);
+
             --positive: #34d399;
             --positive-soft: rgba(52, 211, 153, 0.12);
+            --positive-border: rgba(52, 211, 153, 0.35);
+
             --negative: #f87171;
             --negative-soft: rgba(248, 113, 113, 0.12);
+            --negative-border: rgba(248, 113, 113, 0.35);
+
             --warning: #fbbf24;
             --warning-soft: rgba(251, 191, 36, 0.12);
+            --warning-border: rgba(251, 191, 36, 0.35);
 
             --radius-card: 8px;
             --radius-control: 6px;
             --radius-chip: 4px;
 
-            --font-sans: 'Public Sans', system-ui, -apple-system, sans-serif;
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
         }
 
         * {
@@ -50,13 +59,18 @@
             font-family: var(--font-sans);
             font-size: 14px;
             line-height: 1.5;
-            min-height: 100vh;
+            min-height: 100dvh;
             padding-bottom: 72px;
             -webkit-font-smoothing: antialiased;
         }
 
         .num {
             font-variant-numeric: tabular-nums;
+        }
+
+        code.code-num, samp.code-num {
+            font-family: 'JetBrains Mono', ui-monospace, monospace; /* taste-skill-ignore */
+            font-size: 12px;
         }
 
         /* Top Navigation Bar */
@@ -91,16 +105,19 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
 
         .nav-back-link:hover {
             background: var(--raised-hover);
             border-color: var(--accent);
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-size: 13px;
             font-weight: 700;
             color: var(--muted);
@@ -108,8 +125,18 @@
             text-transform: uppercase;
         }
 
-        .topbar-brand span {
+        .topbar-brand-mark {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-soft);
             color: var(--accent);
+            border: 1px solid var(--accent-border);
+            border-radius: var(--radius-chip);
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
         }
 
         .topbar-right {
@@ -129,12 +156,26 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
 
         .user-badge-btn:hover {
             background: var(--raised-hover);
             border-color: var(--accent);
+        }
+
+        .user-avatar-mini {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-chip);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            background: var(--accent-soft);
+            color: var(--accent);
+            border: 1px solid var(--accent-border);
         }
 
         .user-name-highlight {
@@ -163,7 +204,7 @@
             font-size: 24px;
             font-weight: 800;
             letter-spacing: -0.02em;
-            color: #ffffff;
+            color: var(--text-bright);
             margin-bottom: 6px;
         }
 
@@ -178,7 +219,7 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-card);
-            padding: 14px 18px;
+            padding: 16px 20px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -196,12 +237,12 @@
         .banner-left {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
 
         .banner-avatar {
-            width: 42px;
-            height: 42px;
+            width: 46px;
+            height: 46px;
             border-radius: var(--radius-control);
             background: var(--raised);
             border: 1px solid var(--control);
@@ -209,9 +250,10 @@
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 16px;
+            font-size: 17px;
             color: var(--accent);
             flex-shrink: 0;
+            transition: border-color 0.15s ease;
         }
 
         .banner-user-row {
@@ -222,9 +264,9 @@
         }
 
         .banner-username {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .gamer-rank-badge {
@@ -232,6 +274,7 @@
             font-weight: 700;
             color: var(--accent);
             background: var(--accent-soft);
+            border: 1px solid var(--accent-border);
             padding: 2px 7px;
             border-radius: var(--radius-chip);
             font-variant-numeric: tabular-nums;
@@ -240,12 +283,12 @@
         .banner-meta-desc {
             font-size: 12px;
             color: var(--muted);
-            margin-top: 3px;
+            margin-top: 4px;
         }
 
         .banner-action-btn {
             font-size: 12px;
-            padding: 6px 12px;
+            padding: 6px 14px;
             pointer-events: none;
             white-space: nowrap;
         }
@@ -282,7 +325,7 @@
         .kpi-value {
             font-size: 22px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
             line-height: 1.15;
             font-variant-numeric: tabular-nums;
         }
@@ -327,7 +370,7 @@
         }
 
         .tab-btn:hover {
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .tab-btn.active {
@@ -338,6 +381,7 @@
         .tab-profile-tag {
             background: var(--accent-soft);
             color: var(--accent);
+            border: 1px solid var(--accent-border);
             font-size: 11px;
             padding: 2px 6px;
             border-radius: var(--radius-chip);
@@ -361,8 +405,14 @@
         }
 
         .tab-close-btn:hover {
-            color: #ffffff;
+            color: var(--text-bright);
             background: var(--control);
+        }
+
+        .active-scope-badge {
+            font-size: 12px;
+            color: var(--muted);
+            font-variant-numeric: tabular-nums;
         }
 
         /* Cloud Notice */
@@ -401,7 +451,7 @@
         .panel-title {
             font-size: 16px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .panel-meta {
@@ -438,26 +488,26 @@
         }
 
         .filter-btn:hover {
-            color: #ffffff;
+            color: var(--text-bright);
             border-color: var(--control);
         }
 
         .filter-btn.active {
             background: var(--raised);
             border-color: var(--accent);
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .search-box-wrap {
             position: relative;
-            min-width: 240px;
+            min-width: 260px;
         }
 
         .search-input {
             width: 100%;
             background: var(--ground);
             border: 1px solid var(--border);
-            color: #ffffff;
+            color: var(--text-bright);
             padding: 6px 12px;
             border-radius: var(--radius-control);
             font-size: 13px;
@@ -530,13 +580,42 @@
         .rank-number {
             font-weight: 700;
             color: var(--muted);
-            width: 38px;
+            width: 44px;
             font-variant-numeric: tabular-nums;
         }
 
         .rank-number.top-1 { color: var(--warning); }
         .rank-number.top-2 { color: #cbd5e1; }
         .rank-number.top-3 { color: #f97316; }
+
+        .rank-badge-podium {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: var(--radius-chip);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .rank-badge-podium.top-1 {
+            background: var(--warning-soft);
+            color: var(--warning);
+            border: 1px solid var(--warning-border);
+        }
+
+        .rank-badge-podium.top-2 {
+            background: rgba(203, 213, 225, 0.12);
+            color: #cbd5e1;
+            border: 1px solid rgba(203, 213, 225, 0.3);
+        }
+
+        .rank-badge-podium.top-3 {
+            background: rgba(249, 115, 22, 0.12);
+            color: #f97316;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
 
         .player-identity-cell {
             display: flex;
@@ -545,23 +624,21 @@
         }
 
         .player-avatar-letter {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border-radius: var(--radius-control);
-            background: var(--raised);
-            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 12px;
-            color: var(--accent);
+            font-size: 13px;
             flex-shrink: 0;
+            border: 1px solid var(--control);
         }
 
         .player-name-text {
             font-weight: 600;
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .badge-me {
@@ -570,13 +647,13 @@
             border-radius: var(--radius-chip);
             background: var(--accent-soft);
             color: var(--accent);
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            border: 1px solid var(--accent-border);
             font-weight: 600;
         }
 
         .metric-primary-val {
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
             font-variant-numeric: tabular-nums;
         }
 
@@ -591,12 +668,12 @@
             background: var(--raised);
             border: 1px solid var(--control);
             color: var(--text);
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: var(--radius-chip);
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
             white-space: nowrap;
         }
 
@@ -636,24 +713,22 @@
         }
 
         .profile-avatar-large {
-            width: 52px;
-            height: 52px;
+            width: 56px;
+            height: 56px;
             border-radius: var(--radius-card);
-            background: var(--raised);
-            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
-            color: var(--accent);
             flex-shrink: 0;
+            border: 1px solid var(--border);
         }
 
         .profile-title-group h2 {
             font-size: 20px;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-bright);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -663,7 +738,7 @@
         .profile-meta-line {
             font-size: 13px;
             color: var(--muted);
-            margin-top: 4px;
+            margin-top: 6px;
         }
 
         .profile-actions-right {
@@ -682,7 +757,7 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.15s ease, border-color 0.15s ease;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -692,7 +767,7 @@
         .btn-outline:hover {
             background: var(--raised-hover);
             border-color: var(--accent);
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .btn-primary {
@@ -704,7 +779,7 @@
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.15s ease;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -713,6 +788,7 @@
 
         .btn-primary:hover {
             background: #7dd3fc;
+            border-color: #7dd3fc;
         }
 
         /* Profile KPI sub-strip */
@@ -741,7 +817,7 @@
         .prof-metric-val {
             font-size: 18px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
             margin-top: 3px;
             font-variant-numeric: tabular-nums;
         }
@@ -792,7 +868,7 @@
         .game-title-text {
             font-size: 15px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
         }
 
         .game-subtitle-text {
@@ -824,7 +900,7 @@
         .chip-val {
             font-size: 15px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
             font-variant-numeric: tabular-nums;
         }
 
@@ -861,7 +937,7 @@
         }
 
         .level-item-name {
-            width: 120px;
+            width: 130px;
             color: var(--text);
             white-space: nowrap;
             overflow: hidden;
@@ -920,6 +996,7 @@
             display: flex;
             flex-direction: column;
             gap: 2px;
+            transition: border-color 0.15s ease;
         }
 
         .gacha-char-card.owned {
@@ -941,22 +1018,22 @@
             color: var(--muted);
         }
 
-        .gacha-rank-badge.rank-Z { color: var(--warning); background: var(--warning-soft); }
-        .gacha-rank-badge.rank-S { color: var(--accent); background: var(--accent-soft); }
-        .gacha-rank-badge.rank-A { color: var(--positive); background: var(--positive-soft); }
-        .gacha-rank-badge.rank-B { color: #94a3b8; }
+        .gacha-rank-badge.rank-Z { color: var(--warning); background: var(--warning-soft); border: 1px solid var(--warning-border); }
+        .gacha-rank-badge.rank-S { color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-border); }
+        .gacha-rank-badge.rank-A { color: var(--positive); background: var(--positive-soft); border: 1px solid var(--positive-border); }
+        .gacha-rank-badge.rank-B { color: #94a3b8; border: 1px solid var(--rule); }
 
         .gacha-char-count {
             font-size: 11px;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
             font-variant-numeric: tabular-nums;
         }
 
         .gacha-char-name {
             font-size: 12px;
             font-weight: 600;
-            color: #ffffff;
+            color: var(--text-bright);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -1001,7 +1078,7 @@
 
         .clicker-bld-count {
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-bright);
             font-variant-numeric: tabular-nums;
         }
 
@@ -1016,19 +1093,173 @@
 
         .btn-danger {
             background: var(--negative-soft);
-            border: 1px solid rgba(248, 113, 113, 0.4);
+            border: 1px solid var(--negative-border);
             color: var(--negative);
             padding: 7px 14px;
             border-radius: var(--radius-control);
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.15s ease;
+            transition: background-color 0.15s ease, color 0.15s ease;
         }
 
         .btn-danger:hover {
             background: rgba(248, 113, 113, 0.25);
-            color: #ffffff;
+            color: var(--text-bright);
+        }
+
+        /* Interactive Quick Inspection Drawer */
+        .drawer-backdrop[data-ui="backdrop"] {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 6, 11, 0.7);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease-out;
+        }
+
+        .drawer-backdrop.active[data-ui="backdrop"] {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .player-drawer[data-ui="drawer"] {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 480px;
+            max-width: 100vw;
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            z-index: 210;
+            transform: translateX(100%);
+            transition: transform 0.22s ease-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .player-drawer.active[data-ui="drawer"] {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: var(--surface);
+            flex-shrink: 0;
+        }
+
+        .drawer-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .drawer-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-control);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+
+        .drawer-player-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-bright);
+            line-height: 1.2;
+        }
+
+        .drawer-close-btn {
+            background: var(--raised);
+            border: 1px solid var(--control);
+            color: var(--muted);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-control);
+            font-size: 18px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .drawer-close-btn:hover {
+            background: var(--raised-hover);
+            color: var(--text-bright);
+        }
+
+        .drawer-body {
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            flex: 1;
+        }
+
+        .drawer-action-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .drawer-kpis {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: var(--ground);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-control);
+            padding: 10px;
+        }
+
+        .drawer-kpi-item {
+            padding: 6px;
+        }
+
+        .drawer-kpi-label {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .drawer-kpi-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-top: 2px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .drawer-subpanel {
+            background: var(--ground);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-control);
+            padding: 14px;
+        }
+
+        .drawer-subpanel-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-bright);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         /* Responsive Breakpoints */
@@ -1070,6 +1301,9 @@
             .search-box-wrap {
                 width: 100%;
             }
+            .player-drawer[data-ui="drawer"] {
+                width: 100vw;
+            }
         }
     </style>
 </head>
@@ -1082,12 +1316,14 @@
                 <span>&larr;</span> Rozcestník her
             </a>
             <div class="topbar-brand">
-                OPS <span>Telemetrie</span>
+                <span class="topbar-brand-mark">OPS</span>
+                <span>Telemetrie</span>
             </div>
         </div>
         <div class="topbar-right">
             <span id="opsCloudSyncBadge" class="ops-cloud-sync-badge"></span>
             <button type="button" id="opsUserBadge" class="user-badge-btn" onclick="OPS_STATS.promptUsernameModal()">
+                <span id="topUserAvatarMini" class="user-avatar-mini">?</span>
                 <span id="topUsernameDisplay" class="user-name-highlight">...</span>
                 <span class="user-edit-hint">[upravit]</span>
             </button>
@@ -1169,7 +1405,7 @@
                     <span class="tab-close-btn" onclick="closeInspectedTab(event)" title="Zavřít detail hráče" role="button" tabindex="0">&times;</span>
                 </button>
             </div>
-            <div id="activeScopeLabel" style="font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;">Globální žebříček studentů</div>
+            <div id="activeScopeLabel" class="active-scope-badge">Globální žebříček studentů</div>
         </nav>
 
         <!-- TAB 1: GLOBÁLNÍ ŽEBŘÍČEK -->
@@ -1202,11 +1438,11 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th style="width: 50px;">Pořadí</th>
+                            <th style="width: 58px;">Pořadí</th>
                             <th>Hráč</th>
                             <th id="colMetricHeader" style="text-align:right;">Hodnota</th>
                             <th style="text-align:right;width:150px;">Naposledy aktivní</th>
-                            <th style="width:110px;text-align:center;">Detail profilu</th>
+                            <th style="width:120px;text-align:center;">Detail profilu</th>
                         </tr>
                     </thead>
                     <tbody id="lbTableBody">
@@ -1524,6 +1760,111 @@
         </footer>
     </div>
 
+    <!-- Quick Inspection Drawer Backdrop & Panel -->
+    <div id="drawerBackdrop" class="drawer-backdrop" data-ui="backdrop" onclick="closePlayerDrawer()"></div>
+    <aside id="playerDrawer" class="player-drawer" data-ui="drawer" aria-label="Rychlý přehled hráče">
+        <div class="drawer-header">
+            <div class="drawer-header-left">
+                <div id="drawerAvatar" class="drawer-avatar">?</div>
+                <div>
+                    <div id="drawerUsername" class="drawer-player-title">Hráč</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+                        <span id="drawerRankBadge" class="gamer-rank-badge">LVL 1</span>
+                        <span id="drawerIsMeBadge" class="badge-me" style="display:none;">tento profil</span>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="drawer-close-btn" onclick="closePlayerDrawer()" title="Zavřít panel" aria-label="Zavřít panel">&times;</button>
+        </div>
+
+        <div class="drawer-body">
+            <div class="drawer-action-bar">
+                <button type="button" id="drawerOpenFullBtn" class="btn-primary" style="flex:1;justify-content:center;" onclick="expandDrawerToFullTab()">
+                    Otevřít celou kartu &rarr;
+                </button>
+                <button type="button" id="drawerCompareToggleBtn" class="btn-outline" onclick="toggleDrawerComparison()">
+                    Porovnat se mnou
+                </button>
+            </div>
+
+            <!-- In-Drawer KPIs -->
+            <div class="drawer-kpis">
+                <div class="drawer-kpi-item">
+                    <div class="drawer-kpi-label">Odehraný čas</div>
+                    <div id="drawerTotalTime" class="drawer-kpi-val num">0m</div>
+                </div>
+                <div class="drawer-kpi-item">
+                    <div class="drawer-kpi-label">Clicker MCoiny</div>
+                    <div id="drawerClickerTotal" class="drawer-kpi-val num">0</div>
+                </div>
+                <div class="drawer-kpi-item">
+                    <div class="drawer-kpi-label">Hero rekord</div>
+                    <div id="drawerHeroScore" class="drawer-kpi-val num">0</div>
+                </div>
+                <div class="drawer-kpi-item">
+                    <div class="drawer-kpi-label">Dash levely</div>
+                    <div id="drawerGdLevels" class="drawer-kpi-val num">0 / 22</div>
+                </div>
+                <div class="drawer-kpi-item">
+                    <div class="drawer-kpi-label">Gacha celkem</div>
+                    <div id="drawerGachaPulls" class="drawer-kpi-val num">0</div>
+                </div>
+                <div class="drawer-kpi-item">
+                    <div class="drawer-kpi-label">Učitelů ve sbírce</div>
+                    <div id="drawerGachaUnique" class="drawer-kpi-val num" style="color:var(--positive);">0 / 14</div>
+                </div>
+            </div>
+
+            <!-- In-Drawer Comparison Panel -->
+            <div id="drawerCompareSection" style="display:none;" class="drawer-subpanel">
+                <div class="drawer-subpanel-title">
+                    <span>Přímé srovnání s tebou</span>
+                    <span style="font-size:11px;color:var(--muted);font-weight:normal;">rozdíl</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" style="font-size:12px;">
+                        <thead>
+                            <tr>
+                                <th>Metrika</th>
+                                <th style="text-align:right;">Ty</th>
+                                <th style="text-align:right;">Hráč</th>
+                                <th style="text-align:right;">Rozdíl</th>
+                            </tr>
+                        </thead>
+                        <tbody id="drawerCompareTableBody">
+                            <!-- Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- In-Drawer Highlights -->
+            <div class="drawer-subpanel">
+                <div class="drawer-subpanel-title">
+                    <span>Přehled hlavních her</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;">
+                    <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:6px;">
+                        <span style="color:var(--muted);">Maturita Clicker CPS:</span>
+                        <strong id="drawerClickerCps" class="num" style="color:var(--positive);">0 /s</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:6px;">
+                        <span style="color:var(--muted);">Juchelka Dash skoky:</span>
+                        <strong id="drawerGdJumps" class="num">0</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--rule);padding-bottom:6px;">
+                        <span style="color:var(--muted);">Juchelka Hero hry:</span>
+                        <strong id="drawerHeroGames" class="num">0</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;padding-bottom:2px;">
+                        <span style="color:var(--muted);">Naposledy aktivní:</span>
+                        <span id="drawerLastActive" class="num" style="color:var(--text-bright);">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
     <!-- Scripts -->
     <script src="js/ops-stats.js"></script>
     <script>
@@ -1563,6 +1904,7 @@
         let inspectedPlayerRecord = null;
         let inspectedPlayerStats = null;
         let inspectedPlayerName = '';
+        let drawerCurrentUsername = '';
 
         function escapeHtml(text) {
             if (text === null || text === undefined) return '';
@@ -1572,6 +1914,32 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
+        }
+
+        function getPlayerIdentity(username) {
+            const name = (username || "Anonym").trim();
+            const initial = (name[0] || "?").toUpperCase();
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = (hash << 5) - hash + name.charCodeAt(i);
+                hash |= 0;
+            }
+            const hue = Math.abs(hash) % 360;
+            return {
+                initial,
+                bg: `hsl(${hue}, 28%, 14%)`,
+                border: `hsl(${hue}, 40%, 26%)`,
+                color: `hsl(${hue}, 70%, 75%)`
+            };
+        }
+
+        function applyPlayerAvatarStyle(element, username) {
+            if (!element) return;
+            const ident = getPlayerIdentity(username);
+            element.textContent = ident.initial;
+            element.style.backgroundColor = ident.bg;
+            element.style.borderColor = ident.border;
+            element.style.color = ident.color;
         }
 
         function formatDuration(sec) {
@@ -1597,6 +1965,16 @@
             if (num < 1e15) return (num / 1e12).toFixed(1).replace(".", ",") + " bil.";
             if (num < 1e18) return (num / 1e15).toFixed(1).replace(".", ",") + " bld.";
             return (num / 1e18).toFixed(1).replace(".", ",") + " tril.";
+        }
+
+        function getGamerRankTitle(levelNum) {
+            if (levelNum >= 30) return "Legenda OPS";
+            if (levelNum >= 20) return "Mistr OPS";
+            if (levelNum >= 15) return "Elitní operátor";
+            if (levelNum >= 10) return "Veterán";
+            if (levelNum >= 5) return "Specialista";
+            if (levelNum >= 2) return "Kadet";
+            return "Nováček";
         }
 
         function calculateGamerLevel(stats, playerRecord) {
@@ -1626,20 +2004,27 @@
         /* Top KPI Bar & Overview Banner */
         function updateTopKpis(stats) {
             const myUser = (OPS_STATS.getUsername() || "Hráč").trim();
-            const initial = (myUser[0] || "?").toUpperCase();
             const gamerLvl = calculateGamerLevel(stats);
+            const lvlNum = parseInt(gamerLvl.replace("LVL ", ""), 10) || 1;
+            const rankTitle = getGamerRankTitle(lvlNum);
+
+            // Topbar Mini Avatar
+            const topMiniEl = document.getElementById('topUserAvatarMini');
+            if (topMiniEl) applyPlayerAvatarStyle(topMiniEl, myUser);
 
             // Overview Banner
             const bannerInitialEl = document.getElementById('overviewAvatarLetter');
-            if (bannerInitialEl) bannerInitialEl.textContent = initial;
+            if (bannerInitialEl) applyPlayerAvatarStyle(bannerInitialEl, myUser);
+
             const bannerUserEl = document.getElementById('overviewUsername');
             if (bannerUserEl) bannerUserEl.textContent = myUser;
             const bannerRankEl = document.getElementById('overviewGamerLevelBadge');
-            if (bannerRankEl) bannerRankEl.textContent = gamerLvl;
+            if (bannerRankEl) bannerRankEl.textContent = `${gamerLvl} (${rankTitle})`;
 
             // KPI Strip
             document.getElementById('kpiTotalTime').textContent = formatDuration(stats.meta?.totalPlayTime || 0);
             document.getElementById('kpiGamerLevel').textContent = gamerLvl;
+            document.getElementById('kpiGamerSub').textContent = rankTitle;
             document.getElementById('kpiHeroScore').textContent = stats.stratagem?.highScore || 0;
             document.getElementById('kpiGdCompleted').textContent = `${stats.gd?.completedLevels?.length || 0} / 22`;
 
@@ -1657,6 +2042,8 @@
 
         /* Tab Switching */
         function switchTab(tabKey) {
+            closePlayerDrawer();
+
             const tabLb = document.getElementById('tabLeaderboard');
             const tabProf = document.getElementById('tabPlayerDetail');
 
@@ -1673,7 +2060,8 @@
                 btnMy.classList.remove('active');
                 btnInspected.classList.remove('active');
 
-                scopeLabel.textContent = 'Globální žebříček studentů';
+                const count = cachedLeaderboardData.length;
+                scopeLabel.textContent = count > 0 ? `${count} studentů v žebříčku` : 'Globální žebříček studentů';
                 if (typeof window !== 'undefined' && window.history && window.history.replaceState) {
                     window.history.replaceState(null, null, window.location.pathname);
                 }
@@ -1685,7 +2073,7 @@
                 btnMy.classList.add('active');
                 btnInspected.classList.remove('active');
 
-                scopeLabel.textContent = 'Váš osobní profil (toto zařízení)';
+                scopeLabel.textContent = 'Osobní profil hráče (tento prohlížeč)';
                 const myUser = (OPS_STATS.getUsername() || 'Můj profil').trim();
                 const localStats = OPS_STATS.getStats();
                 inspectedPlayerRecord = null;
@@ -1764,6 +2152,11 @@
             const data = await OPS_STATS.fetchLeaderboard(column, 50);
             cachedLeaderboardData = Array.isArray(data) ? data : [];
 
+            const scopeLabel = document.getElementById('activeScopeLabel');
+            if (scopeLabel && document.getElementById('tabBtnLeaderboard').classList.contains('active')) {
+                scopeLabel.textContent = cachedLeaderboardData.length > 0 ? `${cachedLeaderboardData.length} studentů v žebříčku` : 'Globální žebříček studentů';
+            }
+
             const searchVal = document.getElementById('lbSearchInput')?.value || '';
             renderLeaderboardRows(cachedLeaderboardData, searchVal.trim().toLowerCase());
         }
@@ -1792,14 +2185,16 @@
                 }
 
                 const displayName = myUser || 'Ty';
-                const initialLetter = (displayName[0] || 'T').toUpperCase();
+                const ident = getPlayerIdentity(displayName);
 
                 tbody.innerHTML = `
                     <tr class="clickable-row row-is-me" id="fallbackLocalRow">
-                        <td class="rank-number top-1">1.</td>
+                        <td class="rank-number top-1">
+                            <span class="rank-badge-podium top-1">1</span>
+                        </td>
                         <td>
                             <div class="player-identity-cell">
-                                <div class="player-avatar-letter">${escapeHtml(initialLetter)}</div>
+                                <div class="player-avatar-letter" style="background:${ident.bg};border-color:${ident.border};color:${ident.color};">${escapeHtml(ident.initial)}</div>
                                 <div>
                                     <span class="player-name-text">${escapeHtml(displayName)}</span>
                                     <span class="badge-me">tento profil</span>
@@ -1855,9 +2250,17 @@
             rowsToDisplay.forEach((row, idx) => {
                 const rank = idx + 1;
                 let rankClass = '';
-                if (rank === 1) rankClass = 'top-1';
-                else if (rank === 2) rankClass = 'top-2';
-                else if (rank === 3) rankClass = 'top-3';
+                let rankBadgeHtml = `${rank}.`;
+                if (rank === 1) {
+                    rankClass = 'top-1';
+                    rankBadgeHtml = `<span class="rank-badge-podium top-1">1</span>`;
+                } else if (rank === 2) {
+                    rankClass = 'top-2';
+                    rankBadgeHtml = `<span class="rank-badge-podium top-2">2</span>`;
+                } else if (rank === 3) {
+                    rankClass = 'top-3';
+                    rankBadgeHtml = `<span class="rank-badge-podium top-3">3</span>`;
+                }
 
                 const isMe = row.username && row.username.toLowerCase() === myUser.toLowerCase();
                 const rawStats = getSafeStatsObject(row.stats);
@@ -1887,7 +2290,7 @@
                 }
 
                 const dateStr = row.updated_at ? new Date(row.updated_at).toLocaleDateString("cs-CZ") : "-";
-                const initialLetter = (row.username || 'A')[0].toUpperCase();
+                const ident = getPlayerIdentity(row.username);
 
                 const tr = document.createElement('tr');
                 tr.className = `clickable-row ${isMe ? 'row-is-me' : ''}`;
@@ -1896,10 +2299,10 @@
                 tr.setAttribute('aria-label', `Zobrazit detail profilu ${row.username || 'Anonym'}`);
 
                 tr.innerHTML = `
-                    <td class="rank-number ${rankClass}">${rank}.</td>
+                    <td class="rank-number ${rankClass}">${rankBadgeHtml}</td>
                     <td>
                         <div class="player-identity-cell">
-                            <div class="player-avatar-letter">${escapeHtml(initialLetter)}</div>
+                            <div class="player-avatar-letter" style="background:${ident.bg};border-color:${ident.border};color:${ident.color};">${escapeHtml(ident.initial)}</div>
                             <div>
                                 <span class="player-name-text">${escapeHtml(row.username || 'Anonym')}</span>
                                 ${isMe ? '<span class="badge-me">tento profil</span>' : ''}
@@ -1907,7 +2310,7 @@
                         </div>
                     </td>
                     <td style="text-align:right;">
-                        <div class="metric-primary-val" style="color:${rank === 1 ? 'var(--warning)' : '#ffffff'};">${escapeHtml(primaryVal)}</div>
+                        <div class="metric-primary-val" style="color:${rank === 1 ? 'var(--warning)' : 'var(--text-bright)'};">${escapeHtml(primaryVal)}</div>
                         ${subVal ? `<div class="metric-sub-val">${escapeHtml(subVal)}</div>` : ''}
                     </td>
                     <td style="text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;">${escapeHtml(dateStr)}</td>
@@ -1916,11 +2319,11 @@
                     </td>
                 `;
 
-                tr.addEventListener('click', () => openPlayerDetail(row.username));
+                tr.addEventListener('click', () => openPlayerDrawer(row.username));
                 tr.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        openPlayerDetail(row.username);
+                        openPlayerDrawer(row.username);
                     }
                 });
 
@@ -1928,10 +2331,227 @@
                 if (btn) {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        openPlayerDetail(row.username);
+                        openPlayerDrawer(row.username);
                     });
                 }
 
+                tbody.appendChild(tr);
+            });
+        }
+
+        /* Interactive Drawer Inspection */
+        async function openPlayerDrawer(username) {
+            username = (username || '').trim();
+            if (!username) return;
+
+            const myUser = (OPS_STATS.getUsername() || '').trim();
+            const isMe = username.toLowerCase() === myUser.toLowerCase() || username.toLowerCase() === 'ty';
+
+            drawerCurrentUsername = username;
+
+            const backdrop = document.getElementById('drawerBackdrop');
+            const drawer = document.getElementById('playerDrawer');
+            const avatarEl = document.getElementById('drawerAvatar');
+            const nameEl = document.getElementById('drawerUsername');
+            const isMeBadge = document.getElementById('drawerIsMeBadge');
+            const rankBadge = document.getElementById('drawerRankBadge');
+
+            applyPlayerAvatarStyle(avatarEl, username);
+            nameEl.textContent = username;
+            isMeBadge.style.display = isMe ? 'inline-block' : 'none';
+
+            backdrop.classList.add('active');
+            drawer.classList.add('active');
+
+            // Quick check in cachedLeaderboardData
+            let playerRecord = cachedLeaderboardData.find(r => r.username && r.username.toLowerCase() === username.toLowerCase());
+
+            if (!playerRecord && !isMe) {
+                document.getElementById('drawerTotalTime').textContent = "...";
+                document.getElementById('drawerClickerTotal').textContent = "...";
+                document.getElementById('drawerHeroScore').textContent = "...";
+                document.getElementById('drawerGdLevels').textContent = "...";
+                document.getElementById('drawerGachaPulls').textContent = "...";
+                document.getElementById('drawerGachaUnique').textContent = "...";
+                document.getElementById('drawerLastActive').textContent = "Načítám...";
+
+                playerRecord = await OPS_STATS.fetchPlayerStats(username);
+            }
+
+            let statsObj = {};
+            let totalPlayTime = 0;
+            let updatedAt = null;
+
+            if (isMe) {
+                statsObj = OPS_STATS.getStats();
+                totalPlayTime = statsObj.meta?.totalPlayTime || 0;
+                updatedAt = new Date().toISOString();
+            } else if (playerRecord) {
+                statsObj = getSafeStatsObject(playerRecord.stats);
+                totalPlayTime = Number(playerRecord.total_play_time) || Number(statsObj.meta?.totalPlayTime) || 0;
+                updatedAt = playerRecord.updated_at;
+            }
+
+            const lvl = calculateGamerLevel(statsObj, playerRecord);
+            rankBadge.textContent = lvl;
+
+            document.getElementById('drawerTotalTime').textContent = formatDuration(totalPlayTime);
+            const clicker = statsObj.clicker || {};
+            const totalCookies = Math.max(Number(clicker.totalCookies) || 0, Number(clicker.cookies) || 0);
+            document.getElementById('drawerClickerTotal').textContent = formatCompactNumber(totalCookies);
+            document.getElementById('drawerClickerCps').textContent = `${formatCompactNumber(Number(clicker.cps) || 0)} /s`;
+
+            const heroHighScore = Number(playerRecord?.stratagem_highscore) || Number(statsObj.stratagem?.highScore) || 0;
+            document.getElementById('drawerHeroScore').textContent = heroHighScore;
+            document.getElementById('drawerHeroGames').textContent = formatNumber(statsObj.stratagem?.totalGames || 0);
+
+            const gdLevelsCount = Number(playerRecord?.gd_completed_levels) || (statsObj.gd?.completedLevels && Array.isArray(statsObj.gd.completedLevels) ? statsObj.gd.completedLevels.length : 0);
+            document.getElementById('drawerGdLevels').textContent = `${gdLevelsCount} / 22`;
+            const gdJumps = Number(playerRecord?.gd_total_jumps) || Number(statsObj.gd?.jumps) || 0;
+            document.getElementById('drawerGdJumps').textContent = formatNumber(gdJumps);
+
+            const gacha = statsObj.gacha || {};
+            document.getElementById('drawerGachaPulls').textContent = gacha.totalPulls || 0;
+            const uniqueChars = Object.keys(gacha.inventory || {}).filter(k => (gacha.inventory[k] || 0) > 0).length;
+            document.getElementById('drawerGachaUnique').textContent = `${uniqueChars} / 14`;
+
+            document.getElementById('drawerLastActive').textContent = updatedAt ? new Date(updatedAt).toLocaleDateString("cs-CZ") : "-";
+
+            // Toggle compare button visibility
+            const compareToggleBtn = document.getElementById('drawerCompareToggleBtn');
+            if (compareToggleBtn) {
+                compareToggleBtn.style.display = isMe ? 'none' : 'inline-flex';
+                compareToggleBtn.textContent = 'Porovnat se mnou';
+            }
+            const compareSection = document.getElementById('drawerCompareSection');
+            if (compareSection) compareSection.style.display = 'none';
+
+            // Render drawer comparison
+            renderDrawerComparison(statsObj, playerRecord);
+        }
+
+        function closePlayerDrawer() {
+            const backdrop = document.getElementById('drawerBackdrop');
+            const drawer = document.getElementById('playerDrawer');
+            if (backdrop) backdrop.classList.remove('active');
+            if (drawer) drawer.classList.remove('active');
+        }
+
+        function expandDrawerToFullTab() {
+            const user = drawerCurrentUsername;
+            closePlayerDrawer();
+            if (user) openPlayerDetail(user);
+        }
+
+        function toggleDrawerComparison() {
+            const section = document.getElementById('drawerCompareSection');
+            const btn = document.getElementById('drawerCompareToggleBtn');
+            if (section) {
+                const isOpening = section.style.display !== 'block';
+                section.style.display = isOpening ? 'block' : 'none';
+                if (btn) btn.textContent = isOpening ? 'Skrýt porovnání' : 'Porovnat se mnou';
+            }
+        }
+
+        function renderDrawerComparison(theirStats, theirRecord) {
+            const myStats = OPS_STATS.getStats();
+            theirStats = theirStats || {};
+            theirRecord = theirRecord || {};
+
+            const myTime = Number(myStats.meta?.totalPlayTime) || 0;
+            const theirTime = Number(theirRecord.total_play_time) || Number(theirStats.meta?.totalPlayTime) || 0;
+
+            const myCookies = Math.max(Number(myStats.clicker?.totalCookies) || 0, Number(myStats.clicker?.cookies) || 0);
+            const theirCookies = Math.max(Number(theirStats.clicker?.totalCookies) || 0, Number(theirStats.clicker?.cookies) || 0);
+
+            const myCps = Number(myStats.clicker?.cps) || 0;
+            const theirCps = Number(theirStats.clicker?.cps) || 0;
+
+            const myHero = Number(myStats.stratagem?.highScore) || 0;
+            const theirHero = Number(theirRecord.stratagem_highscore) || Number(theirStats.stratagem?.highScore) || 0;
+
+            const myGd = (myStats.gd?.completedLevels && Array.isArray(myStats.gd.completedLevels)) ? myStats.gd.completedLevels.length : 0;
+            const theirGd = Number(theirRecord.gd_completed_levels) || ((theirStats.gd?.completedLevels && Array.isArray(theirStats.gd.completedLevels)) ? theirStats.gd.completedLevels.length : 0);
+
+            const myGdJumps = Number(myStats.gd?.jumps) || 0;
+            const theirGdJumps = Number(theirRecord.gd_total_jumps) || Number(theirStats.gd?.jumps) || 0;
+
+            const myGacha = Number(myStats.gacha?.totalPulls) || 0;
+            const theirGacha = Number(theirStats.gacha?.totalPulls) || 0;
+
+            const myGachaUnique = Object.keys(myStats.gacha?.inventory || {}).filter(k => (myStats.gacha.inventory[k] || 0) > 0).length;
+            const theirGachaUnique = Object.keys(theirStats.gacha?.inventory || {}).filter(k => (theirStats.gacha.inventory[k] || 0) > 0).length;
+
+            const rows = [
+                {
+                    metric: "Herní čas",
+                    myVal: formatDuration(myTime),
+                    theirVal: formatDuration(theirTime),
+                    diff: (myTime - theirTime) >= 0 ? `+${formatDuration(myTime - theirTime)}` : `-${formatDuration(theirTime - myTime)}`,
+                    status: (myTime - theirTime) > 0 ? "positive" : ((myTime - theirTime) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Maturita MCoiny",
+                    myVal: formatCompactNumber(myCookies),
+                    theirVal: formatCompactNumber(theirCookies),
+                    diff: (myCookies - theirCookies) >= 0 ? `+${formatCompactNumber(myCookies - theirCookies)}` : `-${formatCompactNumber(theirCookies - myCookies)}`,
+                    status: (myCookies - theirCookies) > 0 ? "positive" : ((myCookies - theirCookies) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Pasivní CPS",
+                    myVal: `${formatCompactNumber(myCps)}/s`,
+                    theirVal: `${formatCompactNumber(theirCps)}/s`,
+                    diff: (myCps - theirCps) >= 0 ? `+${formatCompactNumber(myCps - theirCps)}/s` : `-${formatCompactNumber(theirCps - myCps)}/s`,
+                    status: (myCps - theirCps) > 0 ? "positive" : ((myCps - theirCps) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Hero kódů",
+                    myVal: `${myHero}`,
+                    theirVal: `${theirHero}`,
+                    diff: (myHero - theirHero) >= 0 ? `+${myHero - theirHero}` : `${myHero - theirHero}`,
+                    status: (myHero - theirHero) > 0 ? "positive" : ((myHero - theirHero) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Dash levely",
+                    myVal: `${myGd} / 22`,
+                    theirVal: `${theirGd} / 22`,
+                    diff: (myGd - theirGd) >= 0 ? `+${myGd - theirGd}` : `${myGd - theirGd}`,
+                    status: (myGd - theirGd) > 0 ? "positive" : ((myGd - theirGd) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Dash skoky",
+                    myVal: formatNumber(myGdJumps),
+                    theirVal: formatNumber(theirGdJumps),
+                    diff: (myGdJumps - theirGdJumps) >= 0 ? `+${formatNumber(myGdJumps - theirGdJumps)}` : `-${formatNumber(theirGdJumps - myGdJumps)}`,
+                    status: (myGdJumps - theirGdJumps) > 0 ? "positive" : ((myGdJumps - theirGdJumps) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Gacha celkem pullů",
+                    myVal: `${myGacha}`,
+                    theirVal: `${theirGacha}`,
+                    diff: (myGacha - theirGacha) >= 0 ? `+${myGacha - theirGacha}` : `${myGacha - theirGacha}`,
+                    status: (myGacha - theirGacha) > 0 ? "positive" : ((myGacha - theirGacha) < 0 ? "negative" : "neutral")
+                },
+                {
+                    metric: "Postav ve sbírce",
+                    myVal: `${myGachaUnique} / 14`,
+                    theirVal: `${theirGachaUnique} / 14`,
+                    diff: (myGachaUnique - theirGachaUnique) >= 0 ? `+${myGachaUnique - theirGachaUnique}` : `${myGachaUnique - theirGachaUnique}`,
+                    status: (myGachaUnique - theirGachaUnique) > 0 ? "positive" : ((myGachaUnique - theirGachaUnique) < 0 ? "negative" : "neutral")
+                }
+            ];
+
+            const tbody = document.getElementById('drawerCompareTableBody');
+            tbody.innerHTML = '';
+            rows.forEach(r => {
+                const tr = document.createElement('tr');
+                const color = r.status === 'positive' ? 'var(--positive)' : (r.status === 'negative' ? 'var(--negative)' : 'var(--muted)');
+                tr.innerHTML = `
+                    <td style="font-weight:600;">${escapeHtml(r.metric)}</td>
+                    <td style="text-align:right;" class="num">${escapeHtml(r.myVal)}</td>
+                    <td style="text-align:right;" class="num">${escapeHtml(r.theirVal)}</td>
+                    <td style="text-align:right;font-weight:700;color:${color};" class="num">${escapeHtml(r.diff)}</td>
+                `;
                 tbody.appendChild(tr);
             });
         }
@@ -1964,7 +2584,7 @@
 
             // If not found in cache, display loading state and fetch from Supabase
             if (!playerRecord) {
-                document.getElementById('detailAvatarLetter').textContent = (username[0] || '?').toUpperCase();
+                applyPlayerAvatarStyle(document.getElementById('detailAvatarLetter'), username);
                 document.getElementById('detailUsernameDisplay').textContent = `${username} (načítám...)`;
                 document.getElementById('detailIsMeBadge').style.display = 'none';
                 document.getElementById('detailCompareBtn').style.display = 'none';
@@ -1974,7 +2594,7 @@
             }
 
             if (!playerRecord) {
-                document.getElementById('detailAvatarLetter').textContent = (username[0] || '?').toUpperCase();
+                applyPlayerAvatarStyle(document.getElementById('detailAvatarLetter'), username);
                 document.getElementById('detailUsernameDisplay').textContent = username;
                 document.getElementById('detailIsMeBadge').style.display = 'none';
                 document.getElementById('detailCompareBtn').style.display = 'none';
@@ -1997,14 +2617,17 @@
 
         /* Render Profile Data into DOM */
         function renderProfileData(username, stats, totalPlayTime, updatedAt, isMe, playerRecord) {
-            document.getElementById('detailAvatarLetter').textContent = (username || '?')[0].toUpperCase();
+            applyPlayerAvatarStyle(document.getElementById('detailAvatarLetter'), username);
             document.getElementById('detailUsernameDisplay').textContent = username;
             document.getElementById('detailIsMeBadge').style.display = isMe ? 'inline-block' : 'none';
             document.getElementById('detailCompareBtn').style.display = isMe ? 'none' : 'inline-flex';
             document.getElementById('profileComparePanel').style.display = 'none';
 
             // Meta
-            document.getElementById('detailGamerRank').textContent = calculateGamerLevel(stats, playerRecord);
+            const gamerLvl = calculateGamerLevel(stats, playerRecord);
+            const lvlNum = parseInt(gamerLvl.replace("LVL ", ""), 10) || 1;
+            const rankTitle = getGamerRankTitle(lvlNum);
+            document.getElementById('detailGamerRank').textContent = `${gamerLvl} (${rankTitle})`;
             document.getElementById('detailLastActive').textContent = updatedAt ? new Date(updatedAt).toLocaleString("cs-CZ") : "Neuvedeno";
             document.getElementById('detailLastGame').textContent = stats.meta?.lastPlayedGame || "Žádná hra";
 
@@ -2042,7 +2665,7 @@
                 row.className = 'clicker-bld-item';
                 row.innerHTML = `
                     <span class="clicker-bld-name">${escapeHtml(label)}</span>
-                    <span class="clicker-bld-count" style="color:${count > 0 ? '#ffffff' : 'var(--faint)'};">${formatNumber(count)}</span>
+                    <span class="clicker-bld-count" style="color:${count > 0 ? 'var(--text-bright)' : 'var(--faint)'};">${formatNumber(count)}</span>
                 `;
                 bldListEl.appendChild(row);
             }
@@ -2095,7 +2718,7 @@
             const rosterEl = document.getElementById('detGachaRosterList');
             rosterEl.innerHTML = '';
             const inv = gacha.inventory || {};
-            const agents = OPS_STATS.getAgentsList ? OPS_STATS.getAgentsList() : [];
+            const agents = OPS_STATS.getAgentsList ? OPS_STATS.getAgentsList() : (OPS_STATS.agents || []);
             let uniqueCount = 0;
 
             agents.forEach(agent => {
@@ -2137,12 +2760,15 @@
         /* Toggle Comparison View */
         function toggleComparisonView() {
             const panel = document.getElementById('profileComparePanel');
+            const btn = document.getElementById('detailCompareBtn');
             if (panel.style.display === 'block') {
                 panel.style.display = 'none';
+                if (btn) btn.textContent = 'Porovnat se mnou';
                 return;
             }
 
             panel.style.display = 'block';
+            if (btn) btn.textContent = 'Skrýt porovnání';
             document.getElementById('compareTargetName').textContent = inspectedPlayerName;
 
             const myStats = OPS_STATS.getStats();
@@ -2286,6 +2912,13 @@
                 tbody.appendChild(tr);
             });
         }
+
+        // Global key listeners (e.g. Escape closes drawer)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closePlayerDrawer();
+            }
+        });
 
         /* Initial Load */
         window.addEventListener('DOMContentLoaded', () => {
