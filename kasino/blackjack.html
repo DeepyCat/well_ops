@@ -68,7 +68,6 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .chip{--c:#3b82f6;width:48px;height:48px;border-radius:50%;border:3px dashed #ffffffcc;background:var(--c);box-shadow:inset 0 0 0 4px var(--c),0 4px 10px #0007;font-weight:900;font-size:.8rem;color:#fff;transition:transform .12s}
 .chip:hover:not(:disabled){transform:translateY(-3px)}.chip:disabled{opacity:.4;cursor:not-allowed}
 .chip[data-v="50"]{--c:#16a34a}.chip[data-v="160"]{--c:#dc2626}.chip[data-v="500"]{--c:#7c3aed}.chip[data-v="1600"]{--c:#d4a017;color:#241a00}
-.chip.half{--c:#64748b;border-style:solid;font-size:.75rem}
 .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;align-items:center}
 .bet-line{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:12px;color:var(--muted);flex-wrap:wrap}
 .bet-line strong{color:var(--gold);font-size:1.4rem;font-variant-numeric:tabular-nums}
@@ -202,7 +201,6 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
               <button class="chip" data-v="160" type="button" aria-label="Přidat 160">160</button>
               <button class="chip" data-v="500" type="button" aria-label="Přidat 500">500</button>
               <button class="chip" data-v="1600" type="button" aria-label="Přidat 1600">1600</button>
-              <button class="chip half" id="halfBet" type="button" title="Vsadit polovinu dostupných tokenů">1/2</button>
             </div>
             <div class="bet-line">
               <span>Sázka</span>
@@ -214,6 +212,7 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
             </div>
             <div class="row">
               <button class="btn small" id="clearBet" type="button">Vymazat</button>
+              <button class="btn small" id="halfBet" type="button" title="Vsadit polovinu dostupných tokenů">1/2</button>
               <button class="btn small" id="maxBet" type="button">Vsadit vše</button>
               <button class="btn primary" id="dealBtn" type="button">Rozdat <kbd>Enter</kbd></button>
             </div>
@@ -691,7 +690,6 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
 
   /* ---------- události ---------- */
   document.querySelectorAll(".chip").forEach(ch => {
-    if (ch.classList.contains("half")) return;
     ch.addEventListener("click", () => {
       if (busy || phase !== "bet") return;
       const v = Number(ch.dataset.v);
