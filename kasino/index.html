@@ -155,7 +155,7 @@
 }
 </style></head>
 <body>
-<header class="topbar"><div class="brand">OPS <span>///</span> CpASÍNO</div><div class="right"><span class="tokens">◆ <b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="musicBtn" type="button" aria-pressed="true" aria-label="Vypnout hudbu" title="Hudba">Hudba</button><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">Zvuk</button><a href="/games.html">← Zpět na hry</a></div></header>
+<header class="topbar"><div class="brand">OPS <span>///</span> CpASÍNO</div><div class="right"><span class="tokens"><svg class="school-points-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-0.18em;margin-right:3px;filter:drop-shadow(0 0 3px rgba(255,212,119,0.4));flex-shrink:0;" aria-hidden="true"><path d="M12 2L2 9L12 22L22 9L12 2Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="0.8" stroke-linejoin="round"/><path d="M12 2L6 9H18L12 2Z" fill="#FDE68A"/><path d="M2 9L6 9L12 22L2 9Z" fill="#D97706"/><path d="M18 9L22 9L12 22L18 9Z" fill="#B45309"/><path d="M6 9L18 9L12 22L6 9Z" fill="#FBBF24"/><path d="M9 5.5L12 2L15 5.5" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/></svg><b id="tokens">—</b> bodů</span><span id="username">Bez přezdívky</span><button class="sound" id="musicBtn" type="button" aria-pressed="true" aria-label="Vypnout hudbu" title="Hudba">Hudba</button><button class="sound" id="sound" type="button" aria-label="Vypnout zvuky">Zvuk</button><a href="/games.html">← Zpět na hry</a></div></header>
 <main class="wall">
 <div class="sign">CpASÍNO OPS</div>
 <p class="intro">Vyber si stanoviště. Hraješ o školní body, které máš ve všech hrách společné.</p>
@@ -186,7 +186,7 @@
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;background:rgba(25,28,39,0.8);border:1px solid #34394b;border-radius:14px;padding:14px;">
       <div style="text-align:center;">
         <div style="font-size:0.8rem;color:#a4a9bc;margin-bottom:4px;">Aktuální zůstatek tokenů</div>
-        <div style="font-size:1.3rem;font-weight:900;color:#ffd477;">◆ <span id="shopModalTokens">0</span></div>
+        <div style="font-size:1.3rem;font-weight:900;color:#ffd477;display:inline-flex;align-items:center;justify-content:center;gap:4px;"><svg class="school-points-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-0.18em;margin-right:2px;filter:drop-shadow(0 0 4px rgba(255,212,119,0.45));flex-shrink:0;" aria-hidden="true"><path d="M12 2L2 9L12 22L22 9L12 2Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="0.8" stroke-linejoin="round"/><path d="M12 2L6 9H18L12 2Z" fill="#FDE68A"/><path d="M2 9L6 9L12 22L2 9Z" fill="#D97706"/><path d="M18 9L22 9L12 22L18 9Z" fill="#B45309"/><path d="M6 9L18 9L12 22L6 9Z" fill="#FBBF24"/><path d="M9 5.5L12 2L15 5.5" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/></svg><span id="shopModalTokens">0</span></div>
       </div>
       <div style="text-align:center;border-left:1px solid #34394b;">
         <div style="font-size:0.8rem;color:#a4a9bc;margin-bottom:4px;">Aktuální zůstatek sušenek</div>
@@ -221,7 +221,7 @@
     <!-- Vlastní množství -->
     <div style="margin-bottom:18px;">
       <label style="display:block;font-size:0.85rem;color:#a4a9bc;margin-bottom:8px;font-weight:700;">Vlastní množství (<span id="spendCurrencyLabel">sušenek</span>)</label>
-      <input type="number" id="opsCustomAmountInput" min="1" step="1" placeholder="Zadej množství..." style="width:100%;background:#10121a;border:1px solid #34394b;border-radius:10px;padding:12px 14px;color:#fff;font-size:1.1rem;font-family:Consolas,monospace;outline:none;" />
+      <input type="text" inputmode="numeric" id="opsCustomAmountInput" placeholder="Zadej množství..." autocomplete="off" style="width:100%;background:#10121a;border:1px solid #34394b;border-radius:10px;padding:12px 14px;color:#fff;font-size:1.1rem;font-family:Consolas,monospace;outline:none;" />
     </div>
  
     <!-- Výsledek / Přehled -->
@@ -413,26 +413,50 @@
   }
   function deductCookies(amount) {
     const c = readCookiesData();
-    if (c.save) { c.save.cookies = Math.max(0, c.saveCookies - amount); localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); }
+    const remaining = Math.max(0, c.available - amount);
+    if (c.save) {
+      c.save.cookies = remaining;
+    } else {
+      c.save = {
+        cookies: remaining,
+        totalCookies: Math.max(remaining, c.statCookies || 0),
+        clicks: 0, buildings: {}, upgrades: [], achievements: [], lastSave: Date.now()
+      };
+    }
+    try { localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); } catch (e) {}
     if (window.OPS_STATS) {
       const s = window.OPS_STATS.getStats();
-      if (s.clicker) { s.clicker.cookies = Math.max(0, c.statCookies - amount); window.OPS_STATS.saveStats(s); }
+      s.clicker = s.clicker || {};
+      s.clicker.cookies = remaining;
+      window.OPS_STATS.saveStats(s);
     }
   }
   function addCookies(amount) {
     const c = readCookiesData();
-    if (c.save) { c.save.cookies = c.saveCookies + amount; localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); }
+    const newCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(c.available + amount));
+    if (c.save) {
+      c.save.cookies = newCookies;
+      if (Number(c.save.totalCookies || 0) < newCookies) c.save.totalCookies = newCookies;
+    } else {
+      c.save = {
+        cookies: newCookies,
+        totalCookies: newCookies,
+        clicks: 0, buildings: {}, upgrades: [], achievements: [], lastSave: Date.now()
+      };
+    }
+    try { localStorage.setItem("cookieClickerSave", JSON.stringify(c.save)); } catch (e) {}
     if (window.OPS_STATS) {
       const s = window.OPS_STATS.getStats();
       s.clicker = s.clicker || {};
-      s.clicker.cookies = c.statCookies + amount;
+      s.clicker.cookies = newCookies;
+      if (Number(s.clicker.totalCookies || 0) < newCookies) s.clicker.totalCookies = newCookies;
       window.OPS_STATS.saveStats(s);
     }
   }
- 
+
   let exchangeDirection = "cookies_to_tokens";
   let activeSpendAmount = 0;
- 
+
   const modal = document.getElementById("opsShopModal");
   const openBtn = document.getElementById("openOpsShopBtn");
   const closeBtn = document.getElementById("closeOpsShopBtn");
@@ -445,21 +469,32 @@
   const summaryEl = document.getElementById("opsExchangeSummary");
   const msgEl = document.getElementById("opsShopMsg");
   const spendLabel = document.getElementById("spendCurrencyLabel");
- 
+
   if (openBtn && modal) {
     function openModal() {
       updateModalBalances();
       modal.style.display = "flex";
       setTimeout(() => modal.classList.add("open"), 10);
       setDirection("cookies_to_tokens");
-      customInput.value = "";
+      if (customInput) customInput.value = "";
       activeSpendAmount = 0;
       updateCalculation();
-      if (msgEl) msgEl.style.display = "none";
+      if (msgEl) {
+        msgEl.style.display = "none";
+        msgEl.textContent = "";
+      }
     }
     function closeModal() {
       modal.classList.remove("open");
-      setTimeout(() => modal.style.display = "none", 250);
+      setTimeout(() => {
+        modal.style.display = "none";
+        if (customInput) customInput.value = "";
+        activeSpendAmount = 0;
+        if (msgEl) {
+          msgEl.style.display = "none";
+          msgEl.textContent = "";
+        }
+      }, 250);
     }
     function updateModalBalances() {
       const t = getTokens();
@@ -471,27 +506,29 @@
     }
     function getAllAmount() {
       if (exchangeDirection === "cookies_to_tokens") {
-        // sušenky mohou být desetinné, proto floor a -1, jinak by kontrola "nedostatek" selhala
-        return Math.max(0, Math.floor(readCookiesData().available) - 1);
+        return Math.max(0, Math.floor(readCookiesData().available));
       }
       return Math.max(0, Math.floor(getTokens()));
     }
     function setDirection(dir) {
       exchangeDirection = dir;
-      customInput.value = "";
+      if (customInput) customInput.value = "";
       activeSpendAmount = 0;
-      if (msgEl) msgEl.style.display = "none";
+      if (msgEl) {
+        msgEl.style.display = "none";
+        msgEl.textContent = "";
+      }
       if (dir === "cookies_to_tokens") {
         if (dirCookiesBtn) { dirCookiesBtn.style.background = "#252a3d"; dirCookiesBtn.style.borderColor = "#38bdf8"; dirCookiesBtn.style.color = "#fff"; }
         if (dirTokensBtn) { dirTokensBtn.style.background = "#191c27"; dirTokensBtn.style.borderColor = "#34394b"; dirTokensBtn.style.color = "#a4a9bc"; }
         if (spendLabel) spendLabel.textContent = "sušenek";
         if (presetsGrid) {
           presetsGrid.innerHTML = `
-            <button type="button" class="ops-preset-btn" data-spend="1000" data-get="160" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
+            <button type="button" class="ops-preset-btn" data-spend="1000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
               <div style="color:#5be08a;">1 000 sušenek</div>
               <div style="font-size:0.8rem;color:#ffd477;">➔ 160 tokenů</div>
             </button>
-            <button type="button" class="ops-preset-btn" data-spend="10000" data-get="1600" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
+            <button type="button" class="ops-preset-btn" data-spend="10000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
               <div style="color:#5be08a;">10 000 sušenek</div>
               <div style="font-size:0.8rem;color:#ffd477;">➔ 1 600 tokenů</div>
             </button>
@@ -503,11 +540,11 @@
         if (spendLabel) spendLabel.textContent = "tokenů";
         if (presetsGrid) {
           presetsGrid.innerHTML = `
-            <button type="button" class="ops-preset-btn" data-spend="160" data-get="800" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
+            <button type="button" class="ops-preset-btn" data-spend="160" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
               <div style="color:#ffd477;">160 tokenů</div>
               <div style="font-size:0.8rem;color:#5be08a;">➔ 800 sušenek</div>
             </button>
-            <button type="button" class="ops-preset-btn" data-spend="1600" data-get="8000" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
+            <button type="button" class="ops-preset-btn" data-spend="1600" style="background:#202330;border:1px solid #34394b;color:#f5f6fb;padding:12px;border-radius:10px;cursor:pointer;font-weight:700;text-align:left;">
               <div style="color:#ffd477;">1 600 tokenů</div>
               <div style="font-size:0.8rem;color:#5be08a;">➔ 8 000 sušenek</div>
             </button>
@@ -523,23 +560,36 @@
             <div style="font-size:0.8rem;color:${isCookies ? "#5be08a" : "#ffd477"};">${Number(allAmount).toLocaleString("cs-CZ")} ${isCookies ? "sušenek" : "tokenů"}</div>
           </button>`);
       }
-      attachPresetListeners();
       updateCalculation();
     }
-    function attachPresetListeners() {
-      document.querySelectorAll(".ops-preset-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const spend = btn.dataset.all ? getAllAmount() : Number(btn.dataset.spend);
-          if (customInput) customInput.value = spend;
-          activeSpendAmount = spend;
-          updateCalculation();
-        });
-      });
+
+    function parseCustomAmount(rawStr) {
+      let s = String(rawStr || "").trim();
+      if (!s) return 0;
+      if (s.includes(".") && s.includes(",")) {
+        if (s.lastIndexOf(".") > s.lastIndexOf(",")) {
+          s = s.replace(/,/g, "");
+        } else {
+          s = s.replace(/\./g, "").replace(",", ".");
+        }
+      } else if (s.includes(",")) {
+        const parts = s.split(",");
+        if (parts.length === 2 && parts[1].length !== 3) {
+          s = parts[0].replace(/[\s_]/g, "") + "." + parts[1];
+        } else {
+          s = s.replace(/,/g, "");
+        }
+      }
+      s = s.replace(/[\s_]/g, "");
+      const num = Math.floor(Number(s));
+      if (isNaN(num) || !isFinite(num) || num <= 0) return 0;
+      return num;
     }
+
     function updateCalculation() {
       updateModalBalances();
-      const rawVal = parseInt(customInput.value, 10);
-      if (isNaN(rawVal) || rawVal <= 0) {
+      const rawVal = parseCustomAmount(customInput ? customInput.value : "");
+      if (rawVal <= 0) {
         activeSpendAmount = 0;
         if (summaryEl) summaryEl.innerHTML = "Zadej platné kladné celé číslo nebo vyber předvolbu.";
         if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.5"; }
@@ -550,55 +600,135 @@
       const currentTokens = getTokens();
       const currentCookies = readCookiesData().available;
       if (exchangeDirection === "cookies_to_tokens") {
-        spendName = "sušenek"; getName = "tokenů"; getVal = Math.floor(activeSpendAmount * (160 / 1000));
+        spendName = "sušenek";
+        getName = "tokenů";
+        getVal = Math.floor(activeSpendAmount * (160 / 1000));
       } else {
-        spendName = "tokenů"; getName = "sušenek"; getVal = Math.floor(activeSpendAmount * (800 / 160));
+        spendName = "tokenů";
+        getName = "sušenek";
+        getVal = Math.floor(activeSpendAmount * (800 / 160));
       }
+
+      if (getVal <= 0) {
+        const minReq = exchangeDirection === "cookies_to_tokens" ? 7 : 1;
+        const curReqName = exchangeDirection === "cookies_to_tokens" ? "sušenek" : "tokenů";
+        if (summaryEl) {
+          summaryEl.innerHTML = `<span style="color:#ef4444;font-weight:700;">Částka je příliš nízká!</span> Minimální směna je ${minReq} ${curReqName} pro získání alespoň 1 ${getName}.`;
+        }
+        if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.5"; }
+        return;
+      }
+
       let hasEnough = true;
       if (exchangeDirection === "cookies_to_tokens") {
         if (activeSpendAmount > currentCookies) hasEnough = false;
       } else {
         if (activeSpendAmount > currentTokens) hasEnough = false;
       }
+
       let extraNote = "";
       if (exchangeDirection === "cookies_to_tokens") {
-        extraNote = `<br><small style="color:#ffd477;">Nákup tokenů za sušenky (1 000 sušenek = 160 tokenů). Získáš ${Number(getVal).toLocaleString("cs-CZ")} tokenů.</small>`;
+        extraNote = `<br><small style="color:#ffd477;">Nákup tokenů za sušenky (kurz: 1 000 sušenek = 160 tokenů). Získáš ${Number(getVal).toLocaleString("cs-CZ")} tokenů.</small>`;
       } else {
-        extraNote = `<br><small style="color:#7dd3fc;">Zpětná směna tokenů zpět na sušenky (kurz: 160 tokenů = 800 sušenek).</small>`;
+        extraNote = `<br><small style="color:#7dd3fc;">Zpětná směna tokenů zpět na sušenky (kurz: 160 tokenů = 800 sušenek). Získáš ${Number(getVal).toLocaleString("cs-CZ")} sušenek.</small>`;
       }
+
       if (!hasEnough) {
-        if (summaryEl) summaryEl.innerHTML = `<span style="color:#ef4444;font-weight:700;">Nedostatek prostředků!</span> Utrácíš ${Number(activeSpendAmount).toLocaleString("cs-CZ")} ${spendName}, ale máš k dispozici pouze ${Number(exchangeDirection === "cookies_to_tokens" ? currentCookies : currentTokens).toLocaleString("cs-CZ")}.`;
+        if (summaryEl) {
+          summaryEl.innerHTML = `<span style="color:#ef4444;font-weight:700;">Nedostatek prostředků!</span> Utrácíš ${Number(activeSpendAmount).toLocaleString("cs-CZ")} ${spendName}, ale máš k dispozici pouze ${Number(exchangeDirection === "cookies_to_tokens" ? currentCookies : currentTokens).toLocaleString("cs-CZ")}.`;
+        }
         if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.5"; }
         return;
       }
-      if (summaryEl) summaryEl.innerHTML = `Utratíš <b>${Number(activeSpendAmount).toLocaleString("cs-CZ")}</b> ${spendName} a získáš <b>${Number(getVal).toLocaleString("cs-CZ")}</b> ${getName}.${extraNote}`;
+
+      if (summaryEl) {
+        summaryEl.innerHTML = `Utratíš <b>${Number(activeSpendAmount).toLocaleString("cs-CZ")}</b> ${spendName} a získáš <b>${Number(getVal).toLocaleString("cs-CZ")}</b> ${getName}.${extraNote}`;
+      }
       if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = "1"; }
     }
+
     function executeExchange() {
+      updateCalculation();
       if (activeSpendAmount <= 0) return;
+
       const currentTokens = getTokens();
       const currentCookies = readCookiesData().available;
+
       if (exchangeDirection === "cookies_to_tokens") {
-        if (activeSpendAmount > currentCookies) { showMsg("Nemáš dostatek sušenek!", false); return; }
         const getTokensVal = Math.floor(activeSpendAmount * (160 / 1000));
-        if (window.OPS_STATS && typeof window.OPS_STATS.exchangeCookies === "function") {
-          window.OPS_STATS.exchangeCookies(activeSpendAmount, getTokensVal);
-        } else {
-          deductCookies(activeSpendAmount); addTokens(getTokensVal);
+        if (getTokensVal <= 0) {
+          showMsg("Částka je příliš nízká (minimum je 7 sušenek pro 1 token)!", false);
+          return;
         }
-        showMsg(`Úspěšně zakoupeno ${Number(getTokensVal).toLocaleString("cs-CZ")} tokenů za ${Number(activeSpendAmount).toLocaleString("cs-CZ")} sušenek!`, true);
+        if (activeSpendAmount > currentCookies) {
+          showMsg("Nemáš dostatek sušenek!", false);
+          return;
+        }
+
+        let success = false;
+        if (window.OPS_STATS && typeof window.OPS_STATS.exchangeCookies === "function") {
+          const res = window.OPS_STATS.exchangeCookies(activeSpendAmount, getTokensVal);
+          success = res && res.success !== false;
+        } else {
+          deductCookies(activeSpendAmount);
+          addTokens(getTokensVal);
+          success = true;
+        }
+
+        if (success) {
+          showMsg(`Úspěšně zakoupeno ${Number(getTokensVal).toLocaleString("cs-CZ")} tokenů za ${Number(activeSpendAmount).toLocaleString("cs-CZ")} sušenek!`, true);
+        } else {
+          showMsg("Směna se nezdařila. Zkontroluj svůj zůstatek.", false);
+          return;
+        }
       } else {
-        if (activeSpendAmount > currentTokens) { showMsg("Nemáš dostatek tokenů!", false); return; }
         const getCookiesVal = Math.floor(activeSpendAmount * (800 / 160));
-        addTokens(-activeSpendAmount); addCookies(getCookiesVal);
-        showMsg(`Zpětně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} tokenů za ${Number(getCookiesVal).toLocaleString("cs-CZ")} sušenek (se ztrátou)!`, true);
+        if (getCookiesVal <= 0) {
+          showMsg("Částka je příliš nízká pro směnu (minimum je 1 token)!", false);
+          return;
+        }
+        if (activeSpendAmount > currentTokens) {
+          showMsg("Nemáš dostatek tokenů!", false);
+          return;
+        }
+
+        let success = false;
+        if (window.OPS_STATS && typeof window.OPS_STATS.exchangeTokens === "function") {
+          const res = window.OPS_STATS.exchangeTokens(activeSpendAmount, getCookiesVal);
+          success = res && res.success !== false;
+        } else {
+          addTokens(-activeSpendAmount);
+          addCookies(getCookiesVal);
+          success = true;
+        }
+
+        if (success) {
+          showMsg(`Zpětně směněno ${Number(activeSpendAmount).toLocaleString("cs-CZ")} tokenů za ${Number(getCookiesVal).toLocaleString("cs-CZ")} sušenek (se ztrátou)!`, true);
+        } else {
+          showMsg("Směna se nezdařila. Zkontroluj svůj zůstatek.", false);
+          return;
+        }
       }
+
       updateModalBalances();
       const mainTokensEl = document.getElementById("tokens");
-      if (mainTokensEl && window.OPS_STATS) { mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ"); }
-      customInput.value = ""; activeSpendAmount = 0; updateCalculation();
-      setTimeout(() => { closeModal(); window.location.reload(); }, 1200);
+      if (mainTokensEl) {
+        mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
+      }
+      const bal = document.getElementById("monitorBalance");
+      if (bal && mainTokensEl) {
+        bal.textContent = mainTokensEl.textContent + " ◆";
+      }
+
+      if (customInput) customInput.value = "";
+      activeSpendAmount = 0;
+      updateCalculation();
+
+      setTimeout(() => {
+        closeModal();
+      }, 1500);
     }
+
     function showMsg(text, isSuccess) {
       if (!msgEl) return;
       msgEl.style.display = "block";
@@ -607,16 +737,70 @@
       msgEl.style.color = isSuccess ? "#86efac" : "#fca5a5";
       msgEl.textContent = text;
     }
+
     if (openBtn) openBtn.addEventListener("click", openModal);
     if (closeBtn) closeBtn.addEventListener("click", closeModal);
     if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
     if (modal) modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
     if (dirTokensBtn) dirTokensBtn.addEventListener("click", () => setDirection("tokens_to_cookies"));
     if (dirCookiesBtn) dirCookiesBtn.addEventListener("click", () => setDirection("cookies_to_tokens"));
-    if (customInput) { customInput.value = ""; customInput.addEventListener("input", updateCalculation); }
+    if (presetsGrid) {
+      presetsGrid.addEventListener("click", (e) => {
+        const btn = e.target.closest(".ops-preset-btn");
+        if (!btn) return;
+        const spend = btn.dataset.all ? getAllAmount() : Number(btn.dataset.spend);
+        if (customInput) customInput.value = spend;
+        activeSpendAmount = spend;
+        updateCalculation();
+      });
+    }
+    if (customInput) {
+      customInput.value = "";
+      ["input", "change", "keyup"].forEach(ev => {
+        customInput.addEventListener(ev, updateCalculation);
+      });
+      customInput.addEventListener("paste", () => {
+        setTimeout(updateCalculation, 0);
+      });
+      customInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          updateCalculation();
+          if (confirmBtn && !confirmBtn.disabled) {
+            executeExchange();
+          }
+        }
+      });
+    }
     if (confirmBtn) confirmBtn.addEventListener("click", executeExchange);
-    attachPresetListeners();
   }
+
+  // Reactive listeners for external or in-page token and cookie updates
+  window.addEventListener("ops:tokens-changed", (e) => {
+    const mainTokensEl = document.getElementById("tokens");
+    if (mainTokensEl) {
+      const cur = (e && e.detail && typeof e.detail.tokens === "number") ? e.detail.tokens : getTokens();
+      mainTokensEl.textContent = Math.round(cur).toLocaleString("cs-CZ");
+      const bal = document.getElementById("monitorBalance");
+      if (bal) bal.textContent = mainTokensEl.textContent + " ◆";
+    }
+    const tEl = document.getElementById("shopModalTokens");
+    const cEl = document.getElementById("shopModalCookies");
+    if (tEl) tEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
+    if (cEl) cEl.textContent = Math.round(readCookiesData().available).toLocaleString("cs-CZ");
+  });
+  window.addEventListener("ops:stats-updated", () => {
+    const mainTokensEl = document.getElementById("tokens");
+    if (mainTokensEl) {
+      mainTokensEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
+      const bal = document.getElementById("monitorBalance");
+      if (bal) bal.textContent = mainTokensEl.textContent + " ◆";
+    }
+    const tEl = document.getElementById("shopModalTokens");
+    const cEl = document.getElementById("shopModalCookies");
+    if (tEl) tEl.textContent = Math.round(getTokens()).toLocaleString("cs-CZ");
+    if (cEl) cEl.textContent = Math.round(readCookiesData().available).toLocaleString("cs-CZ");
+  });
 })();
 </script>
 <script>

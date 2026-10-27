@@ -26,7 +26,7 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 .primary{width:100%;border:0;border-radius:12px;padding:15px 18px;background:linear-gradient(135deg,#e9bfff,#9b5de5);color:#21102d;font-size:1.08rem;font-weight:1000;box-shadow:0 5px 0 #5a3283;transition:transform .15s,filter .15s}.primary:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}button{font:inherit;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
 .message{margin-top:14px;padding:14px;border-radius:10px;background:#111521;border:1px solid var(--line);min-height:52px;line-height:1.5}.message.win{border-color:#5be08a66;color:#b4ffd0}.message.loss{border-color:#ff526366;color:#ffc1c8}
 .result{font-size:clamp(1.8rem,4vw,2.5rem);text-align:center;color:var(--gold);font-weight:1000;margin:18px 0 4px}.result-note{text-align:center;color:var(--muted);font-size:.9rem}.fineprint{color:#c6c9d6;font-size:.83rem;line-height:1.6;margin-top:15px}
-.currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}.currency strong{color:var(--gold);font-size:1.5rem}
+.currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted)}.currency strong{color:var(--gold);font-size:1.5rem;display:inline-flex;align-items:center;gap:4px}
 .who{color:var(--muted);font-size:.82rem;margin:10px 0 0;line-height:1.5}.who button{background:none;border:0;color:var(--red);font-weight:700;padding:0}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:#ffffff06;border:1px solid #ffffff0e;border-radius:12px;padding:11px 12px}
@@ -69,7 +69,7 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 <div class="layout">
   <div class="panels-sidebar">
     <div class="panel">
-      <div class="currency"><span>Školní body</span><strong>[B] <span id="sideBalance">0</span></strong></div>
+      <div class="currency"><span>Školní body</span><strong><svg class="school-points-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-0.18em;margin-right:2px;filter:drop-shadow(0 0 4px rgba(255,212,119,0.45));flex-shrink:0;" aria-hidden="true"><path d="M12 2L2 9L12 22L22 9L12 2Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="0.8" stroke-linejoin="round"/><path d="M12 2L6 9H18L12 2Z" fill="#FDE68A"/><path d="M2 9L6 9L12 22L2 9Z" fill="#D97706"/><path d="M18 9L22 9L12 22L18 9Z" fill="#B45309"/><path d="M6 9L18 9L12 22L6 9Z" fill="#FBBF24"/><path d="M9 5.5L12 2L15 5.5" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/></svg><span id="sideBalance">0</span></strong></div>
       <p class="who" id="who"></p>
       <p class="notice hide" id="broke" style="color:var(--red)">Došly ti body! Kup si další v obchodu se sušenkami.</p>
     </div>

@@ -65,7 +65,7 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
 .lb-gap{text-align:center;color:var(--muted);letter-spacing:.3em}
 @media(max-width:520px){.lb-row{grid-template-columns:40px minmax(0,1fr)}.lb-stats{grid-column:1/-1;text-align:left}}
 .currency{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:.9rem;margin-bottom:15px}
-.currency strong{color:var(--gold);font-size:1.2rem}
+.currency strong{color:var(--gold);font-size:1.2rem;display:inline-flex;align-items:center;gap:4px}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 14px}
 .section-head h2{margin:0;font-size:1.25rem}.small-btn{background:none;border:0;color:var(--red);font-weight:700}
 
@@ -259,7 +259,7 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
     </section>
     <aside>
       <div class="panel">
-        <div class="currency"><span>Školní body</span><strong>[B] <span id="tokens">1600</span></strong></div>
+        <div class="currency"><span>Školní body</span><strong><svg class="school-points-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-0.18em;margin-right:2px;filter:drop-shadow(0 0 4px rgba(255,212,119,0.45));flex-shrink:0;" aria-hidden="true"><path d="M12 2L2 9L12 22L22 9L12 2Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="0.8" stroke-linejoin="round"/><path d="M12 2L6 9H18L12 2Z" fill="#FDE68A"/><path d="M2 9L6 9L12 22L2 9Z" fill="#D97706"/><path d="M18 9L22 9L12 22L18 9Z" fill="#B45309"/><path d="M6 9L18 9L12 22L6 9Z" fill="#FBBF24"/><path d="M9 5.5L12 2L15 5.5" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/></svg><span id="tokens">1600</span></strong></div>
         <div class="stats">
           <div class="stat wide"><small>Z-Rank pity</small><strong id="zPity">0 / 200</strong><div class="meter z"><i id="zMeter"></i></div></div>
           <div class="stat"><small>S-Rank pity</small><strong id="sPity">0 / 90</strong><div class="meter"><i id="sMeter"></i></div></div>

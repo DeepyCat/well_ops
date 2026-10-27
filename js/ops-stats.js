@@ -1955,13 +1955,32 @@
 
             if (save) {
                 save.cookies = remainingCookies;
-                try {
-                    localStorage.setItem("cookieClickerSave", JSON.stringify(save));
-                } catch (e) {}
+                if (Number(save.totalCookies || 0) < remainingCookies) {
+                    save.totalCookies = remainingCookies;
+                }
+            } else {
+                save = {
+                    cookies: remainingCookies,
+                    totalCookies: Math.max(remainingCookies, Number(stats.clicker?.totalCookies) || 0),
+                    clicks: 0,
+                    buildings: {},
+                    upgrades: [],
+                    achievements: [],
+                    lastSave: Date.now()
+                };
             }
+            try {
+                localStorage.setItem("cookieClickerSave", JSON.stringify(save));
+            } catch (e) {}
 
             stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
             stats.clicker.cookies = remainingCookies;
+            if (Number(stats.clicker.totalCookies || 0) < remainingCookies) {
+                stats.clicker.totalCookies = remainingCookies;
+            }
+            if (save && Number(save.totalCookies || 0) > Number(stats.clicker.totalCookies || 0)) {
+                stats.clicker.totalCookies = save.totalCookies;
+            }
 
             stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
             const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
@@ -1970,12 +1989,11 @@
 
             saveLocalStats(stats);
 
-            if (!syncCloudDebounceTimer) {
-                syncCloudDebounceTimer = setTimeout(() => {
-                    syncCloudDebounceTimer = null;
-                    syncToCloud();
-                }, 1500);
+            if (syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncCloudDebounceTimer = null;
             }
+            syncToCloud();
 
             try {
                 if (typeof window !== "undefined" && window.dispatchEvent) {
@@ -1985,6 +2003,79 @@
             } catch (e) {}
 
             return { success: true, tokens: newTokens, cookies: remainingCookies };
+        },
+
+        exchangeTokens: function(cost, gain) {
+            cost = Math.max(0, Math.floor(Number(cost) || 0));
+            gain = Math.max(0, Math.floor(Number(gain) || 0));
+
+            const stats = loadLocalStats();
+            stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
+            const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
+
+            if (cost > 0 && curTokens < cost) {
+                return { success: false, tokens: curTokens, needed: cost };
+            }
+
+            const newTokens = Math.max(0, curTokens - cost);
+            stats.gacha.tokens = newTokens;
+
+            let save = null;
+            try {
+                const rawSave = localStorage.getItem("cookieClickerSave");
+                if (rawSave) save = JSON.parse(rawSave);
+            } catch (e) {}
+
+            const saveCookies = (save && Number.isFinite(Number(save.cookies))) ? Math.max(0, Number(save.cookies)) : 0;
+            const statCookies = (stats.clicker && Number.isFinite(Number(stats.clicker.cookies))) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
+            const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
+            const newCookies = Math.min(Number.MAX_SAFE_INTEGER, Math.floor(available + gain));
+
+            if (!save) {
+                save = {
+                    cookies: newCookies,
+                    totalCookies: newCookies,
+                    clicks: 0,
+                    buildings: {},
+                    upgrades: [],
+                    achievements: [],
+                    lastSave: Date.now()
+                };
+            } else {
+                save.cookies = newCookies;
+                if (Number(save.totalCookies || 0) < newCookies) {
+                    save.totalCookies = newCookies;
+                }
+            }
+            try {
+                localStorage.setItem("cookieClickerSave", JSON.stringify(save));
+            } catch (e) {}
+
+            stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
+            stats.clicker.cookies = newCookies;
+            if (Number(stats.clicker.totalCookies || 0) < newCookies) {
+                stats.clicker.totalCookies = newCookies;
+            }
+            if (save && Number(save.totalCookies || 0) > Number(stats.clicker.totalCookies || 0)) {
+                stats.clicker.totalCookies = save.totalCookies;
+            }
+
+            saveLocalStats(stats);
+
+            if (syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncCloudDebounceTimer = null;
+            }
+            syncToCloud();
+
+            try {
+                if (typeof window !== "undefined" && window.dispatchEvent) {
+                    window.dispatchEvent(new CustomEvent("ops:stats-updated", { detail: stats }));
+                    window.dispatchEvent(new CustomEvent("ops:tokens-changed", { detail: { tokens: newTokens, cookies: newCookies } }));
+                }
+            } catch (e) {}
+
+            return { success: true, tokens: newTokens, cookies: newCookies };
         },
 
         recordScore: function(gameId, score, extraData = {}) {
