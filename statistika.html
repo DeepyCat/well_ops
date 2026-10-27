@@ -8,6 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- taste-skill-ignore -->
+    <script>
+        if (document.fonts && document.fonts.load) {
+            document.fonts.load('400 14px "Plus Jakarta Sans"');
+            document.fonts.load('600 14px "Plus Jakarta Sans"');
+            document.fonts.load('700 14px "Plus Jakarta Sans"');
+            document.fonts.load('800 24px "Plus Jakarta Sans"');
+        }
+    </script>
     <style>
         :root {
             --ground: #0a0d14;
@@ -51,6 +59,10 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        button, input, select, textarea {
+            font-family: inherit;
         }
 
         body {
@@ -119,10 +131,8 @@
             align-items: center;
             gap: 8px;
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--muted);
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
         }
 
         .topbar-brand-mark {
@@ -133,10 +143,9 @@
             color: var(--accent);
             border: 1px solid var(--accent-border);
             border-radius: var(--radius-chip);
-            padding: 2px 6px;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.05em;
+            padding: 2px 7px;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .topbar-right {
@@ -171,8 +180,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 11px;
-            font-weight: 800;
+            font-size: 12px;
+            font-weight: 700;
             background: var(--accent-soft);
             color: var(--accent);
             border: 1px solid var(--accent-border);
@@ -185,7 +194,7 @@
 
         .user-edit-hint {
             color: var(--muted);
-            font-size: 11px;
+            font-size: 12px;
         }
 
         /* Main Container */
@@ -270,7 +279,7 @@
         }
 
         .gamer-rank-badge {
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--accent);
             background: var(--accent-soft);
@@ -281,13 +290,13 @@
         }
 
         .banner-meta-desc {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--muted);
             margin-top: 4px;
         }
 
         .banner-action-btn {
-            font-size: 12px;
+            font-size: 13px;
             padding: 6px 14px;
             pointer-events: none;
             white-space: nowrap;
@@ -316,7 +325,7 @@
         }
 
         .kpi-label {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--muted);
             font-weight: 500;
             margin-bottom: 6px;
@@ -331,7 +340,7 @@
         }
 
         .kpi-sub {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--muted);
             margin-top: 4px;
             font-variant-numeric: tabular-nums;
@@ -382,8 +391,8 @@
             background: var(--accent-soft);
             color: var(--accent);
             border: 1px solid var(--accent-border);
-            font-size: 11px;
-            padding: 2px 6px;
+            font-size: 13px;
+            padding: 2px 7px;
             border-radius: var(--radius-chip);
             font-weight: 700;
         }
@@ -410,7 +419,7 @@
         }
 
         .active-scope-badge {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--muted);
             font-variant-numeric: tabular-nums;
         }
@@ -543,7 +552,7 @@
             padding: 10px 14px;
             background: var(--surface);
             color: var(--muted);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
@@ -595,7 +604,7 @@
             width: 22px;
             height: 22px;
             border-radius: var(--radius-chip);
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 800;
         }
 
@@ -642,7 +651,7 @@
         }
 
         .badge-me {
-            font-size: 11px;
+            font-size: 12px;
             padding: 2px 6px;
             border-radius: var(--radius-chip);
             background: var(--accent-soft);
@@ -658,7 +667,7 @@
         }
 
         .metric-sub-val {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--muted);
             margin-top: 2px;
             font-variant-numeric: tabular-nums;
@@ -670,7 +679,7 @@
             color: var(--text);
             padding: 5px 12px;
             border-radius: var(--radius-chip);
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -807,11 +816,11 @@
         }
 
         .prof-metric-label {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--muted);
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            text-transform: none;
+            letter-spacing: normal;
         }
 
         .prof-metric-val {
@@ -892,7 +901,7 @@
         }
 
         .chip-label {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--muted);
             margin-bottom: 4px;
         }
@@ -942,7 +951,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .level-bar-track {
@@ -968,7 +977,7 @@
         .level-item-num {
             width: 44px;
             text-align: right;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--accent);
             font-variant-numeric: tabular-nums;
@@ -1010,9 +1019,9 @@
         }
 
         .gacha-rank-badge {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
-            padding: 1px 4px;
+            padding: 1px 5px;
             border-radius: 3px;
             background: var(--raised);
             color: var(--muted);
@@ -1024,14 +1033,14 @@
         .gacha-rank-badge.rank-B { color: #94a3b8; border: 1px solid var(--rule); }
 
         .gacha-char-count {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-bright);
             font-variant-numeric: tabular-nums;
         }
 
         .gacha-char-name {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-bright);
             white-space: nowrap;
@@ -1040,7 +1049,7 @@
         }
 
         .gacha-char-desc {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--muted);
             white-space: nowrap;
             overflow: hidden;
@@ -1064,7 +1073,7 @@
             display: flex;
             justify-content: space-between;
             padding: 4px 6px;
-            font-size: 11px;
+            font-size: 12px;
             border-bottom: 1px solid var(--rule);
         }
 
@@ -1115,12 +1124,16 @@
             background: rgba(4, 6, 11, 0.7);
             z-index: 200;
             opacity: 0;
+            display: none;
+            visibility: hidden;
             pointer-events: none;
-            transition: opacity 0.2s ease-out;
+            transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
         }
 
         .drawer-backdrop.active[data-ui="backdrop"] {
             opacity: 1;
+            display: block;
+            visibility: visible;
             pointer-events: auto;
         }
 
@@ -1135,7 +1148,8 @@
             border-left: 1px solid var(--border);
             z-index: 210;
             transform: translateX(100%);
-            transition: transform 0.22s ease-out;
+            visibility: hidden;
+            transition: transform 0.22s ease-out, visibility 0.22s ease-out;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -1143,6 +1157,7 @@
 
         .player-drawer.active[data-ui="drawer"] {
             transform: translateX(0);
+            visibility: visible;
         }
 
         .drawer-header {
@@ -1233,7 +1248,7 @@
         }
 
         .drawer-kpi-label {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--muted);
         }
 
@@ -1253,7 +1268,7 @@
         }
 
         .drawer-subpanel-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--text-bright);
             margin-bottom: 10px;
@@ -1280,10 +1295,19 @@
 
         @media (max-width: 640px) {
             .ops-topbar {
-                padding: 10px 14px;
+                padding: 10px 20px;
+                gap: 8px;
+            }
+            .nav-back-text,
+            .topbar-brand-sub,
+            .user-edit-hint {
+                display: none;
+            }
+            .user-badge-btn {
+                padding: 5px 10px;
             }
             .container {
-                padding: 20px 14px 0;
+                padding: 20px 20px 0;
             }
             .overview-profile-banner {
                 flex-direction: column;
@@ -1312,12 +1336,12 @@
     <!-- Top Navigation Bar -->
     <header class="ops-topbar">
         <div class="topbar-left">
-            <a href="games.html" class="nav-back-link">
-                <span>&larr;</span> Rozcestník her
+            <a href="games.html" class="nav-back-link" title="Rozcestník her" aria-label="Rozcestník her">
+                <span>&larr;</span> <span class="nav-back-text">Rozcestník her</span>
             </a>
             <div class="topbar-brand">
                 <span class="topbar-brand-mark">OPS</span>
-                <span>Telemetrie</span>
+                <span class="topbar-brand-sub">Telemetrie</span>
             </div>
         </div>
         <div class="topbar-right">
