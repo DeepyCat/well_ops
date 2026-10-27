@@ -16,6 +16,7 @@
 
     const STORAGE_KEY_USER = "ops_username";
     const STORAGE_KEY_STATS = "ops_game_stats";
+    const SESSION_KEY_AUTH = "ops_auth_user";
 
     // Seznam dostupných agentů/postav (školní sbor / NPC)
     const AGENTS_LIST = [
@@ -100,7 +101,8 @@
             totalPlayTime: 0,
             lastPlayedGame: null,
             lastActive: Date.now()
-        }
+        },
+        auth: null
     };
 
     function isSupabaseConfigured() {
@@ -371,7 +373,8 @@
                     totalPulls: gachaParsed.totalPulls || 0,
                     inventory: cleanInventory
                 },
-                meta: { ...DEFAULT_STATS.meta, ...(parsed.meta || {}) }
+                meta: { ...DEFAULT_STATS.meta, ...(parsed.meta || {}) },
+                auth: parsed.auth || null
             };
         } catch (e) {
             console.warn("[OPS Stats] Chyba při čtení localStorage:", e);
@@ -391,6 +394,112 @@
             localStorage.setItem(STORAGE_KEY_STATS, JSON.stringify(stats));
         } catch (e) {
             console.warn("[OPS Stats] Chyba při zápisu do localStorage:", e);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // PASSWORD HASHING & AUTHENTICATION (Web Crypto API: SHA-256 with Salt)
+    // -------------------------------------------------------------------------
+    const cachedAuthData = {};
+
+    async function hashPassword(password, saltHex) {
+        if (!saltHex) {
+            const saltBytes = new Uint8Array(16);
+            if (typeof window !== "undefined" && window.crypto && window.crypto.getRandomValues) {
+                window.crypto.getRandomValues(saltBytes);
+            } else if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+                crypto.getRandomValues(saltBytes);
+            } else {
+                for (let i = 0; i < 16; i++) saltBytes[i] = Math.floor(Math.random() * 256);
+            }
+            saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        const subtle = (typeof window !== "undefined" && window.crypto && window.crypto.subtle)
+            ? window.crypto.subtle
+            : (typeof crypto !== "undefined" && crypto.subtle ? crypto.subtle : null);
+
+        if (!subtle) {
+            throw new Error("Web Crypto API neni podporovano v tomto prostredi.");
+        }
+
+        const encoder = new TextEncoder();
+        const data = encoder.encode(saltHex + ":" + password);
+        const hashBuffer = await subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        return {
+            salt: saltHex,
+            hash: hashHex
+        };
+    }
+
+    async function verifyPassword(password, saltHex, expectedHashHex) {
+        if (!password || !saltHex || !expectedHashHex) return false;
+        try {
+            const result = await hashPassword(password, saltHex);
+            return result.hash === expectedHashHex;
+        } catch (e) {
+            console.warn("[OPS Auth] Chyba pri overovani hesla:", e);
+            return false;
+        }
+    }
+
+    function isAuthenticated(user) {
+        const u = user || (typeof OPS_STATS !== "undefined" && OPS_STATS.getUsername ? OPS_STATS.getUsername() : (typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY_USER) : ""));
+        if (!u) return false;
+        if (u.startsWith("Host")) return true;
+        try {
+            if (typeof sessionStorage === "undefined") return false;
+            return sessionStorage.getItem(SESSION_KEY_AUTH) === u;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function setSessionAuthenticated(username) {
+        try {
+            if (typeof sessionStorage !== "undefined") {
+                sessionStorage.setItem(SESSION_KEY_AUTH, username);
+            }
+        } catch (e) {}
+    }
+
+    function clearSessionAuthenticated() {
+        try {
+            if (typeof sessionStorage !== "undefined") {
+                sessionStorage.removeItem(SESSION_KEY_AUTH);
+            }
+        } catch (e) {}
+    }
+
+    async function fetchUserAuthFromCloud(username) {
+        if (!username || !isSupabaseConfigured() || username.startsWith("Host")) {
+            return { exists: false, hasPassword: false, auth: null, stats: null, error: false };
+        }
+        try {
+            const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=username,stats`;
+            const res = await fetch(endpoint, {
+                method: "GET",
+                headers: getSupabaseHeaders()
+            });
+            if (!res.ok) {
+                console.warn("[OPS Auth] Nepodarilo se ziskat ucet ze serveru:", res.status);
+                return { exists: null, hasPassword: false, auth: null, stats: null, error: true };
+            }
+            const rows = await res.json();
+            if (!rows || rows.length === 0) {
+                return { exists: false, hasPassword: false, auth: null, stats: null, error: false };
+            }
+            const row = rows[0];
+            const stats = row.stats || {};
+            const auth = stats.auth || null;
+            const hasPassword = !!(auth && typeof auth.hash === "string" && typeof auth.salt === "string");
+            return { exists: true, hasPassword, auth, stats, error: false };
+        } catch (err) {
+            console.warn("[OPS Auth] Sitova chyba pri ziskavani uzivatele:", err);
+            return { exists: null, hasPassword: false, auth: null, stats: null, error: true };
         }
     }
 
@@ -440,6 +549,10 @@
             updateCloudSyncBadge("offline");
             return;
         }
+        if (!isAuthenticated(username)) {
+            updateCloudSyncBadge("offline", "Cloud: Neoveren");
+            return;
+        }
 
         isSyncingToCloud = true;
         updateCloudSyncBadge("syncing", "Cloud: Ukladam...");
@@ -485,6 +598,10 @@
     async function syncFromCloud(username) {
         if (!username || !isSupabaseConfigured() || username.startsWith("Host")) {
             updateCloudSyncBadge("offline");
+            return null;
+        }
+        if (!isAuthenticated(username)) {
+            updateCloudSyncBadge("offline", "Cloud: Neoveren");
             return null;
         }
 
@@ -688,7 +805,8 @@
                         totalPlayTime: Math.max(local.meta.totalPlayTime, cloudStats.meta?.totalPlayTime || 0),
                         lastPlayedGame: cloudStats.meta?.lastPlayedGame || local.meta.lastPlayedGame,
                         lastActive: Date.now()
-                    }
+                    },
+                    auth: cloudStats.auth || local.auth || null
                 };
 
                 saveLocalStats(merged);
@@ -1414,50 +1532,68 @@
             return localStorage.getItem(STORAGE_KEY_USER) || "";
         },
 
-        setUsername: async function(name) {
+        setUsername: async function(name, options = {}) {
             const clean = (name || "").trim();
             if (!clean) return false;
 
-            const oldUser = OPS_STATS.getUsername();
-            const isChanged = oldUser !== clean;
-
-            if (isChanged) {
-                if (oldUser) {
+            if (clean.startsWith("Host")) {
+                let current = OPS_STATS.getUsername();
+                let isChanged = current !== clean;
+                if (isChanged && current && !current.startsWith("Host")) {
                     try {
-                        await backupMinecraft(oldUser, "auto");
-                    } catch (e) {
-                        console.warn("[OPS Stats] Auto-backup při přepnutí uživatele selhal:", e);
+                        await backupMinecraft(current, "auto");
+                    } catch (e) {}
+                    if (syncCloudDebounceTimer) {
+                        clearTimeout(syncCloudDebounceTimer);
+                        syncCloudDebounceTimer = null;
                     }
+                    localStorage.clear();
                 }
-                if (syncCloudDebounceTimer) {
-                    clearTimeout(syncCloudDebounceTimer);
-                    syncCloudDebounceTimer = null;
-                }
-                localStorage.clear();
+                localStorage.setItem(STORAGE_KEY_USER, clean);
+                setSessionAuthenticated(clean);
+                updatePlayerBadgeUI();
+                updateCloudSyncBadge("offline", "Cloud: Pouze host");
+                if (isChanged) window.location.reload();
+                return true;
             }
 
-            localStorage.setItem(STORAGE_KEY_USER, clean);
-            updatePlayerBadgeUI();
-
-            if (isChanged) {
-                saveLocalStats(DEFAULT_STATS);
+            if (typeof options === "string") {
+                options = { password: options };
             }
 
-            if (isSupabaseConfigured()) {
-                try {
-                    await syncFromCloud(clean);
-                    await syncToCloud();
-                } catch (e) {
-                    console.warn("[OPS Stats] Chyba při synchronizaci po změně uživatele:", e);
-                }
+            if (options && options.password) {
+                const res = await handleRegisterDirect(clean, options.password);
+                return res.success;
             }
 
-            if (isChanged) {
-                window.location.reload();
-            }
-
+            promptUsernameModal();
             return true;
         },
+
+        isAuthenticated: function(user) {
+            return isAuthenticated(user);
+        },
+
+        login: async function(username, password) {
+            return await handleLoginDirect(username, password);
+        },
+
+        register: async function(username, password) {
+            return await handleRegisterDirect(username, password);
+        },
+
+        setPassword: async function(password) {
+            const user = OPS_STATS.getUsername();
+            if (!user || user.startsWith("Host")) return { success: false, error: "Nelze nastavit heslo pro hosta." };
+            return await handleSetPasswordDirect(user, password);
+        },
+
+        logout: async function() {
+            await handleLogout();
+        },
+
+        hashPassword: hashPassword,
+        verifyPassword: verifyPassword,
 
         getStats: function() {
             return loadLocalStats();
@@ -1600,7 +1736,15 @@
                     headers: getSupabaseHeaders()
                 });
                 if (!res.ok) return [];
-                return await res.json();
+                const rows = await res.json();
+                if (Array.isArray(rows)) {
+                    for (const r of rows) {
+                        if (r && r.stats && r.stats.auth) {
+                            delete r.stats.auth;
+                        }
+                    }
+                }
+                return rows;
             } catch (e) {
                 console.warn("[OPS Stats] Nelze načíst žebříček:", e);
                 return [];
@@ -1610,6 +1754,7 @@
         exportStatsJSON: function() {
             const stats = loadLocalStats();
             if (stats.gacha && stats.gacha.history) delete stats.gacha.history;
+            if (stats.auth) delete stats.auth;
             const data = {
                 username: OPS_STATS.getUsername(),
                 stats: stats,
@@ -1692,6 +1837,10 @@
     // -------------------------------------------------------------------------
     // UI MODAL & BADGE INJECTION
     // -------------------------------------------------------------------------
+    let currentModalMode = "register";
+    let currentTargetUsername = "";
+    let currentAllowCancel = true;
+
     function injectUIStyles() {
         if (document.getElementById("ops-stats-styles")) return;
         const style = document.createElement("style");
@@ -1783,6 +1932,7 @@
                 box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(99, 102, 241, 0.25);
                 transform: scale(0.95);
                 transition: transform 0.25s ease;
+                box-sizing: border-box;
             }
             .ops-modal-backdrop.open .ops-modal-card {
                 transform: scale(1);
@@ -1794,42 +1944,75 @@
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                margin-bottom: 8px;
             }
             .ops-modal-desc {
                 font-size: 0.875rem;
                 color: #94a3b8;
                 line-height: 1.45;
-                margin-bottom: 18px;
+                margin-bottom: 16px;
+            }
+            .ops-modal-field-group {
+                margin-bottom: 14px;
+                text-align: left;
+            }
+            .ops-modal-label {
+                display: block;
+                font-size: 0.78rem;
+                font-weight: 700;
+                color: #94a3b8;
+                margin-bottom: 6px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
             }
             .ops-modal-input {
                 width: 100%;
-                background: rgba(15, 23, 42, 0.8);
+                background: rgba(15, 23, 42, 0.85);
                 border: 1px solid rgba(255, 255, 255, 0.2);
-                border-radius: 10px;
-                padding: 12px 14px;
+                border-radius: 8px;
+                padding: 11px 14px;
                 color: #fff;
                 font-family: Consolas, monospace;
-                font-size: 1rem;
-                margin-bottom: 16px;
+                font-size: 0.95rem;
                 outline: none;
                 box-sizing: border-box;
-                transition: border-color 0.2s ease;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
             }
             .ops-modal-input:focus {
                 border-color: #38bdf8;
                 box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
             }
+            .ops-modal-error {
+                background: rgba(239, 68, 68, 0.18);
+                border: 1px solid rgba(239, 68, 68, 0.5);
+                color: #fca5a5;
+                padding: 10px 14px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                margin-bottom: 14px;
+                line-height: 1.4;
+            }
+            .ops-modal-info {
+                background: rgba(34, 197, 94, 0.18);
+                border: 1px solid rgba(34, 197, 94, 0.5);
+                color: #86efac;
+                padding: 10px 14px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                margin-bottom: 14px;
+                line-height: 1.4;
+            }
             .ops-modal-btn-row {
                 display: flex;
                 gap: 10px;
                 justify-content: flex-end;
+                flex-wrap: wrap;
+                margin-top: 16px;
             }
             .ops-modal-btn {
-                padding: 10px 18px;
+                padding: 10px 16px;
                 border-radius: 8px;
                 font-weight: 700;
-                font-size: 0.9rem;
+                font-size: 0.88rem;
                 cursor: pointer;
                 transition: all 0.2s ease;
                 border: none;
@@ -1850,6 +2033,15 @@
             .ops-modal-btn-ghost:hover {
                 background: rgba(255, 255, 255, 0.16);
             }
+            .ops-modal-btn-danger {
+                background: rgba(239, 68, 68, 0.2);
+                color: #fca5a5;
+                border: 1px solid rgba(239, 68, 68, 0.4);
+            }
+            .ops-modal-btn-danger:hover {
+                background: rgba(239, 68, 68, 0.35);
+                color: #fff;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -1863,101 +2055,669 @@
         backdrop.className = "ops-modal-backdrop";
         backdrop.innerHTML = `
             <div class="ops-modal-card">
-                <div class="ops-modal-title">
-                    Hráčský profil OPS
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+                    <div id="opsModalTitle" class="ops-modal-title">Hracsky profil OPS</div>
+                    <button type="button" id="opsModalCloseX" style="background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>
                 </div>
-                <div class="ops-modal-desc">
-                    Zadej svou přezdívku pro ukládání do online žebříčku a přenos mezi počítači, nebo pokračuj jako anonymní host.
+                <div id="opsModalDesc" class="ops-modal-desc">
+                    Zadej svou prezdivku pro ukladani do online zebricku a prenos mezi pocitaci, nebo pokracuj jako anonymni host.
                 </div>
-                <input type="text" id="opsUsernameInput" class="ops-modal-input" placeholder="Tvoje přezdívka..." maxlength="24" autocomplete="off" />
+
+                <div id="opsModalError" class="ops-modal-error" style="display:none;"></div>
+                <div id="opsModalInfo" class="ops-modal-info" style="display:none;"></div>
+
+                <div id="opsModalProfileBox" style="display:none;background:rgba(15,23,42,0.6);border:1px solid rgba(56,189,248,0.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.6;">
+                    <div>Aktivni profil: <strong id="opsModalProfileUser" style="color:#38bdf8;">--</strong></div>
+                    <div>Stav uctu: <span id="opsModalProfileStatus" style="color:#22c55e;">Prihlasen a overen</span></div>
+                </div>
+
+                <div id="opsUsernameGroup" class="ops-modal-field-group">
+                    <label id="opsUsernameLabel" for="opsUsernameInput" class="ops-modal-label">Prezdivka:</label>
+                    <input type="text" id="opsUsernameInput" class="ops-modal-input" placeholder="Tvoje prezdivka..." maxlength="24" autocomplete="username" />
+                </div>
+
+                <div id="opsPasswordGroup" class="ops-modal-field-group">
+                    <label id="opsPasswordLabel" for="opsPasswordInput" class="ops-modal-label">Heslo:</label>
+                    <input type="password" id="opsPasswordInput" class="ops-modal-input" placeholder="Heslo..." maxlength="64" autocomplete="current-password" />
+                </div>
+
+                <div id="opsPasswordConfirmGroup" class="ops-modal-field-group" style="display:none;">
+                    <label id="opsPasswordConfirmLabel" for="opsPasswordConfirmInput" class="ops-modal-label">Potvrzeni hesla:</label>
+                    <input type="password" id="opsPasswordConfirmInput" class="ops-modal-input" placeholder="Zadej heslo znovu..." maxlength="64" autocomplete="new-password" />
+                </div>
+
                 <div class="ops-modal-btn-row">
-                    <button type="button" id="opsModalGuestBtn" class="ops-modal-btn ops-modal-btn-ghost">Hrát jako host</button>
-                    <button type="button" id="opsModalSaveBtn" class="ops-modal-btn ops-modal-btn-primary">Pokračovat</button>
+                    <button type="button" id="opsModalGuestBtn" class="ops-modal-btn ops-modal-btn-ghost">Hrat jako host</button>
+                    <button type="button" id="opsModalSwitchBtn" class="ops-modal-btn ops-modal-btn-ghost" style="display:none;">Prepnout ucet</button>
+                    <button type="button" id="opsModalLogoutBtn" class="ops-modal-btn ops-modal-btn-danger" style="display:none;">Odhlasit se</button>
+                    <button type="button" id="opsModalSaveBtn" class="ops-modal-btn ops-modal-btn-primary">Pokracovat</button>
                 </div>
             </div>
         `;
         document.body.appendChild(backdrop);
 
-        const input = document.getElementById("opsUsernameInput");
+        const inputUser = document.getElementById("opsUsernameInput");
+        const inputPass = document.getElementById("opsPasswordInput");
+        const inputConfirm = document.getElementById("opsPasswordConfirmInput");
         const saveBtn = document.getElementById("opsModalSaveBtn");
         const guestBtn = document.getElementById("opsModalGuestBtn");
+        const switchBtn = document.getElementById("opsModalSwitchBtn");
+        const logoutBtn = document.getElementById("opsModalLogoutBtn");
+        const closeX = document.getElementById("opsModalCloseX");
 
-        const submit = async () => {
-            const val = input.value.trim();
-            if (!val) {
-                let current = OPS_STATS.getUsername();
-                let guestName = (current && current.startsWith("Host")) ? current : `Host_${Math.floor(1000 + Math.random() * 9000)}`;
-                saveBtn.disabled = true;
-                await OPS_STATS.setUsername(guestName);
-                saveBtn.disabled = false;
-                backdrop.classList.remove("open");
-                return;
-            }
-            saveBtn.disabled = true;
-            saveBtn.textContent = "Ukládám...";
-            await OPS_STATS.setUsername(val);
-            saveBtn.disabled = false;
-            backdrop.classList.remove("open");
-        };
-
-        const playAsGuest = async () => {
-            let current = OPS_STATS.getUsername();
-            let guestName = (current && current.startsWith("Host")) ? current : `Host_${Math.floor(1000 + Math.random() * 9000)}`;
-            guestBtn.disabled = true;
-            await OPS_STATS.setUsername(guestName);
-            guestBtn.disabled = false;
-            backdrop.classList.remove("open");
-        };
-
-        saveBtn.addEventListener("click", submit);
+        saveBtn.addEventListener("click", handleModalSubmit);
         guestBtn.addEventListener("click", playAsGuest);
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") submit();
+        switchBtn.addEventListener("click", () => {
+            showAuthModal({ mode: "register", username: "", allowCancel: true });
         });
+        logoutBtn.addEventListener("click", handleLogout);
+        closeX.addEventListener("click", closeModal);
+
+        inputUser.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                if (inputPass && inputPass.offsetParent !== null) {
+                    inputPass.focus();
+                } else {
+                    handleModalSubmit();
+                }
+            }
+        });
+
+        inputPass.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                if (inputConfirm && inputConfirm.offsetParent !== null) {
+                    inputConfirm.focus();
+                } else {
+                    handleModalSubmit();
+                }
+            }
+        });
+
+        inputConfirm.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") handleModalSubmit();
+        });
+
         backdrop.addEventListener("click", (e) => {
-            if (e.target === backdrop) backdrop.classList.remove("open");
+            if (e.target === backdrop && currentAllowCancel) closeModal();
         });
+
         document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && backdrop.classList.contains("open")) {
-                backdrop.classList.remove("open");
+            if (e.key === "Escape" && currentAllowCancel && backdrop.classList.contains("open")) {
+                closeModal();
             }
         });
     }
 
-    function showUsernameModal(allowCancel = true) {
-        createModalDOM();
+    function closeModal() {
         const backdrop = document.getElementById("opsStatsModalBackdrop");
-        const input = document.getElementById("opsUsernameInput");
+        if (backdrop) backdrop.classList.remove("open");
+    }
+
+    function showModalError(msg) {
+        const errEl = document.getElementById("opsModalError");
+        const infoEl = document.getElementById("opsModalInfo");
+        if (infoEl) infoEl.style.display = "none";
+        if (errEl) {
+            errEl.textContent = msg;
+            errEl.style.display = "block";
+        }
+    }
+
+    function showModalInfo(msg) {
+        const errEl = document.getElementById("opsModalError");
+        const infoEl = document.getElementById("opsModalInfo");
+        if (errEl) errEl.style.display = "none";
+        if (infoEl) {
+            infoEl.textContent = msg;
+            infoEl.style.display = "block";
+        }
+    }
+
+    function clearModalAlerts() {
+        const errEl = document.getElementById("opsModalError");
+        const infoEl = document.getElementById("opsModalInfo");
+        if (errEl) errEl.style.display = "none";
+        if (infoEl) infoEl.style.display = "none";
+    }
+
+    function showAuthModal(options = {}) {
+        createModalDOM();
+        clearModalAlerts();
+
+        const backdrop = document.getElementById("opsStatsModalBackdrop");
+        const titleEl = document.getElementById("opsModalTitle");
+        const descEl = document.getElementById("opsModalDesc");
+        const closeX = document.getElementById("opsModalCloseX");
+        const userGroup = document.getElementById("opsUsernameGroup");
+        const userInput = document.getElementById("opsUsernameInput");
+        const passGroup = document.getElementById("opsPasswordGroup");
+        const passLabel = document.getElementById("opsPasswordLabel");
+        const passInput = document.getElementById("opsPasswordInput");
+        const confirmGroup = document.getElementById("opsPasswordConfirmGroup");
+        const confirmInput = document.getElementById("opsPasswordConfirmInput");
+        const profileBox = document.getElementById("opsModalProfileBox");
+        const profileUser = document.getElementById("opsModalProfileUser");
+        const profileStatus = document.getElementById("opsModalProfileStatus");
+        const guestBtn = document.getElementById("opsModalGuestBtn");
+        const switchBtn = document.getElementById("opsModalSwitchBtn");
+        const logoutBtn = document.getElementById("opsModalLogoutBtn");
         const saveBtn = document.getElementById("opsModalSaveBtn");
 
-        const current = OPS_STATS.getUsername();
-        if (current && !current.startsWith("Host")) {
-            input.value = current;
-            saveBtn.textContent = `Hrát jako ${current}`;
+        currentModalMode = options.mode || "register";
+        currentTargetUsername = options.username || "";
+        currentAllowCancel = typeof options.allowCancel === "boolean" ? options.allowCancel : true;
+
+        closeX.style.display = currentAllowCancel ? "block" : "none";
+
+        if (currentModalMode === "login") {
+            titleEl.textContent = "Prihlaseni k uctu";
+            descEl.innerHTML = `Vitej zpet! Zadej heslo pro prihlaseni k uctu <strong style="color:#38bdf8;">${currentTargetUsername}</strong>:`;
+            userGroup.style.display = "none";
+            passGroup.style.display = "block";
+            passLabel.textContent = "Heslo:";
+            passInput.value = "";
+            passInput.placeholder = "Zadej heslo...";
+            confirmGroup.style.display = "none";
+            profileBox.style.display = "none";
+            guestBtn.style.display = "inline-block";
+            switchBtn.style.display = "inline-block";
+            switchBtn.textContent = "Prepnout ucet";
+            logoutBtn.style.display = "none";
+            saveBtn.style.display = "inline-block";
+            saveBtn.textContent = "Prihlasit se";
+            setTimeout(() => passInput.focus(), 120);
+        } else if (currentModalMode === "set-password") {
+            titleEl.textContent = "Nastaveni hesla";
+            descEl.innerHTML = `Tvuj ucet <strong style="color:#38bdf8;">${currentTargetUsername}</strong> zatim nema heslo. Zvol si prosim heslo pro zabezpeceni profilu a ukladani statistik:`;
+            userGroup.style.display = "none";
+            passGroup.style.display = "block";
+            passLabel.textContent = "Nove heslo:";
+            passInput.value = "";
+            passInput.placeholder = "Nove heslo...";
+            confirmGroup.style.display = "block";
+            confirmInput.value = "";
+            confirmInput.placeholder = "Potvrzeni hesla...";
+            profileBox.style.display = "none";
+            guestBtn.style.display = "inline-block";
+            switchBtn.style.display = "inline-block";
+            switchBtn.textContent = "Prepnout ucet";
+            logoutBtn.style.display = "none";
+            saveBtn.style.display = "inline-block";
+            saveBtn.textContent = "Nastavit heslo a hrat";
+            setTimeout(() => passInput.focus(), 120);
+        } else if (currentModalMode === "profile") {
+            titleEl.textContent = "Hracsky profil";
+            descEl.textContent = "Prehled tveho aktivniho prihlaseni v tomto prohlizeci:";
+            userGroup.style.display = "none";
+            passGroup.style.display = "none";
+            confirmGroup.style.display = "none";
+            profileBox.style.display = "block";
+            profileUser.textContent = currentTargetUsername || OPS_STATS.getUsername();
+            profileStatus.textContent = isAuthenticated(currentTargetUsername) ? "Prihlasen a overen" : "Neoveren";
+            profileStatus.style.color = isAuthenticated(currentTargetUsername) ? "#22c55e" : "#ef4444";
+            guestBtn.style.display = "none";
+            switchBtn.style.display = "inline-block";
+            switchBtn.textContent = "Zmenit ucet";
+            logoutBtn.style.display = "inline-block";
+            logoutBtn.textContent = "Odhlasit se";
+            saveBtn.style.display = "inline-block";
+            saveBtn.textContent = "Zavrit";
         } else {
-            input.value = "";
-            saveBtn.textContent = "Pokračovat";
+            currentModalMode = "register";
+            titleEl.textContent = "Hracsky profil OPS";
+            descEl.textContent = "Zadej svou prezdivku a zvol si heslo pro ukladani do online zebricku a prenos mezi zarizenimi, nebo pokracuj jako anonymni host:";
+            userGroup.style.display = "block";
+            userInput.value = currentTargetUsername || "";
+            userInput.placeholder = "Tvoje prezdivka...";
+            passGroup.style.display = "block";
+            passLabel.textContent = "Heslo:";
+            passInput.value = "";
+            passInput.placeholder = "Zvol si heslo...";
+            confirmGroup.style.display = "none";
+            profileBox.style.display = "none";
+            guestBtn.style.display = "inline-block";
+            switchBtn.style.display = "none";
+            logoutBtn.style.display = "none";
+            saveBtn.style.display = "inline-block";
+            saveBtn.textContent = "Pokracovat";
+            setTimeout(() => {
+                if (!userInput.value) userInput.focus();
+                else passInput.focus();
+            }, 120);
         }
 
-        input.oninput = () => {
-            const val = input.value.trim();
-            saveBtn.textContent = val ? `Hrát jako ${val}` : "Pokračovat";
-        };
-
         backdrop.classList.add("open");
-        setTimeout(() => input.focus(), 100);
+    }
+
+    async function handleModalSubmit() {
+        clearModalAlerts();
+        const saveBtn = document.getElementById("opsModalSaveBtn");
+        const originalText = saveBtn.textContent;
+
+        if (currentModalMode === "profile") {
+            closeModal();
+            return;
+        }
+
+        if (currentModalMode === "login") {
+            const username = currentTargetUsername;
+            const pass = document.getElementById("opsPasswordInput").value;
+            if (typeof pass !== "string" || pass.length === 0) {
+                showModalError("Zadejte prosim heslo.");
+                return;
+            }
+            saveBtn.disabled = true;
+            saveBtn.textContent = "Overuji...";
+
+            try {
+                let auth = cachedAuthData[username] || null;
+                if (!auth) {
+                    const cloud = await fetchUserAuthFromCloud(username);
+                    if (cloud.hasPassword) {
+                        auth = cloud.auth;
+                        cachedAuthData[username] = auth;
+                    }
+                }
+                if (!auth) {
+                    const local = loadLocalStats();
+                    if (local.auth && local.auth.hash) auth = local.auth;
+                }
+                if (!auth || !auth.hash) {
+                    showModalError("Ucet nema nastavene heslo.");
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalText;
+                    return;
+                }
+
+                const match = await verifyPassword(pass, auth.salt, auth.hash);
+                if (!match) {
+                    showModalError("Nespravne heslo. Zkuste to znovu.");
+                    const pInput = document.getElementById("opsPasswordInput");
+                    pInput.value = "";
+                    pInput.focus();
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalText;
+                    return;
+                }
+
+                await executeUserSwitch(username, auth, false);
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+                closeModal();
+                return;
+            } catch (e) {
+                console.warn("[OPS Auth] Chyba pri prihlasovani:", e);
+                showModalError("Doslo k chybe pri overeni hesla.");
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+                return;
+            }
+        }
+
+        if (currentModalMode === "set-password") {
+            const username = currentTargetUsername;
+            const pass = document.getElementById("opsPasswordInput").value;
+            const confirm = document.getElementById("opsPasswordConfirmInput").value;
+
+            if (typeof pass !== "string" || pass.length === 0) {
+                showModalError("Zadejte prosim heslo.");
+                return;
+            }
+            if (pass !== confirm) {
+                showModalError("Zadana hesla se neshoduji.");
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = "Ukladam heslo...";
+
+            try {
+                const authData = await hashPassword(pass);
+                await executeUserSwitch(username, authData, true);
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+                closeModal();
+                return;
+            } catch (e) {
+                console.warn("[OPS Auth] Chyba pri ukladani hesla:", e);
+                showModalError("Nepodarilo se ulozit heslo.");
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+                return;
+            }
+        }
+
+        if (currentModalMode === "register") {
+            const username = document.getElementById("opsUsernameInput").value.trim();
+            const pass = document.getElementById("opsPasswordInput").value;
+
+            if (!username) {
+                showModalError("Zadejte prosim prezdivku.");
+                return;
+            }
+            if (username.length < 2) {
+                showModalError("Prezdivka musi mit alespon 2 znaky.");
+                return;
+            }
+            if (username.startsWith("Host_") || username.toLowerCase() === "host") {
+                showModalError("Prezdivka nemuze zacinat na 'Host_'.");
+                return;
+            }
+            if (typeof pass !== "string" || pass.length === 0) {
+                showModalError("Zadejte prosim heslo.");
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = "Zpracovavam...";
+
+            try {
+                const cloud = await fetchUserAuthFromCloud(username);
+
+                if (cloud.exists && cloud.hasPassword) {
+                    const match = await verifyPassword(pass, cloud.auth.salt, cloud.auth.hash);
+                    if (!match) {
+                        showModalError(`Ucet '${username}' jiz existuje. Zadane heslo neni spravne.`);
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = originalText;
+                        return;
+                    }
+                    await executeUserSwitch(username, cloud.auth, false);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalText;
+                    closeModal();
+                    return;
+                }
+
+                if (cloud.exists && !cloud.hasPassword) {
+                    const authData = await hashPassword(pass);
+                    await executeUserSwitch(username, authData, true);
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalText;
+                    closeModal();
+                    return;
+                }
+
+                const authData = await hashPassword(pass);
+                await executeUserSwitch(username, authData, true);
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+                closeModal();
+                return;
+            } catch (e) {
+                console.warn("[OPS Auth] Chyba pri registraci:", e);
+                showModalError("Chyba spojeni se serverem.");
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+                return;
+            }
+        }
+    }
+
+    async function executeUserSwitch(username, authData, isNewOrSetPassword) {
+        const oldUser = OPS_STATS.getUsername();
+        const isChanged = oldUser !== username;
+
+        if (isChanged && oldUser && !oldUser.startsWith("Host")) {
+            try {
+                await backupMinecraft(oldUser, "auto");
+            } catch (e) {}
+            if (syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncCloudDebounceTimer = null;
+            }
+            localStorage.clear();
+        }
+
+        localStorage.setItem(STORAGE_KEY_USER, username);
+        setSessionAuthenticated(username);
+        if (authData) cachedAuthData[username] = authData;
+
+        const stats = loadLocalStats();
+        if (authData) stats.auth = authData;
+        saveLocalStats(stats);
+
+        if (isNewOrSetPassword && isSupabaseConfigured()) {
+            try {
+                const payload = {
+                    username: username,
+                    updated_at: new Date().toISOString(),
+                    stats: stats
+                };
+                await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`, {
+                    method: "POST",
+                    headers: {
+                        ...getSupabaseHeaders(),
+                        "Prefer": "resolution=merge-duplicates"
+                    },
+                    body: JSON.stringify(payload)
+                });
+            } catch (e) {
+                console.warn("[OPS Auth] Nepodarilo se nahrat auth do cloudu:", e);
+            }
+        }
+
+        updatePlayerBadgeUI();
+
+        if (isSupabaseConfigured()) {
+            try {
+                await syncFromCloud(username);
+                await syncToCloud();
+            } catch (e) {
+                console.warn("[OPS Auth] Chyba pri synchronizaci po prihlaseni:", e);
+            }
+        }
+
+        if (isChanged) {
+            window.location.reload();
+        }
+    }
+
+    async function playAsGuest() {
+        clearModalAlerts();
+        let current = OPS_STATS.getUsername();
+        let guestName = (current && current.startsWith("Host")) ? current : `Host_${Math.floor(1000 + Math.random() * 9000)}`;
+        const oldUser = OPS_STATS.getUsername();
+        const isChanged = oldUser !== guestName;
+
+        if (isChanged && oldUser && !oldUser.startsWith("Host")) {
+            try {
+                await backupMinecraft(oldUser, "auto");
+            } catch (e) {}
+            if (syncCloudDebounceTimer) {
+                clearTimeout(syncCloudDebounceTimer);
+                syncCloudDebounceTimer = null;
+            }
+            localStorage.clear();
+        }
+
+        localStorage.setItem(STORAGE_KEY_USER, guestName);
+        setSessionAuthenticated(guestName);
+        updatePlayerBadgeUI();
+        updateCloudSyncBadge("offline", "Cloud: Pouze host");
+        closeModal();
+
+        if (isChanged) {
+            window.location.reload();
+        }
+    }
+
+    async function handleLogout() {
+        clearModalAlerts();
+        const oldUser = OPS_STATS.getUsername();
+        if (oldUser && !oldUser.startsWith("Host")) {
+            try {
+                await backupMinecraft(oldUser, "auto");
+            } catch (e) {}
+        }
+        clearSessionAuthenticated();
+        localStorage.removeItem(STORAGE_KEY_USER);
+        updateCloudSyncBadge("offline");
+        closeModal();
+        updatePlayerBadgeUI();
+        window.location.reload();
+    }
+
+    function promptUsernameModal() {
+        const currentUser = OPS_STATS.getUsername();
+        if (!currentUser || currentUser.startsWith("Host")) {
+            showAuthModal({ mode: "register", username: "", allowCancel: true });
+        } else if (isAuthenticated(currentUser)) {
+            showAuthModal({ mode: "profile", username: currentUser, allowCancel: true });
+        } else {
+            checkUserAuthRequirement(currentUser, true);
+        }
+    }
+
+    function showUsernameModal(allowCancel = true) {
+        promptUsernameModal();
     }
 
     function updatePlayerBadgeUI() {
         const badge = document.getElementById("opsUserBadge");
+        const topUserEl = document.getElementById("topUsernameDisplay");
         const username = OPS_STATS.getUsername();
+
+        if (topUserEl) {
+            topUserEl.textContent = username || "Neznamy hrac";
+        }
+
         if (badge) {
-            if (username) {
-                badge.innerHTML = `<span class="ops-user-badge-name">${username}</span> <span style="opacity:0.6;font-size:10px;">[změnit]</span>`;
-                badge.title = "Klikněte pro změnu přezdívky nebo přihlášení na jiném PC";
+            if (!username) {
+                badge.innerHTML = `<span style="color:#fbbf24;">Prihlasit se / Zadat prezdivku</span>`;
+                badge.title = "Kliknete pro prihlaseni nebo registraci";
+            } else if (username.startsWith("Host")) {
+                badge.innerHTML = `<span class="ops-user-badge-name">${username}</span> <span style="opacity:0.6;font-size:10px;">(Host)</span> <span style="color:#38bdf8;font-size:10px;">[prihlasit]</span>`;
+                badge.title = "Hrajete jako host. Kliknete pro prihlaseni nebo registraci.";
+            } else if (!isAuthenticated(username)) {
+                badge.innerHTML = `<span class="ops-user-badge-name">${username}</span> <span style="color:#f87171;font-size:10px;">[neprihlasen]</span>`;
+                badge.title = "Ucet neni v teto relaci overen. Kliknete pro zadani hesla.";
             } else {
-                badge.innerHTML = `<span style="color:#fbbf24;">Zadat přezdívku</span>`;
+                badge.innerHTML = `<span class="ops-user-badge-name">${username}</span> <span style="opacity:0.6;font-size:10px;">[ucet]</span>`;
+                badge.title = "Prihlasen a overen. Kliknete pro spravu profilu.";
             }
+        }
+    }
+
+    async function checkUserAuthRequirement(username, shouldPrompt) {
+        if (!username || username.startsWith("Host")) return;
+        updateCloudSyncBadge("syncing", "Cloud: Kontrola uctu...");
+        const cloudAuth = await fetchUserAuthFromCloud(username);
+
+        if (cloudAuth.error) {
+            const localStats = loadLocalStats();
+            if (localStats.auth && localStats.auth.hash) {
+                cachedAuthData[username] = localStats.auth;
+                if (shouldPrompt) {
+                    showAuthModal({ mode: "login", username: username, allowCancel: false });
+                }
+            } else {
+                if (shouldPrompt) {
+                    showAuthModal({ mode: "set-password", username: username, allowCancel: false });
+                }
+            }
+            updateCloudSyncBadge("error", "Cloud: Offline");
+            return;
+        }
+
+        if (!cloudAuth.exists) {
+            const localStats = loadLocalStats();
+            if (localStats.auth && localStats.auth.hash) {
+                cachedAuthData[username] = localStats.auth;
+                if (shouldPrompt) {
+                    showAuthModal({ mode: "login", username: username, allowCancel: false });
+                }
+            } else {
+                if (shouldPrompt) {
+                    showAuthModal({ mode: "set-password", username: username, allowCancel: false });
+                }
+            }
+            updateCloudSyncBadge("offline", "Cloud: Ceka na heslo");
+            return;
+        }
+
+        if (cloudAuth.hasPassword) {
+            cachedAuthData[username] = cloudAuth.auth;
+            const localStats = loadLocalStats();
+            localStats.auth = cloudAuth.auth;
+            saveLocalStats(localStats);
+
+            updateCloudSyncBadge("offline", "Cloud: Ceka na prihlaseni");
+            if (shouldPrompt) {
+                showAuthModal({ mode: "login", username: username, allowCancel: false });
+            }
+        } else {
+            updateCloudSyncBadge("offline", "Cloud: Nastavte heslo");
+            if (shouldPrompt) {
+                showAuthModal({ mode: "set-password", username: username, allowCancel: false });
+            }
+        }
+    }
+
+    async function handleLoginDirect(username, password) {
+        const clean = (username || "").trim();
+        if (!clean || typeof password !== "string" || password.length === 0) {
+            return { success: false, error: "Zadejte jmeno a heslo." };
+        }
+        try {
+            let auth = cachedAuthData[clean] || null;
+            if (!auth) {
+                const cloud = await fetchUserAuthFromCloud(clean);
+                if (cloud.hasPassword) {
+                    auth = cloud.auth;
+                    cachedAuthData[clean] = auth;
+                }
+            }
+            if (!auth) {
+                const local = loadLocalStats();
+                if (local.auth && local.auth.hash) auth = local.auth;
+            }
+            if (!auth || !auth.hash) {
+                return { success: false, error: "Ucet nema nastavene heslo." };
+            }
+            const match = await verifyPassword(password, auth.salt, auth.hash);
+            if (!match) {
+                return { success: false, error: "Nespravne heslo." };
+            }
+            await executeUserSwitch(clean, auth, false);
+            return { success: true };
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    }
+
+    async function handleRegisterDirect(username, password) {
+        const clean = (username || "").trim();
+        if (!clean || clean.length < 2) return { success: false, error: "Prezdivka musi mit alespon 2 znaky." };
+        if (clean.startsWith("Host_")) return { success: false, error: "Prezdivka nemuze zacinat na Host_." };
+        if (typeof password !== "string" || password.length === 0) return { success: false, error: "Zadejte heslo." };
+
+        try {
+            const cloud = await fetchUserAuthFromCloud(clean);
+            if (cloud.exists && cloud.hasPassword) {
+                const match = await verifyPassword(password, cloud.auth.salt, cloud.auth.hash);
+                if (!match) return { success: false, error: "Ucet jiz existuje a heslo nesouhlasi." };
+                await executeUserSwitch(clean, cloud.auth, false);
+                return { success: true, mode: "login" };
+            }
+            const authData = await hashPassword(password);
+            await executeUserSwitch(clean, authData, true);
+            return { success: true, mode: "register" };
+        } catch (e) {
+            return { success: false, error: e.message };
+        }
+    }
+
+    async function handleSetPasswordDirect(username, password) {
+        const clean = (username || "").trim();
+        if (!clean || clean.startsWith("Host")) return { success: false, error: "Neplatny uzivatel." };
+        if (typeof password !== "string" || password.length === 0) return { success: false, error: "Zadejte heslo." };
+        try {
+            const authData = await hashPassword(password);
+            await executeUserSwitch(clean, authData, true);
+            return { success: true };
+        } catch (e) {
+            return { success: false, error: e.message };
         }
     }
 
@@ -2183,14 +2943,6 @@
         updatePlayerBadgeUI();
 
         const currentUser = OPS_STATS.getUsername();
-        if (!currentUser || currentUser.startsWith("Host") || !isSupabaseConfigured()) {
-            updateCloudSyncBadge("offline");
-        } else {
-            updateCloudSyncBadge("synced");
-            syncFromCloud(currentUser).then(() => {
-                updatePlayerBadgeUI();
-            });
-        }
 
         const isGameOrHub = window.location.pathname.endsWith("games.html") || 
                             window.location.pathname.includes("games.html") || 
@@ -2204,10 +2956,22 @@
                             window.location.pathname.includes("/clicker/") ||
                             window.location.pathname.includes("/kasino/");
 
-        if (isGameOrHub) {
-            const user = OPS_STATS.getUsername();
-            if (!user) {
-                setTimeout(() => showUsernameModal(true), 500);
+        if (!currentUser) {
+            updateCloudSyncBadge("offline");
+            if (isGameOrHub) {
+                setTimeout(() => showAuthModal({ mode: "register", username: "", allowCancel: true }), 400);
+            }
+        } else if (currentUser.startsWith("Host")) {
+            updateCloudSyncBadge("offline", "Cloud: Pouze host");
+        } else {
+            if (isAuthenticated(currentUser)) {
+                updateCloudSyncBadge("synced");
+                syncFromCloud(currentUser).then(() => {
+                    updatePlayerBadgeUI();
+                });
+            } else {
+                updateCloudSyncBadge("offline", "Cloud: Prihlaseni...");
+                checkUserAuthRequirement(currentUser, isGameOrHub);
             }
         }
 
