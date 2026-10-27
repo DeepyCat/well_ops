@@ -534,6 +534,18 @@
   }
 
   function buyWithCookies(cookieCost, gain) {
+    if (window.OPS_STATS && typeof window.OPS_STATS.exchangeCookies === "function") {
+      const res = window.OPS_STATS.exchangeCookies(cookieCost, gain);
+      if (!res.success) {
+        sfx.error();
+        toast(`Nemáš dost sušenek (vidím ${Math.floor(res.available || 0).toLocaleString("cs-CZ")}, potřeba ${cookieCost.toLocaleString("cs-CZ")}).`);
+        return;
+      }
+      sfx.coin();
+      render();
+      toast(`Nakoupeno ${gain.toLocaleString("cs-CZ")} bodů za ${cookieCost.toLocaleString("cs-CZ")} sušenek! Zbývá: ${Math.floor(res.cookies || 0).toLocaleString("cs-CZ")}`);
+      return;
+    }
     const c = readCookies();
     if (c.available < cookieCost) {
       sfx.error();
@@ -657,6 +669,8 @@
     updateMuteBtn();
     if (!sfx.isMuted()) sfx.tick();
   });
+  window.addEventListener("ops:stats-updated", () => { if (!busy) render(); });
+  window.addEventListener("ops:tokens-changed", () => { if (!busy) render(); });
   updateMuteBtn();
 
   render();

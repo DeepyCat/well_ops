@@ -137,7 +137,8 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 </div>
 </div>
 </main><div class="toast" id="toast" role="status"></div>
-<script src="/js/ops-stats.js"></script>
+<script src="../js/ops-stats.js"></script>
+<script>if (!window.OPS_STATS) { document.write('<script src="/js/ops-stats.js"><\/script>'); }</script>
 <script>
 (()=>{'use strict';
 const _secureRng = (() => {
@@ -344,6 +345,12 @@ function refreshSide(){
 }
 function buyCookies(cost,gain){
  if(spinning){toast('Pockej, az se hra dotoci.');return}
+ if(window.OPS_STATS&&typeof window.OPS_STATS.exchangeCookies==='function'){
+  const res=window.OPS_STATS.exchangeCookies(cost,gain);
+  if(!res.success){toast('Nemas dost susenek (potreba '+fmt(cost)+').');return}
+  refreshSide();renderBalance();toast('Nakoupeno '+fmt(gain)+' bodu za '+fmt(cost)+' susenek.');
+  return;
+ }
  const c=readCookies();
  if(c.available<cost){toast('Nemas dost susenek (potreba '+fmt(cost)+').');return}
  const remainingCookies=Math.max(0,c.available-cost);
@@ -407,6 +414,8 @@ $('shopBuy1').addEventListener('click',()=>buyCookies(1000,160));
 $('shopBuy2').addEventListener('click',()=>buyCookies(10000,1600));
 $('lbRefresh').addEventListener('click',loadLeaderboard);
 
+window.addEventListener('ops:stats-updated',()=>{if(!spinning){renderBalance();refreshSide();}});
+window.addEventListener('ops:tokens-changed',()=>{if(!spinning){renderBalance();refreshSide();}});
 drawWheel();updateChoices();renderBalance();refreshSide();renderStats();pullGameStats();loadLeaderboard();
 })();
 </script></body></html>
