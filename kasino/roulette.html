@@ -7,8 +7,12 @@
 <style>
 :root{color-scheme:dark;--bg:#10121a;--panel:#191c27;--line:#34394b;--text:#f5f6fb;--muted:#a4a9bc;--red:#ff5263;--gold:#ffd477;--cyan:#7ff0ff;--green:#5be08a}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#3b1822,#10121a 65%);color:var(--text);font-family:Inter,"Segoe UI",system-ui,sans-serif;min-height:100vh}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px clamp(14px,3vw,34px);background:#141620;border-bottom:1px solid var(--line)}
-.brand{font-weight:950;letter-spacing:.07em}.brand span{color:var(--red)}a{color:var(--text);text-decoration:none}a:hover{color:var(--cyan)}.balance{color:var(--gold);font-weight:800}
+.topbar{height:68px;padding:0 clamp(16px,4vw,52px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff14;background:#10121add;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
+.brand{font-weight:900;letter-spacing:.12em}.brand span{color:var(--red)}
+.top-right{display:flex;align-items:center;gap:10px}
+.mute-btn{background:#ffffff09;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:1rem;color:inherit}.mute-btn:hover{border-color:var(--red)}
+.back{color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:9px 13px;border-radius:10px}.back:hover{color:white;border-color:var(--red)}
+a{color:inherit}
 main{width:min(1280px,94vw);margin:30px auto 70px}.heading{text-align:center;margin:0 0 8px;color:var(--gold);font-size:clamp(2rem,5vw,3.4rem);font-weight:1000;font-style:italic;text-shadow:0 0 24px #ff526344}.sub{text-align:center;color:#e4c7cc;margin:0 auto 24px;max-width:650px}
 .right-col{display:grid;gap:20px;min-width:0;align-items:start}.lb-panel{width:100%}
 .layout{display:grid;grid-template-columns:minmax(320px,.8fr) minmax(0,1.8fr);gap:24px;align-items:start}
@@ -57,7 +61,13 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin:0 
 </style>
 </head>
 <body>
-<header><div class="brand">OPS <span>///</span> RULETA</div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="balance">◆ <b id="balance">—</b> tokenů</span><a href="/kasino/index.html">← Zpět do kasina</a></div></header>
+<header class="topbar">
+  <div class="brand">OPS <span>///</span> RULETA</div>
+  <div class="top-right">
+    <button class="mute-btn" id="muteBtn" type="button" aria-label="Zvuky" title="Ztlumit zvuky">🔊</button>
+    <a class="back" href="index.html">← Zpět na hry</a>
+  </div>
+</header>
 <main>
 <h1 class="heading">EVROPSKÁ RULETA</h1><p class="sub">Jedna nula, 37 polí a tvoje volba. Vyber sázku, zvol tip a roztoč kolo.</p>
 <div class="layout">
@@ -154,13 +164,60 @@ function drawWheel(){
 function stats(){return window.OPS_STATS?window.OPS_STATS.getStats():null}
 function balance(){const s=stats();return s&&s.gacha&&Number.isFinite(Number(s.gacha.tokens))?Math.max(0,Number(s.gacha.tokens)):0}
 function saveBalance(v){const s=stats();if(!s||!window.OPS_STATS)return false;s.gacha=s.gacha||{};s.gacha.tokens=Math.max(0,Math.floor(v));window.OPS_STATS.saveStats(s);renderBalance();return true}
-function renderBalance(){$('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');if($('sideBalance'))$('sideBalance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updatePayout()}
+function renderBalance(){if($('balance'))$('balance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');if($('sideBalance'))$('sideBalance').textContent=Math.floor(balance()).toLocaleString('cs-CZ');updatePayout()}
 function selectedChoice(){return $('choice').value}
 function betType(){return $('betType').value}
 function validBet(){const v=Number($('bet').value);return Number.isSafeInteger(v)&&v>0&&v<=balance()}
 function odds(){return betType()==='number'?36:betType()==='dozen'?3:2}
 function updatePayout(){const b=Number($('bet').value);const o=odds();$('payout').textContent=(Number.isSafeInteger(b)&&b>0?Math.floor(b*o):0).toLocaleString('cs-CZ')+' tokenů celkem';$('payoutNote').textContent=betType()==='number'?'Výhra: 36× sázka (35× čistý zisk).':'Výplata zahrnuje vrácení sázky.';$('spinBtn').disabled=spinning||!validButton()||!window.OPS_STATS}
 function validButton(){return Number.isSafeInteger(Number($('bet').value))&&Number($('bet').value)>0&&Number($('bet').value)<=balance()}
+
+const sfx = (() => {
+  let ctx = null, muted = false;
+  try { muted = localStorage.getItem("ops_gacha_muted") === "1"; } catch (e) {}
+  function ac() {
+    if (muted) return null;
+    try {
+      if (!ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return null; ctx = new AC(); }
+      if (ctx.state === "suspended") ctx.resume();
+      return ctx;
+    } catch (e) { return null; }
+  }
+  function tone(f, t0, dur, type = "sine", vol = .1, f2) {
+    const c = ac(); if (!c) return;
+    const t = c.currentTime + t0, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + .012);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .05);
+  }
+  const arp = (notes, step, type, vol, dur) => notes.forEach((n, i) => tone(n, i * step, dur, type, vol));
+  return {
+    isMuted: () => muted,
+    setMuted(v) { muted = !!v; try { localStorage.setItem("ops_gacha_muted", muted ? "1" : "0"); } catch (e) {} },
+    spin() { arp([300, 380, 480, 600], .05, "triangle", .08, .1); },
+    tick() { tone(850, 0, .03, "square", .03); },
+    win()  { arp([523, 659, 784, 1046], .08, "triangle", .12, .3); },
+    loss() { tone(200, 0, .25, "sawtooth", .06, 120); }
+  };
+})();
+
+function updateMuteBtn() {
+  const b = $("muteBtn");
+  if (!b) return;
+  b.textContent = sfx.isMuted() ? "🔇" : "🔊";
+  b.title = sfx.isMuted() ? "Zapnout zvuky" : "Ztlumit zvuky";
+}
+const mb = $("muteBtn");
+if (mb) {
+  mb.addEventListener("click", () => {
+    sfx.setMuted(!sfx.isMuted());
+    updateMuteBtn();
+  });
+  updateMuteBtn();
+}
 function updateChoices(){
  const type=betType(),sel=$('choice');
  const opts= type==='color'?[['red','Červená'],['black','Černá']]
@@ -187,6 +244,7 @@ function spin(){
  if(spinning||!validBet()){showMessage('Zkontroluj sázku a svůj zůstatek.','loss');return}
  const stake=Number($('bet').value),before=balance();
  if(!saveBalance(before-stake)){showMessage('Nepodařilo se uložit zůstatek.','loss');return}
+ sfx.spin();
  spinning=true;refreshSide();$('spinBtn').disabled=true;$('bet').disabled=true;$('betType').disabled=true;$('choice').disabled=true;
  const index=Math.floor(Math.random()*nums.length),n=nums[index],centerDeg=-90+(index+.5)*360/37;
  const target=(270-centerDeg+360)%360,delta=(target-((rotation%360)+360)%360+360)%360;
@@ -199,8 +257,8 @@ function spin(){
   history.unshift(n);history=history.slice(0,12);renderHistory();
   $('lastResult').textContent=String(n);$('lastResult').style.color=color(n)==='red'?'#ff5263':color(n)==='black'?'#f5f6fb':'#5be08a';
   $('lastResultText').textContent=color(n)==='red'?'Červená':color(n)==='black'?'Černá':'Zelená';
-  if(won)showMessage(`🎉 Padlo ${n} (${color(n)}). Vyhráváš ${returned.toLocaleString('cs-CZ')} tokenů celkem; čistý výsledek ${ (returned-stake).toLocaleString('cs-CZ')} tokenů.`, 'win');
-  else showMessage(`Padlo ${n} (${color(n)}). Sázka ${stake.toLocaleString('cs-CZ')} tokenů propadá.`, 'loss');
+  if(won){sfx.win();showMessage(`Padlo ${n} (${color(n)}). Vyhráváš ${returned.toLocaleString('cs-CZ')} tokenů celkem; čistý výsledek ${ (returned-stake).toLocaleString('cs-CZ')} tokenů.`, 'win');}
+  else{sfx.loss();showMessage(`Padlo ${n} (${color(n)}). Sázka ${stake.toLocaleString('cs-CZ')} tokenů propadá.`, 'loss');}
   spinning=false;refreshSide();$('bet').disabled=false;$('betType').disabled=false;$('choice').disabled=false;updatePayout();
  },5500);
 }
@@ -208,6 +266,7 @@ $('betType').addEventListener('change',updateChoices);$('choice').addEventListen
 
 $('halfBetBtn').addEventListener('click', () => {
   if (spinning) return;
+  sfx.tick();
   const max = Math.floor(balance());
   const half = Math.max(1, Math.floor(max / 2));
   $('bet').value = half;
@@ -215,6 +274,7 @@ $('halfBetBtn').addEventListener('click', () => {
 });
 $('maxBetBtn').addEventListener('click', () => {
   if (spinning) return;
+  sfx.tick();
   $('bet').value = Math.floor(balance());
   updatePayout();
 });
