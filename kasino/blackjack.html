@@ -235,7 +235,8 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
 </main>
 <div class="toast" id="toast" role="status"></div>
 
-<script src="/js/ops-stats.js"></script>
+<script src="../js/ops-stats.js"></script>
+<script>if (!window.OPS_STATS) { document.write('<script src="/js/ops-stats.js"><\/script>'); }</script>
 <script>
 (() => {
   "use strict";
@@ -602,6 +603,18 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
 
   function buyWithCookies(cost, gain) {
     if (busy || phase !== "bet") { toast("Nakupovat můžeš mezi koly."); return; }
+    if (window.OPS_STATS && typeof window.OPS_STATS.exchangeCookies === "function") {
+      const res = window.OPS_STATS.exchangeCookies(cost, gain);
+      if (!res.success) {
+        sfx.error();
+        toast(`Nemáš dost sušenek (vidím ${fmt(res.available || 0)}, potřeba ${fmt(cost)}).`);
+        return;
+      }
+      sfx.chip(); setTimeout(() => sfx.chip(), 90);
+      updateUI();
+      toast(`Nakoupeno ${fmt(gain)} bodů za ${fmt(cost)} sušenek!`);
+      return;
+    }
     const c = readCookies();
     if (c.available < cost) {
       sfx.error();
@@ -840,6 +853,8 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
 
   window.addEventListener("load", () => setTimeout(() => { clampBet(); if (!busy) updateUI(); }, 1200));
   window.addEventListener("focus", () => { if (!busy) { clampBet(); updateUI(); } });
+  window.addEventListener("ops:stats-updated", () => { if (!busy) updateUI(); });
+  window.addEventListener("ops:tokens-changed", () => { if (!busy) updateUI(); });
 
   updateMuteBtn();
   bet = Math.min(160, maxAffordable());

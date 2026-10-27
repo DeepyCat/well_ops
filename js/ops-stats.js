@@ -185,7 +185,7 @@
         meta: {
             totalPlayTime: 0,
             lastPlayedGame: null,
-            lastActive: Date.now()
+            lastActive: 0
         },
         auth: null
     };
@@ -1072,7 +1072,8 @@
                         const cloudTok = Number.isFinite(cloudStats.gacha?.tokens) ? cloudStats.gacha.tokens : 2000;
                         const localTime = Number(local.meta?.lastActive) || 0;
                         const cloudTime = Number(cloudStats.meta?.lastActive) || (rows[0].updated_at ? new Date(rows[0].updated_at).getTime() : 0);
-                        const resolvedTok = (cloudTime > localTime) ? cloudTok : localTok;
+                        const localHasActivity = localTime > 0 && ((local.meta?.totalPlayTime || 0) > 0 || (local.gacha?.totalPulls || 0) > 0 || (local.clicker?.clicks || 0) > 0);
+                        const resolvedTok = (!localHasActivity || cloudTime > localTime) ? cloudTok : localTok;
                         const safeTok = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(resolvedTok)));
                         return {
                             tokens: safeTok,
@@ -1103,6 +1104,12 @@
 
                 saveLocalStats(merged);
                 updateCloudSyncBadge("synced");
+                try {
+                    if (typeof window !== "undefined" && window.dispatchEvent) {
+                        window.dispatchEvent(new CustomEvent("ops:stats-updated", { detail: merged }));
+                        window.dispatchEvent(new CustomEvent("ops:tokens-changed", { detail: { tokens: merged.gacha?.tokens } }));
+                    }
+                } catch (e) {}
                 return merged;
             } else {
                 updateCloudSyncBadge("synced");
@@ -1900,6 +1907,84 @@
                     syncToCloud();
                 }, 4000);
             }
+        },
+
+        addTokens: function(delta) {
+            delta = Math.floor(Number(delta) || 0);
+            const stats = loadLocalStats();
+            stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
+            const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
+            const newTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(curTokens + delta)));
+            stats.gacha.tokens = newTokens;
+            saveLocalStats(stats);
+            if (!syncCloudDebounceTimer) {
+                syncCloudDebounceTimer = setTimeout(() => {
+                    syncCloudDebounceTimer = null;
+                    syncToCloud();
+                }, 3000);
+            }
+            try {
+                if (typeof window !== "undefined" && window.dispatchEvent) {
+                    window.dispatchEvent(new CustomEvent("ops:stats-updated", { detail: stats }));
+                    window.dispatchEvent(new CustomEvent("ops:tokens-changed", { detail: { tokens: newTokens } }));
+                }
+            } catch (e) {}
+            return newTokens;
+        },
+
+        exchangeCookies: function(cost, gain) {
+            cost = Math.max(0, Math.floor(Number(cost) || 0));
+            gain = Math.max(0, Math.floor(Number(gain) || 0));
+
+            let save = null;
+            try {
+                const rawSave = localStorage.getItem("cookieClickerSave");
+                if (rawSave) save = JSON.parse(rawSave);
+            } catch (e) {}
+
+            const stats = loadLocalStats();
+            const saveCookies = (save && Number.isFinite(Number(save.cookies))) ? Math.max(0, Number(save.cookies)) : 0;
+            const statCookies = (stats.clicker && Number.isFinite(Number(stats.clicker.cookies))) ? Math.max(0, Number(stats.clicker.cookies)) : 0;
+            const available = Math.min(Number.MAX_SAFE_INTEGER, Math.max(saveCookies, statCookies));
+
+            if (cost > 0 && available < cost) {
+                return { success: false, available, needed: cost };
+            }
+
+            const remainingCookies = Math.max(0, available - cost);
+
+            if (save) {
+                save.cookies = remainingCookies;
+                try {
+                    localStorage.setItem("cookieClickerSave", JSON.stringify(save));
+                } catch (e) {}
+            }
+
+            stats.clicker = stats.clicker || { ...DEFAULT_STATS.clicker };
+            stats.clicker.cookies = remainingCookies;
+
+            stats.gacha = stats.gacha || { ...DEFAULT_STATS.gacha };
+            const curTokens = Number.isFinite(Number(stats.gacha.tokens)) ? Number(stats.gacha.tokens) : DEFAULT_STATS.gacha.tokens;
+            const newTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(curTokens + gain)));
+            stats.gacha.tokens = newTokens;
+
+            saveLocalStats(stats);
+
+            if (!syncCloudDebounceTimer) {
+                syncCloudDebounceTimer = setTimeout(() => {
+                    syncCloudDebounceTimer = null;
+                    syncToCloud();
+                }, 1500);
+            }
+
+            try {
+                if (typeof window !== "undefined" && window.dispatchEvent) {
+                    window.dispatchEvent(new CustomEvent("ops:stats-updated", { detail: stats }));
+                    window.dispatchEvent(new CustomEvent("ops:tokens-changed", { detail: { tokens: newTokens, cookies: remainingCookies } }));
+                }
+            } catch (e) {}
+
+            return { success: true, tokens: newTokens, cookies: remainingCookies };
         },
 
         recordScore: function(gameId, score, extraData = {}) {

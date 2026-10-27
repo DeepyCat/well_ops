@@ -132,7 +132,8 @@ label{display:block;color:var(--muted);font-size:.9rem;font-weight:700;margin-bo
 </div>
 </div>
 </main><div class="toast" id="toast" role="status"></div>
-<script src="/js/ops-stats.js"></script>
+<script src="../js/ops-stats.js"></script>
+<script>if (!window.OPS_STATS) { document.write('<script src="/js/ops-stats.js"><\/script>'); }</script>
 <script>
 (()=>{'use strict';
 const _secureRng = (() => {
@@ -329,6 +330,12 @@ function refreshSide(){
 }
 function buyCookies(cost,gain){
  if(spinning){toast('Počkej, až se hra dotočí.');return}
+ if(window.OPS_STATS&&typeof window.OPS_STATS.exchangeCookies==='function'){
+  const res=window.OPS_STATS.exchangeCookies(cost,gain);
+  if(!res.success){toast('Nemáš dost sušenek (potřeba '+fmt(cost)+').');return}
+  refreshSide();renderBalance();toast('Nakoupeno '+fmt(gain)+' bodů za '+fmt(cost)+' sušenek.');
+  return;
+ }
  const c=readCookies();
  if(c.available<cost){toast('Nemáš dost sušenek (potřeba '+fmt(cost)+').');return}
  const remainingCookies=Math.max(0,c.available-cost);
@@ -392,6 +399,8 @@ $('shopBuy1').addEventListener('click',()=>buyCookies(1000,160));
 $('shopBuy2').addEventListener('click',()=>buyCookies(10000,1600));
 $('lbRefresh').addEventListener('click',loadLeaderboard);
 
+window.addEventListener('ops:stats-updated',()=>{if(!spinning){renderBalance();refreshSide();}});
+window.addEventListener('ops:tokens-changed',()=>{if(!spinning){renderBalance();refreshSide();}});
 draw();renderBalance();refreshSide();renderStats();pullGameStats();loadLeaderboard();
 })();
 </script></body></html>

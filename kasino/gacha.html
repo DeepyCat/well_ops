@@ -350,7 +350,8 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
 <div class="toast" id="toast" role="status"></div>
 
 <!-- Nejdřív správce statistik, potom gacha logika -->
-<script src="/js/ops-stats.js"></script>
+<script src="../js/ops-stats.js"></script>
+<script>if (!window.OPS_STATS) { document.write('<script src="/js/ops-stats.js"><\/script>'); }</script>
 <script src="gacha.js"></script>
 </body>
 </html>

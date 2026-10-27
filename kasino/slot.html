@@ -31,9 +31,14 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .slot-screen{background:#0a0b10;border:2px solid var(--line);border-radius:16px;padding:16px;box-shadow:inset 0 0 30px #000a;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;position:relative;overflow:hidden}
 .reel-col{background:#121520;border:1px solid #ffffff14;border-radius:10px;height:270px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center}
 .reel-strip{position:absolute;width:100%;display:flex;flex-direction:column;transition:transform .4s cubic-bezier(.15,.85,.25,1)}
-.reel-symbol{height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:2.4rem;user-select:none;border-bottom:1px dashed #ffffff08}
-.reel-symbol small{font-size:.65rem;color:var(--muted);font-weight:700;margin-top:2px}
-.reel-symbol.win-glow{background:#ffd47722;color:var(--gold);text-shadow:0 0 12px var(--gold)}
+.reel-symbol{height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;user-select:none;border-bottom:1px dashed #ffffff08}
+.reel-symbol .sym-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;transition:transform .2s}
+.reel-symbol .sym-icon svg{width:100%;height:100%;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.45))}
+.reel-symbol small{font-size:.68rem;color:var(--muted);font-weight:700;margin-top:4px;letter-spacing:.02em}
+.reel-symbol.win-glow{background:radial-gradient(circle at center,#ffd47733 0,#ffd4770d 70%);border-radius:10px}
+.reel-symbol.win-glow .sym-icon{transform:scale(1.15)}
+.reel-symbol.win-glow .sym-icon svg{filter:drop-shadow(0 0 10px var(--gold)) drop-shadow(0 0 18px #ffd47799)}
+.reel-symbol.win-glow small{color:var(--gold);text-shadow:0 0 8px var(--gold)}
 
 .big-win-overlay{position:fixed;inset:0;z-index:50;background:#080910eb;backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;text-align:center;padding:20px}
 .big-win-overlay.show{display:flex;animation:fade .25s ease}
@@ -71,6 +76,9 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .who button{background:none;border:0;color:var(--red);font-weight:700;padding:0}
 .paytable-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.82rem}
 .paytable-item{background:#ffffff05;border:1px solid #ffffff0d;border-radius:10px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between}
+.paytable-item .pt-label{display:inline-flex;align-items:center;gap:8px;font-weight:700}
+.paytable-item .pt-icon{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px}
+.paytable-item .pt-icon svg{width:100%;height:100%}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat{background:#ffffff06;border:1px solid #ffffff0e;border-radius:12px;padding:11px 12px}
 .stat small{display:block;color:var(--muted);font-size:.72rem;margin-bottom:5px}.stat strong{font-size:1.1rem;font-variant-numeric:tabular-nums}
@@ -141,7 +149,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
           <div class="stat"><small>Toček</small><strong id="stSpins">0</strong></div>
           <div class="stat"><small>Výher</small><strong id="stWins">0</strong></div>
           <div class="stat"><small>Největší výhra</small><strong id="stBiggest">0</strong></div>
-          <div class="stat"><small>Jackpoty [Z]</small><strong id="stJackpots">0</strong></div>
+          <div class="stat"><small>Jackpoty</small><strong id="stJackpots">0</strong></div>
           <div class="stat"><small>Celkem vsazeno</small><strong id="stWagered">0</strong></div>
           <div class="stat"><small>Celkem vyhráno</small><strong id="stWon">0</strong></div>
           <div class="stat wide"><small>Čistý zisk</small><strong id="stNet">0</strong></div>
@@ -192,12 +200,12 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       <div class="panel">
         <h2>Výplatní tabulka (Paytable)</h2>
         <div class="paytable-grid">
-          <div class="paytable-item"><span>[Z] Ředitel (Wild)</span><span>5× = 500×</span></div>
-          <div class="paytable-item"><span>[S] Zvonek</span><span>5× = 200×</span></div>
-          <div class="paytable-item"><span>[A] Kniha</span><span>5× = 100×</span></div>
-          <div class="paytable-item"><span>[B] Tužka</span><span>5× = 50×</span></div>
-          <div class="paytable-item"><span>[C] Jablko</span><span>5× = 20×</span></div>
-          <div class="paytable-item"><span>[D] Známka</span><span>5× = 10×</span></div>
+          <div class="paytable-item"><span class="pt-label"><span class="pt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#ffd477"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><circle cx="12" cy="4" r="1.5" fill="#ffd477"/><circle cx="4" cy="4" r="1.5" fill="#ffd477"/><circle cx="20" cy="4" r="1.5" fill="#ffd477"/><path d="M5 16h14v3a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-3z" fill="#ffd477" fill-opacity="0.25"/></svg></span> Ředitel (Wild)</span><span>5× = 500×</span></div>
+          <div class="paytable-item"><span class="pt-label"><span class="pt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#fbbf24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M12 2v2"/><circle cx="12" cy="11" r="2" fill="#fbbf24" fill-opacity="0.3"/></svg></span> Zvonek</span><span>5× = 200×</span></div>
+          <div class="paytable-item"><span class="pt-label"><span class="pt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#60a5fa"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="6" x2="16" y2="6"/><line x1="12" y1="10" x2="16" y2="10"/></svg></span> Kniha</span><span>5× = 100×</span></div>
+          <div class="paytable-item"><span class="pt-label"><span class="pt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#34d399"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/><path d="M15 5l4 4"/></svg></span> Tužka</span><span>5× = 50×</span></div>
+          <div class="paytable-item"><span class="pt-label"><span class="pt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f87171"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg></span> Jablko</span><span>5× = 20×</span></div>
+          <div class="paytable-item"><span class="pt-label"><span class="pt-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c084fc"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/><polygon points="12 6 13.8 9.8 18 10.4 15 13.4 15.7 17.6 12 15.6 8.3 17.6 9 13.4 6 10.4 10.2 9.8 12 6" fill="#c084fc" fill-opacity="0.3"/></svg></span> Známka</span><span>5× = 10×</span></div>
         </div>
         <p class="notice" style="margin-top:10px">RTP 93.37%. Výherních je 5 pevných linií (střed, horní, dolní a 2 diagonály).</p>
       </div>
@@ -221,7 +229,8 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
 <div class="toast" id="toast" role="status"></div>
 
-<script src="/js/ops-stats.js"></script>
+<script src="../js/ops-stats.js"></script>
+<script>if (!window.OPS_STATS) { document.write('<script src="/js/ops-stats.js"><\/script>'); }</script>
 <script>
 (() => {
   "use strict";
@@ -257,13 +266,22 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   const $ = id => document.getElementById(id);
   const sleep = ms => new Promise(r => setTimeout(r, REDUCE ? Math.min(ms, 30) : ms));
 
+  const ICONS = Object.freeze({
+    "Ředitel": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#ffd477"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><circle cx="12" cy="4" r="1.5" fill="#ffd477"/><circle cx="4" cy="4" r="1.5" fill="#ffd477"/><circle cx="20" cy="4" r="1.5" fill="#ffd477"/><path d="M5 16h14v3a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-3z" fill="#ffd477" fill-opacity="0.25"/></svg>',
+    "Zvonek":  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#fbbf24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M12 2v2"/><circle cx="12" cy="11" r="2" fill="#fbbf24" fill-opacity="0.3"/></svg>',
+    "Kniha":   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#60a5fa"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="12" y1="6" x2="16" y2="6"/><line x1="12" y1="10" x2="16" y2="10"/></svg>',
+    "Tužka":   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#34d399"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/><path d="M15 5l4 4"/></svg>',
+    "Jablko":  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#f87171"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>',
+    "Známka":  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c084fc"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/><polygon points="12 6 13.8 9.8 18 10.4 15 13.4 15.7 17.6 12 15.6 8.3 17.6 9 13.4 6 10.4 10.2 9.8 12 6" fill="#c084fc" fill-opacity="0.3"/></svg>'
+  });
+
   const SYMBOLS = Object.freeze([
-    Object.freeze({ name: "Ředitel", icon: "[Z]", rank: "Z" }),
-    Object.freeze({ name: "Zvonek", icon: "[S]", rank: "S" }),
-    Object.freeze({ name: "Kniha", icon: "[A]", rank: "A" }),
-    Object.freeze({ name: "Tužka", icon: "[B]", rank: "B" }),
-    Object.freeze({ name: "Jablko", icon: "[C]", rank: "C" }),
-    Object.freeze({ name: "Známka", icon: "[D]", rank: "D" })
+    Object.freeze({ name: "Ředitel", icon: ICONS["Ředitel"], rank: "Z" }),
+    Object.freeze({ name: "Zvonek", icon: ICONS["Zvonek"], rank: "S" }),
+    Object.freeze({ name: "Kniha", icon: ICONS["Kniha"], rank: "A" }),
+    Object.freeze({ name: "Tužka", icon: ICONS["Tužka"], rank: "B" }),
+    Object.freeze({ name: "Jablko", icon: ICONS["Jablko"], rank: "C" }),
+    Object.freeze({ name: "Známka", icon: ICONS["Známka"], rank: "D" })
   ]);
   const WEIGHTS = Object.freeze([2, 12, 35, 90, 220, 450]);
   const PAYOUTS = Object.freeze({
@@ -282,23 +300,27 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     Object.freeze([2, 1, 0, 1, 2])
   ]);
 
-  let fallbackTokens = 1600;
+  let fallbackTokens = 2000;
   function getTokens() {
     if (!window.OPS_STATS) return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, fallbackTokens));
     const s = window.OPS_STATS.getStats();
-    const t = s && s.gacha && typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 1600;
+    const t = s && s.gacha && typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 2000;
     return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(t)));
   }
   function addTokens(delta) {
+    if (window.OPS_STATS && typeof window.OPS_STATS.addTokens === "function") {
+      return window.OPS_STATS.addTokens(delta);
+    }
     if (!window.OPS_STATS) {
       fallbackTokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, fallbackTokens + delta));
-      return;
+      return fallbackTokens;
     }
     const s = window.OPS_STATS.getStats();
     s.gacha = s.gacha || {};
-    const cur = typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 1600;
+    const cur = typeof s.gacha.tokens === "number" && Number.isFinite(s.gacha.tokens) ? s.gacha.tokens : 2000;
     s.gacha.tokens = Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.floor(cur + delta)));
     window.OPS_STATS.saveStats(s);
+    return s.gacha.tokens;
   }
 
   const emptyStats = () => ({ spins: 0, wins: 0, biggest: 0, net: 0, jackpots: 0, totalWagered: 0, totalWon: 0 });
@@ -448,7 +470,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         const sym = getRandomSymbol();
         const div = document.createElement("div");
         div.className = "reel-symbol";
-        div.innerHTML = `<span>${sym.icon}</span><small>${sym.name}</small>`;
+        div.innerHTML = `<span class="sym-icon">${sym.icon}</span><small>${sym.name}</small>`;
         div.dataset.symbol = sym.name;
         strip.appendChild(div);
       }
@@ -538,7 +560,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       for (const sym of tempSymbols) {
         const div = document.createElement("div");
         div.className = "reel-symbol";
-        div.innerHTML = `<span>${sym.icon}</span><small>${sym.name}</small>`;
+        div.innerHTML = `<span class="sym-icon">${sym.icon}</span><small>${sym.name}</small>`;
         div.dataset.symbol = sym.name;
         strip.appendChild(div);
       }
@@ -566,7 +588,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
         if (winningSymbolsSet.has(`${c}-${r}`)) {
           div.classList.add("win-glow");
         }
-        div.innerHTML = `<span>${sym.icon}</span><small>${sym.name}</small>`;
+        div.innerHTML = `<span class="sym-icon">${sym.icon}</span><small>${sym.name}</small>`;
         strip.appendChild(div);
       }
     }
@@ -632,6 +654,18 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
   function buyWithCookies(cost, gain) {
     if (busy || autoRunning) { toast("Nyní nelze nakupovat."); return; }
+    if (window.OPS_STATS && typeof window.OPS_STATS.exchangeCookies === "function") {
+      const res = window.OPS_STATS.exchangeCookies(cost, gain);
+      if (!res.success) {
+        sfx.error();
+        toast(`Nemáš dost sušenek (vidím ${fmt(res.available || 0)}, potřeba ${fmt(cost)}).`);
+        return;
+      }
+      sfx.click();
+      updateUI();
+      toast(`Nakoupeno ${fmt(gain)} bodů za ${fmt(cost)} sušenek!`);
+      return;
+    }
     const c = readCookies();
     if (c.available < cost) {
       sfx.error();
@@ -870,6 +904,8 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
   window.addEventListener("load", () => setTimeout(() => { clampBet(); initScreen(); updateUI(); }, 1200));
   window.addEventListener("focus", () => { if (!busy) { clampBet(); updateUI(); } });
+  window.addEventListener("ops:stats-updated", () => { if (!busy) updateUI(); });
+  window.addEventListener("ops:tokens-changed", () => { if (!busy) updateUI(); });
 
   updateMuteBtn();
   initScreen();
