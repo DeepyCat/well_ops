@@ -262,18 +262,25 @@ function spin(){
  spinning=true;refreshSide();$('stake').disabled=true;$('spinBtn').disabled=true;$('result').textContent='Kolo se točí…';$('resultNote').textContent='Drž palce!';
  sfx.spin();
  const index=_secureRng.int(0, segments.length - 1),seg=segments[index],centerDeg=-90+(index+.5)*360/segments.length;
+ const finalSeg=Object.freeze({ ...seg });
+ const finalOutcome=Object.freeze({
+   bet,
+   seg: finalSeg,
+   prize: Math.floor(bet * finalSeg.m),
+   isJackpot: finalSeg.m === 10
+ });
  const target=(270-centerDeg+360)%360,delta=(target-((rotation%360)+360)%360+360)%360;
  rotation+=360*7+delta;canvas.style.transform=`rotate(${rotation}deg)`;
  message('Kolo se roztočilo…');
  setTimeout(()=>{
-  const prize=Math.floor(bet*seg.m);
-  if(prize>0)saveBalance(balance()+prize);else renderBalance();
-  recordRound(bet,prize,seg.m===10);refreshSide();
-  $('result').textContent=seg.label+' '+(seg.m===10?'JACKPOT!':'');
-  $('resultNote').textContent=`Sázka ${bet.toLocaleString('cs-CZ')} · odměna ${prize.toLocaleString('cs-CZ')} tokenů · čistý výsledek ${(prize-bet).toLocaleString('cs-CZ')} tokenů`;
-  if(seg.m===10){sfx.jackpot();message(`Paráda! Padlo ${seg.label}. Získáváš ${prize.toLocaleString('cs-CZ')} tokenů.`, 'win');}
-  else if(seg.m>=1){sfx.win();message(`Padlo ${seg.label}. Připsáno ${prize.toLocaleString('cs-CZ')} tokenů.`, 'win');}
-  else{sfx.loss();message(`Tentokrát padlo ${seg.label}. Sázka propadá. Zkus to znovu, až budeš chtít.`, 'loss');}
+  const o=finalOutcome;
+  if(o.prize>0)saveBalance(balance()+o.prize);else renderBalance();
+  recordRound(o.bet,o.prize,o.isJackpot);refreshSide();
+  $('result').textContent=o.seg.label+' '+(o.isJackpot?'JACKPOT!':'');
+  $('resultNote').textContent=`Sázka ${o.bet.toLocaleString('cs-CZ')} · odměna ${o.prize.toLocaleString('cs-CZ')} tokenů · čistý výsledek ${(o.prize-o.bet).toLocaleString('cs-CZ')} tokenů`;
+  if(o.isJackpot){sfx.jackpot();message(`Paráda! Padlo ${o.seg.label}. Získáváš ${o.prize.toLocaleString('cs-CZ')} tokenů.`, 'win');}
+  else if(o.seg.m>=1){sfx.win();message(`Padlo ${o.seg.label}. Připsáno ${o.prize.toLocaleString('cs-CZ')} tokenů.`, 'win');}
+  else{sfx.loss();message(`Tentokrát padlo ${o.seg.label}. Sázka propadá. Zkus to znovu, až budeš chtít.`, 'loss');}
   spinning=false;refreshSide();$('stake').disabled=false;updateUI();
  },5750);
 }
@@ -296,8 +303,18 @@ $('maxStakeBtn').addEventListener('click', () => {
 
 const STAT_KEY='ops_wheel_stats';
 const emptyStats=()=>({spins:0,wins:0,biggest:0,jackpots:0,totalWagered:0,totalWon:0,net:0});
-function loadGameStats(){try{return {...emptyStats(),...(JSON.parse(localStorage.getItem(STAT_KEY))||{})}}catch(e){return emptyStats()}}
-function saveGameStats(s){try{localStorage.setItem(STAT_KEY,JSON.stringify(s))}catch(e){}}
+function loadGameStats(){
+  if(window.OPS_STATS&&typeof window.OPS_STATS.loadCasinoStats==='function'){
+    return window.OPS_STATS.loadCasinoStats('wheel',emptyStats());
+  }
+  try{return {...emptyStats(),...(JSON.parse(localStorage.getItem(STAT_KEY))||{})}}catch(e){return emptyStats()}
+}
+function saveGameStats(s){
+  if(window.OPS_STATS&&typeof window.OPS_STATS.saveCasinoStats==='function'){
+    return window.OPS_STATS.saveCasinoStats('wheel',s);
+  }
+  try{localStorage.setItem(STAT_KEY,JSON.stringify(s))}catch(e){}
+}
 const fmt=n=>Math.round(Number(n)||0).toLocaleString('cs-CZ');
 const signed=n=>(n>0?'+':n<0?'−':'')+fmt(Math.abs(n));
 function renderStats(){
@@ -357,9 +374,18 @@ async function pushGameStats(){
  const c=cloudCfg(),u=cloudUser();if(!c||!u){setCloudNote('Bez přezdívky se statistiky ukládají jen lokálně.',true);return}
  const st=loadGameStats();
  if(!Number.isFinite(st.spins)||st.spins<0||!Number.isFinite(st.totalWagered)||st.totalWagered<0||!Number.isFinite(st.totalWon)||st.totalWon<0)return;
+ st.net = Math.floor(st.totalWon - st.totalWagered);
+ st.wins = Math.min(st.spins, Math.max(0, st.wins));
+ st.biggest = Math.min(st.totalWon, Math.max(0, st.biggest));
+ if(window.OPS_STATS&&typeof window.OPS_STATS.verifyCasinoStats==='function'){
+   if(!window.OPS_STATS.verifyCasinoStats('wheel',st))return;
+ }
  try{
   const fetchFn=_nativeFetch||fetch;
-  const r=await fetchFn(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}`,{method:'PATCH',headers:{...cloudHeaders(),Prefer:'return=representation'},body:JSON.stringify({wheel:st}),keepalive:true});
+  const payload = { wheel: st };
+  const tok = window.OPS_STATS && window.OPS_STATS.getAuthToken ? window.OPS_STATS.getAuthToken() : null;
+  if (tok) payload.auth_token = tok;
+  const r=await fetchFn(`${c.url}/rest/v1/${c.table}?username=eq.${encodeURIComponent(u)}`,{method:'PATCH',headers:{...cloudHeaders(),Prefer:'return=representation'},body:JSON.stringify(payload),keepalive:true});
   if(!r.ok){setCloudNote(r.status===400||r.status===404?'Cloud: ověř sloupec wheel v Supabase.':`Cloud: uložení selhalo (${r.status}).`,false);return}
   const rows=await r.json();if(!rows.length){setCloudNote('Cloud: uživatelský záznam nebyl nalezen.',false);return}
   setCloudNote('Cloud: statistiky uloženy.',true);loadLeaderboard();
@@ -374,8 +400,21 @@ async function pullGameStats(){
   if(!r.ok){setCloudNote('Cloud: ověř sloupec wheel v Supabase.',false);return}
   const rows=await r.json(),remote=rows[0]&&rows[0].wheel;
   const local=loadGameStats();
-  if(remote&&Number(remote.spins)>local.spins){saveGameStats({...emptyStats(),...remote});renderStats();setCloudNote('Cloud: statistiky načteny.',true)}
-  else if(local.spins>((remote&&Number(remote.spins))||0))pushGameStats();else setCloudNote('Cloud: statistiky jsou synchronizované.',true)
+  if(remote&&Number(remote.spins)>local.spins){
+    const sanitizedRemote = {
+      ...emptyStats(),
+      ...remote,
+      spins: Math.max(0, Math.floor(Number(remote.spins) || 0)),
+      totalWagered: Math.max(0, Math.floor(Number(remote.totalWagered) || 0)),
+      totalWon: Math.max(0, Math.floor(Number(remote.totalWon) || 0))
+    };
+    sanitizedRemote.net = Math.floor(sanitizedRemote.totalWon - sanitizedRemote.totalWagered);
+    sanitizedRemote.wins = Math.min(sanitizedRemote.spins, Math.max(0, Math.floor(Number(remote.wins) || 0)));
+    sanitizedRemote.biggest = Math.min(sanitizedRemote.totalWon, Math.max(0, Math.floor(Number(remote.biggest) || 0)));
+    saveGameStats(sanitizedRemote);
+    renderStats();
+    setCloudNote('Cloud: statistiky načteny.',true);
+  } else if(local.spins>((remote&&Number(remote.spins))||0))pushGameStats();else setCloudNote('Cloud: statistiky jsou synchronizované.',true)
  }catch(e){setCloudNote('Cloud: chyba spojení.',false)}
 }
 async function loadLeaderboard(){

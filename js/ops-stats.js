@@ -477,6 +477,210 @@
                 (h4 >>> 0).toString(16).padStart(8, '0')].join("");
     }
 
+    function computeCasinoSignature(gameName, stats, username, includeUser = false) {
+        const u = username || (typeof OPS_STATS !== "undefined" && OPS_STATS.getUsername ? OPS_STATS.getUsername() : (typeof localStorage !== "undefined" ? localStorage.getItem(STORAGE_KEY_USER) : "")) || "";
+        const salt = getDeviceSalt();
+        const isBlackjack = gameName === "blackjack";
+
+        let msgParts;
+        if (isBlackjack) {
+            const hands = Math.max(0, Math.floor(Number(stats?.hands ?? stats?.spins) || 0));
+            const wins = Math.max(0, Math.floor(Number(stats?.wins) || 0));
+            const losses = Math.max(0, Math.floor(Number(stats?.losses) || 0));
+            const pushes = Math.max(0, Math.floor(Number(stats?.pushes) || 0));
+            const blackjacks = Math.max(0, Math.floor(Number(stats?.blackjacks) || 0));
+            const best = Math.max(0, Math.floor(Number(stats?.best ?? stats?.biggest) || 0));
+            const net = Math.floor(Number(stats?.net) || 0);
+            msgParts = includeUser
+                ? [gameName, u, hands, wins, losses, pushes, blackjacks, best, net, salt, INTEGRITY_PEPPER]
+                : [gameName, hands, wins, losses, pushes, blackjacks, best, net, salt, INTEGRITY_PEPPER];
+        } else {
+            const spins = Math.max(0, Math.floor(Number(stats?.spins) || 0));
+            const totalWagered = Math.max(0, Math.floor(Number(stats?.totalWagered) || 0));
+            const totalWon = Math.max(0, Math.floor(Number(stats?.totalWon) || 0));
+            const net = Math.floor(Number(stats?.net) || 0);
+            const biggest = Math.max(0, Math.floor(Number(stats?.biggest) || 0));
+            const wins = Math.max(0, Math.floor(Number(stats?.wins) || 0));
+            const jackpots = Math.max(0, Math.floor(Number(stats?.jackpots) || 0));
+            msgParts = includeUser
+                ? [gameName, u, spins, totalWagered, totalWon, net, biggest, wins, jackpots, salt, INTEGRITY_PEPPER]
+                : [gameName, spins, totalWagered, totalWon, net, biggest, wins, jackpots, salt, INTEGRITY_PEPPER];
+        }
+
+        const msg = msgParts.join("::");
+
+        let h1 = 0xdeadbeef ^ 0x98765432;
+        let h2 = 0x41c64e6d ^ 0x12344321;
+        let h3 = 0x9e3779b9 ^ 0xfedcba98;
+        let h4 = 0x85ebca6b ^ 0x2468ace0;
+
+        for (let i = 0; i < msg.length; i++) {
+            const c = msg.charCodeAt(i);
+            h1 = Math.imul(h1 ^ c, 0x85ebca6b);
+            h1 = (h1 << 13) | (h1 >>> 19);
+            h2 = Math.imul(h2 ^ (c * 31), 0xc2b2ae35);
+            h2 = (h2 << 17) | (h2 >>> 15);
+            h3 = Math.imul(h3 ^ (c * 17), 0x27d4eb2f);
+            h3 = (h3 << 11) | (h3 >>> 21);
+            h4 = Math.imul(h4 ^ (c * 53), 0x165667b1);
+            h4 = (h4 << 19) | (h4 >>> 13);
+        }
+
+        h1 ^= h2 >>> 16; h1 = Math.imul(h1, 0x85ebca6b); h1 ^= h1 >>> 13;
+        h2 ^= h3 >>> 16; h2 = Math.imul(h2, 0xc2b2ae35); h2 ^= h2 >>> 15;
+        h3 ^= h4 >>> 16; h3 = Math.imul(h3, 0x27d4eb2f); h3 ^= h3 >>> 11;
+        h4 ^= h1 >>> 16; h4 = Math.imul(h4, 0x165667b1); h4 ^= h4 >>> 17;
+
+        return [(h1 >>> 0).toString(16).padStart(8, '0'),
+                (h2 >>> 0).toString(16).padStart(8, '0'),
+                (h3 >>> 0).toString(16).padStart(8, '0'),
+                (h4 >>> 0).toString(16).padStart(8, '0')].join("");
+    }
+
+    function verifyCasinoStats(gameName, stats, username) {
+        if (!stats || typeof stats !== "object") return false;
+        if (typeof stats._sig !== "string" || !stats._sig) return false;
+        const isBlackjack = gameName === "blackjack";
+        if (isBlackjack) {
+            const hands = Math.max(0, Math.floor(Number(stats.hands ?? stats.spins) || 0));
+            const wins = Math.max(0, Math.floor(Number(stats.wins) || 0));
+            const losses = Math.max(0, Math.floor(Number(stats.losses) || 0));
+            const pushes = Math.max(0, Math.floor(Number(stats.pushes) || 0));
+            const blackjacks = Math.max(0, Math.floor(Number(stats.blackjacks) || 0));
+            if (wins > hands || losses > hands || pushes > hands) return false;
+            if (wins + losses + pushes > hands) return false;
+            if (blackjacks > wins) return false;
+        } else {
+            const spins = Math.max(0, Math.floor(Number(stats.spins) || 0));
+            const totalWagered = Math.max(0, Math.floor(Number(stats.totalWagered) || 0));
+            const totalWon = Math.max(0, Math.floor(Number(stats.totalWon) || 0));
+            const net = Math.floor(Number(stats.net) || 0);
+            const wins = Math.max(0, Math.floor(Number(stats.wins) || 0));
+            const biggest = Math.max(0, Math.floor(Number(stats.biggest) || 0));
+            if (net !== Math.floor(totalWon - totalWagered)) return false;
+            if (wins > spins) return false;
+            if (biggest > totalWon) return false;
+        }
+        const currentSig = computeCasinoSignature(gameName, stats);
+        if (stats._sig === currentSig) return true;
+        if (username && stats._sig === computeCasinoSignature(gameName, stats, username, true)) return true;
+        return false;
+    }
+
+    function sanitizeCasinoStats(gameName, stats) {
+        if (!stats || typeof stats !== "object") stats = {};
+        const isBlackjack = gameName === "blackjack";
+        if (isBlackjack) {
+            const hands = Math.max(0, Math.floor(Number(stats.hands ?? stats.spins) || 0));
+            const wins = Math.min(hands, Math.max(0, Math.floor(Number(stats.wins) || 0)));
+            const losses = Math.min(hands, Math.max(0, Math.floor(Number(stats.losses) || 0)));
+            const pushes = Math.min(hands, Math.max(0, Math.floor(Number(stats.pushes) || 0)));
+            const blackjacks = Math.min(wins, Math.max(0, Math.floor(Number(stats.blackjacks) || 0)));
+            const best = Math.max(0, Math.floor(Number(stats.best ?? stats.biggest) || 0));
+            const net = Math.floor(Number(stats.net) || 0);
+            return {
+                ...stats,
+                hands: hands,
+                wins: wins,
+                losses: losses,
+                pushes: pushes,
+                blackjacks: blackjacks,
+                best: best,
+                net: net
+            };
+        } else {
+            const spins = Math.max(0, Math.floor(Number(stats.spins) || 0));
+            const totalWagered = Math.max(0, Math.floor(Number(stats.totalWagered) || 0));
+            const totalWon = Math.max(0, Math.floor(Number(stats.totalWon) || 0));
+            const net = Math.floor(totalWon - totalWagered);
+            const wins = Math.min(spins, Math.max(0, Math.floor(Number(stats.wins) || 0)));
+            const biggest = Math.min(totalWon, Math.max(0, Math.floor(Number(stats.biggest) || 0)));
+            const jackpots = Math.min(wins, Math.max(0, Math.floor(Number(stats.jackpots) || 0)));
+            const sanitized = {
+                ...stats,
+                spins: spins,
+                totalWagered: totalWagered,
+                totalWon: totalWon,
+                net: net,
+                wins: wins,
+                biggest: biggest
+            };
+            if (gameName === "slots") {
+                sanitized.jackpots = jackpots;
+            }
+            return sanitized;
+        }
+    }
+
+    function loadCasinoStats(gameName, defaultStats = {}) {
+        const storageKey = "ops_" + gameName + "_stats";
+        try {
+            if (typeof localStorage === "undefined") return { ...defaultStats };
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return { ...defaultStats };
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== "object") return { ...defaultStats };
+
+            const isBJ = gameName === "blackjack";
+            const activityCount = isBJ ? (Number(parsed.hands) || 0) : (Number(parsed.spins) || 0);
+            const netVal = Number(parsed.net) || 0;
+            const wonVal = isBJ ? (Number(parsed.best) || 0) : (Number(parsed.totalWon) || 0);
+
+            if (parsed._sig) {
+                if (!verifyCasinoStats(gameName, parsed)) {
+                    console.warn(`[OPS Security] Neplatny podpis ${storageKey}! Resetuji manipulovane hodnoty.`);
+                    const resetStats = sanitizeCasinoStats(gameName, { ...defaultStats });
+                    resetStats._sig = computeCasinoSignature(gameName, resetStats);
+                    localStorage.setItem(storageKey, JSON.stringify(resetStats));
+                    return resetStats;
+                }
+                return sanitizeCasinoStats(gameName, parsed);
+            }
+
+            // Unsigned save in localStorage
+            const isInitialized = localStorage.getItem("ops_casino_initialized");
+            if (!isInitialized) {
+                localStorage.setItem("ops_casino_initialized", "true");
+                const sanitizedLegacy = sanitizeCasinoStats(gameName, { ...defaultStats, ...parsed });
+                const plausible = isBJ ? (sanitizedLegacy.hands <= 5000) : (sanitizedLegacy.spins <= 5000 && sanitizedLegacy.totalWon <= 5000000);
+                if (plausible) {
+                    sanitizedLegacy._sig = computeCasinoSignature(gameName, sanitizedLegacy);
+                    localStorage.setItem(storageKey, JSON.stringify(sanitizedLegacy));
+                    return sanitizedLegacy;
+                }
+            }
+
+            if (activityCount > 0 || netVal !== 0 || wonVal > 0) {
+                console.warn(`[OPS Security] Chybejici podpis u modifikovanych hodnot ${storageKey}! Resetuji.`);
+                const resetStats = sanitizeCasinoStats(gameName, { ...defaultStats });
+                resetStats._sig = computeCasinoSignature(gameName, resetStats);
+                localStorage.setItem(storageKey, JSON.stringify(resetStats));
+                return resetStats;
+            }
+
+            const cleanDefault = sanitizeCasinoStats(gameName, { ...defaultStats, ...parsed });
+            cleanDefault._sig = computeCasinoSignature(gameName, cleanDefault);
+            localStorage.setItem(storageKey, JSON.stringify(cleanDefault));
+            return cleanDefault;
+        } catch (e) {
+            return { ...defaultStats };
+        }
+    }
+
+    function saveCasinoStats(gameName, stats) {
+        const storageKey = "ops_" + gameName + "_stats";
+        try {
+            const sanitized = sanitizeCasinoStats(gameName, stats);
+            sanitized._sig = computeCasinoSignature(gameName, sanitized);
+            if (typeof localStorage !== "undefined") {
+                localStorage.setItem(storageKey, JSON.stringify(sanitized));
+            }
+            return sanitized;
+        } catch (e) {
+            return stats;
+        }
+    }
+
     function computeAuthBlind(saltHex, hashHex, updatedAt) {
         const msg = [saltHex, hashHex, updatedAt || 0, AUTH_PEPPER].join("::");
         let h1 = 0x6a09e667, h2 = 0xbb67ae85, h3 = 0x3c6ef372, h4 = 0xa54ff53a;
@@ -505,6 +709,8 @@
         const updatedAt = auth.updatedAt || Date.now();
         const verifier = computeAuthBlind(salt, hash, updatedAt);
         return {
+            algo: auth.algo || "sha256",
+            iterations: auth.iterations || 1,
             blinded: true,
             salt: salt,
             verifier: verifier,
@@ -565,8 +771,11 @@
                     tokensCandidate = DEFAULT_STATS.gacha.tokens;
                 }
             } else if (raw && tokensCandidate !== DEFAULT_STATS.gacha.tokens) {
-                console.warn("[OPS Security] Chybejici podpis stavu v localStorage! Resetuji tokeny na vychozi hodnotu.");
-                tokensCandidate = DEFAULT_STATS.gacha.tokens;
+                const isLegacyActive = (clickerState.totalCookies > 0 || clickerState.cookies > 0 || (parsed.meta?.totalPlayTime || 0) > 0 || (gachaParsed.totalPulls || 0) > 0);
+                if (!isLegacyActive) {
+                    console.warn("[OPS Security] Chybejici podpis stavu v localStorage! Resetuji tokeny na vychozi hodnotu.");
+                    tokensCandidate = DEFAULT_STATS.gacha.tokens;
+                }
             }
 
             lastVerifiedTokens = tokensCandidate;
@@ -645,53 +854,111 @@
     }
 
     // -------------------------------------------------------------------------
-    // PASSWORD HASHING & AUTHENTICATION (Web Crypto API: SHA-256 with Salt)
+    // PASSWORD HASHING & AUTHENTICATION (PBKDF2 100k rounds + Legacy SHA-256 fallback)
     // -------------------------------------------------------------------------
     const cachedAuthData = {};
 
-    async function hashPassword(password, saltHex) {
-        if (!saltHex) {
-            const saltBytes = new Uint8Array(16);
-            _secureRng.getRandomBytes(saltBytes);
-            saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
+    async function hashPasswordLegacy(password, saltHex) {
         const subtle = (typeof window !== "undefined" && window.crypto && window.crypto.subtle)
             ? window.crypto.subtle
             : (typeof crypto !== "undefined" && crypto.subtle ? crypto.subtle : null);
-
-        if (!subtle) {
-            throw new Error("Web Crypto API neni podporovano v tomto prostredi.");
-        }
-
+        if (!subtle) throw new Error("Web Crypto API neni podporovano v tomto prostredi.");
         const encoder = new TextEncoder();
         const data = encoder.encode(saltHex + ":" + password);
         const hashBuffer = await subtle.digest("SHA-256", data);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
+        const updatedAt = Date.now();
         return {
+            algo: "sha256",
+            iterations: 1,
             salt: saltHex,
             hash: hashHex,
-            updatedAt: Date.now()
+            verifier: computeAuthBlind(saltHex, hashHex, updatedAt),
+            updatedAt: updatedAt
         };
+    }
+
+    async function hashPasswordPbkdf2(password, saltHex, iterations = 100000) {
+        if (!saltHex) {
+            const saltBytes = new Uint8Array(16);
+            _secureRng.getRandomBytes(saltBytes);
+            saltHex = Array.from(saltBytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        const subtle = (typeof window !== "undefined" && window.crypto && window.crypto.subtle)
+            ? window.crypto.subtle
+            : (typeof crypto !== "undefined" && crypto.subtle ? crypto.subtle : null);
+        if (!subtle) throw new Error("Web Crypto API neni podporovano v tomto prostredi.");
+
+        const encoder = new TextEncoder();
+        const keyMaterial = await subtle.importKey(
+            "raw",
+            encoder.encode(password),
+            { name: "PBKDF2" },
+            false,
+            ["deriveBits"]
+        );
+        const saltBytes = new Uint8Array(saltHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+        const derivedBits = await subtle.deriveBits(
+            {
+                name: "PBKDF2",
+                salt: saltBytes,
+                iterations: iterations,
+                hash: "SHA-256"
+            },
+            keyMaterial,
+            256
+        );
+        const hashHex = Array.from(new Uint8Array(derivedBits)).map(b => b.toString(16).padStart(2, '0')).join('');
+        const updatedAt = Date.now();
+        return {
+            algo: "pbkdf2",
+            iterations: iterations,
+            salt: saltHex,
+            hash: hashHex,
+            verifier: computeAuthBlind(saltHex, hashHex, updatedAt),
+            updatedAt: updatedAt
+        };
+    }
+
+    async function hashPassword(password, saltHex) {
+        return await hashPasswordPbkdf2(password, saltHex, 100000);
     }
 
     async function verifyPassword(password, saltHex, expectedAuth) {
         if (typeof password !== "string" || password.length === 0) return false;
         if (typeof saltHex !== "string" || !expectedAuth) return false;
         try {
-            const result = await hashPassword(password, saltHex);
+            const isPbkdf2 = expectedAuth && expectedAuth.algo === "pbkdf2";
+            if (isPbkdf2) {
+                const result = await hashPasswordPbkdf2(password, saltHex, expectedAuth.iterations || 100000);
+                if (typeof expectedAuth === "string") {
+                    return result.hash === expectedAuth;
+                }
+                if (typeof expectedAuth === "object") {
+                    if (expectedAuth.verifier) {
+                        const expectedBlind = computeAuthBlind(saltHex, result.hash, expectedAuth.updatedAt || 0);
+                        return expectedBlind === expectedAuth.verifier;
+                    }
+                    if (expectedAuth.hash) {
+                        return result.hash === expectedAuth.hash;
+                    }
+                }
+                return false;
+            }
+
+            // Fallback na starsi jednokolovy SHA-256
+            const legacyRes = await hashPasswordLegacy(password, saltHex);
             if (typeof expectedAuth === "string") {
-                return result.hash === expectedAuth;
+                return legacyRes.hash === expectedAuth;
             }
             if (typeof expectedAuth === "object") {
                 if (expectedAuth.verifier) {
-                    const expectedBlind = computeAuthBlind(saltHex, result.hash, expectedAuth.updatedAt || 0);
-                    return expectedBlind === expectedAuth.verifier;
+                    const expectedBlind = computeAuthBlind(saltHex, legacyRes.hash, expectedAuth.updatedAt || 0);
+                    if (expectedBlind === expectedAuth.verifier) return true;
                 }
-                if (expectedAuth.hash) {
-                    return result.hash === expectedAuth.hash;
+                if (expectedAuth.hash && legacyRes.hash === expectedAuth.hash) {
+                    return true;
                 }
             }
             return false;
@@ -729,13 +996,52 @@
         } catch (e) {}
     }
 
+    let activeAuthToken = null;
+
+    async function deriveAuthToken(password, saltHex) {
+        if (!password || !saltHex) return null;
+        try {
+            const subtle = (typeof window !== "undefined" && window.crypto && window.crypto.subtle)
+                ? window.crypto.subtle
+                : (typeof crypto !== "undefined" && crypto.subtle ? crypto.subtle : null);
+            if (!subtle) return null;
+            const data = new TextEncoder().encode(saltHex + "::" + password + "::OPS_SEC_ROW_TOKEN_2026");
+            const buf = await subtle.digest("SHA-256", data);
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+        } catch (e) {
+            return null;
+        }
+    }
+
     async function fetchUserAuthFromCloud(username) {
         if (!username || !isSupabaseConfigured() || isGuestUsername(username)) {
             return { exists: false, hasPassword: false, auth: null, stats: null, error: false };
         }
+        const fetchFn = _nativeFetch || fetch;
+
+        // 1. Try secure RPC function (which reads from private player_auth table)
         try {
-            const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=username,stats`;
-            const fetchFn = _nativeFetch || fetch;
+            const rpcEndpoint = `${SUPABASE_CONFIG.url}/rest/v1/rpc/get_user_auth`;
+            const rpcRes = await fetchFn(rpcEndpoint, {
+                method: "POST",
+                headers: {
+                    ...getSupabaseHeaders(),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ p_username: username })
+            });
+            if (rpcRes.ok) {
+                const rpcAuth = await rpcRes.json();
+                if (rpcAuth && typeof rpcAuth === "object") {
+                    const hasPassword = !!(rpcAuth.salt && (rpcAuth.hash || rpcAuth.verifier));
+                    return { exists: true, hasPassword, auth: rpcAuth, stats: null, error: false };
+                }
+            }
+        } catch (e) {}
+
+        // 2. Fallback to direct table query
+        try {
+            const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(username)}&select=username,stats->auth`;
             const res = await fetchFn(endpoint, {
                 method: "GET",
                 headers: getSupabaseHeaders()
@@ -749,10 +1055,9 @@
                 return { exists: false, hasPassword: false, auth: null, stats: null, error: false };
             }
             const row = rows[0];
-            const stats = (typeof row.stats === "string") ? JSON.parse(row.stats || "{}") : (row.stats || {});
-            const auth = stats.auth || null;
+            const auth = (row && typeof row.auth === "object") ? row.auth : null;
             const hasPassword = !!(auth && typeof auth.salt === "string" && (typeof auth.hash === "string" || typeof auth.verifier === "string"));
-            return { exists: true, hasPassword, auth, stats, error: false };
+            return { exists: true, hasPassword, auth, stats: null, error: false };
         } catch (err) {
             console.warn("[OPS Auth] Sitova chyba pri ziskavani uzivatele:", err);
             return { exists: null, hasPassword: false, auth: null, stats: null, error: true };
@@ -825,6 +1130,7 @@
         }
         delete statsToUpload._sig;
 
+        const token = (typeof activeAuthToken === "string" && activeAuthToken) ? activeAuthToken : (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("ops_auth_token") : null);
         const payload = {
             username: username,
             updated_at: new Date().toISOString(),
@@ -834,6 +1140,9 @@
             total_play_time: Math.floor(stats.meta?.totalPlayTime || 0),
             stats: statsToUpload
         };
+        if (token) {
+            payload.auth_token = token;
+        }
 
         try {
             const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`;
@@ -1886,6 +2195,21 @@
 
         hashPassword: hashPassword,
         verifyPassword: verifyPassword,
+        deriveAuthToken: deriveAuthToken,
+        getAuthToken: function() {
+            if (activeAuthToken) return activeAuthToken;
+            try {
+                if (typeof sessionStorage !== "undefined") {
+                    return sessionStorage.getItem("ops_auth_token");
+                }
+            } catch (e) {}
+            return null;
+        },
+
+        computeCasinoSignature: computeCasinoSignature,
+        verifyCasinoStats: verifyCasinoStats,
+        loadCasinoStats: loadCasinoStats,
+        saveCasinoStats: saveCasinoStats,
 
         getStats: function() {
             return loadLocalStats();
@@ -2205,7 +2529,8 @@
                 if (orderBy === "clicker_total_cookies") {
                     orderParam = "stats->clicker->totalCookies.desc.nullslast";
                 }
-                const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats&order=${orderParam}&limit=${limit}`;
+                const selectFields = "username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats->clicker,stats->gacha,stats->meta,stats->gd,stats->stratagem,stats->maturita,stats->runner404,stats->hyperdrive,stats->mc";
+                const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=${selectFields}&order=${orderParam}&limit=${limit}`;
                 const fetchFn = _nativeFetch || fetch;
                 const res = await fetchFn(endpoint, {
                     method: "GET",
@@ -2216,12 +2541,26 @@
                 if (Array.isArray(rows)) {
                     for (const r of rows) {
                         if (r) {
-                            if (typeof r.stats === "string") {
-                                try { r.stats = JSON.parse(r.stats); } catch (e) { r.stats = {}; }
-                            }
-                            if (r.stats && r.stats.auth) {
-                                delete r.stats.auth;
-                            }
+                            r.stats = {
+                                clicker: r.clicker || {},
+                                gacha: r.gacha || {},
+                                meta: r.meta || {},
+                                gd: r.gd || {},
+                                stratagem: r.stratagem || {},
+                                maturita: r.maturita || {},
+                                runner404: r.runner404 || {},
+                                hyperdrive: r.hyperdrive || {},
+                                mc: r.mc || {}
+                            };
+                            delete r.clicker;
+                            delete r.gacha;
+                            delete r.meta;
+                            delete r.gd;
+                            delete r.stratagem;
+                            delete r.maturita;
+                            delete r.runner404;
+                            delete r.hyperdrive;
+                            delete r.mc;
                         }
                     }
                 }
@@ -2257,7 +2596,8 @@
 
             try {
                 const fetchFn = _nativeFetch || fetch;
-                let endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(cleanUser)}&select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats`;
+                const selectFields = "username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats->clicker,stats->gacha,stats->meta,stats->gd,stats->stratagem,stats->maturita,stats->runner404,stats->hyperdrive,stats->mc";
+                let endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=eq.${encodeURIComponent(cleanUser)}&select=${selectFields}`;
                 let res = await fetchFn(endpoint, {
                     method: "GET",
                     headers: getSupabaseHeaders()
@@ -2266,7 +2606,7 @@
 
                 if ((!rows || rows.length === 0) && cleanUser.length > 0) {
                     const safePattern = cleanUser.replace(/([%_\\])/g, "\\$1");
-                    endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=ilike.${encodeURIComponent(safePattern)}&select=username,stratagem_highscore,gd_completed_levels,gd_total_jumps,total_play_time,updated_at,stats&limit=1`;
+                    endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?username=ilike.${encodeURIComponent(safePattern)}&select=${selectFields}&limit=1`;
                     res = await fetchFn(endpoint, {
                         method: "GET",
                         headers: getSupabaseHeaders()
@@ -2279,12 +2619,26 @@
                 if (!rows || rows.length === 0) return null;
                 const row = rows[0];
                 if (row) {
-                    if (typeof row.stats === "string") {
-                        try { row.stats = JSON.parse(row.stats); } catch (e) { row.stats = {}; }
-                    }
-                    if (row.stats && row.stats.auth) {
-                        delete row.stats.auth;
-                    }
+                    row.stats = {
+                        clicker: row.clicker || {},
+                        gacha: row.gacha || {},
+                        meta: row.meta || {},
+                        gd: row.gd || {},
+                        stratagem: row.stratagem || {},
+                        maturita: row.maturita || {},
+                        runner404: row.runner404 || {},
+                        hyperdrive: row.hyperdrive || {},
+                        mc: row.mc || {}
+                    };
+                    delete row.clicker;
+                    delete row.gacha;
+                    delete row.meta;
+                    delete row.gd;
+                    delete row.stratagem;
+                    delete row.maturita;
+                    delete row.runner404;
+                    delete row.hyperdrive;
+                    delete row.mc;
                 }
                 return row;
             } catch (e) {
@@ -2898,7 +3252,12 @@
                     return;
                 }
 
-                await executeUserSwitch(username, auth, false);
+                if (auth.algo !== "pbkdf2") {
+                    const upgraded = await hashPassword(pass);
+                    await executeUserSwitch(username, upgraded, true, pass);
+                } else {
+                    await executeUserSwitch(username, auth, false, pass);
+                }
                 saveBtn.disabled = false;
                 saveBtn.textContent = originalText;
                 closeModal();
@@ -2931,7 +3290,7 @@
 
             try {
                 const authData = await hashPassword(pass);
-                await executeUserSwitch(username, authData, true);
+                await executeUserSwitch(username, authData, true, pass);
                 saveBtn.disabled = false;
                 saveBtn.textContent = originalText;
                 closeModal();
@@ -2980,7 +3339,12 @@
                         saveBtn.textContent = originalText;
                         return;
                     }
-                    await executeUserSwitch(username, cloud.auth, false);
+                    if (cloud.auth.algo !== "pbkdf2") {
+                        const upgraded = await hashPassword(pass);
+                        await executeUserSwitch(username, upgraded, true, pass);
+                    } else {
+                        await executeUserSwitch(username, cloud.auth, false, pass);
+                    }
                     saveBtn.disabled = false;
                     saveBtn.textContent = originalText;
                     closeModal();
@@ -2989,7 +3353,7 @@
 
                 if (cloud.exists && !cloud.hasPassword) {
                     const authData = await hashPassword(pass);
-                    await executeUserSwitch(username, authData, true);
+                    await executeUserSwitch(username, authData, true, pass);
                     saveBtn.disabled = false;
                     saveBtn.textContent = originalText;
                     closeModal();
@@ -2997,7 +3361,7 @@
                 }
 
                 const authData = await hashPassword(pass);
-                await executeUserSwitch(username, authData, true);
+                await executeUserSwitch(username, authData, true, pass);
                 saveBtn.disabled = false;
                 saveBtn.textContent = originalText;
                 closeModal();
@@ -3012,9 +3376,16 @@
         }
     }
 
-    async function executeUserSwitch(username, authData, isNewOrSetPassword) {
+    async function executeUserSwitch(username, authData, isNewOrSetPassword, plainPassword = null) {
         const oldUser = OPS_STATS.getUsername();
         const isChanged = oldUser !== username;
+
+        if (authData && authData.salt && plainPassword) {
+            activeAuthToken = await deriveAuthToken(plainPassword, authData.salt);
+            if (typeof sessionStorage !== "undefined" && activeAuthToken) {
+                sessionStorage.setItem("ops_auth_token", activeAuthToken);
+            }
+        }
 
         if (isChanged && oldUser && !isGuestUsername(oldUser)) {
             try {
@@ -3041,6 +3412,14 @@
 
         if (isSupabaseConfigured() && !isGuestUsername(username)) {
             try {
+                if (authData && activeAuthToken) {
+                    const fetchFn = _nativeFetch || fetch;
+                    fetchFn(`${SUPABASE_CONFIG.url}/rest/v1/rpc/save_user_auth`, {
+                        method: "POST",
+                        headers: { ...getSupabaseHeaders(), "Content-Type": "application/json" },
+                        body: JSON.stringify({ p_username: username, p_auth: authData, p_auth_token: activeAuthToken })
+                    }).catch(() => {});
+                }
                 await syncFromCloud(username);
                 if (authData) {
                     stats = loadLocalStats();
@@ -3096,6 +3475,10 @@
             } catch (e) {}
         }
         clearSessionAuthenticated();
+        activeAuthToken = null;
+        if (typeof sessionStorage !== "undefined") {
+            try { sessionStorage.removeItem("ops_auth_token"); } catch (e) {}
+        }
         if (syncCloudDebounceTimer) {
             clearTimeout(syncCloudDebounceTimer);
             syncCloudDebounceTimer = null;
@@ -3224,7 +3607,12 @@
             if (!match) {
                 return { success: false, error: "Nespravne heslo." };
             }
-            await executeUserSwitch(clean, auth, false);
+            if (auth.algo !== "pbkdf2") {
+                const upgraded = await hashPassword(password);
+                await executeUserSwitch(clean, upgraded, true, password);
+                return { success: true };
+            }
+            await executeUserSwitch(clean, auth, false, password);
             return { success: true };
         } catch (e) {
             return { success: false, error: e.message };
@@ -3242,11 +3630,16 @@
             if (cloud.exists && cloud.hasPassword) {
                 const match = await verifyPassword(password, cloud.auth.salt, cloud.auth);
                 if (!match) return { success: false, error: "Ucet jiz existuje a heslo nesouhlasi." };
-                await executeUserSwitch(clean, cloud.auth, false);
+                if (cloud.auth.algo !== "pbkdf2") {
+                    const upgraded = await hashPassword(password);
+                    await executeUserSwitch(clean, upgraded, true, password);
+                } else {
+                    await executeUserSwitch(clean, cloud.auth, false, password);
+                }
                 return { success: true, mode: "login" };
             }
             const authData = await hashPassword(password);
-            await executeUserSwitch(clean, authData, true);
+            await executeUserSwitch(clean, authData, true, password);
             return { success: true, mode: "register" };
         } catch (e) {
             return { success: false, error: e.message };
@@ -3259,7 +3652,7 @@
         if (typeof password !== "string" || password.length === 0) return { success: false, error: "Zadejte heslo." };
         try {
             const authData = await hashPassword(password);
-            await executeUserSwitch(clean, authData, true);
+            await executeUserSwitch(clean, authData, true, password);
             return { success: true };
         } catch (e) {
             return { success: false, error: e.message };

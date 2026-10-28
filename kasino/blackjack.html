@@ -295,10 +295,18 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
   /* ---------- statistiky ---------- */
   const emptyStats = () => ({hands:0, wins:0, losses:0, pushes:0, blackjacks:0, best:0, net:0});
   function loadStats() {
+    if (window.OPS_STATS && typeof window.OPS_STATS.loadCasinoStats === "function") {
+      return window.OPS_STATS.loadCasinoStats("blackjack", emptyStats());
+    }
     try { return { ...emptyStats(), ...(JSON.parse(localStorage.getItem(STATS_KEY)) || {}) }; }
     catch (e) { return emptyStats(); }
   }
-  function saveStats(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {} }
+  function saveStats(st) {
+    if (window.OPS_STATS && typeof window.OPS_STATS.saveCasinoStats === "function") {
+      return window.OPS_STATS.saveCasinoStats("blackjack", st);
+    }
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {}
+  }
 
   /* ---------- zvuky ---------- */
   const sfx = (() => {
@@ -667,13 +675,23 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
     const cfg = cloudCfg(), user = cloudUser();
     if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen v tomto prohlížeči.", true); return; }
     const st = loadStats();
-    if (!Number.isFinite(st.hands) || st.hands < 0 || !Number.isFinite(st.net)) return;
+    if (!Number.isFinite(st.hands) || st.hands < 0) return;
+    st.wins = Math.min(st.hands, Math.max(0, Math.floor(Number(st.wins) || 0)));
+    st.losses = Math.min(st.hands, Math.max(0, Math.floor(Number(st.losses) || 0)));
+    st.pushes = Math.min(st.hands, Math.max(0, Math.floor(Number(st.pushes) || 0)));
+    st.blackjacks = Math.min(st.wins, Math.max(0, Math.floor(Number(st.blackjacks) || 0)));
+    if (window.OPS_STATS && typeof window.OPS_STATS.verifyCasinoStats === "function") {
+      if (!window.OPS_STATS.verifyCasinoStats("blackjack", st)) return;
+    }
     try {
       const fetchFn = _nativeFetch || fetch;
+      const payload = { blackjack: st };
+      const tok = window.OPS_STATS && window.OPS_STATS.getAuthToken ? window.OPS_STATS.getAuthToken() : null;
+      if (tok) payload.auth_token = tok;
       const res = await fetchFn(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}`, {
         method: "PATCH",
         headers: cloudHeaders({ Prefer: "return=representation" }),
-        body: JSON.stringify({ blackjack: st }),
+        body: JSON.stringify(payload),
         keepalive: true
       });
       if (!res.ok) {
@@ -711,7 +729,16 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
       const remote = rows[0] && rows[0].blackjack && typeof rows[0].blackjack === "object" ? rows[0].blackjack : null;
       const local = loadStats();
       if (remote && (Number(remote.hands) || 0) > local.hands) {
-        saveStats({ ...emptyStats(), ...remote });
+        const sanitizedRemote = {
+          ...emptyStats(),
+          ...remote,
+          hands: Math.max(0, Math.floor(Number(remote.hands) || 0)),
+          wins: Math.min(Number(remote.hands) || 0, Math.max(0, Math.floor(Number(remote.wins) || 0))),
+          losses: Math.min(Number(remote.hands) || 0, Math.max(0, Math.floor(Number(remote.losses) || 0))),
+          pushes: Math.min(Number(remote.hands) || 0, Math.max(0, Math.floor(Number(remote.pushes) || 0))),
+          blackjacks: Math.min(Number(remote.wins) || 0, Math.max(0, Math.floor(Number(remote.blackjacks) || 0)))
+        };
+        saveStats(sanitizedRemote);
         renderStats();
         setCloudNote("Cloud: statistiky načteny.", true);
       } else if (local.hands > ((remote && Number(remote.hands)) || 0)) {
@@ -774,8 +801,9 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
       if (raw === "") {
         bet = 0;
       } else {
-        let val = parseInt(raw, 10);
-        if (isNaN(val) || val < 0) val = 0;
+        const clean = raw.replace(/[\s_]/g, "").replace(/^\+/, "");
+        let val = Math.floor(Number(clean));
+        if (isNaN(val) || !isFinite(val) || val < 0) val = 0;
         const max = maxAffordable();
         if (val > max) {
           val = max;
@@ -791,8 +819,9 @@ kbd{font:inherit;font-size:.72rem;opacity:.7;margin-left:6px;border:1px solid cu
       if (busy || phase !== "bet") return;
       const raw = customBetInput.value.trim();
       if (raw !== "") {
-        let val = parseInt(raw, 10);
-        if (isNaN(val) || val < MIN_BET) {
+        const clean = raw.replace(/[\s_]/g, "").replace(/^\+/, "");
+        let val = Math.floor(Number(clean));
+        if (isNaN(val) || !isFinite(val) || val < MIN_BET) {
           if (maxAffordable() >= MIN_BET) {
             toast(`Minimální sázka je ${MIN_BET} bodů.`);
             bet = MIN_BET;
