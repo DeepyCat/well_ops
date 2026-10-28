@@ -325,10 +325,18 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
   const emptyStats = () => ({ spins: 0, wins: 0, biggest: 0, net: 0, jackpots: 0, totalWagered: 0, totalWon: 0 });
   function loadStats() {
+    if (window.OPS_STATS && typeof window.OPS_STATS.loadCasinoStats === "function") {
+      return window.OPS_STATS.loadCasinoStats("slots", emptyStats());
+    }
     try { return { ...emptyStats(), ...(JSON.parse(localStorage.getItem(STATS_KEY)) || {}) }; }
     catch (e) { return emptyStats(); }
   }
-  function saveStats(st) { try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {} }
+  function saveStats(st) {
+    if (window.OPS_STATS && typeof window.OPS_STATS.saveCasinoStats === "function") {
+      return window.OPS_STATS.saveCasinoStats("slots", st);
+    }
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(st)); } catch (e) {}
+  }
 
   const sfx = (() => {
     let ctx = null, muted = false;
@@ -718,12 +726,21 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
     if (!cfg || !user) { setCloudNote("Bez přezdívky se statistiky ukládají jen lokálně.", true); return; }
     const st = loadStats();
     if (!Number.isFinite(st.spins) || st.spins < 0 || !Number.isFinite(st.totalWagered) || st.totalWagered < 0 || !Number.isFinite(st.totalWon) || st.totalWon < 0) return;
+    st.net = Math.floor(st.totalWon - st.totalWagered);
+    st.wins = Math.min(st.spins, Math.max(0, st.wins));
+    st.biggest = Math.min(st.totalWon, Math.max(0, st.biggest));
+    if (window.OPS_STATS && typeof window.OPS_STATS.verifyCasinoStats === "function") {
+      if (!window.OPS_STATS.verifyCasinoStats("slots", st)) return;
+    }
     try {
       const fetchFn = _nativeFetch || fetch;
+      const payload = { slots: st };
+      const tok = window.OPS_STATS && window.OPS_STATS.getAuthToken ? window.OPS_STATS.getAuthToken() : null;
+      if (tok) payload.auth_token = tok;
       const res = await fetchFn(`${cfg.url}/rest/v1/${cfg.table}?username=eq.${encodeURIComponent(user)}`, {
         method: "PATCH",
         headers: cloudHeaders({ Prefer: "return=representation" }),
-        body: JSON.stringify({ slots: st }),
+        body: JSON.stringify(payload),
         keepalive: true
       });
       if (!res.ok) {
@@ -761,7 +778,17 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       const remote = rows[0] && rows[0].slots && typeof rows[0].slots === "object" ? rows[0].slots : null;
       const local = loadStats();
       if (remote && (Number(remote.spins) || 0) > local.spins) {
-        saveStats({ ...emptyStats(), ...remote });
+        const sanitizedRemote = {
+          ...emptyStats(),
+          ...remote,
+          spins: Math.max(0, Math.floor(Number(remote.spins) || 0)),
+          totalWagered: Math.max(0, Math.floor(Number(remote.totalWagered) || 0)),
+          totalWon: Math.max(0, Math.floor(Number(remote.totalWon) || 0))
+        };
+        sanitizedRemote.net = Math.floor(sanitizedRemote.totalWon - sanitizedRemote.totalWagered);
+        sanitizedRemote.wins = Math.min(sanitizedRemote.spins, Math.max(0, Math.floor(Number(remote.wins) || 0)));
+        sanitizedRemote.biggest = Math.min(sanitizedRemote.totalWon, Math.max(0, Math.floor(Number(remote.biggest) || 0)));
+        saveStats(sanitizedRemote);
         renderStats();
         setCloudNote("Cloud: statistiky načteny.", true);
       } else if (local.spins > ((remote && Number(remote.spins)) || 0)) {
@@ -833,8 +860,9 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       if (raw === "") {
         bet = MIN_BET;
       } else {
-        let val = parseInt(raw, 10);
-        if (isNaN(val) || val < 1) val = MIN_BET;
+        const clean = raw.replace(/[\s_]/g, "").replace(/^\+/, "");
+        let val = Math.floor(Number(clean));
+        if (isNaN(val) || !isFinite(val) || val < 1) val = MIN_BET;
         const max = maxAffordable();
         if (max >= MIN_BET && val > max) {
           val = max;
@@ -848,9 +876,11 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
     customBetInput.addEventListener("change", () => {
       if (busy || autoRunning) return;
-      let val = parseInt(customBetInput.value, 10);
+      const raw = customBetInput.value.trim();
+      const clean = raw.replace(/[\s_]/g, "").replace(/^\+/, "");
+      let val = Math.floor(Number(clean));
       const max = maxAffordable();
-      if (isNaN(val) || val < MIN_BET) {
+      if (isNaN(val) || !isFinite(val) || val < MIN_BET) {
         toast(`Minimální sázka je ${MIN_BET} bodů.`);
         bet = MIN_BET;
       } else if (max >= MIN_BET && val > max) {
