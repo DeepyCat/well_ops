@@ -104,6 +104,41 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 .toast.show{display:block}
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
 @media(max-width:560px){.machine-table{padding:14px}.reel-col{height:210px}.reel-symbol{height:70px;font-size:1.8rem}}
+
+/* ===== Tutoriál (tut-) ===== */
+#tutRoot[hidden],.tut-ask[hidden],.tut-dialog[hidden]{display:none}
+.tut-block{position:fixed;inset:0;z-index:9990}
+.tut-spot{position:fixed;z-index:9991;pointer-events:none;border-radius:14px;box-shadow:0 0 0 9999px rgba(6,3,9,.8),0 0 0 3px var(--gold),0 0 26px #ffd47799;transition:left .35s,top .35s,width .35s,height .35s}
+.tut-spot.tut-none{box-shadow:0 0 0 9999px rgba(6,3,9,.8);border-radius:0}
+.tut-ask,.tut-dialog{position:fixed;z-index:9992;color:var(--text)}
+.tut-ask{left:50%;top:50%;transform:translate(-50%,-50%);width:min(440px,92vw);padding:26px 24px 22px;text-align:center;background:linear-gradient(#1d1522,#140f19);border:1px solid var(--gold);border-radius:18px;box-shadow:0 20px 60px #000a,0 0 30px #ffd47733}
+.tut-ask img{height:120px;width:auto;margin:-80px auto 6px;display:block;filter:drop-shadow(0 8px 14px #000a)}
+.tut-ask h3{margin:0 0 6px;font-size:1.35rem;color:var(--gold)}
+.tut-ask p{margin:0 0 18px;color:var(--muted);font-size:.95rem;line-height:1.5}
+.tut-btns{display:flex;gap:10px;justify-content:center}
+.tut-btn{border:1px solid #ffffff2e;background:#262030;color:var(--text);padding:10px 22px;border-radius:10px;font-weight:700;font-size:.95rem;font-family:inherit;cursor:pointer;transition:transform .15s,background .15s}
+.tut-btn:hover{transform:translateY(-1px);background:#32293e}
+.tut-btn.tut-primary{background:linear-gradient(135deg,#ffd477,#f0a640);color:#2a1604;border-color:#ffd477}
+.tut-btn.tut-primary:hover{background:linear-gradient(135deg,#ffe090,#f5b155)}
+.tut-btn.tut-ghost{background:transparent;color:var(--muted)}
+.tut-dialog{left:50%;bottom:0;transform:translateX(-50%);width:min(860px,100%);display:flex;align-items:flex-end;gap:10px;padding:0 14px calc(14px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.tut-dialog>*{pointer-events:auto}
+.tut-char{flex:0 0 auto;height:clamp(150px,26vh,250px);width:auto;max-width:42vw;object-fit:contain;filter:drop-shadow(0 10px 16px #000b);animation:tutIn .35s ease-out}
+.tut-char.tut-flip{scale:-1 1}
+@keyframes tutIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.tut-bubble{position:relative;flex:1;min-width:0;max-height:calc(100vh - 28px);overflow:auto;margin-bottom:14px;padding:16px 18px 14px;background:linear-gradient(#1d1522f2,#140f19f2);border:1px solid var(--gold);border-radius:16px;box-shadow:0 12px 40px #000a}
+.tut-bubble:before{content:"";position:absolute;left:-9px;bottom:34px;width:16px;height:16px;background:#1b1420;border-left:1px solid var(--gold);border-bottom:1px solid var(--gold);transform:rotate(45deg)}
+.tut-title{margin:0 0 6px;font-size:1.1rem;font-weight:900;color:var(--gold)}
+.tut-text{margin:0;font-size:.95rem;line-height:1.55;color:#ece8f2}
+.tut-text b{color:var(--gold)}
+.tut-foot{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tut-dots{display:flex;gap:6px;margin-right:auto}
+.tut-dots i{width:8px;height:8px;border-radius:50%;background:#ffffff2e}
+.tut-dots i.tut-on{background:var(--gold)}
+.tut-foot .tut-btn{padding:8px 16px;font-size:.86rem}
+@media(max-width:560px){.tut-dialog{gap:0;padding:0 8px calc(8px + env(safe-area-inset-bottom,0px))}.tut-char{height:120px;max-width:34vw}.tut-bubble{padding:13px 14px 12px}.tut-text{font-size:.88rem;line-height:1.5}.tut-title{font-size:1rem}.tut-bubble:before{bottom:26px}.tut-foot .tut-btn{padding:8px 12px}.tut-ask{padding:24px 18px 18px}}
+@media(max-width:380px){.tut-dots{flex-basis:100%;margin-bottom:2px}}
+@media(prefers-reduced-motion:reduce){.tut-char{animation:none}.tut-spot{transition:none}.tut-btn{transition:none}}
 </style>
 </head>
 <body>
@@ -944,6 +979,156 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
   renderStats();
   pullStats();
   loadLeaderboard();
+})();
+</script>
+<div id="tutRoot" hidden>
+  <div class="tut-block"></div>
+  <div class="tut-spot tut-none" id="tutSpot"></div>
+  <div class="tut-ask" id="tutAsk" role="dialog" aria-modal="true" aria-labelledby="tutAskTitle">
+    <img src="img/think.png" alt="">
+    <h3 id="tutAskTitle">Chceš tutoriál?</h3>
+    <p>Rychle ti vysvětlím, jak funguje Výherní automat, jak se skládají výhry a k čemu je Turbo a Auto-spin. Zabere to asi minutu a potom už se ti nezobrazí.</p>
+    <div class="tut-btns"><button type="button" class="tut-btn tut-ghost" id="tutNo">Ne, díky</button><button type="button" class="tut-btn tut-primary" id="tutYes">Jo, ukaž</button></div>
+  </div>
+  <div class="tut-dialog" id="tutDialog" role="dialog" aria-modal="true" aria-live="polite" aria-labelledby="tutTitle" hidden>
+    <img class="tut-char" id="tutChar" src="img/show.png" alt="">
+    <div class="tut-bubble">
+      <div class="tut-title" id="tutTitle"></div>
+      <p class="tut-text" id="tutText"></p>
+      <div class="tut-foot">
+        <div class="tut-dots" id="tutDots"></div>
+        <button type="button" class="tut-btn tut-ghost" id="tutSkip">Přeskočit</button>
+        <button type="button" class="tut-btn" id="tutBack">Zpět</button>
+        <button type="button" class="tut-btn tut-primary" id="tutNext">Další</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  'use strict';
+  const KEY = 'cpasino_tutorial_slot';   // 'declined' | 'done'
+  const root = document.getElementById('tutRoot');
+  if (!root) return;
+  const get = () => { try { return localStorage.getItem(KEY); } catch (e) { return 'unavailable'; } };
+  const set = v => { try { localStorage.setItem(KEY, v); } catch (e) {} };
+  if (get()) { root.remove(); return; }       // už jsme se ptali, proběhl, nebo je localStorage zablokovaný
+
+  try {
+    // target = selektor nebo pole selektorů (zvýrazní se jejich společná plocha),
+    // closest = zvýrazní se nejbližší rodič, např. celý panel nebo celá zóna na stole
+    const STEPS = [
+      { img: 'show', title: 'Vítej u Výherního automatu!', text: 'Toč válci se školními symboly, skládej výherní linie a sbírej body. Ukážu ti, jak se vyhrává a co všechno tu můžeš ovládat.' },
+      { img: 'show', title: 'Jak se vyhrává', target: '.slot-screen', text: 'Automat má <b>5 válců a 3 řádky</b> a hrají se <b>5 pevných linií</b> (střed, horní, dolní a dvě diagonály). Výhra vznikne, když jsou na lince <b>aspoň 3 stejné symboly za sebou zleva doprava</b>. Symbol <b>Ředitel</b> je <b>wild</b> a nahradí ostatní.' },
+      { img: 'point', title: 'Body a obchod', target: ['.currency', '.shop'], closest: '.panel', text: 'Hraješ o <b>školní body</b>, které se sdílí s ostatními hrami. Došly ti? Kup další za sušenky z Clickeru: <b>1 000 sušenek = 160 bodů</b>, <b>10 000 = 1 600 bodů</b>. Nakupovat jde jen mezi točeními.' },
+      { img: 'point', title: 'Nastav sázku', target: '.control-row', text: 'Žetony <b>10, 50, 160, 500 a 1600</b> nastaví sázku přesně na tu částku (nepřičítají se). Dál tu máš <b>1/2</b>, <b>Vsadit vše</b>, <b>Vymazat</b> (vrátí minimum 10) a políčko pro <b>vlastní</b> sázku. Sázka se rozdělí rovným dílem mezi 5 linií.' },
+      { img: 'point', title: 'Toč!', target: '#spinBtn', text: 'Klikni na <b>TOČIT</b> nebo stiskni <b>mezerník</b>. Sázka se odečte, válce se zastaví a výhry se přičtou. Výhra každé linie je násobek její pětiny sázky podle výplatní tabulky.' },
+      { img: 'point', title: 'Turbo a Auto-spin', target: '.toggles', text: '<b>Turbo</b> zrychlí točení. <b>Auto-spin</b> zatočí až 25× za sebou a sám se zastaví při velké výhře, při nedostatku bodů nebo když ho zastavíš tlačítkem.' },
+      { img: 'point', title: 'Výplatní tabulka', target: '.paytable-grid', closest: '.panel', text: 'Čím vzácnější symbol, tím víc platí, nejvíc <b>Ředitel</b>, pak Zvonek, Kniha, Tužka, Jablko a Známka. Víc stejných symbolů za sebou (3, 4 nebo 5) znamená vyšší výhru. Přesné násobky najdeš v tabulce.' },
+      { img: 'point', title: 'Tvoje statistiky', target: '.stats', closest: '.panel', text: 'Počítá se počet toček, výhry, největší výhra, jackpoty, celkem vsazeno a vyhráno a <b>čistý zisk</b>. S přezdívkou se ukládají i do cloudu.' },
+      { img: 'think', title: 'Žebříček a rada na závěr', target: '.lb-panel', text: 'Dole je žebříček deseti hráčů s nejvyšším čistým ziskem na automatu. Hraje se jen o školní body, tak hraj s rozumem, nevsázej všechno najednou a hlavně se u toho bav.' }
+    ];
+
+    const $ = id => document.getElementById(id);
+    const spot = $('tutSpot'), ask = $('tutAsk'), dlg = $('tutDialog'), ch = $('tutChar');
+    let i = 0, active = false;
+    const prevPad = document.body.style.paddingBottom;   // odsazení dole se po tutoriálu vrátí zpět
+
+    ['point', 'show', 'think'].forEach(n => { new Image().src = 'img/' + n + '.png'; });
+    root.hidden = false;
+
+    // společná plocha všech nalezených a viditelných prvků kroku (nebo null)
+    function rectOf(st) {
+      const list = [].concat(st.target || []);
+      let L = 1e9, T = 1e9, R = -1e9, B = -1e9, n = 0;
+      list.forEach(sel => {
+        let el = document.querySelector(sel);
+        if (el && st.closest) el = el.closest(st.closest);
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        if (!r.width && !r.height) return;
+        L = Math.min(L, r.left); T = Math.min(T, r.top); R = Math.max(R, r.right); B = Math.max(B, r.bottom); n++;
+      });
+      return n ? { left: L, top: T, right: R, bottom: B, width: R - L, height: B - T } : null;
+    }
+    // horní lišta je sticky, cíl se nesmí schovat pod ni
+    const topInset = () => { const h = document.querySelector('.topbar'); return (h ? h.offsetHeight : 0) + 12; };
+
+    function close(value) {
+      set(value); active = false;
+      document.body.style.paddingBottom = prevPad;
+      window.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true);
+      root.remove();
+    }
+
+    function place() {
+      if (!active) return;
+      const r = rectOf(STEPS[i]);
+      if (!r) { spot.className = 'tut-spot tut-none'; spot.style.cssText = 'left:50%;top:50%;width:0;height:0'; return; }
+      const pad = 8;
+      spot.className = 'tut-spot';
+      spot.style.left = (r.left - pad) + 'px'; spot.style.top = (r.top - pad) + 'px';
+      spot.style.width = (r.width + pad * 2) + 'px'; spot.style.height = (r.height + pad * 2) + 'px';
+    }
+
+    function reveal(r) {
+      // cíl se přesune do volné části mezi horní lištou a dialogem
+      const top = topInset(), avail = dlg.getBoundingClientRect().top - 24 - top;
+      const want = r.height >= avail ? top : top + (avail - r.height) / 2;
+      window.scrollBy(0, r.top - want);
+    }
+
+    function show() {
+      const st = STEPS[i];
+      ch.src = 'img/' + st.img + '.png';
+      ch.style.animation = 'none'; void ch.offsetWidth; ch.style.animation = '';
+      $('tutTitle').textContent = st.title;
+      $('tutText').innerHTML = st.text;
+      $('tutDots').innerHTML = STEPS.map((_, k) => '<i class="' + (k === i ? 'tut-on' : '') + '"></i>').join('');
+      $('tutBack').style.visibility = i ? 'visible' : 'hidden';
+      $('tutNext').textContent = i === STEPS.length - 1 ? 'Hotovo' : 'Další';
+      $('tutSkip').style.display = i === STEPS.length - 1 ? 'none' : '';
+      // místo dole, aby šlo i spodní prvky posunout nad dialog
+      document.body.style.paddingBottom = (Math.ceil(dlg.getBoundingClientRect().height) + 40) + 'px';
+      let r = rectOf(st);
+      if (r) { reveal(r); r = rectOf(st); }
+      // ukazuje-li maskot doprava a cíl je vlevo od dialogu, zrcadlově otočit
+      ch.classList.toggle('tut-flip', !!(st.img === 'point' && r && (r.left + r.width / 2) < window.innerWidth / 2 - 40));
+      place();
+      $('tutNext').focus({ preventScroll: true });
+    }
+
+    function start() { active = true; ask.hidden = true; dlg.hidden = false; i = 0; show(); }
+    function next() { if (i >= STEPS.length - 1) close('done'); else { i++; show(); } }
+    function back() { if (i > 0) { i--; show(); } }
+
+    function onKey(e) {
+      e.stopPropagation();                      // zkratky hry (mezerník) se při tutoriálu nespustí
+      if (e.key === 'Escape') { close(active ? 'done' : 'declined'); return; }
+      if (e.key === 'Tab') {                    // fokus zůstane uvnitř tutoriálu
+        const box = active ? dlg : ask, btns = [...box.querySelectorAll('button')].filter(b => b.offsetParent && b.style.visibility !== 'hidden');
+        if (!btns.length) return;
+        const idx = btns.indexOf(document.activeElement);
+        if (idx === -1 || (e.shiftKey && idx === 0) || (!e.shiftKey && idx === btns.length - 1)) { e.preventDefault(); btns[e.shiftKey ? btns.length - 1 : 0].focus(); }
+        return;
+      }
+      if (!active) return;
+      if (e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); back(); }
+    }
+
+    $('tutYes').addEventListener('click', start);
+    $('tutNo').addEventListener('click', () => close('declined'));
+    $('tutNext').addEventListener('click', next);
+    $('tutBack').addEventListener('click', back);
+    $('tutSkip').addEventListener('click', () => close('done'));
+    window.addEventListener('keydown', onKey, true);
+    window.addEventListener('resize', place); window.addEventListener('scroll', place, true);
+    setTimeout(() => { const y = $('tutYes'); if (y) y.focus({ preventScroll: true }); }, 50);
+  } catch (e) {
+    try { root.remove(); } catch (_) {}        // při chybě stránka funguje dál bez tutoriálu
+  }
 })();
 </script>
 </body>
