@@ -31,7 +31,7 @@
   const agents = Object.freeze([
     Object.freeze({id:"reditel",name:"Ředitel",file:"Reditel",rank:"Z",symbol:"[Z]",type:"Ředitel školy"}),
     Object.freeze({id:"rybar",name:"Rybář",file:"Rybar",rank:"Z",symbol:"[Z]",type:"Zástupce ředitele"}),
-    Object.freeze({id:"nova",name:"Chobot",file:"Nova",rank:"S",symbol:"[S]",type:"Třídní · Featured"}),
+    Object.freeze({id:"nova",name:"Chobot",file:"Nova",rank:"S",symbol:"[S]",type:"Třídní"}),
     Object.freeze({id:"riven",name:"Juchelka",file:"Riven",rank:"S",symbol:"[S]",type:"Matikář/OPS"}),
     Object.freeze({id:"vesper",name:"Jašík",file:"Vesper",rank:"S",symbol:"[S]",type:"POS"}),
     Object.freeze({id:"mira",name:"Bařina",file:"Mira",rank:"A",symbol:"[A]",type:"Češtinář"}),
@@ -44,6 +44,83 @@
     Object.freeze({id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"B",symbol:"[B]",type:"Robotika"}),
     Object.freeze({id:"Huvarova",name:"Huvarová",file:"Huvarova",rank:"B",symbol:"[B]",type:"Elektronika"})
   ]);
+
+  /* =====================================================================
+     BANNERY  -  SEM SE PŘIDÁVAJÍ NOVÉ BANNERY
+     ---------------------------------------------------------------------
+     JAK PŘIDAT NOVÝ BANNER (3 kroky):
+       1) Zkopíruj celý jeden blok { ... }, (od složené závorky po složenou
+          závorku včetně čárky na konci) a vlož ho pod poslední banner.
+       2) V novém bloku změň texty, barvu a hlavně "featured".
+       3) Ulož soubor a obnov stránku (Ctrl+F5). Záložka se objeví sama,
+          nic dalšího (HTML, CSS) upravovat nemusíš.
+
+     CO KTERÁ ŘÁDKA ZNAMENÁ:
+       id        unikátní jméno banneru, malá písmena bez mezer a diakritiky
+       name      krátký nápis na záložce
+       tag       malý štítek nad nadpisem
+       title     velký nadpis, <br> udělá nový řádek
+       text      popisek banneru
+       featured  KDO JE FEATURED. Musí to být "id" učitele S-ranku z pole
+                 agents výše (teď: nova, riven, vesper). Špatné id banner
+                 vypne a do konzole (F12) napíše, co je špatně.
+       accent    barva banneru (hex, například "#ff5263")
+       letter    velké písmeno v pozadí (nepovinné, bez něj je to Z)
+       pills     nepovinné: vlastní štítky dole, například ["S-Rank · 0,6 %"]
+
+     NOVÝ UČITEL JAKO FEATURED:
+       a) přidej ho do pole agents s rank:"S" (a dej obrázek do složky img/
+          ve tvaru S-Soubor.png, podle hodnoty "file")
+       b) jeho "id" napiš do "featured" u nového banneru
+
+     PRAVIDLA, ABYS NEBYL PŘEKVAPENÝ:
+       - šance (Z 0,1 %, S 0,6 %), pity i záruka 50/50 jsou SPOLEČNÉ pro
+         všechny bannery, banner mění jen to, kdo je při výhře 50/50 featured
+       - první banner v seznamu je ten, který se zobrazí jako výchozí
+       - hráč si poslední vybraný banner pamatuje v prohlížeči
+     ===================================================================== */
+  const BANNERS = [
+    {
+      id: "zvoneni",
+      name: "Zvonění začíná",
+      tag: "LIMITED NÁBOR · FEATURED TŘÍDNÍ",
+      title: "Zvonění<br>začíná.",
+      text: "Další S-rank učitel může být jen jeden pull daleko – a někde nahoře čeká ještě vzácnější Z-rank. Hlídej pity a rozhodni se, kdy zvolit deset zápisů najednou.",
+      featured: "nova",
+      accent: "#ff5263",
+      letter: "Z"
+    },
+    {
+      id: "hodina-matiky",
+      name: "Hodina matiky",
+      tag: "LIMITED NÁBOR · FEATURED MATIKÁŘ",
+      title: "Hodina<br>matiky.",
+      text: "Na tabuli čeká příklad a ve sborovně nová posila. Tohle je banner, kde je při výhře 50/50 featured Juchelka, matikář a OPS v jedné osobě. Pity zůstává společné s ostatními bannery.",
+      featured: "riven",
+      accent: "#c084fc",
+      letter: "S"
+    }
+
+    // ,{ ...tady začíná další banner, nezapomeň na čárku před ním... }
+  ];
+
+  const DEFAULT_BANNER = { id: "default", name: "Nábor", tag: "NÁBOR UČITELŮ", title: "Nábor<br>učitelů.", text: "Vytáhni si učitele do sborovny a sbírej celý pedagogický sbor.", featured: "nova", accent: "#ff5263", letter: "Z" };
+  const DEFAULT_PILLS = [{ t: "Z-Rank · 0,1 %", z: true }, { t: "S-Rank · 0,6 %" }, { t: "50/50 systém" }, { t: "Cloud sync aktivní" }];
+  const BANNER_KEY = "ops_gacha_banner";
+
+  // Zkontroluje bannery. Špatný banner se přeskočí (a řekne proč), hra se tím nerozbije.
+  const BANNER_LIST = (() => {
+    const seen = new Set(), ok = [];
+    BANNERS.forEach((b, i) => {
+      const a = agents.find(x => x.id === b.featured);
+      if (!b.id || seen.has(b.id)) { console.warn("[Banner #" + (i + 1) + "] přeskočen: chybí id nebo se opakuje.", b); return; }
+      if (!a || a.rank !== "S") { console.warn("[Banner " + b.id + "] přeskočen: featured \"" + b.featured + "\" není id učitele S-ranku z pole agents.", b); return; }
+      seen.add(b.id); ok.push(b);
+    });
+    return ok.length ? ok : [DEFAULT_BANNER];
+  })();
+  let activeBannerId = BANNER_LIST[0].id;
+  function activeBanner() { return BANNER_LIST.find(b => b.id === activeBannerId) || BANNER_LIST[0]; }
 
   let sessionHistory = [];
 
@@ -185,6 +262,40 @@
     }
   });
 
+  /* ---------- vykreslení banneru a záložek ---------- */
+  function renderBanner() {
+    const box = $("bannerBox"), tabs = $("bannerTabs");
+    if (!box) return;
+    const b = activeBanner(), f = agentById(b.featured);
+    const title = escapeHtml(b.title || "").replace(/&lt;br\s*\/?&gt;/gi, "<br>");
+    const pills = [{ t: "Featured: " + f.name }].concat(b.pills ? b.pills.map(t => ({ t })) : DEFAULT_PILLS);
+    box.style.setProperty("--bn", b.accent || "#ff5263");
+    box.dataset.letter = b.letter || "Z";
+    box.innerHTML = `<span class="banner-tag">${escapeHtml(b.tag || "")}</span><h2>${title}</h2><p>${escapeHtml(b.text || "")}</p>` +
+      `<div class="banner-foot">${pills.map(p => `<span class="pill${p.z ? " z" : ""}">${escapeHtml(p.t)}</span>`).join("")}</div>` +
+      `<img class="banner-portrait" src="${IMG_DIR}${f.rank}-${f.file}.png" alt="" draggable="false" onerror="this.style.display='none'">`;
+    if (tabs) {
+      tabs.innerHTML = BANNER_LIST.length > 1 ? BANNER_LIST.map(x =>
+        `<button type="button" class="banner-tab${x.id === b.id ? " active" : ""}" data-banner="${escapeHtml(x.id)}" aria-pressed="${x.id === b.id}"><i style="background:${escapeHtml(x.accent || "#ff5263")}"></i>${escapeHtml(x.name || agentById(x.featured).name)}</button>`).join("") : "";
+    }
+  }
+  function setBanner(id) {
+    if (busy || id === activeBannerId || !BANNER_LIST.some(b => b.id === id)) return;
+    activeBannerId = id;
+    try { localStorage.setItem(BANNER_KEY, id); } catch (e) {}
+    sfx.tick();
+    renderBanner();
+    render();
+  }
+  function initBanners() {
+    let saved = null;
+    try { saved = localStorage.getItem(BANNER_KEY); } catch (e) {}
+    if (saved && BANNER_LIST.some(b => b.id === saved)) activeBannerId = saved;
+    const tabs = $("bannerTabs");
+    if (tabs) tabs.addEventListener("click", e => { const t = e.target.closest(".banner-tab"); if (t) setBanner(t.dataset.banner); });
+    renderBanner();
+  }
+
   function rollOne(state) {
     state.zPity++;
     state.sPity++;
@@ -206,8 +317,9 @@
       agent = pick(agents.filter(a => a.rank === "Z"));
       state.zPity = 0; state.sPity = 0; state.aPity = 0;
     } else if (rank === "S") {
+      const featuredId = activeBanner().featured;   // featured učitel právě zvoleného banneru
       featured = state.guaranteed || (_secureRng.random() < .5);
-      agent = featured ? agents.find(a => a.id === "nova") : pick(agents.filter(a => a.rank === "S" && a.id !== "nova"));
+      agent = featured ? agentById(featuredId) : pick(agents.filter(a => a.rank === "S" && a.id !== featuredId));
       state.guaranteed = !featured;
       state.sPity = 0; state.aPity = 0;
     } else if (rank === "A") {
@@ -485,7 +597,7 @@
     $("shopCookies").textContent = Math.floor(readCookies().available).toLocaleString("cs-CZ") + " sušenek";
     $("singleBtn").disabled = busy || state.tokens < COST;
     $("tenBtn").disabled = busy || state.tokens < COST*10;
-    $("roster").innerHTML = agents.map(a => `<div class="char ${a.rank.toLowerCase()}${state.inventory[a.id] ? "" : " locked"}" onclick="inspectAgent('${a.id}')">${art(a)}<span class="rk">${a.rank}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}</small><small>× ${state.inventory[a.id] || 0}</small></div>`).join("");
+    $("roster").innerHTML = agents.map(a => `<div class="char ${a.rank.toLowerCase()}${state.inventory[a.id] ? "" : " locked"}" onclick="inspectAgent('${a.id}')">${art(a)}<span class="rk">${a.rank}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}${a.id === activeBanner().featured ? " · Featured" : ""}</small><small>× ${state.inventory[a.id] || 0}</small></div>`).join("");
     const collected = agents.filter(a => state.inventory[a.id]).length;
     $("rosterCount").textContent = `${collected} / ${agents.length} získáno`;
     $("history").innerHTML = sessionHistory.length ? sessionHistory.slice(0,8).map(h => {
@@ -673,6 +785,7 @@
   window.addEventListener("ops:tokens-changed", () => { if (!busy) render(); });
   updateMuteBtn();
 
+  initBanners();
   render();
   loadLeaderboard();
 })();
