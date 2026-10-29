@@ -46,14 +46,19 @@
   ]);
 
   /* =====================================================================
-     BANNERY  -  SEM SE PŘIDÁVAJÍ NOVÉ BANNERY
-     ---------------------------------------------------------------------
-     JAK PŘIDAT NOVÝ BANNER (3 kroky):
-       1) Zkopíruj celý jeden blok { ... }, (od složené závorky po složenou
-          závorku včetně čárky na konci) a vlož ho pod poslední banner.
-       2) V novém bloku změň texty, barvu a hlavně "featured".
-       3) Ulož soubor a obnov stránku (Ctrl+F5). Záložka se objeví sama,
-          nic dalšího (HTML, CSS) upravovat nemusíš.
+     BANNERY  -  VŽDY JSOU DVA
+       1) KLASICKÝ   stálý banner, je tu pořád. Nemá featured učitele,
+                     takže každý S-rank je stejně pravděpodobný a nehraje
+                     se 50/50.
+       2) LIMITOVANÝ banner s featured učitelem. Střídá se sám podle
+                     rozvrhu v ROTATION (výchozí: jednou týdně).
+
+     JAK PŘIDAT NOVÝ LIMITOVANÝ BANNER (3 kroky):
+       1) V ROTATION.banners zkopíruj celý jeden blok { ... }, (včetně
+          čárky na konci) a vlož ho pod poslední.
+       2) Změň v něm texty, barvu a hlavně "featured".
+       3) Ulož a obnov stránku (Ctrl+F5). Do střídání se zařadí sám,
+          v pořadí, v jakém jsou v seznamu.
 
      CO KTERÁ ŘÁDKA ZNAMENÁ:
        id        unikátní jméno banneru, malá písmena bez mezer a diakritiky
@@ -61,66 +66,129 @@
        tag       malý štítek nad nadpisem
        title     velký nadpis, <br> udělá nový řádek
        text      popisek banneru
-       featured  KDO JE FEATURED. Musí to být "id" učitele S-ranku z pole
-                 agents výše (teď: nova, riven, vesper). Špatné id banner
-                 vypne a do konzole (F12) napíše, co je špatně.
+       featured  KDO JE FEATURED: "id" učitele S-ranku z pole agents
+                 (teď: nova, riven, vesper). Špatné id banner přeskočí
+                 a do konzole (F12) napíše, co je špatně.
        accent    barva banneru (hex, například "#ff5263")
-       letter    velké písmeno v pozadí (nepovinné, bez něj je to Z)
-       pills     nepovinné: vlastní štítky dole, například ["S-Rank · 0,6 %"]
+       letter    velké písmeno v pozadí (nepovinné)
+       pills     nepovinné: vlastní štítky dole
+       days      nepovinné: jak dlouho tento banner trvá (ve dnech). Bez něj
+                 platí výchozí "days" z ROTATION níže.
 
-     NOVÝ UČITEL JAKO FEATURED:
-       a) přidej ho do pole agents s rank:"S" (a dej obrázek do složky img/
-          ve tvaru S-Soubor.png, podle hodnoty "file")
-       b) jeho "id" napiš do "featured" u nového banneru
+     NASTAVENÍ STŘÍDÁNÍ (ROTATION):
+       startDate  datum začátku počítání, formát "RRRR-MM-DD" (nejlépe pondělí)
+       days       výchozí délka jednoho limitovaného banneru (ve dnech)
+       pin        chceš jeden banner zobrazit napevno (třeba na zkoušku)?
+                  Napiš jeho id, například "hodina-matiky". Střídání se
+                  zastaví. Hodnota null = střídá se podle rozvrhu.
+
+     POD ŠTÍTKEM BANNERU se sám ukazuje, kolik dní banner ještě potrvá
+     a do kdy (u klasického: "Stálý banner, je tu pořád").
 
      PRAVIDLA, ABYS NEBYL PŘEKVAPENÝ:
-       - šance (Z 0,1 %, S 0,6 %), pity i záruka 50/50 jsou SPOLEČNÉ pro
-         všechny bannery, banner mění jen to, kdo je při výhře 50/50 featured
-       - první banner v seznamu je ten, který se zobrazí jako výchozí
-       - hráč si poslední vybraný banner pamatuje v prohlížeči
+       - šance (Z 0,1 %, S 0,6 %) a pity jsou SPOLEČNÉ pro oba bannery
+       - záruka 50/50 se týká jen limitovaného banneru; klasický ji
+         nemění ani nepoužívá
+       - střídání se řídí datem v počítači hráče
+       - hráč si poslední vybranou záložku pamatuje v prohlížeči
      ===================================================================== */
-  const BANNERS = [
-    {
-      id: "zvoneni",
-      name: "Zvonění začíná",
-      tag: "LIMITED NÁBOR · FEATURED TŘÍDNÍ",
-      title: "Zvonění<br>začíná.",
-      text: "Další S-rank učitel může být jen jeden pull daleko – a někde nahoře čeká ještě vzácnější Z-rank. Hlídej pity a rozhodni se, kdy zvolit deset zápisů najednou.",
-      featured: "nova",
-      accent: "#ff5263",
-      letter: "Z"
-    },
-    {
-      id: "hodina-matiky",
-      name: "Hodina matiky",
-      tag: "LIMITED NÁBOR · FEATURED MATIKÁŘ",
-      title: "Hodina<br>matiky.",
-      text: "Na tabuli čeká příklad a ve sborovně nová posila. Tohle je banner, kde je při výhře 50/50 featured Juchelka, matikář a OPS v jedné osobě. Pity zůstává společné s ostatními bannery.",
-      featured: "riven",
-      accent: "#c084fc",
-      letter: "S"
-    }
+  const STANDARD_BANNER = {
+    id: "klasicky",
+    name: "Klasický nábor",
+    tag: "STÁLÝ NÁBOR · BEZ FEATURED",
+    title: "Klasický<br>nábor.",
+    text: "Stálý nábor, který je tu pořád. Nemá žádného featured učitele, takže každý S-rank je stejně pravděpodobný a nehraje se 50/50. Limitovaný banner s featured učitelem najdeš v druhé záložce.",
+    featured: null,
+    accent: "#8cbbff",
+    letter: "A"
+  };
 
-    // ,{ ...tady začíná další banner, nezapomeň na čárku před ním... }
-  ];
+  const ROTATION = {
+    startDate: "2026-10-26",
+    days: 7,
+    pin: null,
+    banners: [
+      {
+        id: "zvoneni",
+        name: "Zvonění začíná",
+        tag: "LIMITED NÁBOR · FEATURED TŘÍDNÍ",
+        title: "Zvonění<br>začíná.",
+        text: "Další S-rank učitel může být jen jeden pull daleko – a někde nahoře čeká ještě vzácnější Z-rank. Hlídej pity a rozhodni se, kdy zvolit deset zápisů najednou.",
+        featured: "nova",
+        accent: "#ff5263",
+        letter: "Z"
+      },
+      {
+        id: "hodina-matiky",
+        name: "Hodina matiky",
+        tag: "LIMITED NÁBOR · FEATURED MATIKÁŘ",
+        title: "Hodina<br>matiky.",
+        text: "Na tabuli čeká příklad a ve sborovně nová posila. Tentokrát je při výhře 50/50 featured Juchelka, matikář a OPS v jedné osobě. Pity zůstává společné s klasickým bannerem.",
+        featured: "riven",
+        accent: "#c084fc",
+        letter: "S"
+      },
+      {
+        id: "serverovna",
+        name: "Serverovna se probouzí",
+        tag: "LIMITED NÁBOR · FEATURED POS",
+        title: "Serverovna<br>se probouzí.",
+        text: "Ve sborovně se rozsvítil monitor a nábor se otevřel znovu. Tentokrát je při výhře 50/50 featured Jašík z POS. Pity zůstává společné s klasickým bannerem.",
+        featured: "vesper",
+        accent: "#4ade80",
+        letter: "S"
+      }
 
-  const DEFAULT_BANNER = { id: "default", name: "Nábor", tag: "NÁBOR UČITELŮ", title: "Nábor<br>učitelů.", text: "Vytáhni si učitele do sborovny a sbírej celý pedagogický sbor.", featured: "nova", accent: "#ff5263", letter: "Z" };
-  const DEFAULT_PILLS = [{ t: "Z-Rank · 0,1 %", z: true }, { t: "S-Rank · 0,6 %" }, { t: "50/50 systém" }, { t: "Cloud sync aktivní" }];
+      // ,{ ...tady začíná další limitovaný banner, nezapomeň na čárku před ním... }
+    ]
+  };
+
+  const DEFAULT_LIMITED = { id: "default", name: "Nábor", tag: "LIMITED NÁBOR", title: "Nábor<br>učitelů.", text: "Vytáhni si učitele do sborovny a sbírej celý pedagogický sbor.", featured: "nova", accent: "#ff5263", letter: "Z" };
   const BANNER_KEY = "ops_gacha_banner";
+  const DAY_MS = 86400000;
 
-  // Zkontroluje bannery. Špatný banner se přeskočí (a řekne proč), hra se tím nerozbije.
-  const BANNER_LIST = (() => {
-    const seen = new Set(), ok = [];
-    BANNERS.forEach((b, i) => {
-      const a = agents.find(x => x.id === b.featured);
+  const czDate = ms => { const d = new Date(ms); return d.getUTCDate() + ". " + (d.getUTCMonth() + 1) + ". " + d.getUTCFullYear(); };
+  const czDays = n => n === 1 ? "1 den" : (n >= 2 && n <= 4) ? n + " dny" : n + " dní";
+  const dayUTC = d => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  function parseDay(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s)); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3]) : NaN; }
+  function featuredOk(b) { const a = agents.find(x => x.id === b.featured); return !!a && a.rank === "S"; }
+
+  // Vybere, který limitovaný banner je právě na řadě. Špatné bannery přeskočí a řekne proč.
+  const ROTATION_NOW = (() => {
+    const seen = new Set(), list = [];
+    ROTATION.banners.forEach((b, i) => {
       if (!b.id || seen.has(b.id)) { console.warn("[Banner #" + (i + 1) + "] přeskočen: chybí id nebo se opakuje.", b); return; }
-      if (!a || a.rank !== "S") { console.warn("[Banner " + b.id + "] přeskočen: featured \"" + b.featured + "\" není id učitele S-ranku z pole agents.", b); return; }
-      seen.add(b.id); ok.push(b);
+      if (!featuredOk(b)) { console.warn("[Banner " + b.id + "] přeskočen: featured \"" + b.featured + "\" není id učitele S-ranku z pole agents.", b); return; }
+      seen.add(b.id); list.push(b);
     });
-    return ok.length ? ok : [DEFAULT_BANNER];
+    if (!list.length) return { banner: DEFAULT_LIMITED, daysLeft: null };
+    if (ROTATION.pin) {
+      const pinned = list.find(b => b.id === ROTATION.pin);
+      if (pinned) return { banner: pinned, daysLeft: null };
+      console.warn("[Banner] pin \"" + ROTATION.pin + "\" neexistuje, střídá se podle rozvrhu.");
+    }
+    const len = Math.max(1, Math.floor(Number(ROTATION.days)) || 7);
+    const dur = b => Math.max(1, Math.floor(Number(b.days)) || len);
+    let start = parseDay(ROTATION.startDate);
+    if (!Number.isFinite(start)) console.warn("[Banner] startDate musí být ve tvaru RRRR-MM-DD.");
+    const today = dayUTC(new Date());
+    const since = Number.isFinite(start) ? Math.floor((today - start) / DAY_MS) : -1;
+    if (since < 0) return { banner: list[0], daysLeft: null };
+    const total = list.reduce((s, b) => s + dur(b), 0);
+    let off = since % total;
+    for (const b of list) {
+      if (off < dur(b)) { const daysLeft = dur(b) - off; return { banner: b, daysLeft, endsOn: today + (daysLeft - 1) * DAY_MS }; }
+      off -= dur(b);
+    }
+    return { banner: list[0], daysLeft: null };
   })();
-  let activeBannerId = BANNER_LIST[0].id;
-  function activeBanner() { return BANNER_LIST.find(b => b.id === activeBannerId) || BANNER_LIST[0]; }
+
+  const BANNER_LIST = [
+    Object.assign({}, STANDARD_BANNER, { slot: "standard", featured: STANDARD_BANNER.featured && featuredOk(STANDARD_BANNER) ? STANDARD_BANNER.featured : null }),
+    Object.assign({}, ROTATION_NOW.banner, { slot: "limited", daysLeft: ROTATION_NOW.daysLeft, endsOn: ROTATION_NOW.endsOn })
+  ];
+  let activeBannerId = "limited";     // výchozí záložka: limitovaný banner
+  function activeBanner() { return BANNER_LIST.find(b => b.slot === activeBannerId) || BANNER_LIST[1]; }
 
   let sessionHistory = [];
 
@@ -262,37 +330,76 @@
     }
   });
 
+  /* ---------- vzhled banneru a záložek (vkládá se sám, v HTML ho mít nemusíš) ---------- */
+  const BANNER_CSS = `
+.banner{--bn:#ff5263}
+.banner:before{background:radial-gradient(circle at 80% 40%,color-mix(in srgb,var(--bn) 20%,transparent),transparent 28%),linear-gradient(125deg,transparent 48%,#ffffff08 49%,transparent 50%);background-size:auto,34px 34px}
+.banner:after{content:attr(data-letter)}
+.banner-tag{border-color:color-mix(in srgb,var(--bn) 42%,transparent);color:color-mix(in srgb,var(--bn) 55%,#fff);background:color-mix(in srgb,var(--bn) 10%,transparent)}
+.banner-time{margin:12px 0 0;font-size:.88rem;font-weight:700;letter-spacing:.02em;color:color-mix(in srgb,var(--bn) 55%,#fff)}
+.banner-time + h2{margin-top:14px}
+.banner-portrait{position:absolute;right:3%;bottom:0;height:94%;max-width:46%;object-fit:contain;z-index:-1;filter:drop-shadow(0 10px 30px #000a);pointer-events:none;user-select:none}
+.banner-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.banner-tabs:empty{display:none}
+.banner-tab{display:inline-flex;align-items:center;gap:8px;background:#ffffff0a;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;font-size:.85rem;cursor:pointer;transition:.15s}
+.banner-tab i{width:9px;height:9px;border-radius:50%;flex:none}
+.banner-tab:hover{border-color:var(--cyan);color:var(--text)}
+.banner-tab.active{color:var(--text);border-color:var(--gold);background:#ffd4771a}
+@media(max-width:850px){.banner-portrait{opacity:.3;max-width:70%}}
+`;
+  function injectBannerStyle() {
+    if (document.getElementById("bannerStyle")) return;
+    const st = document.createElement("style");
+    st.id = "bannerStyle"; st.textContent = BANNER_CSS;
+    document.head.appendChild(st);
+  }
+
   /* ---------- vykreslení banneru a záložek ---------- */
   function renderBanner() {
     const box = $("bannerBox"), tabs = $("bannerTabs");
     if (!box) return;
-    const b = activeBanner(), f = agentById(b.featured);
+    const b = activeBanner(), f = b.featured ? agentById(b.featured) : null;
     const title = escapeHtml(b.title || "").replace(/&lt;br\s*\/?&gt;/gi, "<br>");
-    const pills = [{ t: "Featured: " + f.name }].concat(b.pills ? b.pills.map(t => ({ t })) : DEFAULT_PILLS);
+    // řádek pod štítkem: jak dlouho ještě banner potrvá
+    let when = "";
+    if (b.slot === "standard") when = "Stálý banner, je tu pořád";
+    else if (b.daysLeft) when = b.daysLeft === 1 ? "Poslední den banneru" : (b.daysLeft < 5 ? "Zbývají " : "Zbývá ") + czDays(b.daysLeft) + " · do " + czDate(b.endsOn);
+    const pills = [{ t: f ? "Featured: " + f.name : "Bez featured učitele" }]
+      .concat(b.pills ? b.pills.map(t => ({ t })) : [{ t: "Z-Rank · 0,1 %", z: true }, { t: "S-Rank · 0,6 %" }, { t: f ? "50/50 systém" : "Bez 50/50" }, { t: "Cloud sync aktivní" }]);
     box.style.setProperty("--bn", b.accent || "#ff5263");
     box.dataset.letter = b.letter || "Z";
-    box.innerHTML = `<span class="banner-tag">${escapeHtml(b.tag || "")}</span><h2>${title}</h2><p>${escapeHtml(b.text || "")}</p>` +
+    box.innerHTML = `<span class="banner-tag">${escapeHtml(b.tag || "")}</span>` +
+      (when ? `<div class="banner-time">${escapeHtml(when)}</div>` : "") +
+      `<h2>${title}</h2><p>${escapeHtml(b.text || "")}</p>` +
       `<div class="banner-foot">${pills.map(p => `<span class="pill${p.z ? " z" : ""}">${escapeHtml(p.t)}</span>`).join("")}</div>` +
-      `<img class="banner-portrait" src="${IMG_DIR}${f.rank}-${f.file}.png" alt="" draggable="false" onerror="this.style.display='none'">`;
+      (f ? `<img class="banner-portrait" src="${IMG_DIR}${f.rank}-${f.file}.png" alt="" draggable="false" onerror="this.style.display='none'">` : "");
     if (tabs) {
-      tabs.innerHTML = BANNER_LIST.length > 1 ? BANNER_LIST.map(x =>
-        `<button type="button" class="banner-tab${x.id === b.id ? " active" : ""}" data-banner="${escapeHtml(x.id)}" aria-pressed="${x.id === b.id}"><i style="background:${escapeHtml(x.accent || "#ff5263")}"></i>${escapeHtml(x.name || agentById(x.featured).name)}</button>`).join("") : "";
+      tabs.innerHTML = BANNER_LIST.map(x =>
+        `<button type="button" class="banner-tab${x.slot === b.slot ? " active" : ""}" data-banner="${x.slot}" aria-pressed="${x.slot === b.slot}"><i style="background:${escapeHtml(x.accent || "#ff5263")}"></i>${x.slot === "limited" ? "Limitovaný · " : ""}${escapeHtml(x.name || "")}</button>`).join("");
     }
   }
-  function setBanner(id) {
-    if (busy || id === activeBannerId || !BANNER_LIST.some(b => b.id === id)) return;
-    activeBannerId = id;
-    try { localStorage.setItem(BANNER_KEY, id); } catch (e) {}
+  function setBanner(slot) {
+    if (busy || slot === activeBannerId || !BANNER_LIST.some(b => b.slot === slot)) return;
+    activeBannerId = slot;
+    try { localStorage.setItem(BANNER_KEY, slot); } catch (e) {}
     sfx.tick();
     renderBanner();
     render();
   }
   function initBanners() {
+    injectBannerStyle();
+    // funguje i se starším gacha.html: když chybí kontejnery, vytvoří je
+    let box = $("bannerBox");
+    if (!box) { box = document.querySelector(".banner"); if (box) box.id = "bannerBox"; }
+    if (!box) return;
+    if (!$("bannerTabs")) {
+      const t = document.createElement("div");
+      t.id = "bannerTabs"; t.className = "banner-tabs"; t.setAttribute("aria-label", "Bannery");
+      box.parentNode.insertBefore(t, box);
+    }
     let saved = null;
     try { saved = localStorage.getItem(BANNER_KEY); } catch (e) {}
-    if (saved && BANNER_LIST.some(b => b.id === saved)) activeBannerId = saved;
-    const tabs = $("bannerTabs");
-    if (tabs) tabs.addEventListener("click", e => { const t = e.target.closest(".banner-tab"); if (t) setBanner(t.dataset.banner); });
+    if (saved && BANNER_LIST.some(b => b.slot === saved)) activeBannerId = saved;
+    $("bannerTabs").addEventListener("click", e => { const t = e.target.closest(".banner-tab"); if (t) setBanner(t.dataset.banner); });
     renderBanner();
   }
 
@@ -317,10 +424,14 @@
       agent = pick(agents.filter(a => a.rank === "Z"));
       state.zPity = 0; state.sPity = 0; state.aPity = 0;
     } else if (rank === "S") {
-      const featuredId = activeBanner().featured;   // featured učitel právě zvoleného banneru
-      featured = state.guaranteed || (_secureRng.random() < .5);
-      agent = featured ? agentById(featuredId) : pick(agents.filter(a => a.rank === "S" && a.id !== featuredId));
-      state.guaranteed = !featured;
+      const featuredId = activeBanner().featured;   // featured učitel zvoleného banneru (null = klasický banner)
+      if (featuredId) {
+        featured = state.guaranteed || (_secureRng.random() < .5);
+        agent = featured ? agentById(featuredId) : pick(agents.filter(a => a.rank === "S" && a.id !== featuredId));
+        state.guaranteed = !featured;
+      } else {
+        agent = pick(agents.filter(a => a.rank === "S"));   // klasický: bez featured a bez 50/50, záruka se nemění
+      }
       state.sPity = 0; state.aPity = 0;
     } else if (rank === "A") {
       agent = pick(agents.filter(a => a.rank === "A"));
@@ -592,7 +703,7 @@
     $("zMeter").style.width = `${Math.min(100,state.zPity/Z_HARD*100)}%`;
     $("sMeter").style.width = `${Math.min(100,state.sPity/S_HARD*100)}%`;
     $("aMeter").style.width = `${Math.min(100,state.aPity/A_HARD*100)}%`;
-    $("guarantee").textContent = state.guaranteed ? "FEATURED" : "50/50";
+    $("guarantee").textContent = activeBanner().featured ? (state.guaranteed ? "FEATURED" : "50/50") : "Bez 50/50";
     $("totalPulls").textContent = state.totalPulls.toLocaleString("cs-CZ");
     $("shopCookies").textContent = Math.floor(readCookies().available).toLocaleString("cs-CZ") + " sušenek";
     $("singleBtn").disabled = busy || state.tokens < COST;
