@@ -223,19 +223,6 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
 @media(max-width:850px){.layout{grid-template-columns:1fr}.roster{grid-template-columns:repeat(3,minmax(0,1fr))}.banner{min-height:330px}}
 @media(max-width:520px){main{margin-top:22px}.topbar{height:60px}.banner{padding:22px;min-height:350px}.roster{grid-template-columns:repeat(2,minmax(0,1fr))}.result-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-card:last-child:nth-child(odd){grid-column:1/-1}.panel{padding:16px}}
 
-/* ===== Bannery (záložky, barva z JS, portrét) ===== */
-.banner{--bn:#ff5263}
-.banner:before{background:radial-gradient(circle at 80% 40%,color-mix(in srgb,var(--bn) 20%,transparent),transparent 28%),linear-gradient(125deg,transparent 48%,#ffffff08 49%,transparent 50%);background-size:auto,34px 34px}
-.banner:after{content:attr(data-letter)}
-.banner-tag{border-color:color-mix(in srgb,var(--bn) 42%,transparent);color:color-mix(in srgb,var(--bn) 55%,#fff);background:color-mix(in srgb,var(--bn) 10%,transparent)}
-.banner-portrait{position:absolute;right:3%;bottom:0;height:94%;max-width:46%;object-fit:contain;z-index:-1;filter:drop-shadow(0 10px 30px #000a);pointer-events:none;user-select:none}
-.banner-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}.banner-tabs:empty{display:none}
-.banner-tab{display:inline-flex;align-items:center;gap:8px;background:#ffffff0a;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 14px;font-weight:700;font-size:.85rem;transition:.15s}
-.banner-tab i{width:9px;height:9px;border-radius:50%;flex:none}
-.banner-tab:hover{border-color:var(--cyan);color:var(--text)}
-.banner-tab.active{color:var(--text);border-color:var(--gold);background:#ffd4771a}
-@media(max-width:850px){.banner-portrait{opacity:.3;max-width:70%}}
-
 /* ===== Tutoriál (tut-) ===== */
 #tutRoot[hidden],.tut-ask[hidden],.tut-dialog[hidden]{display:none}
 .tut-block{position:fixed;inset:0;z-index:9990}
@@ -288,10 +275,9 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
     <section>
       <div class="banner-tabs" id="bannerTabs" aria-label="Bannery"></div>
       <div class="banner" id="bannerBox" data-letter="Z">
-        <span class="banner-tag">LIMITED NÁBOR · FEATURED TŘÍDNÍ</span>
-        <h2>Zvonění<br>začíná.</h2>
-        <p>Další S-rank učitel může být jen jeden pull daleko – a někde nahoře čeká ještě vzácnější Z-rank. Hlídej pity a rozhodni se, kdy zvolit deset zápisů najednou.</p>
-        <div class="banner-foot"><span class="pill z">Z-Rank · 0,1 %</span><span class="pill">S-Rank · 0,6 %</span><span class="pill">50/50 systém</span><span class="pill">Cloud sync aktivní</span></div>
+        <span class="banner-tag">NÁBOR UČITELŮ</span>
+        <h2>Banner<br>se načítá…</h2>
+        <p>Banner se kreslí ze souboru gacha.js. Pokud vidíš tenhle text a nejsou tu záložky bannerů, nový gacha.js se nenačetl: dej ho do stejné složky jako gacha.html a obnov stránku (Ctrl+F5).</p>
       </div>
       <div class="section-head"><h2>Pedagogický sbor</h2><span class="pill" id="rosterCount">0 / 0 získáno</span></div>
       <div class="roster" id="roster"></div>
@@ -440,10 +426,10 @@ h1{font-size:clamp(2rem,5vw,3.5rem);margin:8px 0}.sub{color:var(--muted);margin:
     // closest = zvýrazní se nejbližší rodič, např. celý panel nebo celá zóna na stole
     const STEPS = [
       { img: 'show', title: 'Vítej v náboru učitelů!', text: 'Tady si „zapisuješ“ učitele do sborovny, sbíráš celý pedagogický sbor a sleduješ svoje pity. Provedu tě tím, ať v tom nemáš zmatek.' },
-      { img: 'show', title: 'Bannery', target: ['#bannerTabs', '#bannerBox'], text: 'Banner určuje, který učitel je právě <b>featured</b>. Je-li bannerů víc, přepínáš je záložkami nad ním. Šance, pity i záruka 50/50 jsou společné pro všechny bannery.' },
+      { img: 'show', title: 'Bannery', target: ['#bannerTabs', '#bannerBox'], text: 'Vždy máš na výběr dva bannery. <b>Klasický</b> je stálý a nemá featured učitele. <b>Limitovaný</b> má featured učitele a po čase se mění. Přepínáš je záložkami nad bannerem a šance i pity jsou u obou společné.' },
       { img: 'point', title: 'Školní body', target: '.currency', text: 'Tady vidíš své školní body. <b>1× zápis stojí 160 bodů</b>, <b>10× zápis 1 600</b>. Body se sdílí s ostatními hrami OPS.' },
       { img: 'point', title: 'Vzácnosti a pity', target: '.stats', text: 'Učitelé mají vzácnost <b>Z</b> (0,1 %), <b>S</b> (0,6 %), <b>A</b> (7 %) a <b>B</b>. Počítadla ukazují zápisy od poslední trefy. Na <b>hard pity</b> (<b>Z 200, S 90, A 10</b>) dostaneš tu vzácnost jistě a šance roste už před ním (Z od 150, S od 75).' },
-      { img: 'point', title: '50/50', target: '#guarantee', closest: '.stat', text: 'Když padne <b>S-rank</b>, je 50% šance, že to bude <b>featured</b> učitel. Když ne, další S-rank už featured bude jistě. Stav vidíš tady: <b>50/50</b> nebo <b>FEATURED</b>.' },
+      { img: 'point', title: '50/50', target: '#guarantee', closest: '.stat', text: 'Na <b>limitovaném</b> banneru platí: když padne <b>S-rank</b>, je 50% šance, že to bude <b>featured</b> učitel, a když ne, další S-rank už featured bude jistě. Stav vidíš tady (<b>50/50</b> nebo <b>FEATURED</b>), na klasickém banneru <b>Bez 50/50</b>.' },
       { img: 'point', title: 'Zápisy', target: '.actions', text: 'Spustí se animace, kterou klepnutím přeskočíš, a výsledky se ukážou v okně, které zavřeš tlačítkem <b>Pokračovat</b>. Pozor na <b>Resetovat účet</b>: smaže pity i sbor a vrátí body na 1 600.' },
       { img: 'point', title: 'Obchod se sušenkami', target: '.shop', closest: '.panel', text: 'Došly ti body? <b>1 000 sušenek = 160 bodů</b>, <b>10 000 sušenek = 1 600 bodů</b>. Sušenky se berou z Clickeru a pro jistotu ho při nákupu měj zavřený.' },
       { img: 'point', title: 'Pedagogický sbor', target: ['.section-head', '#roster'], text: 'Tady je celý sbor. Získaní učitelé jsou odhalení, ostatní zůstávají zamčení a pod jménem vidíš, kolikrát jsi je získal. Kliknutím na učitele si ho prohlédneš.' },
