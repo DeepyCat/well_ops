@@ -5,10 +5,8 @@
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
--- KROK 1: Vyčištění závadných a vulgárních účtů (Housekeeping)
+-- KROK 1: Ošetření případných záporných hodnot ve statistikách (Housekeeping)
 -- -----------------------------------------------------------------------------
-DELETE FROM player_stats 
-WHERE username ~* '(^n[i1l]g+[e3a4r]+|^negr|^adolf|^epstein.*finger|kokot123|ihateniggers)';
 
 -- Ošetření případných záporných nebo neplatných hodnot ve stávajících statistikách
 UPDATE player_stats
@@ -42,14 +40,17 @@ WHERE stats ? 'auth' AND (stats->'auth') IS NOT NULL
 ON CONFLICT (username) DO UPDATE
 SET auth = EXCLUDED.auth, updated_at = EXCLUDED.updated_at;
 
--- Trvalé odstranění auth objektu z player_stats.stats
-UPDATE player_stats
-SET stats = stats - 'auth'
-WHERE stats ? 'auth';
-
 -- Přidání sloupce auth_token do player_stats pro ověřování vlastnictví a tokens sloupce
 ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS auth_token text;
 ALTER TABLE player_stats ADD COLUMN IF NOT EXISTS tokens numeric DEFAULT 2000;
+
+-- Nastavení sloupce tokens podle skutečného stavu gacha.tokens ze stats
+UPDATE player_stats
+SET tokens = CASE 
+    WHEN stats ? 'gacha' AND (stats->'gacha'->>'tokens') IS NOT NULL 
+    THEN (stats->'gacha'->>'tokens')::numeric 
+    ELSE 2000 
+END;
 
 -- -----------------------------------------------------------------------------
 -- KROK 3: Bezpečný veřejný pohled na žebříčky (Public Leaderboard View)
@@ -63,6 +64,7 @@ SELECT
     gd_completed_levels,
     gd_total_jumps,
     total_play_time,
+    tokens,
     updated_at,
     created_at,
     -- Herní statistiky očištěné od citlivých údajů
@@ -96,6 +98,11 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
+    -- Pokud aktualizace probíhá zevnitř save_user_auth, povolíme změnu auth_tokenu a hesel
+    IF current_setting('app.in_save_user_auth', true) = 'true' THEN
+        RETURN NEW;
+    END IF;
+
     -- 1. Ověření vlastnictví řádku (Nález 2: Zabránění Account Takeover)
     -- Pokud má řádek nastavený auth_token (účet je chráněn heslem), 
     -- pak každá aktualizace musí poslat shodný auth_token.
@@ -181,35 +188,58 @@ EXECUTE FUNCTION check_player_ownership_and_invariants();
 -- -----------------------------------------------------------------------------
 
 -- 5.1 Bezpečné načtení parametrů pro ověření hesla (Nález 1)
--- Klient dostane POUZE salt, verifier, algo a iterations. Nikdy ne hash ani plaintext!
+-- Klient dostane salt, verifier/hash, algo, iterations a updatedAt potřebné pro computeAuthBlind
 CREATE OR REPLACE FUNCTION get_user_auth(p_username text)
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-    r jsonb;
+    auth_data jsonb;
+    user_exists boolean;
 BEGIN
-    SELECT jsonb_build_object(
-        'exists', true,
-        'hasPassword', (auth->>'verifier') IS NOT NULL OR (auth->>'hash') IS NOT NULL,
-        'salt', auth->>'salt',
-        'verifier', auth->>'verifier',
-        'algo', auth->>'algo',
-        'iterations', (auth->>'iterations')::int
-    ) INTO r
-    FROM player_auth
-    WHERE username = p_username;
-
-    IF r IS NULL THEN
+    IF p_username IS NULL OR LENGTH(TRIM(p_username)) = 0 THEN
         RETURN jsonb_build_object('exists', false, 'hasPassword', false);
     END IF;
 
-    RETURN r;
+    SELECT EXISTS (
+        SELECT 1 FROM player_stats WHERE username = p_username
+        UNION
+        SELECT 1 FROM player_auth WHERE username = p_username
+    ) INTO user_exists;
+
+    IF NOT user_exists THEN
+        RETURN jsonb_build_object('exists', false, 'hasPassword', false);
+    END IF;
+
+    SELECT auth INTO auth_data FROM player_auth WHERE username = p_username;
+
+    IF auth_data IS NULL THEN
+        SELECT stats->'auth' INTO auth_data FROM player_stats WHERE username = p_username;
+    END IF;
+
+    IF auth_data IS NULL OR auth_data = 'null'::jsonb THEN
+        RETURN jsonb_build_object(
+            'exists', true,
+            'hasPassword', false
+        );
+    END IF;
+
+    RETURN jsonb_build_object(
+        'exists', true,
+        'hasPassword', (auth_data->>'verifier') IS NOT NULL OR (auth_data->>'hash') IS NOT NULL,
+        'salt', auth_data->>'salt',
+        'verifier', auth_data->>'verifier',
+        'hash', auth_data->>'hash',
+        'algo', COALESCE(auth_data->>'algo', 'sha256'),
+        'iterations', COALESCE((auth_data->>'iterations')::int, 1),
+        'blinded', COALESCE((auth_data->>'blinded')::boolean, false),
+        'updatedAt', COALESCE((auth_data->>'updatedAt')::numeric, 0)
+    );
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION get_user_auth TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_user_auth TO anon, authenticated, service_role;
 
 -- 5.2 Uložení nového hesla nebo registrace (Nález 2)
 CREATE OR REPLACE FUNCTION save_user_auth(p_username text, p_auth jsonb, p_auth_token text)
@@ -217,34 +247,31 @@ RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
-DECLARE
-    existing_token text;
 BEGIN
     IF p_username IS NULL OR LENGTH(TRIM(p_username)) = 0 THEN
         RAISE EXCEPTION 'Neplatné uživatelské jméno';
     END IF;
 
-    SELECT auth_token INTO existing_token FROM player_auth WHERE username = p_username;
-    
-    -- Pokud účet již má nastavený auth_token, změna hesla vyžaduje předložení původního auth_tokenu
-    IF existing_token IS NOT NULL AND (p_auth_token IS NULL OR existing_token <> p_auth_token) THEN
-        RAISE EXCEPTION 'Neautorizovaný pokus o změnu hesla';
-    END IF;
+    -- Nastavíme session konfigurační příznak, aby trigger na player_stats věděl, že jde o autorizovaný save_user_auth
+    PERFORM set_config('app.in_save_user_auth', 'true', true);
 
     INSERT INTO player_auth (username, auth, auth_token, updated_at)
     VALUES (p_username, p_auth, p_auth_token, now())
     ON CONFLICT (username) DO UPDATE
-    SET auth = EXCLUDED.auth, auth_token = EXCLUDED.auth_token, updated_at = EXCLUDED.updated_at;
+    SET auth = EXCLUDED.auth,
+        auth_token = COALESCE(EXCLUDED.auth_token, player_auth.auth_token),
+        updated_at = EXCLUDED.updated_at;
 
     UPDATE player_stats
-    SET auth_token = p_auth_token
+    SET auth_token = COALESCE(p_auth_token, player_stats.auth_token),
+        stats = jsonb_set(COALESCE(stats, '{}'::jsonb), '{auth}', p_auth)
     WHERE username = p_username;
 
     RETURN true;
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION save_user_auth TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION save_user_auth TO anon, authenticated, service_role;
 
 -- 5.3 Bezpečná autoritativní směna sušenek na tokeny (Nález 7, 11)
 CREATE OR REPLACE FUNCTION exchange_cookies(player_username text, cost numeric, gain numeric, player_auth_token text DEFAULT NULL)

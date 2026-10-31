@@ -169,6 +169,8 @@
             buildings: {},
             upgrades: [],
             achievements: [],
+            globalMultiplier: 1,
+            coinBonus: 0,
             playTime: 0,
             lastSave: 0,
             inactiveAccumulatedMs: 0
@@ -212,6 +214,8 @@
         let buildingBonus = 0;
         let grandmaBonus = 0;
         let steroidBonus = 1;
+        let globalMultiplier = 1;
+        let coinBonus = 0;
         const buildingMultipliers = {};
 
         const multUpgrades = {
@@ -266,12 +270,19 @@
         if (upgrades.has("cyber-fingers")) { baseClick *= 5; percentCps += 0.04; }
         if (upgrades.has("singularity-clicks")) { baseClick *= 5; percentCps += 0.05; }
 
+        if (upgrades.has("lesk-kuhnovy-plesky") || upgrades.has("kuhn-shine")) {
+            globalMultiplier *= 1.1;
+            coinBonus += 0.1;
+        }
+
         return {
             baseClick,
             percentCps,
             buildingBonus,
             grandmaBonus,
             steroidBonus,
+            globalMultiplier,
+            coinBonus,
             buildingMultipliers
         };
     }
@@ -316,6 +327,7 @@
         const sBonus = typeof clickerData.steroidBonus === "number" && clickerData.steroidBonus > 1
             ? clickerData.steroidBonus
             : bonuses.steroidBonus;
+        const gMult = Math.max(typeof clickerData.globalMultiplier === "number" ? clickerData.globalMultiplier : 1, bonuses.globalMultiplier || 1);
 
         let totalCps = 0;
         for (const [id, baseCps] of Object.entries(baseCpsMap)) {
@@ -331,7 +343,7 @@
             }
             totalCps += cps;
         }
-        return totalCps;
+        return totalCps * (gMult || 1);
     }
 
     function computeClickerClickPower(clickerData) {
@@ -339,7 +351,7 @@
         const bonuses = computeClickerBonuses(clickerData.upgrades);
         const cps = computeClickerCps(clickerData);
         const bonus = Math.round(cps * bonuses.percentCps);
-        const computed = Math.max(1, bonuses.baseClick + bonus);
+        const computed = Math.max(1, Math.round(bonuses.baseClick * (bonuses.globalMultiplier || 1)) + bonus);
         const saved = typeof clickerData.clickPower === "number" ? clickerData.clickPower : 1;
         return Math.max(saved, computed);
     }
@@ -353,7 +365,7 @@
         const bonuses = computeClickerBonuses(saveData.upgrades);
         const totalClickedCookies = typeof saveData.totalClickedCookies === "number"
             ? Math.min(totalCookies, Math.max(0, saveData.totalClickedCookies))
-            : Math.min(totalCookies, clicks * bonuses.baseClick);
+            : Math.min(totalCookies, clicks * Math.round(bonuses.baseClick * (bonuses.globalMultiplier || 1)));
 
         return {
             cookies: typeof saveData.cookies === "number" ? Math.max(0, saveData.cookies) : 0,
@@ -367,6 +379,8 @@
             buildings: saveData.buildings && typeof saveData.buildings === "object" ? { ...saveData.buildings } : {},
             upgrades: Array.isArray(saveData.upgrades) ? [...saveData.upgrades] : [],
             achievements: Array.isArray(saveData.achievements) ? [...saveData.achievements] : [],
+            globalMultiplier: bonuses.globalMultiplier,
+            coinBonus: bonuses.coinBonus,
             playTime: existingPlayTime || 0,
             lastSave: typeof saveData.lastSave === "number" ? saveData.lastSave : Date.now(),
             inactiveAccumulatedMs: typeof saveData.inactiveAccumulatedMs === "number" ? saveData.inactiveAccumulatedMs : 0
@@ -388,7 +402,8 @@
                         if (typeof s.totalClickedCookies === "number") {
                             clickerState.totalClickedCookies = Math.min(clickerState.totalCookies || 0, Math.max(0, s.totalClickedCookies));
                         } else if (typeof clickerState.totalClickedCookies !== "number") {
-                            clickerState.totalClickedCookies = Math.min(clickerState.totalCookies || 0, (clickerState.clicks || 0) * (computeClickerBonuses(clickerState.upgrades).baseClick));
+                            const curBonuses = computeClickerBonuses(clickerState.upgrades);
+                            clickerState.totalClickedCookies = Math.min(clickerState.totalCookies || 0, (clickerState.clicks || 0) * Math.round(curBonuses.baseClick * (curBonuses.globalMultiplier || 1)));
                         }
                         clickerState.clickPower = Math.max(clickerState.clickPower || 1, computeClickerClickPower(s));
                         clickerState.buildings = s.buildings && typeof s.buildings === "object" ? { ...s.buildings } : clickerState.buildings;
@@ -398,6 +413,9 @@
                         if (Array.isArray(s.achievements)) {
                             clickerState.achievements = Array.from(new Set([...clickerState.achievements, ...s.achievements]));
                         }
+                        const curBonuses = computeClickerBonuses(clickerState.upgrades);
+                        clickerState.globalMultiplier = curBonuses.globalMultiplier;
+                        clickerState.coinBonus = curBonuses.coinBonus;
                         clickerState.cps = computeClickerCps(s);
                         clickerState.clickCps = typeof s.clickCps === "number" ? Math.min(20, Math.max(0, s.clickCps)) : (clickerState.clickCps || 0);
                         clickerState.peakClickCps = Math.min(20, Math.max(clickerState.peakClickCps || 0, Number(s.peakClickCps) || 0));
@@ -1033,6 +1051,9 @@
             if (rpcRes.ok) {
                 const rpcAuth = await rpcRes.json();
                 if (rpcAuth && typeof rpcAuth === "object") {
+                    if (rpcAuth.exists === false) {
+                        return { exists: false, hasPassword: false, auth: null, stats: null, error: false };
+                    }
                     const hasPassword = !!(rpcAuth.salt && (rpcAuth.hash || rpcAuth.verifier));
                     return { exists: true, hasPassword, auth: rpcAuth, stats: null, error: false };
                 }
@@ -1278,10 +1299,12 @@
                             upgrades: mergedUpgrades,
                             achievements: mergedAchievements,
                             clickPower: higherClickPower,
-                            cps: computeClickerCps({ buildings: mergedBuildings, upgrades: mergedUpgrades, buildingMultipliers: mergedBonuses.buildingMultipliers }),
+                            cps: computeClickerCps({ buildings: mergedBuildings, upgrades: mergedUpgrades, buildingMultipliers: mergedBonuses.buildingMultipliers, globalMultiplier: mergedBonuses.globalMultiplier }),
                             buildingBonus: mergedBonuses.buildingBonus,
                             grandmaBonus: mergedBonuses.grandmaBonus,
                             steroidBonus: mergedBonuses.steroidBonus,
+                            globalMultiplier: mergedBonuses.globalMultiplier,
+                            coinBonus: mergedBonuses.coinBonus,
                             buildingMultipliers: mergedBonuses.buildingMultipliers,
                             startTime: baseSource.startTime || Date.now(),
                             lastCursorClick: baseSource.lastCursorClick || Date.now(),
@@ -1308,6 +1331,8 @@
                             buildings: mergedSaveObj.buildings,
                             upgrades: mergedSaveObj.upgrades,
                             achievements: mergedSaveObj.achievements,
+                            globalMultiplier: mergedBonuses.globalMultiplier,
+                            coinBonus: mergedBonuses.coinBonus,
                             playTime: higherPlayTime,
                             inactiveAccumulatedMs: mergedSaveObj.inactiveAccumulatedMs,
                             lastSave: mergedSaveObj.lastSave
@@ -2014,6 +2039,7 @@
         stats.meta.lastActive = Date.now();
 
         const curPlayTime = stats.clicker?.playTime || 0;
+        const bonuses = computeClickerBonuses(data.upgrades);
         const cps = computeClickerCps(data);
         const curClickCps = typeof data.clickCps === "number" ? Math.min(20, Math.max(0, data.clickCps)) : 0;
         const curPeakClickCps = Math.min(20, Math.max(Number(stats.clicker?.peakClickCps) || 0, Number(data.peakClickCps) || 0));
@@ -2024,7 +2050,7 @@
             clicks: typeof data.clicks === "number" ? data.clicks : 0,
             totalClickedCookies: typeof data.totalClickedCookies === "number"
                 ? Math.min(newTotal, Math.max(0, data.totalClickedCookies))
-                : Math.min(newTotal, (Number(data.clicks) || 0) * (computeClickerBonuses(data.upgrades).baseClick)),
+                : Math.min(newTotal, (Number(data.clicks) || 0) * Math.round(bonuses.baseClick * (bonuses.globalMultiplier || 1))),
             clickPower: computeClickerClickPower(data),
             cps: cps,
             clickCps: curClickCps,
@@ -2032,6 +2058,8 @@
             buildings: data.buildings && typeof data.buildings === "object" ? { ...data.buildings } : {},
             upgrades: Array.isArray(data.upgrades) ? [...data.upgrades] : [],
             achievements: Array.isArray(data.achievements) ? [...data.achievements] : [],
+            globalMultiplier: bonuses.globalMultiplier,
+            coinBonus: bonuses.coinBonus,
             playTime: curPlayTime,
             lastSave: typeof data.lastSave === "number" ? data.lastSave : Date.now(),
             inactiveAccumulatedMs: typeof data.inactiveAccumulatedMs === "number" ? data.inactiveAccumulatedMs : 0
