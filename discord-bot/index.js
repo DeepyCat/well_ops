@@ -7,7 +7,8 @@ const {
   EmbedBuilder,
   PermissionFlagsBits
 } = require('discord.js');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;

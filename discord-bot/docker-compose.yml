@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  ops-discord-bot:
+    build: .
+    container_name: ops-discord-bot
+    restart: unless-stopped
+    env_file:
+      - .env
