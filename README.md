@@ -18,7 +18,7 @@
 
 ## 📖 O projektu
 
-`well_ops` je web zaměřený hlavně na operační systémy, praktická cvičení a studijní materiály. Kromě toho tu jsou různé hry, nástroje a další menší projekty.
+`well_ops` je web zaměřený hlavně na operační systémy, praktická cvičení a studijní materiály. Kromě toho tu najdeš různé hry, nástroje a nově také plnohodnotné **kasíno** s minihrami.
 
 Všechno je na jednom místě, takže není potřeba hledat materiály v deseti různých složkách.
 
@@ -29,15 +29,20 @@ Všechno je na jednom místě, takže není potřeba hledat materiály v deseti 
 
 📦 **GitHub:** [DeepyCat/well_ops](https://github.com/DeepyCat/well_ops)
 
+---
+
 ## 🌐 Co tu najdeš
 
 | Část | Co obsahuje |
 |---|---|
-| 🏠 Domů | Hlavní stránka a rozcestník |
-| 🛠️ Praxe | Praktické úlohy a moduly |
-| 📚 Teorie | Materiály k operačním systémům |
-| 📊 Statistiky | Statistiky webu |
-| 🎮 Hry | Hry a různé experimenty |
+| 🏠 Domů | Hlavní stránka a rozcestník (`index.html`) |
+| 🛠️ Praxe | Praktické úlohy a moduly (`praxe.html`) |
+| 📚 Teorie | Materiály k operačním systémům (`teorie.html`) |
+| 📊 Statistiky | Statistiky webu (`statistika.html`) |
+| 🎮 Hry | Hry, experimenty a zábavné nástroje (`games.html`) |
+| 🎰 Kasíno | Herní sekce a kasíno (`kasino/`) |
+
+---
 
 ## 🛠️ Praktická část
 
@@ -67,47 +72,59 @@ Odesílání zajišťuje automatizace v `.github/workflows/notify-new-modules.ym
 
 Ve složce `skripty/` jsou `.bat` a `.ps1` skripty, které slouží ke kontrole vybraných nastavení a splnění praktických úloh.
 
-## 🎮 Herní projekty
+---
 
-Repozitář obsahuje také několik samostatných her a herních nástrojů.
+## 🎮 Herní a kasinové projekty
 
-| Projekt | Popis |
-|---|---|
-| [Clicker](clicker/) | Maturita clicker |
-| [Geometry Dash](gd/) | Hra inspirovaná Juchelka dash |
-| [Hyperdrive](hyperdrive/) | Samostatná webová hra |
-| [Minecraft](mc/) | Minecraft běžící v prohlížeči |
-| [Stratagem](stratagem/) | Pomůcka pro zadávání stratagemů v Helldivers 2 |
+Repozitář obsahuje celou řadu samostatných her, zábavných nástrojů a nově i sekci kasína:
+
+| Projekt | Popis | Cesta |
+|---|---|---|
+| 🎰 Kasíno (Rozcestník) | Hlavní hub pro kasinové hry a gachu | [kasino/](kasino/) |
+| 🃏 Blackjack | Karetní hra v kasínu | [kasino/blackjack.html](kasino/blackjack.html) |
+| 🎁 Gacha | Systém otevírání beden / postav | [kasino/gacha.html](kasino/gacha.html) |
+| 🎡 Ruleta | Kasinová ruleta | [kasino/roulette.html](kasino/roulette.html) |
+| 🎰 Výherní automat | Slot machine | [kasino/slot.html](kasino/slot.html) |
+| 🎡 Kolo štěstí | Kolo štěstí | [kasino/wheel.html](kasino/wheel.html) |
+| 🍪 Clicker | Maturita clicker | [clicker/](clicker/) |
+| 🕹️ Geometry Dash | Hra inspirovaná Juchelka dash | [gd/](gd/) |
+| 🚗 Hyperdrive | Samostatná 3D hra | [hyperdrive/](hyperdrive/) |
+| 🟩 Minecraft | Minecraft běžící v prohlížeči | [mc/](mc/) |
+| 🎯 Stratagem | Pomůcka pro zadávání stratagemů v Helldivers 2 | [stratagem/](stratagem/) |
 
 Další projekty a obsah najdeš na stránce [Hry](games.html).
+
+---
 
 ## 📂 Struktura projektu
 
 ```text
 well_ops/
-├── .agents/              # Skills a nástroje pro AI agenty
-├── .github/              # GitHub Actions a automatizace
-├── clicker/              # Klikací hra
-├── gd/                   # Geometry Dash klon
-├── hyperdrive/           # Samostatná 3D hra
-├── img/                  # Obrázky, diagramy a GIFy
-├── js/                   # JavaScriptové funkce webu
-├── maturita/             # Maturitní část webu
-├── mc/                   # Minecraft v prohlížeči
-├── md/                   # Teoretické materiály
-├── praxe/                # Praktická cvičení a moduly
-├── skripty/              # Kontrolní a pomocné skripty
-├── stratagem/            # Pomůcka pro Helldivers 2
-├── 404.html              # Stránka nenalezeného obsahu
-├── games.html            # Přehled her
-├── index.html            # Hlavní stránka
-├── lab_gen.md            # Poznámky k lab_gen
-├── praxe.html            # Praktická část
-├── README.md             # Dokumentace projektu
-├── skills-lock.json      # Zámek verzí AI skills
-├── statistika.html       # Statistiky
-├── style.css             # Styly webu
-└── teorie.html           # Teoretická část
+├── .agents/                 # Skills a nástroje pro AI agenty
+├── .github/                 # GitHub Actions a automatizace
+├── blackjack/               # Samostatná složka blackjacku
+├── clicker/                 # Klikací hra
+├── gd/                      # Geometry Dash klon
+├── hyperdrive/              # Samostatná 3D hra
+├── img/                     # Obrázky, diagramy a GIFy
+├── js/                      # JavaScriptové funkce webu
+├── kasino/                  # Sekce kasína (minihry, gacha, audio)
+├── maturita/                # Maturitní část webu
+├── mc/                      # Minecraft v prohlížeči
+├── md/                      # Teoretické materiály (.md)
+├── praxe/                   # Praktická cvičení a moduly
+├── skripty/                 # Kontrolní, bezpečnostní a pomocné skripty
+├── stratagem/               # Pomůcka pro Helldivers 2
+├── 404.html                 # Stránka nenalezeného obsahu
+├── games.html               # Přehled her
+├── index.html               # Hlavní stránka
+├── lab_gen.md               # Poznámky k lab_gen
+├── praxe.html               # Praktická část
+├── README.md                # Dokumentace projektu
+├── skills-lock.json         # Zámek verzí AI skills
+├── statistika.html          # Statistiky
+├── style.css                # Styly webu
+└── teorie.html              # Teoretická část
 ```
 
 <details>
@@ -117,56 +134,38 @@ well_ops/
 well_ops/
 ├── .agents/
 │   └── skills/
+│       ├── design-taste-frontend/
 │       ├── hardening-windows-endpoint-with-cis-benchmark/
-│       │   ├── assets/
-│       │   │   └── template.md
-│       │   ├── references/
-│       │   │   ├── api-reference.md
-│       │   │   ├── standards.md
-│       │   │   └── workflows.md
-│       │   ├── scripts/
-│       │   │   ├── agent.py
-│       │   │   └── process.py
-│       │   └── SKILL.md
 │       ├── lab_gen/
-│       │   ├── references/
-│       │   │   ├── hardening-windows-endpoint-with-cis-benchmark/
-│       │   │   ├── sysadmin-toolbox/
-│       │   │   └── windows-hardening/
-│       │   └── SKILL.md
 │       ├── powershell-master/
-│       │   ├── references/
-│       │   │   ├── cicd-integration.md
-│       │   │   ├── cross-platform-patterns.md
-│       │   │   └── ...
-│       │   └── SKILL.md
 │       ├── powershell-windows/
-│       │   └── SKILL.md
 │       ├── sysadmin-toolbox/
-│       │   ├── references/
-│       │   ├── scripts/
-│       │   └── SKILL.md
 │       └── windows-hardening/
-│           └── SKILL.md
 ├── .github/
 │   └── workflows/
 │       ├── notify-new-modules.yml
 │       └── static.yml
+├── blackjack/
 ├── clicker/
 │   ├── assets/
+│   │   ├── 01-Dnl9NRJ6.png
+│   │   ├── 02_-Ds-_5-p-.png
 │   │   └── ...
 │   ├── img/
-│   │   ├── ...
-│   │   └── další obrázky
+│   │   ├── alchemylab.png
+│   │   ├── cookie.svg
+│   │   └── ...
 │   ├── 02_.png
-│   ├── cookie.svg
 │   └── index.html
 ├── gd/
 │   ├── assets/
 │   │   ├── levels/
-│   │   │   ├── ...
-│   │   │   └── object_overrides.json
-│   │   └── ...
+│   │   │   ├── 1.txt
+│   │   │   ├── 2.txt
+│   │   │   └── ... (+ další úrovně)
+│   │   ├── BackOnTrack.mp3
+│   │   ├── StereoMadness.mp3
+│   │   └── ... (+ další hudba a assety)
 │   ├── game.js
 │   ├── index.html
 │   ├── LICENSE
@@ -180,6 +179,8 @@ well_ops/
 │   │   ├── Hyperdrive-Web.loader.js
 │   │   └── Hyperdrive-Web.wasm
 │   ├── TemplateData/
+│   │   ├── favicon.ico
+│   │   └── style.css
 │   ├── index.html
 │   ├── kokes_blue_1.jpg
 │   ├── kokes_blue_2.jpg
@@ -187,36 +188,49 @@ well_ops/
 ├── img/
 │   ├── celebration/
 │   │   ├── proud-of-you1.gif
-│   │   ├── proud-of-you2.gif
 │   │   └── ...
-│   ├── ...
-│   ├── bird.png
-│   ├── praxe-bg.jpg
-│   ├── praxeS-bg.jpg
-│   ├── prezentace-bg.jpg
-│   ├── prezentaceS-bg.jpg
-│   ├── teorie-bg.jpg
-│   └── ...
+│   ├── binary-search-tree.svg
+│   ├── bios-boot.svg
+│   ├── os-concept.svg
+│   └── ... (+ desítky dalších SVG schémat a pozadí)
 ├── js/
-│   └── ops-stats.js
+│   ├── ops-stats.js
+│   ├── zaloha.js
+│   └── zalohaV1.txt
+├── kasino/
+│   ├── img/
+│   │   ├── A-Echo.png
+│   │   ├── A-Kairo.png
+│   │   └── ... (+ další postavy a ikony)
+│   ├── song/
+│   │   ├── playlist.json
+│   │   ├── song1.mp3
+│   │   └── song2.mp3
+│   ├── blackjack.html
+│   ├── gacha.html
+│   ├── gacha.js
+│   ├── index.html
+│   ├── kasino-bg.png
+│   ├── NOVY_BANNER.md
+│   ├── roulette.html
+│   ├── slot.html
+│   └── wheel.html
 ├── maturita/
 │   ├── _not-found/
-│   │   └── ...
-│   ├── ...
 │   ├── 404.html
 │   ├── barina_run.png
 │   ├── icon.svg
-│   └── index.html
+│   ├── index.html
+│   └── index.txt
 ├── mc/
 │   ├── v1_8/
 │   │   ├── lang/
-│   │   │   └── ...
+│   │   │   ├── cs_CZ.lang
+│   │   │   ├── en_US.lang
+│   │   │   └── ... (+ desítky jazyků)
 │   │   ├── assets.epk
 │   │   ├── classes.js
-│   │   ├── favicon.png
-│   │   ├── index.html
-│   │   └── README.md
-│   ├── assets.epw
+│   │   └── index.html
 │   ├── bootstrap.js
 │   ├── classes.js
 │   ├── favicon.png
@@ -226,49 +240,35 @@ well_ops/
 ├── md/
 │   ├── 01_Mass_Storage_Structure.md
 │   ├── 01_Process_Concept.md
-│   ├── 01_Vypocetni_system.md
 │   ├── 02_BIOS_UEFI.md
-│   ├── 02_Co_je_to_operacni_system.md
-│   ├── ...
-│   └── 07_Multitasking_Multithreading.md
+│   └── ... (+ další teoretické soubory)
 ├── praxe/
 │   ├── 00/
-│   │   ├── __reseni.md
-│   │   ├── __zadani.md
-│   │   ├── _reseni.md
-│   │   ├── _zadani.md
+│   │   ├── __reseni.html
+│   │   ├── __zadani.html
 │   │   ├── tasks.js
-│   │   ├── verified.json
-│   │   └── ...
+│   │   └── verified.json
 │   ├── 01/
-│   │   └── ...
 │   ├── 02/
-│   │   └── ...
 │   ├── modules.js
 │   └── modules.json
 ├── skripty/
 │   ├── 00_check_PC1-WIN.bat
 │   ├── 00_check_PC1-WIN.ps1
-│   ├── 00_check_SRV1-DC.bat
-│   ├── 00_check_SRV1-DC.ps1
-│   ├── 00_check_SRV2-FS.bat
-│   ├── 00_check_SRV2-FS.ps1
-│   ├── ...
-│   └── notify-new-modules.mjs
+│   ├── notify-new-modules.mjs
+│   ├── supabase_security_setup.sql
+│   └── test_security_suite.js
 ├── stratagem/
 │   ├── data/
 │   │   ├── Images/
 │   │   │   ├── Arrows/
-│   │   │   │   ├── D.png
-│   │   │   │   ├── L.png
-│   │   │   │   └── ...
 │   │   │   └── Stratagem Icons/
 │   │   │       └── hd2/
-│   │   │           └── ...
+│   │   │           ├── autocannon.svg
+│   │   │           ├── eagle_500kg_bomb.svg
+│   │   │           ├── orbital_laser.svg
+│   │   │           └── ... (+ desítky dalších ikon stratagemů)
 │   │   ├── Sounds/
-│   │   │   ├── 1_D.mp3
-│   │   │   ├── 2_L.mp3
-│   │   │   └── ...
 │   │   └── HD2-Sequences.json
 │   ├── index.html
 │   ├── links.csv
@@ -287,36 +287,35 @@ well_ops/
 
 </details>
 
+---
+
 ## ⚙️ Technologie
 
 - **HTML** – struktura stránek.
-- **CSS** – vzhled webu.
-- **JavaScript** – interaktivní funkce a hry.
+- **CSS** – vzhled webu a responzivní design.
+- **JavaScript** – interaktivní funkce, hry a logika kasína.
 - **Markdown** – studijní materiály a dokumentace.
 - **PowerShell a Batch** – kontrolní skripty pro praktická cvičení.
 - **Python** – pomocné skripty v některých AI skills.
 - **GitHub Actions** – automatizace vybraných úloh v repozitáři.
 
-Jednotlivé herní projekty mohou používat i další technologie.
+---
 
 ## 🚀 Spuštění lokálně
 
-Pro základní prohlédnutí webu můžeš otevřít `index.html` přímo v prohlížeči. Pokud některé funkce nebudou fungovat, spusť web přes lokální HTTP server.
+Pro základní prohlédnutí webu můžeš otevřít `index.html` přímo v prohlížeči. Pokud některé funkce či moduly nebudou fungovat (např. kvůli CORS zásadám při načítání lokálních JSONů či skriptů), spusť web přes lokální HTTP server.
 
 1. Naklonuj repozitář:
-
    ```bash
    git clone https://github.com/DeepyCat/well_ops.git
    ```
 
 2. Otevři složku projektu:
-
    ```bash
    cd well_ops
    ```
 
 3. Spusť lokální server pomocí Pythonu:
-
    ```bash
    python -m http.server 8000
    ```
