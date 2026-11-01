@@ -48,5 +48,26 @@
         "Moje dokumentace / Modul 0 Příprava (část PC1-WIN)"
       ]
     }
+  },
+  {
+    "id": "03",
+    "code": "M03",
+    "title": "Modul 03: DNS Server",
+    "shortTitle": "Modul 03",
+    "folder": "praxe/03",
+    "vms": [
+      "SRV1-DC",
+      "PC1-WIN"
+    ],
+    "defaultVM": "SRV1-DC",
+    "tasksFile": "praxe/03/tasks.js",
+    "verifiedFile": "praxe/03/verified.json",
+    "submission": {
+      "title": "CO ODEVZDAT",
+      "zipName": "Prijmeni_Jmeno_Modul3.zip",
+      "folders": [
+        "Moje dokumentace / Modul 3 DNS (postup.md, overeni.md a složka images se screenshoty)"
+      ]
+    }
   }
 ]

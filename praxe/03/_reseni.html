@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Výsledek: Modul 03 – DNS Server (__reseni.md)</title>
+  <link rel="icon" type="image/x-icon" href="../../img/bird.png">
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --card-bg: #222222;
+      --border: #333333;
+      --border-subtle: #2c2c2c;
+      --text: #e0e0e0;
+      --text-muted: #888888;
+      --text-bright: #ffffff;
+      --accent: #ff5555;
+      --accent-hover: #ff7777;
+      --accent-bg: rgba(255, 85, 85, 0.15);
+      --code-bg: #151515;
+      --table-header: #1e1e1e;
+      --table-row-alt: #181818;
+      --quote-border: #ff5555;
+      --quote-bg: rgba(255, 85, 85, 0.08);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: #444 var(--bg);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0;
+      padding: 0;
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(34, 34, 34, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-breadcrumb a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-bg);
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: var(--accent-hover);
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background-color: #242424;
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: #f0f6fc;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #382222;
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(255, 85, 85, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #d32f2f 0%, #ff5555 100%);
+      border: 1px solid #ff7777;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(211, 47, 47, 0.45);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #b71c1c 0%, #ff6666 100%);
+      border-color: #ff9999;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(255, 85, 85, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 32px auto 80px auto;
+      padding: 0 24px;
+    }
+
+    .markdown-body {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-top: 36px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent-hover);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    blockquote {
+      margin: 20px 0;
+      padding: 12px 18px;
+      background-color: var(--quote-bg);
+      border-left: 4px solid var(--quote-border);
+      border-radius: 0 6px 6px 0;
+      color: #d1d5db;
+    }
+
+    blockquote p:last-child {
+      margin-bottom: 0;
+    }
+
+    ul, ol {
+      margin-top: 0;
+      margin-bottom: 16px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: var(--code-bg);
+      color: #fca5a5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #332222;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--table-header);
+      color: var(--text-bright);
+      font-weight: 600;
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    tr:nth-child(even) td {
+      background-color: var(--table-row-alt);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .code-block-wrapper {
+      position: relative;
+      margin: 18px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: var(--code-bg);
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 14px;
+      background-color: #1a1a1a;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .copy-code-btn {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 0.15s ease;
+    }
+
+    .copy-code-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #f0f6fc;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: inherit;
+    }
+
+    .alert-box {
+      background: rgba(255, 85, 85, 0.08);
+      border: 1px solid rgba(255, 85, 85, 0.3);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 18px 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-breadcrumb">
+      <a href="../../praxe.html?modul=03">OPS Lab</a>
+      <span>/</span>
+      <span>Modul 03</span>
+      <span>/</span>
+      <span class="file-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        __reseni.md
+      </span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="_zadani.html" class="btn" title="Zobrazit zadání modulu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        <span>Zobrazit zadání</span>
+      </a>
+      <a href="../../praxe.html?modul=03" class="btn btn-primary" title="Zpět do interaktivního portálu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Zpět do labu</span>
+      </a>
+      <a href="_reseni.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Raw .md</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Document Body -->
+  <main class="container">
+    <article class="markdown-body">
+      <h1>[Jak se pozná, že už to mám?]</h1>
+
+      <blockquote>
+        <p><strong>Verze:</strong> 2026-11-01 &nbsp;|&nbsp; <strong>Kontrolní seznam vzorového řešení</strong></p>
+      </blockquote>
+
+      <div class="alert-box">
+        <strong>Pravidlo pro pracoviště:</strong> Ve vzorovém postupu je číslo pracoviště <code>200</code> a příjmení <code>novak</code>. Vy všude dosaďte číslo svého pracoviště (<code>192.168.N.x</code>, kde <code>N</code> je číslo vašeho pracoviště) a své příjmení bez diakritiky (<code>prijmeni.cyberschool.internal</code>).
+      </div>
+
+      <p>Ověření tohoto modulu probíhá v kooperaci mezi serverem <strong>SRV1-DC</strong> a klientskou stanicí <strong>PC1-WIN</strong>.</p>
+
+      <h2>1. Role DNS Server běží a dopředná zóna je aktivní (SRV1-DC)</h2>
+      <p>V <strong>Server Manageru</strong> je role <strong>DNS</strong> na Dashboardu zelená. V konzoli <strong>DNS Manager</strong> (<code>dnsmgmt.msc</code>) existuje ve větvi <strong>Forward Lookup Zones</strong> zóna pojmenovaná podle vaší domény (<code>&lt;prijmeni&gt;.cyberschool.internal</code>). Zóna je typu <em>Active Directory-Integrated Primary</em> a má nastaveny zabezpečené dynamické aktualizace (<em>Secure only</em>).</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-Service -Name DNS | Select-Object Name, Status, StartType
+Get-DnsServerZone -Name "$((Get-ADDomain).DNSRoot)" | Select-Object ZoneName, ZoneType, ReplicationScope, DynamicUpdate</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>Name Status  StartType
+---- ------  ---------
+DNS  Running Automatic
+
+ZoneName                        ZoneType ReplicationScope DynamicUpdate
+--------                        -------- ---------------- -------------
+&lt;prijmeni&gt;.cyberschool.internal Primary  Domain           Secure</code></pre>
+      </div>
+
+      <h2>2. Reverzní zóna pro síť 192.168.N.0/24 existuje (SRV1-DC)</h2>
+      <p>V konzoli <strong>DNS Manager</strong> existuje ve větvi <strong>Reverse Lookup Zones</strong> zóna pro síť vašeho pracoviště s názvem <code>N.168.192.in-addr.arpa</code>. Zóna je rovněž integrována v Active Directory s replikací v rámci domény a zabezpečenými dynamickými aktualizacemi.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$wsX = (Get-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4).IPAddress.Split('.')[2]
+Get-DnsServerZone -Name "$wsX.168.192.in-addr.arpa" | Select-Object ZoneName, ZoneType, ReplicationScope, DynamicUpdate</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>ZoneName                 ZoneType ReplicationScope DynamicUpdate
+--------                 -------- ---------------- -------------
+N.168.192.in-addr.arpa   Primary  Domain           Secure</code></pre>
+      </div>
+
+      <h2>3. Záznamy A a PTR pro servery SRV1-DC a SRV2-FS (SRV1-DC)</h2>
+      <p>V dopředné zóně existují záznamy typu <strong>A</strong> pro <code>SRV1-DC</code> (<code>192.168.N.10</code>) a <code>SRV2-FS</code> (<code>192.168.N.20</code>). V reverzní zóně existují odpovídající záznamy <strong>PTR</strong> s ukazateli zpět na doménová jména serverů.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$domain = (Get-ADDomain).DNSRoot
+$wsX = (Get-NetIPAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4).IPAddress.Split('.')[2]
+
+# Kontrola dopředných A záznamů:
+Get-DnsServerResourceRecord -ZoneName $domain -RRType A | Where-Object { $_.HostName -in 'srv1-dc', 'srv2-fs' } | Select-Object HostName, RecordType, @{N='IPAddress';E={$_.RecordData.IPv4Address}}
+
+# Kontrola reverzních PTR záznamů:
+Get-DnsServerResourceRecord -ZoneName "$wsX.168.192.in-addr.arpa" -RRType Ptr | Where-Object { $_.HostName -in '10', '20' } | Select-Object HostName, RecordType, @{N='PtrDomainName';E={$_.RecordData.PtrDomainName}}</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>HostName RecordType IPAddress
+-------- ---------- ---------
+srv1-dc  A          192.168.N.10
+srv2-fs  A          192.168.N.20
+
+HostName RecordType PtrDomainName
+-------- ---------- -------------
+10       Ptr        srv1-dc.&lt;prijmeni&gt;.cyberschool.internal.
+20       Ptr        srv2-fs.&lt;prijmeni&gt;.cyberschool.internal.</code></pre>
+      </div>
+
+      <h2>4. Alias CNAME ftp je vytvořen a ukazuje na srv2-fs (SRV1-DC)</h2>
+      <p>V dopředné zóně je evidován záznam typu <strong>Alias (CNAME)</strong> s názvem <code>ftp</code>, který odkazuje na kanonické jméno serveru <code>srv2-fs.&lt;prijmeni&gt;.cyberschool.internal</code>.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit na SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$domain = (Get-ADDomain).DNSRoot
+Get-DnsServerResourceRecord -ZoneName $domain -Name "ftp" | Select-Object HostName, RecordType, @{N='HostNameAlias';E={$_.RecordData.HostNameAlias}}</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>HostName RecordType HostNameAlias
+-------- ---------- -------------
+ftp      CNAME      srv2-fs.&lt;prijmeni&gt;.cyberschool.internal.</code></pre>
+      </div>
+
+      <h2>5. Klient PC1-WIN používá správný DNS server a doménovou příponu (PC1-WIN)</h2>
+      <p>Na stanici <strong>PC1-WIN</strong> ukazuje <code>ipconfig /all</code> nebo PowerShell rozhraní <code>Ethernet1</code> primární DNS server <code>192.168.N.10</code> a DNS příponu <code>&lt;prijmeni&gt;.cyberschool.internal</code>.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Spustit na PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses
+Get-DnsClient -InterfaceAlias Ethernet1 | Select-Object ConnectionSpecificSuffix, RegisterThisConnectionsAddress</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>InterfaceAlias ServerAddresses
+-------------- ---------------
+Ethernet1      {192.168.N.10}
+
+ConnectionSpecificSuffix         RegisterThisConnectionsAddress
+------------------------         ------------------------------
+&lt;prijmeni&gt;.cyberschool.internal  True</code></pre>
+      </div>
+
+      <h2>6. Dopředný překlad jména na IP funguje bez chyb (PC1-WIN)</h2>
+      <p>Příkaz <code>nslookup srv2-fs</code> nebo <code>Resolve-DnsName srv2-fs</code> vrátí správnou IP adresu <code>192.168.N.20</code> bez hlášky <em>Non-existent domain</em>.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell / Příkazový řádek (PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>nslookup srv2-fs
+Resolve-DnsName -Name "srv2-fs" | Select-Object Name, Type, IPAddress</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>Server:  srv1-dc.&lt;prijmeni&gt;.cyberschool.internal
+Address:  192.168.N.10
+
+Name:    srv2-fs.&lt;prijmeni&gt;.cyberschool.internal
+Address: 192.168.N.20
+
+Name                                    Type IPAddress
+----                                    ---- ---------
+srv2-fs.&lt;prijmeni&gt;.cyberschool.internal A    192.168.N.20</code></pre>
+      </div>
+
+      <h2>7. Reverzní překlad adresy na jméno funguje (PC1-WIN)</h2>
+      <p>Dotaz na IP adresu <code>192.168.N.20</code> i <code>192.168.N.10</code> vrátí odpovídající plné doménové jméno (FQDN).</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell / Příkazový řádek (PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>nslookup 192.168.N.20
+nslookup 192.168.N.10</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>Server:  srv1-dc.&lt;prijmeni&gt;.cyberschool.internal
+Address:  192.168.N.10
+
+Name:    srv2-fs.&lt;prijmeni&gt;.cyberschool.internal
+Address: 192.168.N.20
+
+Server:  srv1-dc.&lt;prijmeni&gt;.cyberschool.internal
+Address:  192.168.N.10
+
+Name:    srv1-dc.&lt;prijmeni&gt;.cyberschool.internal
+Address: 192.168.N.10</code></pre>
+      </div>
+
+      <h2>8. Alias ftp funguje a vrací správný kanonický cíl (PC1-WIN)</h2>
+      <p>Příkaz <code>nslookup ftp</code> vrátí cíl <code>srv2-fs.&lt;prijmeni&gt;.cyberschool.internal</code>, alias <code>ftp</code> a adresu <code>192.168.N.20</code>.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell / Příkazový řádek (PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>nslookup ftp
+Resolve-DnsName -Name "ftp" | Select-Object Name, Type, NameHost, IPAddress</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>Server:  srv1-dc.&lt;prijmeni&gt;.cyberschool.internal
+Address:  192.168.N.10
+
+Name:    srv2-fs.&lt;prijmeni&gt;.cyberschool.internal
+Address: 192.168.N.20
+Aliases: ftp.&lt;prijmeni&gt;.cyberschool.internal
+
+Name                                 Type  NameHost                                 IPAddress
+----                                 ----  --------                                 ---------
+ftp.&lt;prijmeni&gt;.cyberschool.internal  CNAME srv2-fs.&lt;prijmeni&gt;.cyberschool.internal
+srv2-fs.&lt;prijmeni&gt;.cyberschool.internal A                                           192.168.N.20</code></pre>
+      </div>
+
+      <h2>9. Přejmenování a nový záznam se v DNS projeví (PC1-WIN)</h2>
+      <p>Ověření spojení pomocí doménového jména:</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>ping srv2-fs</code></pre>
+      </div>
+      <p>Očekávaný výstup:</p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header"><span>Očekávaný výstup</span></div>
+        <pre><code>Pinging srv2-fs.&lt;prijmeni&gt;.cyberschool.internal [192.168.N.20] with 32 bytes of data:
+Reply from 192.168.N.20: bytes=32 time&lt;1ms TTL=128</code></pre>
+      </div>
+
+      <h2>10. Otisk konfigurace pro odevzdání (SRV1-DC a PC1-WIN)</h2>
+      <p>Spusťte na obou strojích povinné otisky do odevzdávací dokumentace:</p>
+
+      <p><strong>Na SRV1-DC:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-Date
+whoami
+hostname
+(Get-CimInstance Win32_ComputerSystemProduct).UUID
+(Get-ADDomain).DNSRoot
+(Get-ADDomain).DomainSID.Value</code></pre>
+      </div>
+
+      <p><strong>Na PC1-WIN:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-Date
+whoami
+hostname
+(Get-CimInstance Win32_ComputerSystemProduct).UUID
+(Get-NetIPAddress -AddressFamily IPv4 | Where-Object IPAddress -like '192.168.*').IPAddress</code></pre>
+      </div>
+
+      <h2>11. (Nepovinné) Rychlé automatické ověření celého stroje</h2>
+      <p>Univerzální jednořádkový příkaz pro automatický audit konfigurace:</p>
+
+      <p><strong>Na serveru SRV1-DC:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+
+      <p><strong>Na klientovi PC1-WIN:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+    </article>
+  </main>
+
+  <script>
+    function copySnippet(btn) {
+      const code = btn.closest('.code-block-wrapper').querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Zkopírováno!';
+        setTimeout(() => { btn.innerText = orig; }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

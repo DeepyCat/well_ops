@@ -43,6 +43,24 @@ window.OPS_MODULES = [
         "<code>Moje dokumentace / Modul 0 Příprava</code> (část <code>PC1-WIN</code>)"
       ]
     }
+  },
+  {
+    id: "03",
+    code: "M03",
+    title: "Modul 03: DNS Server",
+    shortTitle: "Modul 03",
+    folder: "praxe/03",
+    vms: ["SRV1-DC", "PC1-WIN"],
+    defaultVM: "SRV1-DC",
+    tasksFile: "praxe/03/tasks.js",
+    verifiedFile: "praxe/03/verified.json",
+    submission: {
+      title: "CO ODEVZDAT",
+      zipName: "Prijmeni_Jmeno_Modul3.zip",
+      folders: [
+        "<code>Moje dokumentace / Modul 3 DNS</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)"
+      ]
+    }
   }
 ];
 
@@ -57,6 +75,10 @@ window.OPS_MODULE_VERIFIED = {
     "SRV1-DC": false
   },
   "02": {
+    "SRV1-DC": false,
+    "PC1-WIN": false
+  },
+  "03": {
     "SRV1-DC": false,
     "PC1-WIN": false
   }
