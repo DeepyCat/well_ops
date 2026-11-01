@@ -1,0 +1,14 @@
+{
+  "name": "well-ops-discord-bot",
+  "version": "1.0.0",
+  "description": "Discord oznamovací bot pro OPS Portál a praktická cvičení",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.18.0",
+    "dotenv": "^16.4.7"
+  }
+}
