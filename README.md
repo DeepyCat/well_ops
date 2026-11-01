@@ -53,6 +53,7 @@ Praxe je rozdělená do modulů, které se zaměřují na práci se systémy Win
 | 00 | Příprava a instalace OS |
 | 01 | Active Directory Domain Services |
 | 02 | DHCP Server |
+| 03 | DNS |
 
 V úlohách se používají tyto virtuální stroje:
 
