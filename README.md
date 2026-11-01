@@ -65,7 +65,7 @@ Seznam modulů a jejich nastavení jsou v `praxe/modules.json`. Logiku jejich na
 
 ### 📧 Upozornění na nové moduly
 
-Při přidání nového praktického modulu se automaticky odešle e-mailové upozornění. Díky tomu se o novém obsahu dozvíš bez nutnosti web pravidelně kontrolovat.
+Při přidání nového praktického modulu se automaticky odešle e-mailové upozornění nebo na discordu. Díky tomu se o novém obsahu dozvíš bez nutnosti web pravidelně kontrolovat.
 
 Odesílání zajišťuje automatizace v `.github/workflows/notify-new-modules.yml` a související skript `skripty/notify-new-modules.mjs`.
 
@@ -105,6 +105,7 @@ well_ops/
 ├── .github/                 # GitHub Actions a automatizace
 ├── blackjack/               # Samostatná složka blackjacku
 ├── clicker/                 # Klikací hra
+├── discord-bot/             # Automatické oznamené na discord
 ├── gd/                      # Geometry Dash klon
 ├── hyperdrive/              # Samostatná 3D hra
 ├── img/                     # Obrázky, diagramy a GIFy
@@ -158,6 +159,7 @@ well_ops/
 │   │   └── ...
 │   ├── 02_.png
 │   └── index.html
+├── discord-bot/
 ├── gd/
 │   ├── assets/
 │   │   ├── levels/
