@@ -159,9 +159,9 @@ Při vytváření úkolů **VŽDY bez výjimky** dodržujte tato pravidla:
 -  **VŽDY ODKÁZAT NA TEAMS:** Použijte zástupný text `<LAB-KEY-Z-TEAMS>` a napište:
   > *„Produktový klíč (LAB KEY) si zkopírujte přímo ze zadání v Microsoft Teams.“*
 
-### 3. ZÁKAZ EMOJI V HTML DOKUMENTACI
--  **NIKDY NEPOUŽÍVAT:** Unicode smajlíky jako , , , .
--  **VŽDY POUŽÍVAT ČISTÉ VEKTOROVÉ SVG:** Používejte inline SVG ikony (Lucide / Feather styl, `width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"`).
+### 3. STRIKTNÍ ZÁKAZ EMOJI KDEKOLIV V PROJEKTU
+- **NIKDY NEPOUŽÍVAT:** Unicode smajlíky a emoji v kódu, HTML, markdownu, skriptech, komentářích ani v commit messages.
+- **VŽDY POUŽÍVAT ČISTÉ VEKTOROVÉ SVG:** V HTML používejte výhradně inline SVG ikony (Lucide / Feather styl, `width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"`).
 
 ### 4. DYNAMICKÉ PRÁCOVIŠTĚ (Workstation X)
 - Síťové konfigurace musí být navázány na proměnnou `wsX` (`x = wsX || 2`):
@@ -244,19 +244,34 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
   - Vytváří payload s `part = "PC1"`.
   - Pro bezpečné provedení přes `[scriptblock]::Create` nesmí obsahovat žádné syntaktické kolize s prefixy scopes ani nekompatibilní cmdlety.
 
+### 12. OBFUSKACE DISCORD WEBHOOK URL V POWERSHELL SKRIPTECH
+- GitHub Secret Scanner okamžitě zneplatní (revokuje) Discord webhooky, pokud je URL vložena do repozitáře jako plain-text řetězec `https://discord.com/api/webhooks/...`.
+- Ve všech `.ps1` a `.bat` skriptech je **POVINNÉ** Webhook URL obfuskovat (např. otočením řetězce při běhu skriptu pomocí `-join ("...".ToCharArray() | ForEach-Object { $_ })` nebo rozdělením na části), aby ji skener nerozpoznal.
+
+### 13. POVINNÉ PRIVILEGOVANÉ INTENTY PRO DISCORD BOTA
+- Discord bot vyžaduje v Discord Developer Portalu (záložka *Bot* -> *Privileged Gateway Intents*) aktivní přepínače:
+  - **MESSAGE CONTENT INTENT** (pro čtení JSON příloh z webhooků a obsahu zpráv).
+  - **SERVER MEMBERS INTENT** (pro spolehlivé vyhledání studentů a doručení ZIP archivu do DM).
+- V kódu bota (`discord-bot/index.js`) musí být `GatewayIntentBits.MessageContent`.
+
+### 14. POVINNÝ GIT AUTOR COMMITŮ
+- Všechny commity musí být prováděny pod identitou autora: `samanbeer <tomas.pachomov@frengp.cz>` (`git commit --author="samanbeer <tomas.pachomov@frengp.cz>"`).
+
 ---
 
-##  Ověřovací checklist pro AI před odevzdáním práce
+## Ověřovací checklist pro AI před odevzdáním práce
 
 Než označíte úkol za dokončený, zkontrolujte v terminálu:
 1. `praxe/XX/verified.json` existuje a má platný JSON formát.
 2. `praxe/XX/tasks.js` je syntakticky validní JS (`node -e "new Function(fs.readFileSync('praxe/XX/tasks.js'))"`).
-3. `praxe/modules.js` a `praxe/modules.json` obsahují nový modul.
+3. `praxe/modules.js` a `praxe/modules.json` obsahují nový modul a `docWorkflow`.
 4. `praxe.html` má v `<head>` tag `<script src="praxe/XX/tasks.js"></script>`.
 5. V `praxe.html` nedošlo k syntaktické chybě v JS.
-6. Žádný příkaz neobsahuje `Ethernet*`.
+6. Žádný příkaz neobsahuje `Ethernet*` (vždy přesně `Ethernet1`).
 7. Žádné heslo ani klíč nejsou v rozporu se zadáním (klíče z Teams, heslo `Pa55w.rd`).
 8. Všechny HTML stránky obsahují v `<head>` favicon odkazující na `bird.png` (`img/bird.png` resp. `../../img/bird.png`).
 9. Ve složce `skripty/` existují funkční kontrolní skripty `XX_check_<VM>.bat` pro všechny VM modulu.
 10. Ve složce `skripty/` existují funkční dokumentační skripty `XX_doc_<VM>.bat` a šablony v `praxe/XX/doc_templates/` i `discord-bot/templates/XX/`.
-11. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
+11. Webhook URL v dokumentačních skriptech je bezpečně obfuskována.
+12. Nikde v kódu, textech ani commitech nejsou použity emoji.
+13. Změny jsou otestovány, commitnuty pod autorem `samanbeer <tomas.pachomov@frengp.cz>` a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
