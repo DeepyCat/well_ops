@@ -6,7 +6,8 @@ const {
   SlashCommandBuilder,
   EmbedBuilder,
   PermissionFlagsBits,
-  AttachmentBuilder
+  AttachmentBuilder,
+  MessageFlags
 } = require('discord.js');
 const path = require('path');
 const fs = require('fs');
@@ -113,12 +114,13 @@ const commands = [
     )
 ].map(cmd => cmd.toJSON());
 
-// Inicializace Discord klienta se standardnimi (neprivilegovanymi) intenty
+// Inicializace Discord klienta s potrebnymi intenty pro cteni dokumentacnich priloh
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.DirectMessages
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.MessageContent
   ]
 });
 
@@ -176,10 +178,17 @@ async function registerSlashCommands() {
   }
 }
 
-client.once('ready', async () => {
+let isReadyHandled = false;
+async function onReady() {
+  if (isReadyHandled) return;
+  isReadyHandled = true;
   console.log(`Bot je prihlasen jako: ${client.user.tag}`);
   await registerSlashCommands();
-});
+  await backfillRecentDocs();
+}
+
+client.once('clientReady', onReady);
+client.once('ready', onReady);
 
 // ------------------------------------------------------------
 // Zpracovani interakci (Slash prikazu)
@@ -193,7 +202,7 @@ client.on('interactionCreate', async (interaction) => {
   if (commandName === 'moje-id') {
     return interaction.reply({
       content: `**Tvoje Discord udaje:**\n- Uzivatelske jmeno: \`${interaction.user.username}\`\n- Display name: \`${interaction.user.displayName}\`\n- User ID: \`${interaction.user.id}\`\n\n*Toto uzivatelske jmeno (napr. \`${interaction.user.username}\`) muzes zadat do skriptu na SRV1-DC a PC1-WIN.*`,
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
   }
 
@@ -207,7 +216,7 @@ client.on('interactionCreate', async (interaction) => {
     if (!fs.existsSync(userCompletedDir)) {
       return interaction.reply({
         content: `Zatim pro tebe nemam zadnou hotovou dokumentaci pro **Modul ${formattedModule}**.\nNejprve prosim spust Krok 1 (SRV1-DC) a Krok 2 (PC1-WIN) ve virtualnim stroji.`,
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -226,13 +235,13 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.reply({
         content: `Tady je tvoje naposledy vygenerovana dokumentace pro **Modul ${formattedModule}**:`,
         files: files,
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     } catch (err) {
       console.error('Chyba pri odesilani posledni dokumentace:', err);
       return interaction.reply({
         content: `Chyba pri nacitani souboru: ${err.message}`,
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
   }
@@ -242,7 +251,7 @@ client.on('interactionCreate', async (interaction) => {
     if (!isUserAuthorized(interaction)) {
       return interaction.reply({
         content: 'Nemate opravneni pouzivat tento oznamovaci prikaz.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -253,7 +262,7 @@ client.on('interactionCreate', async (interaction) => {
     } catch (err) {
       return interaction.reply({
         content: `Nepodarilo se najit kanal pro oznameni (ID: ${channelId}). Zkontrolujte nastaveni v .env.`,
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
 
@@ -293,10 +302,10 @@ client.on('interactionCreate', async (interaction) => {
         await targetChannel.send({ content: contentPing || undefined, embeds: [embed] });
         return interaction.reply({
           content: `Novy modul byl uspesne publikovan v kanalu <#${targetChannel.id}>.`,
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
       } catch (err) {
-        return interaction.reply({ content: `Chyba pri odesilani: ${err.message}`, ephemeral: true });
+        return interaction.reply({ content: `Chyba pri odesilani: ${err.message}`, flags: MessageFlags.Ephemeral });
       }
     }
 
@@ -322,10 +331,10 @@ client.on('interactionCreate', async (interaction) => {
         await targetChannel.send({ content: contentPing || undefined, embeds: [embed] });
         return interaction.reply({
           content: `Aktualizace byla uspesne publikovana v kanalu <#${targetChannel.id}>.`,
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
       } catch (err) {
-        return interaction.reply({ content: `Chyba pri odesilani: ${err.message}`, ephemeral: true });
+        return interaction.reply({ content: `Chyba pri odesilani: ${err.message}`, flags: MessageFlags.Ephemeral });
       }
     }
   }
@@ -334,9 +343,12 @@ client.on('interactionCreate', async (interaction) => {
 // ------------------------------------------------------------
 // Zpracovani prichozich zprav z dokumentacniho webhooku
 // ------------------------------------------------------------
-client.on('messageCreate', async (message) => {
+const processedMessageIds = new Set();
+
+async function handleDocMessage(message, isBackfill = false) {
   // Ignorujeme zpravy od sebe sama
   if (message.author.id === client.user.id) return;
+  if (processedMessageIds.has(message.id)) return;
 
   // Kontrola, zda zprava patri do dokumentacniho kanalu nebo nese identifikator
   const isDocChannel = message.channelId === DOCS_CHANNEL_ID;
@@ -349,14 +361,16 @@ client.on('messageCreate', async (message) => {
   const jsonAttachment = message.attachments.find(a => a.name && a.name.endsWith('.json'));
   if (!jsonAttachment) return;
 
+  processedMessageIds.add(message.id);
+  console.log(`[DOC] Prijata JSON data z webhooku: ${jsonAttachment.name} (zprava: ${message.id}, backfill: ${isBackfill})`);
+
   try {
-    console.log(`Prijata JSON data z webhooku: ${jsonAttachment.name}`);
     const res = await fetch(jsonAttachment.url);
     if (!res.ok) throw new Error(`HTTP ${res.status} pri stahovani prilohy`);
     const data = await res.json();
 
     if (!data.module || !data.part || !data.discordUser) {
-      console.warn('Neplatny format JSON dat z VM:', data);
+      console.warn('[DOC] Neplatny format JSON dat z VM:', data);
       return;
     }
 
@@ -392,14 +406,17 @@ client.on('messageCreate', async (message) => {
         ? 'Nyni otevrete stroj **PC1-WIN** a spustte prikaz pro **Krok 2/2**.'
         : 'Cekam jeste na dokonceni serverove casti (**SRV1-DC**).';
 
-      await message.channel.send({
-        content: `**[KROK ${isSrv ? '1/2' : '2/2'} PRIJAT]**\n${readyPart} pro studenta **@${data.discordUser}** (Modul ${formattedModule}) byla uspesne zaznamenana!\n${nextStep}`
-      });
+      console.log(`[DOC] Zaznamenana cast ${data.part} pro ${userKey} (Modul ${formattedModule}). Cekam na druhou cast.`);
+      if (!isBackfill) {
+        await message.channel.send({
+          content: `**[KROK ${isSrv ? '1/2' : '2/2'} PRIJAT]**\n${readyPart} pro studenta **@${data.discordUser}** (Modul ${formattedModule}) byla uspesne zaznamenana!\n${nextStep}`
+        });
+      }
       return;
     }
 
     // 2. Mame OBE casti (SRV1-DC i PC1-WIN) -> spojime a posleme!
-    console.log(`Mame obe casti pro ${userKey} (Modul ${formattedModule})! Generuji finalni dokumentaci...`);
+    console.log(`[DOC] Mame obe casti pro ${userKey} (Modul ${formattedModule})! Generuji finalni dokumentaci...`);
 
     const templatesDir = path.join(__dirname, 'templates', formattedModule);
     const overeniTemplatePath = path.join(templatesDir, 'overeni.md');
@@ -477,13 +494,15 @@ client.on('messageCreate', async (message) => {
     let targetMember = null;
     if (message.guild) {
       try {
-        const members = await message.guild.members.fetch();
-        targetMember = members.find(m =>
-          m.user.username.toLowerCase() === userKey ||
-          (m.nickname && m.nickname.toLowerCase() === userKey) ||
-          m.displayName.toLowerCase() === userKey ||
-          m.id === userKey
-        );
+        const members = await message.guild.members.fetch().catch(() => null);
+        if (members) {
+          targetMember = members.find(m =>
+            m.user.username.toLowerCase() === userKey ||
+            (m.nickname && m.nickname.toLowerCase() === userKey) ||
+            m.displayName.toLowerCase() === userKey ||
+            m.id === userKey
+          );
+        }
       } catch (e) {
         console.warn('Nelze nacist seznam clenu:', e.message);
       }
@@ -537,7 +556,7 @@ client.on('messageCreate', async (message) => {
 
     // Uklidime pending data, protoze je dokumentace hotova
     fs.unlinkSync(pendingFile);
-    console.log(`Dokumentace pro ${userKey} uspesne odeslana a dokoncena!`);
+    console.log(`[DOC] Dokumentace pro ${userKey} uspesne odeslana a dokoncena!`);
 
   } catch (err) {
     console.error('Chyba pri zpracovani dokumentace z webhooku:', err);
@@ -545,7 +564,32 @@ client.on('messageCreate', async (message) => {
       content: `Nastala chyba pri zpracovani dokumentace z VM: \`${err.message}\``
     });
   }
+}
+
+// Event listener pro nove prichozi zpravy
+client.on('messageCreate', async (message) => {
+  await handleDocMessage(message, false);
 });
+
+// Zpetne nacteni a zpracovani nedokoncenych zprav z kanalu pri startu
+async function backfillRecentDocs() {
+  if (!DOCS_CHANNEL_ID) return;
+  try {
+    const channel = await client.channels.fetch(DOCS_CHANNEL_ID);
+    if (!channel || !channel.isTextBased()) return;
+    console.log(`[BACKFILL] Kontroluji predchozi zpravy v dokumentacnim kanalu (${DOCS_CHANNEL_ID})...`);
+    const fetched = await channel.messages.fetch({ limit: 50 });
+    const sorted = Array.from(fetched.values()).reverse();
+    for (const msg of sorted) {
+      if (msg.author.id === client.user.id) continue;
+      if (msg.attachments && msg.attachments.size > 0) {
+        await handleDocMessage(msg, true);
+      }
+    }
+  } catch (err) {
+    console.warn('[BACKFILL] Chyba pri kontrole historie zprav:', err.message);
+  }
+}
 
 // Spusteni bota
 if (!TOKEN || TOKEN === 'sem_vloz_token_bota') {
