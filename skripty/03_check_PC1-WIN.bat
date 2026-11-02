@@ -1,6 +1,6 @@
 @echo off
 set "BAT_PATH=%~f0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "=[scriptblock]::Create((Get-Content -LiteralPath :BAT_PATH | Select-Object -Skip 5 | Out-String)); &  %*"
 (goto) 2>nul & del "%~f0"
 exit /b %ERRORLEVEL%
 <#
@@ -236,26 +236,41 @@ try {
 # ------------------------------------------------------------
 Write-Section "5. Preklad aliasu CNAME (ftp)"
 
+$targetDomain = if ($suffix) { $suffix } else { "pachomov.cyberschool.internal" }
+$ftpFqdn = "ftp.$targetDomain"
+
 try {
-    $resFtp = Resolve-DnsName -Name "ftp" -ErrorAction Stop
+    # Resolve-DnsName primo na DNS server SRV1-DC (192.168.X.10) na Ethernet1
+    $resFtp = Resolve-DnsName -Name $ftpFqdn -Server $expectedServerIP -ErrorAction Stop | Select-Object Name, Type, NameHost, IPAddress
     $cnameRecord = $resFtp | Where-Object { $_.Type -eq "CNAME" }
     $aRecord = $resFtp | Where-Object { $_.Type -eq "A" }
 
     if ($cnameRecord -and $cnameRecord.NameHost -like "*srv2-fs*") {
-        Report-Ok "Alias 'ftp' spravne odkazuje na kanonicky cil '$($cnameRecord.NameHost)'"
+        Report-Ok "Alias '$ftpFqdn' (Server: $expectedServerIP) odkazuje na '$($cnameRecord.NameHost)'"
     } elseif ($cnameRecord) {
-        Report-Warn "Alias 'ftp' odkazuje na '$($cnameRecord.NameHost)', ocekavano 'srv2-fs'"
+        Report-Warn "Alias '$ftpFqdn' odkazuje na '$($cnameRecord.NameHost)', ocekavano 'srv2-fs'"
     } else {
-        Report-Warn "Dotaz na 'ftp' vratil vysledek, ale nebyl detekovan zaznam typu CNAME"
+        Report-Warn "Dotaz na '$ftpFqdn' vratil vysledek, ale nebyl detekovan zaznam typu CNAME"
     }
 
     if ($aRecord -and $aRecord.IPAddress -contains $expectedFsIP) {
-        Report-Ok "Alias 'ftp' se uspesne prelozil na cilovou IP $expectedFsIP"
+        Report-Ok "Alias '$ftpFqdn' se uspesne prelozil na cilovou IP $expectedFsIP"
     } else {
-        Report-Fail "Preklad aliasu 'ftp' nevratil cilovou IP $expectedFsIP" "Zkontrolujte A zaznam pro srv2-fs a cil aliasu ftp"
+        Report-Fail "Preklad aliasu '$ftpFqdn' nevratil cilovou IP $expectedFsIP" "Zkontrolujte A zaznam pro srv2-fs a cil aliasu ftp"
     }
 } catch {
-    Report-Fail "Dotaz na alias 'ftp' selhal: $($_.Exception.Message)" "Add-DnsServerResourceRecordCName -Name 'ftp' -HostNameAlias 'srv2-fs.<domena>' na SRV1-DC"
+    try {
+        $resFtp = Resolve-DnsName -Name "ftp" -Server $expectedServerIP -ErrorAction Stop | Select-Object Name, Type, NameHost, IPAddress
+        $cnameRecord = $resFtp | Where-Object { $_.Type -eq "CNAME" }
+        $aRecord = $resFtp | Where-Object { $_.Type -eq "A" }
+        if ($cnameRecord -and $aRecord.IPAddress -contains $expectedFsIP) {
+            Report-Ok "Alias 'ftp' se na serveru $expectedServerIP uspesne prelozil na $expectedFsIP"
+        } else {
+            Report-Fail "Preklad aliasu 'ftp' na $expectedServerIP nevratil $expectedFsIP"
+        }
+    } catch {
+        Report-Fail "Dotaz Resolve-DnsName -Name '$ftpFqdn' -Server $expectedServerIP selhal: $($_.Exception.Message)" "Add-DnsServerResourceRecordCName -Name 'ftp' -HostNameAlias 'srv2-fs.<domena>' na SRV1-DC"
+    }
 }
 
 # ------------------------------------------------------------

@@ -553,30 +553,22 @@ Address: 192.168.N.10</code></pre>
       </div>
 
       <h2>8. Alias ftp funguje a vrací správný kanonický cíl (PC1-WIN)</h2>
-      <p>Příkaz <code>nslookup ftp</code> vrátí cíl <code>srv2-fs.&lt;prijmeni&gt;.cyberschool.internal</code>, alias <code>ftp</code> a adresu <code>192.168.N.20</code>.</p>
+      <p>Příkaz <code>Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.N.10 | Select-Object Name, Type, NameHost, IPAddress</code> vrátí CNAME cíl <code>srv2-fs.pachomov.cyberschool.internal</code> a adresu <code>192.168.N.20</code>.</p>
 
       <div class="code-block-wrapper">
         <div class="code-block-header">
-          <span>PowerShell / Příkazový řádek (PC1-WIN)</span>
+          <span>PowerShell (PC1-WIN)</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>nslookup ftp
-Resolve-DnsName -Name "ftp" | Select-Object Name, Type, NameHost, IPAddress</code></pre>
+        <pre><code>Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.N.10 | Select-Object Name, Type, NameHost, IPAddress</code></pre>
       </div>
       <p>Očekávaný výstup:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header"><span>Očekávaný výstup</span></div>
-        <pre><code>Server:  srv1-dc.&lt;prijmeni&gt;.cyberschool.internal
-Address:  192.168.N.10
-
-Name:    srv2-fs.&lt;prijmeni&gt;.cyberschool.internal
-Address: 192.168.N.20
-Aliases: ftp.&lt;prijmeni&gt;.cyberschool.internal
-
-Name                                 Type  NameHost                                 IPAddress
-----                                 ----  --------                                 ---------
-ftp.&lt;prijmeni&gt;.cyberschool.internal  CNAME srv2-fs.&lt;prijmeni&gt;.cyberschool.internal
-srv2-fs.&lt;prijmeni&gt;.cyberschool.internal A                                           192.168.N.20</code></pre>
+        <pre><code>Name                                  Type  NameHost                                  IPAddress
+----                                  ----  --------                                  ---------
+ftp.pachomov.cyberschool.internal     CNAME srv2-fs.pachomov.cyberschool.internal
+srv2-fs.pachomov.cyberschool.internal A                                               192.168.N.20</code></pre>
       </div>
 
       <h2>9. Přejmenování a nový záznam se v DNS projeví (PC1-WIN)</h2>

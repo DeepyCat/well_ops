@@ -326,20 +326,24 @@ nslookup 192.168.${x}.10`;
     what: (vm, wsX) => {
       const x = wsX || 2;
       return `
-        <p>Ověřte překlad aliasu <code>ftp</code>. Příkaz <code>nslookup ftp</code> musí vrátit kanonické jméno serveru <code>srv2-fs.&lt;prijmeni&gt;.cyberschool.internal</code>, alias <code>ftp.&lt;prijmeni&gt;.cyberschool.internal</code> a IP adresu <code>192.168.${x}.20</code>.</p>
+        <p>Ověřte překlad aliasu <code>ftp</code> dotazem přímo na DNS server <code>192.168.${x}.10</code> (SRV1-DC). Dotaz vrátí kanonické jméno serveru <code>srv2-fs.&lt;prijmeni&gt;.cyberschool.internal</code>, alias <code>ftp.&lt;prijmeni&gt;.cyberschool.internal</code> a IP adresu <code>192.168.${x}.20</code>.</p>
       `;
     },
     how: (vm, wsX) => {
-      return `# Dotaz na alias ftp:
-nslookup ftp
-Resolve-DnsName -Name "ftp" | Select-Object Name, Type, NameHost, IPAddress`;
+      const x = wsX || 2;
+      return `# Dotaz na alias ftp přímo na DNS server 192.168.${x}.10 přes Ethernet1:
+Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.${x}.10 | Select-Object Name, Type, NameHost, IPAddress
+
+# Nebo přes nslookup:
+nslookup ftp.pachomov.cyberschool.internal 192.168.${x}.10`;
     },
     verify: (vm, wsX) => {
-      return `Resolve-DnsName -Name "ftp" | Select-Object Name, Type, NameHost, IPAddress`;
+      const x = wsX || 2;
+      return `Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.${x}.10 | Select-Object Name, Type, NameHost, IPAddress`;
     },
     expected: (vm, wsX) => {
       const x = wsX || 2;
-      return `Name                                 Type  NameHost                                 IPAddress\n----                                 ----  --------                                 ---------\nftp.<prijmeni>.cyberschool.internal  CNAME srv2-fs.<prijmeni>.cyberschool.internal\nsrv2-fs.<prijmeni>.cyberschool.internal A                                           192.168.${x}.20`;
+      return `Name                                  Type  NameHost                                  IPAddress\n----                                  ----  --------                                  ---------\nftp.pachomov.cyberschool.internal     CNAME srv2-fs.pachomov.cyberschool.internal\nsrv2-fs.pachomov.cyberschool.internal A                                               192.168.${x}.20`;
     }
   },
   {

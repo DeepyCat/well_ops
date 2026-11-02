@@ -204,16 +204,19 @@ Start-Sleep -Milliseconds 400
 # M3-PC1.V4 Preklad aliasu ftp
 Write-Host "  [PROBIHA]  M3-PC1.V4 Preklad aliasu ftp.$studentDomain..." -ForegroundColor DarkYellow
 Start-Sleep -Milliseconds 400
-$nslookupFtpText = try {
-    cmd.exe /c "nslookup ftp.$studentDomain"
+$ftpResolveText = try {
+    Resolve-DnsName -Name "ftp.$studentDomain" -Server "192.168.$wsX.10" -ErrorAction Stop |
+        Select-Object Name, Type, NameHost, IPAddress |
+        Format-Table -AutoSize |
+        Out-String
 } catch {
-    "Chyba pri nslookup ftp.$studentDomain: $_"
+    cmd.exe /c "nslookup ftp.$studentDomain 192.168.$wsX.10"
 }
 
 $pc1V4Output = @"
-PS C:\Users\Administrator> nslookup ftp.$studentDomain
+PS C:\Users\Administrator> Resolve-DnsName -Name "ftp.$studentDomain" -Server 192.168.$wsX.10 | Select-Object Name, Type, NameHost, IPAddress
 
-$nslookupFtpText
+$ftpResolveText
 PS C:\Users\Administrator>
 "@
 Report-Step "  OK   " "M3-PC1.V4-D1" "Preklad aliasu ftp zaznamenan" "Green"
