@@ -113,12 +113,11 @@ const commands = [
     )
 ].map(cmd => cmd.toJSON());
 
-// Inicializace Discord klienta se vsemi potrebnymi intenty
+// Inicializace Discord klienta se standardnimi (neprivilegovanymi) intenty
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
     GatewayIntentBits.DirectMessages
   ]
 });
