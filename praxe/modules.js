@@ -62,25 +62,25 @@ window.OPS_MODULES = [
       ]
     },
     docWorkflow: {
-      title: "Automatické vyplnění dokumentace & odeslání na Discord",
-      warning: "Všechny příkazy dělej postupně a nepřeskakuj!",
+      title: "Automatické vygenerování dokumentace & odeslání na Discord",
+      warning: "DŮLEŽITÉ PRAVIDLO: Příkazy provádějte POSTUPNĚ jeden po druhém! Nikdy nespouštějte skripty na více strojích naráz. Počkejte, až bot potvrdí Krok 1, a teprve poté spusťte Krok 2.",
       steps: [
         {
           num: 1,
           vm: "SRV1-DC",
-          title: "1. Krok: Otevři SRV1-DC",
-          desc: "Vlož tento příkaz do PowerShellu a počkej, až se dokončí. Reaguj na dotazy (jméno, třída, Discord username). Jakmile se v PowerShellu vypíše HOTOVO, přejdi ke kroku 2:",
+          title: "Krok 1: Spusťte na serveru SRV1-DC",
+          desc: "Otevřete PowerShell jako Správce na stroji SRV1-DC, spusťte níže uvedený příkaz a vyplňte své jméno, třídu (T3A) a přesné Discord uživatelské jméno. Skript provede audit konfigurace DNS serveru a odešle data na Discord do kanálu #dokumentace. Vyčkejte, až se v kanálu zobrazí potvrzení od bota '[KROK 1/2 PRIJAT]'.",
           command: 'powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_doc_SRV1-DC.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue"'
         },
         {
           num: 2,
           vm: "PC1-WIN",
-          title: "2. Krok: Otevři PC1-WIN",
-          desc: "Vlož tento příkaz do PowerShellu na PC1-WIN a zadej stejné Discord uživatelské jméno:",
+          title: "Krok 2: Spusťte na stanici PC1-WIN (až po potvrzení Kroku 1!)",
+          desc: "Přepněte se na klientskou stanici PC1-WIN a otevřete PowerShell jako Správce. Spusťte níže uvedený příkaz a zadejte STEJNÉ uživatelské jméno na Discordu jako v prvním kroku. Skript provede klientské testy překladu a odešle druhou část botovi.",
           command: 'powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_doc_PC1-WIN.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue"'
         }
       ],
-      footnote: "Po dokončení 2. kroku ti náš Discord bot automaticky pošle hotovou a spojenou dokumentaci (overeni.md, postup.md i ZIP) přímo na Discord!"
+      footnote: "Po přijetí obou částí bot zahájí generování a do 5 minut vám do kanálu doručí hotový ZIP archiv. DŮLEŽITÉ: U bodu M3-SRV1.V1-D2 nezapomeňte ručně vložit screenshot DNS Manageru!"
     }
   }
 ];

@@ -308,6 +308,13 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 - Pokud zadání řeší pouze 1 stroj (např. Modul 01: pouze SRV1-DC), nesmí se generovat klientské skripty pro PC1, docWorkflow má pouze 1 krok a Discord bot nesmí čekat na PC1, ale ihned po přijetí SRV1 vygenerovat ZIP.
 - Pokud zadání zapojuje 3 stroje (včetně SRV2-FS), musí vzniknout skripty, úkoly i workflow pro všechny 3 stroje.
 
+### 16. ODDĚLENÍ AUTOMATICKÉ DOKUMENTACE OD ÚKOLŮ (NEZAPOČÍTÁVÁ SE DO PROGRESS BARU)
+- Automatická dokumentace se NIKDY nezařazuje jako běžný úkol (checkbox) do `tasks.js` – nesmí ovlivňovat procenta dokončení modulu!
+- Posledním krokem každého VM v `tasks.js` musí být VŽDY interaktivní ověřovací skript stroje (`XX_check_<VM>.bat`).
+- Automatická dokumentace se na webu zobrazuje výhradně pod samostatným žlutě zvýrazněným tlačítkem `DOKUMENTACE (udělá se sama :O )` vedle tlačítek jednotlivých VM.
+- V popUp okně po 100% dokončení úkolů se nezobrazuje inline návod, ale žluté tlačítko pro přechod do záložky dokumentace.
+- Instrukce v záložce dokumentace musí být jednoduché, zřetelné a striktně vyžadovat postupné provádění krok za krokem (spustit Krok 1, vyčkat na potvrzení od bota `[KROK 1/X PRIJAT]`, teprve poté spustit další krok).
+
 ---
 
 ## Ověřovací checklist pro AI před odevzdáním práce

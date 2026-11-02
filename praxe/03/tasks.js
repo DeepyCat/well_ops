@@ -411,56 +411,5 @@ ping srv2-fs`;
     expected: (vm, wsX) => {
       return `Všechny testované položky zakončeny stavem [ OK ] bez chyb.`;
     }
-  },
-  {
-    id: "auto-documentation",
-    title: "14. (Automatizace) Vyplnění dokumentace a odeslání na Discord",
-    forVMs: ["SRV1-DC", "PC1-WIN"],
-    what: (vm, wsX) => {
-      if (vm === "SRV1-DC") {
-        return `
-          <div class="nic-warning-banner" style="border-left-color: #22c55e;">
-            <div class="nic-warning-title" style="color: #22c55e;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-              <span>KROK 1/2: ZAZNAMENÁNÍ SERVEROVÉ DOKUMENTACE NA SRV1-DC</span>
-            </div>
-            <div class="nic-warning-text">
-              Příkazy provádějte postupně a nepřeskakujte. Po spuštění na SRV1-DC zadejte své jméno, třídu (T3A) a Discord uživatelské jméno.
-              Jakmile skript napíše <strong>HOTOVO</strong>, přejděte na PC1-WIN a spusťte Krok 2/2.
-            </div>
-          </div>
-        `;
-      } else {
-        return `
-          <div class="nic-warning-banner" style="border-left-color: #22c55e;">
-            <div class="nic-warning-title" style="color: #22c55e;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-              <span>KROK 2/2: KLIENTSKÉ OVERENÍ A SPOJENÍ DOKUMENTACE NA DISCORDU</span>
-            </div>
-            <div class="nic-warning-text">
-              Spusťte tento příkaz na PC1-WIN a zadejte <strong>stejné Discord jméno</strong> jako na SRV1-DC.
-              Po dokončení Discord bot automaticky spojí obě části a zašle vám <code>overeni.md</code>, <code>postup.md</code> i ZIP přímo na Discord!
-            </div>
-          </div>
-        `;
-      }
-    },
-    how: (vm, wsX) => {
-      if (vm === "SRV1-DC") {
-        return `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_doc_SRV1-DC.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue"`;
-      } else {
-        return `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_doc_PC1-WIN.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue"`;
-      }
-    },
-    verify: (vm, wsX) => {
-      return vm === "SRV1-DC"
-        ? `Zkontrolujte, zda skript vypsal zelené hlášení HOTOVO a odeslal data na Discord.`
-        : `Zkontrolujte svůj Discord kanál #dokumentace nebo soukromé zprávy (DM), kde bot doručil hotové soubory.`;
-    },
-    expected: (vm, wsX) => {
-      return vm === "SRV1-DC"
-        ? `[ HOTOVO ] Serverova cast SRV1-DC byla uspesne zaznamenana! Přejděte na PC1-WIN.`
-        : `Dokumentace pro @uzivatel byla uspesne spojena a dorucena na Discord (overeni.md, postup.md, ZIP)!`;
-    }
   }
 ];
