@@ -238,31 +238,35 @@ Add-DnsServerResourceRecordPtr -Name "10" -ZoneName "$wsX.168.192.in-addr.arpa" 
   },
   {
     id: "dns-client-registration",
-    title: "7. Registrace a nastavení klienta v DNS (PC1-WIN)",
+    title: "7. Priorita adaptérů a registrace klienta v DNS (PC1-WIN)",
     forVMs: ["PC1-WIN"],
     what: (vm, wsX) => {
       const x = wsX || 2;
       return `
-        <p>Na klientské stanici <strong>PC1-WIN</strong> ověřte, že adaptér <code>Ethernet1</code> (NIC 2 v CyLabu) má jako primární DNS server nastavenou adresu <code>192.168.${x}.10</code> a obdržel doménovou příponu <code>&lt;prijmeni&gt;.cyberschool.internal</code> (z DHCP nebo ručně).</p>
-        <p>Příkazem <code>ipconfig /registerdns</code> vyzvěte klienta k okamžité registraci svých záznamů A i PTR na DNS serveru a příkazem <code>ipconfig /flushdns</code> promažte lokální mezipaměť překladače.</p>
+        <p>Protože má stanice <strong>PC1-WIN</strong> dva síťové adaptéry (<code>Ethernet0</code> pro NAT a <code>Ethernet1</code> pro školní síť), systém Windows by při výchozí automatické metrice mohl DNS dotazy omylem posílat na vnější adaptér NAT.</p>
+        <p>Nastavte nižší metriku (vyšší prioritu) pro adaptér <code>Ethernet1</code> (metrika <code>10</code>) a vyšší metriku pro <code>Ethernet0</code> (metrika <code>50</code>). Tím zajistíte, že veškeré překlady a komunikace v rámci domény budou prioritně směrovány přes školní síť a server SRV1-DC.</p>
+        <p>Zároveň ověřte, že adaptér <code>Ethernet1</code> má jako primární DNS server adresu <code>192.168.${x}.10</code>, doménovou příponu a proveďte registraci klienta v DNS.</p>
       `;
     },
     how: (vm, wsX) => {
-      return `# 1. Kontrola DNS serveru na Ethernet1:
+      const x = wsX || 2;
+      return `# 1. Nastavení priority síťových adaptérů (Ethernet1 má přednost před Ethernet0):
+Set-NetIPInterface -InterfaceAlias "Ethernet1" -InterfaceMetric 10
+Set-NetIPInterface -InterfaceAlias "Ethernet0" -InterfaceMetric 50
+
+# 2. Kontrola nastavené metriky a DNS serveru:
+Get-NetIPInterface -InterfaceAlias "Ethernet1", "Ethernet0" -AddressFamily IPv4 | Select-Object InterfaceAlias, InterfaceMetric
 Get-DnsClientServerAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses
 
-# 2. Vynucení okamžité dynamické registrace klienta do DNS:
+# 3. Vynucení okamžité registrace a vyčištění DNS cache:
 ipconfig /registerdns
-
-# 3. Vyčištění lokální paměti překladače (DNS cache):
 ipconfig /flushdns`;
     },
     verify: (vm, wsX) => {
-      return `Get-DnsClientServerAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses`;
+      return `Get-NetIPInterface -InterfaceAlias "Ethernet1", "Ethernet0" -AddressFamily IPv4 | Select-Object InterfaceAlias, InterfaceMetric`;
     },
     expected: (vm, wsX) => {
-      const x = wsX || 2;
-      return `InterfaceAlias ServerAddresses\n-------------- ---------------\nEthernet1      {192.168.${x}.10}`;
+      return `InterfaceAlias InterfaceMetric\n-------------- ---------------\nEthernet1                   10\nEthernet0                   50`;
     }
   },
   {

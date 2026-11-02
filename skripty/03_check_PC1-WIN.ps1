@@ -164,6 +164,18 @@ if ($dnsClient -and $dnsClient.ConnectionSpecificSuffix) {
     Report-Warn "Rozhrani Ethernet1 nema nastavenou domenovou priponu" "Zkontrolujte DHCP Option 015 nebo zadejte priponu rucne"
 }
 
+# Kontrola priority rozhrani (InterfaceMetric Ethernet1 vs Ethernet0)
+$metricEth1 = (Get-NetIPInterface -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue).InterfaceMetric
+$metricEth0 = (Get-NetIPInterface -InterfaceAlias "Ethernet0" -AddressFamily IPv4 -ErrorAction SilentlyContinue).InterfaceMetric
+
+if ($metricEth1 -and $metricEth0 -and $metricEth1 -lt $metricEth0) {
+    Report-Ok "Priorita adapteru (InterfaceMetric) je spravna: Ethernet1 ($metricEth1) ma prednost pred Ethernet0 ($metricEth0)"
+} elseif ($metricEth1 -and $metricEth0) {
+    Report-Warn "Ethernet1 ma metriku $metricEth1 a Ethernet0 ma $metricEth0 (Ethernet1 by mel mit nizsi metriku pro prednost DNS)" "Spuste: Set-NetIPInterface -InterfaceAlias 'Ethernet1' -InterfaceMetric 10; Set-NetIPInterface -InterfaceAlias 'Ethernet0' -InterfaceMetric 50"
+} elseif ($metricEth1) {
+    Report-Ok "Metrika rozhrani Ethernet1 je $metricEth1"
+}
+
 # ------------------------------------------------------------
 # 3. Dopredny preklad (Forward Lookup: A zaznamy)
 # ------------------------------------------------------------

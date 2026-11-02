@@ -96,17 +96,25 @@ ftp      CNAME      srv2-fs.<prijmeni>.cyberschool.internal.
 
 ---
 
-### 5. Klient PC1-WIN používá správný DNS server a doménovou příponu (PC1-WIN)
-Na stanici **PC1-WIN** ukazuje `ipconfig /all` nebo PowerShell rozhraní `Ethernet1` primární DNS server `192.168.N.10` a DNS příponu `<prijmeni>.cyberschool.internal`.
+### 5. Klient PC1-WIN používá správný DNS server, prioritu adaptérů a doménovou příponu (PC1-WIN)
+Na stanici **PC1-WIN** nastavte prioritu adaptérů tak, aby školní síť `Ethernet1` měla nižší metriku (10) než adaptér pro internet `Ethernet0` (metrika 50). Tím zajistíte, že systém bude veškeré doménové DNS dotazy prioritně směrovat na server SRV1-DC (`192.168.N.10`).
 
 V PowerShellu na PC1-WIN:
 ```powershell
+Set-NetIPInterface -InterfaceAlias "Ethernet1" -InterfaceMetric 10
+Set-NetIPInterface -InterfaceAlias "Ethernet0" -InterfaceMetric 50
+Get-NetIPInterface -InterfaceAlias "Ethernet1", "Ethernet0" -AddressFamily IPv4 | Select-Object InterfaceAlias, InterfaceMetric
 Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses
 Get-DnsClient -InterfaceAlias Ethernet1 | Select-Object ConnectionSpecificSuffix, RegisterThisConnectionsAddress
 ```
 
 Očekávaný výstup:
 ```text
+InterfaceAlias InterfaceMetric
+-------------- ---------------
+Ethernet1                   10
+Ethernet0                   50
+
 InterfaceAlias ServerAddresses
 -------------- ---------------
 Ethernet1      {192.168.N.10}

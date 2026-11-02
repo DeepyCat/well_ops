@@ -477,21 +477,29 @@ Get-DnsServerResourceRecord -ZoneName $domain -Name "ftp" | Select-Object HostNa
 ftp      CNAME      srv2-fs.&lt;prijmeni&gt;.cyberschool.internal.</code></pre>
       </div>
 
-      <h2>5. Klient PC1-WIN používá správný DNS server a doménovou příponu (PC1-WIN)</h2>
-      <p>Na stanici <strong>PC1-WIN</strong> ukazuje <code>ipconfig /all</code> nebo PowerShell rozhraní <code>Ethernet1</code> primární DNS server <code>192.168.N.10</code> a DNS příponu <code>&lt;prijmeni&gt;.cyberschool.internal</code>.</p>
+      <h2>5. Klient PC1-WIN používá správný DNS server, prioritu adaptérů a doménovou příponu (PC1-WIN)</h2>
+      <p>Na stanici <strong>PC1-WIN</strong> nastavte prioritu adaptérů (InterfaceMetric), aby školní síť <code>Ethernet1</code> (metrika <code>10</code>) měla přednost před adaptérem pro internet <code>Ethernet0</code> (metrika <code>50</code>) a DNS dotazy směřovaly na SRV1-DC (<code>192.168.N.10</code>).</p>
 
       <div class="code-block-wrapper">
         <div class="code-block-header">
           <span>PowerShell (Spustit na PC1-WIN)</span>
           <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
         </div>
-        <pre><code>Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses
+        <pre><code>Set-NetIPInterface -InterfaceAlias "Ethernet1" -InterfaceMetric 10
+Set-NetIPInterface -InterfaceAlias "Ethernet0" -InterfaceMetric 50
+Get-NetIPInterface -InterfaceAlias "Ethernet1", "Ethernet0" -AddressFamily IPv4 | Select-Object InterfaceAlias, InterfaceMetric
+Get-DnsClientServerAddress -InterfaceAlias Ethernet1 -AddressFamily IPv4 | Select-Object InterfaceAlias, ServerAddresses
 Get-DnsClient -InterfaceAlias Ethernet1 | Select-Object ConnectionSpecificSuffix, RegisterThisConnectionsAddress</code></pre>
       </div>
       <p>Očekávaný výstup:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header"><span>Očekávaný výstup</span></div>
-        <pre><code>InterfaceAlias ServerAddresses
+        <pre><code>InterfaceAlias InterfaceMetric
+-------------- ---------------
+Ethernet1                   10
+Ethernet0                   50
+
+InterfaceAlias ServerAddresses
 -------------- ---------------
 Ethernet1      {192.168.N.10}
 

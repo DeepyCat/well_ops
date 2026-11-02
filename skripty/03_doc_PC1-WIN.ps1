@@ -246,13 +246,19 @@ Start-Sleep -Milliseconds 400
 Write-Section "3. Priprava textu postupu na PC1-WIN"
 
 $pc1P1Text = @"
-1. Na klientskem pocitaci PC1-WIN spusten prikaz:
+1. Nastavena priorita sitovych adapteru pro preferenci skolni site Ethernet1 pred NAT adapterem Ethernet0:
+   Set-NetIPInterface -InterfaceAlias "Ethernet1" -InterfaceMetric 10
+   Set-NetIPInterface -InterfaceAlias "Ethernet0" -InterfaceMetric 50
+2. Na klientskem pocitaci PC1-WIN spusten prikaz:
    ipconfig /all
-2. V sekci 'Ethernet adapter Ethernet1' overeno:
+3. V sekci 'Ethernet adapter Ethernet1' overeno:
    - Primary Dns Suffix: $studentDomain
    - DNS Servers: 192.168.$wsX.10 (IP adresa serveru SRV1-DC)
    - Connection-specific DNS Suffix: $studentDomain
-3. Proverena dostupnost DNS serveru pomoci prikazu:
+4. Vynucena registrace a promazani DNS cache:
+   ipconfig /registerdns
+   ipconfig /flushdns
+5. Proverena dostupnost DNS serveru pomoci prikazu:
    Test-NetConnection -ComputerName 192.168.$wsX.10 -Port 53
 "@
 
