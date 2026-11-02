@@ -81,21 +81,42 @@ try {
 $wsX = if ($WorkspaceX -gt 0) { $WorkspaceX } else { $detectedX }
 
 # Autodetekce domeny ze spojeni nebo systemu
-$detectedDomain = "pachomov.cyberschool.internal"
+$detectedDomain = ""
 try {
-    $connSuffix = (Get-DnsClientGlobalSetting -ErrorAction SilentlyContinue).SuffixSearchList | Select-Object -First 1
-    if (-not [string]::IsNullOrWhiteSpace($connSuffix)) {
-        $detectedDomain = $connSuffix
-    } else {
-        $sysDomain = (Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue).Domain
-        if (-not [string]::IsNullOrWhiteSpace($sysDomain) -and $sysDomain -ne "WORKGROUP") {
-            $detectedDomain = $sysDomain
-        }
+    $dnsSuffix = (Get-DnsClient -InterfaceAlias "Ethernet1" -ErrorAction SilentlyContinue).ConnectionSpecificSuffix
+    if (-not [string]::IsNullOrWhiteSpace($dnsSuffix)) {
+        $detectedDomain = $dnsSuffix
     }
 } catch {}
+if ([string]::IsNullOrWhiteSpace($detectedDomain)) {
+    try {
+        $connSuffix = (Get-DnsClientGlobalSetting -ErrorAction SilentlyContinue).SuffixSearchList | Select-Object -First 1
+        if (-not [string]::IsNullOrWhiteSpace($connSuffix)) {
+            $detectedDomain = $connSuffix
+        } else {
+            $sysDomain = (Get-CimInstance Win32_ComputerSystem -ErrorAction SilentlyContinue).Domain
+            if (-not [string]::IsNullOrWhiteSpace($sysDomain) -and $sysDomain -ne "WORKGROUP") {
+                $detectedDomain = $sysDomain
+            }
+        }
+    } catch {}
+}
+if ([string]::IsNullOrWhiteSpace($detectedDomain)) {
+    try {
+        $ptrDc = Resolve-DnsName -Name "192.168.$wsX.10" -Server "192.168.$wsX.10" -ErrorAction SilentlyContinue | Where-Object { $_.Type -eq "PTR" } | Select-Object -First 1
+        if ($ptrDc -and $ptrDc.NameHost -match '^srv1-dc\.(.+)$') {
+            $detectedDomain = $matches[1].TrimEnd('.')
+        }
+    } catch {}
+}
 
 if (-not [string]::IsNullOrWhiteSpace($DomainName)) {
     $detectedDomain = $DomainName
+}
+if ([string]::IsNullOrWhiteSpace($detectedDomain)) {
+    Write-Host "Zadejte vasi domenu [vychozi: cyberschool.internal]: " -ForegroundColor Yellow -NoNewline
+    $inputDom = Read-Host
+    $detectedDomain = if (-not [string]::IsNullOrWhiteSpace($inputDom)) { $inputDom.Trim() } else { "cyberschool.internal" }
 }
 
 $studentDomain = $detectedDomain

@@ -1,6 +1,6 @@
 @echo off
 set "BAT_PATH=%~f0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "=[scriptblock]::Create((Get-Content -LiteralPath :BAT_PATH | Select-Object -Skip 5 | Out-String)); &  %*"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"
 (goto) 2>nul & del "%~f0"
 exit /b %ERRORLEVEL%
 <#
@@ -248,8 +248,25 @@ try {
 # ------------------------------------------------------------
 Write-Section "5. Preklad aliasu CNAME (ftp)"
 
-$targetDomain = if ($suffix) { $suffix } else { "pachomov.cyberschool.internal" }
-$ftpFqdn = "ftp.$targetDomain"
+$targetDomain = if ($suffix) { $suffix } else { "" }
+if ([string]::IsNullOrWhiteSpace($targetDomain)) {
+    try {
+        $ptrDc = Resolve-DnsName -Name $expectedServerIP -Server $expectedServerIP -ErrorAction SilentlyContinue | Where-Object { $_.Type -eq "PTR" } | Select-Object -First 1
+        if ($ptrDc -and $ptrDc.NameHost -match '^srv1-dc\.(.+)$') {
+            $targetDomain = $matches[1].TrimEnd('.')
+        }
+    } catch {}
+}
+if ([string]::IsNullOrWhiteSpace($targetDomain)) {
+    try {
+        $connSuffix = (Get-DnsClientGlobalSetting -ErrorAction SilentlyContinue).SuffixSearchList | Select-Object -First 1
+        if (-not [string]::IsNullOrWhiteSpace($connSuffix)) {
+            $targetDomain = $connSuffix
+        }
+    } catch {}
+}
+
+$ftpFqdn = if ($targetDomain) { "ftp.$targetDomain" } else { "ftp" }
 
 try {
     # Resolve-DnsName primo na DNS server SRV1-DC (192.168.X.10) na Ethernet1

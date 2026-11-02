@@ -177,19 +177,19 @@ Address: 192.168.N.10
 ---
 
 ### 8. Alias ftp funguje a vrací správný kanonický cíl (PC1-WIN)
-Příkaz `Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.N.10 | Select-Object Name, Type, NameHost, IPAddress` vrátí záznam typu CNAME odkazující na `srv2-fs.pachomov.cyberschool.internal` a následně A záznam s IP adresou `192.168.N.20`.
+Příkaz `Resolve-DnsName -Name "ftp.<prijmeni>.cyberschool.internal" -Server 192.168.N.10 | Select-Object Name, Type, NameHost, IPAddress` vrátí záznam typu CNAME odkazující na `srv2-fs.<prijmeni>.cyberschool.internal` a následně A záznam s IP adresou `192.168.N.20`.
 
 V PowerShellu na PC1-WIN:
 ```powershell
-Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.N.10 | Select-Object Name, Type, NameHost, IPAddress
+Resolve-DnsName -Name "ftp.<prijmeni>.cyberschool.internal" -Server 192.168.N.10 | Select-Object Name, Type, NameHost, IPAddress
 ```
 
 Očekávaný výstup:
 ```text
 Name                                  Type  NameHost                                  IPAddress
 ----                                  ----  --------                                  ---------
-ftp.pachomov.cyberschool.internal     CNAME srv2-fs.pachomov.cyberschool.internal
-srv2-fs.pachomov.cyberschool.internal A                                               192.168.N.20
+ftp.<prijmeni>.cyberschool.internal     CNAME srv2-fs.<prijmeni>.cyberschool.internal
+srv2-fs.<prijmeni>.cyberschool.internal A                                               192.168.N.20
 ```
 
 ---

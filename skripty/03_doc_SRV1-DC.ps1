@@ -69,16 +69,30 @@ try {
 $wsX = if ($WorkspaceX -gt 0) { $WorkspaceX } else { $detectedX }
 
 # Autodetekce domeny z AD
-$detectedDomain = "pachomov.cyberschool.internal"
+$detectedDomain = ""
 try {
     $adDomain = (Get-ADDomain -ErrorAction SilentlyContinue).DNSRoot
     if (-not [string]::IsNullOrWhiteSpace($adDomain)) {
         $detectedDomain = $adDomain
     }
 } catch {}
+if ([string]::IsNullOrWhiteSpace($detectedDomain)) {
+    try {
+        $zones = Get-DnsServerZone -ErrorAction SilentlyContinue | Where-Object { -not $_.IsAutoCreated -and $_.ZoneType -eq "Primary" -and $_.ZoneName -notlike "*.in-addr.arpa" }
+        if ($zones) {
+            $detectedDomain = ($zones | Select-Object -First 1).ZoneName
+        }
+    } catch {}
+}
+if (-not [string]::IsNullOrWhiteSpace($DomainName)) {
+    $detectedDomain = $DomainName
+}
+if ([string]::IsNullOrWhiteSpace($detectedDomain)) {
+    $detectedDomain = "cyberschool.internal"
+}
 
 # Jmeno studenta
-$defaultName = "Tomas Pachomov"
+$defaultName = ""
 try {
     $who = (whoami).Split('\')[-1]
     if ($who -and $who -ne "administrator") {
@@ -86,9 +100,15 @@ try {
     }
 } catch {}
 
-Write-Host "Zadejte Jmeno a Prijmeni [vychozi: $defaultName]: " -ForegroundColor Yellow -NoNewline
-$inputName = Read-Host
-$studentName = if (-not [string]::IsNullOrWhiteSpace($inputName)) { $inputName } else { $defaultName }
+if ($defaultName) {
+    Write-Host "Zadejte Jmeno a Prijmeni [vychozi: $defaultName]: " -ForegroundColor Yellow -NoNewline
+    $inputName = Read-Host
+    $studentName = if (-not [string]::IsNullOrWhiteSpace($inputName)) { $inputName.Trim() } else { $defaultName }
+} else {
+    Write-Host "Zadejte Jmeno a Prijmeni (napr. Jan Novak): " -ForegroundColor Yellow -NoNewline
+    $inputName = Read-Host
+    $studentName = if (-not [string]::IsNullOrWhiteSpace($inputName)) { $inputName.Trim() } else { "Student" }
+}
 
 # Trida
 Write-Host "Zadejte Tridu [vychozi: T3A]: " -ForegroundColor Yellow -NoNewline

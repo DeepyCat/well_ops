@@ -336,18 +336,18 @@ nslookup 192.168.${x}.10`;
     how: (vm, wsX) => {
       const x = wsX || 2;
       return `# Dotaz na alias ftp přímo na DNS server 192.168.${x}.10 přes Ethernet1:
-Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.${x}.10 | Select-Object Name, Type, NameHost, IPAddress
+Resolve-DnsName -Name "ftp.<prijmeni>.cyberschool.internal" -Server 192.168.${x}.10 | Select-Object Name, Type, NameHost, IPAddress
 
 # Nebo přes nslookup:
-nslookup ftp.pachomov.cyberschool.internal 192.168.${x}.10`;
+nslookup ftp.<prijmeni>.cyberschool.internal 192.168.${x}.10`;
     },
     verify: (vm, wsX) => {
       const x = wsX || 2;
-      return `Resolve-DnsName -Name "ftp.pachomov.cyberschool.internal" -Server 192.168.${x}.10 | Select-Object Name, Type, NameHost, IPAddress`;
+      return `Resolve-DnsName -Name "ftp.<prijmeni>.cyberschool.internal" -Server 192.168.${x}.10 | Select-Object Name, Type, NameHost, IPAddress`;
     },
     expected: (vm, wsX) => {
       const x = wsX || 2;
-      return `Name                                  Type  NameHost                                  IPAddress\n----                                  ----  --------                                  ---------\nftp.pachomov.cyberschool.internal     CNAME srv2-fs.pachomov.cyberschool.internal\nsrv2-fs.pachomov.cyberschool.internal A                                               192.168.${x}.20`;
+      return `Name                                  Type  NameHost                                  IPAddress\n----                                  ----  --------                                  ---------\nftp.<prijmeni>.cyberschool.internal     CNAME srv2-fs.<prijmeni>.cyberschool.internal\nsrv2-fs.<prijmeni>.cyberschool.internal A                                               192.168.${x}.20`;
     }
   },
   {

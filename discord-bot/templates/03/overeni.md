@@ -121,7 +121,7 @@ DOPLNIT
 
 ### M3-PC1.V4 Alias ftp funguje
 
-**M3-PC1.V4-D1** – Důkaz: Výstup nslookup ftp.prijmeni.cyberschool.internal
+**M3-PC1.V4-D1** – Důkaz: Výstup Resolve-DnsName ftp.<prijmeni>.cyberschool.internal
 
 ```text
 DOPLNIT
