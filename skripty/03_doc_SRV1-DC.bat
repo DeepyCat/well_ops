@@ -149,7 +149,7 @@ $studentDomain = if (-not [string]::IsNullOrWhiteSpace($inputDomain)) { $inputDo
 $targetDiscord = $DiscordUser
 while ([string]::IsNullOrWhiteSpace($targetDiscord)) {
     Write-Host ""
-    Write-Host "Zadejte vase Discord uzivatelske jmeno (napr. samanbeer): " -ForegroundColor Cyan -NoNewline
+    Write-Host "Zadejte vase Discord uzivatelske jmeno (napr. jannovak): " -ForegroundColor Cyan -NoNewline
     $targetDiscord = Read-Host
     if (-not [string]::IsNullOrWhiteSpace($targetDiscord)) {
         $targetDiscord = $targetDiscord.Trim().TrimStart('@')

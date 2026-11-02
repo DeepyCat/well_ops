@@ -91,7 +91,7 @@ Pro každý modul se školní dokumentací vytvořit:
      `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"`
      (Pozor: proměnné `$script` a `$env:BAT_PATH` nesmí být ořezány!)
    - **Autodetekce:** Zjištění čísla pracoviště z `Ethernet1` (striktně bez hvězdiček), domény a jména.
-   - **Dotaz na Discord username:** Vyzve studenta k zadání jeho Discord uživatelského jména (např. `samanbeer`).
+   - **Dotaz na Discord username:** Vyzve studenta k zadání jeho Discord uživatelského jména (např. `jannovak`).
    - **Autentické výpisy:** Všechny textové důkazy vkládat i s PowerShell promptem (`PS C:\Users\Administrator> ...`).
    - **Vizuální průběh:** Postupné spouštění kroků s prodlevou pro čitelnost (`[ OK ]`, `[ RUČNÍ ]` u screenshotů).
    - **Odeslání na Webhook:** Zabalení do JSON a odeslání na Discord Webhook pomocí `curl.exe`.
@@ -132,6 +132,27 @@ Pro každý modul se školní dokumentací vytvořit:
    - V `how` uvést zkopírovatelný univerzální jednořádkový příkaz na skript v `skripty/XX_check_<VM>.bat` (spustitelný v PowerShellu, CMD i Terminálu):
      `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`
    - V `verify` a `expected` ukázat spuštění skriptu a přehled `[ OK ]` výsledků.
+9. **ZÁKAZ OSOBNÍCH ÚDAJŮ V KÓDU A ŠABLONÁCH (GENERICKÉ PLACEHOLDERY):**
+   - Všechny generované skripty, šablony, nápovědy a dotazy musí používat striktně anonymní a generické zástupné texty:
+     - Jméno: `Jan Novák` (nikdy skutečné jméno autora projektu).
+     - Doména: `cyberschool.internal` nebo `novak.cyberschool.internal`.
+     - Discord uživatel: `jannovak` (nikdy osobní přezdívka či jméno autora).
+     - Třída: `T3A`.
+10. **ZÁKAZ DVOJTEČKY PŘÍMO ZA PROMĚNNOU V POWERSHELLU (FATÁLNÍ CHYBA PRO PC A BAT ZAVADĚČ):**
+    - V PowerShell řetězcích v uvozovkách (např. chybové zprávy v `catch`, logy, texty výstupů) NIKDY nepsat dvojtečku bezprostředně za název proměnné, např. `"$studentDomain:"` nebo `"$var:"`.
+    - PowerShell parser to vyhodnocuje jako neplatný scope prefix (např. `$studentDomain:`) a selže s fatální chybou:
+      `ParseException: Variable reference is not valid. ':' was not followed by a valid variable name character. Consider using ${} to delimit the name.`
+    - V hybridních `.bat` zavaděčích (`[scriptblock]::Create(...)`) tato chyba způsobí okamžité selhání celé kompilace skriptu a následnou chybu `BadExpression` při spuštění `& $script`.
+    - **ŘEŠENÍ:** Vždy proměnnou ohraničit složenými závorkami `${studentDomain}:` nebo oddělit mezerou či pomlčkou:
+      `${studentDomain} : $_` nebo `${studentDomain} - $_` nebo `"${studentDomain}: $_"`.
+11. **SPECIFICKÝ FORMÁT PRO KLIENTSKÉ SKRIPTY (PC1-WIN vs SRV1-DC):**
+    - Klientské stroje (PC1-WIN) nemají nainstalované role AD DS ani DNS Server – cmdlety jako `Get-ADDomain`, `Get-DnsServerZone` a `Get-DnsServerResourceRecord` na nich neexistují a nesmí být volány.
+    - Skripty pro PC1-WIN musí používat výhradně klientské nástroje: `Get-DnsClient`, `Get-DnsClientGlobalSetting`, `Resolve-DnsName`, `cmd.exe /c ipconfig`, `cmd.exe /c nslookup`.
+    - Skript na PC1-WIN je Krok 2/2 workflow dokumentace:
+      - Nepožaduje znovu zadání jména ani třídy.
+      - Přebírá pouze Discord username (`$DiscordUser`) pro spárování s balíčkem ze SRV1-DC.
+      - Vytváří payload s `part = "PC1"`.
+      - Pro bezpečné provedení přes `[scriptblock]::Create` nesmí obsahovat žádné syntaktické kolize s prefixy scopes ani nekompatibilní cmdlety.
 
 ---
 

@@ -204,7 +204,7 @@ Start-Sleep -Milliseconds 400
 $nslookupFsText = try {
     cmd.exe /c "nslookup srv2-fs.$studentDomain"
 } catch {
-    "Chyba pri nslookup srv2-fs.$studentDomain: $_"
+    "Chyba pri nslookup srv2-fs.${studentDomain} : $_"
 }
 
 $pc1V2Output = @"
@@ -222,7 +222,7 @@ Start-Sleep -Milliseconds 400
 $nslookupRevText = try {
     cmd.exe /c "nslookup 192.168.$wsX.20"
 } catch {
-    "Chyba pri nslookup 192.168.$wsX.20: $_"
+    "Chyba pri nslookup 192.168.${wsX}.20 : $_"
 }
 
 $pc1V3Output = @"
