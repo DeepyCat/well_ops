@@ -315,6 +315,39 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 - V popUp okně po 100% dokončení úkolů se nezobrazuje inline návod, ale žluté tlačítko pro přechod do záložky dokumentace.
 - Instrukce v záložce dokumentace musí být jednoduché, zřetelné a striktně vyžadovat postupné provádění krok za krokem (spustit Krok 1, vyčkat na potvrzení od bota `[KROK 1/X PRIJAT]`, teprve poté spustit další krok).
 
+### 17. ZÁKAZ NEZABALENÝCH OSTRÝCH ZÁVOREK V MARKDOWN ŠABLONÁCH (ROZBITÍ PARSERU)
+- V markdown šablonách (`overeni.md`, `postup.md`) a textech NIKDY nepsat zástupné placeholdery v ostrých závorkách bez inline backticků (např. `<prijmeni>` nebo `<domena>`).
+- Parsery Markdownu (Obsidian, GitHub, VS Code) ostré závorky `<tag>` vyhodnocují jako otevírací HTML tag. Pokud tag není uzavřen (`</tag>`), markdown renderer přepne do režimu raw HTML a od tohoto místa až do konce souboru zcela přestane interpretovat Markdown značky (nadpisy `###`, bloky kódu ```text, checkboxy `- [x]`, tučné písmo `**`).
+- **ŘEŠENÍ:**
+  - V šablonách psát placeholdery bez ostrých závorek (např. `prijmeni.cyberschool.internal`) nebo je zabalit do kódu: `Resolve-DnsName ftp.prijmeni.cyberschool.internal`.
+  - V Discord botovi (`replaceStudentInfo`) dynamicky nahradit `<prijmeni>` i `prijmeni.cyberschool.internal` skutečným příjmením / doménou studenta.
+
+### 18. SPRÁVNÝ ZÁCHYT VÍCEŘÁDKOVÝCH VÝSTUPŮ Z CMD V POWERSHELLU (ZPLOSTĚNÍ VÝSTUPŮ A KÓDOVÁNÍ)
+- Externí příkazy jako `ipconfig /all`, `nslookup`, `ping` vracejí v PowerShellu pole řádků (`[string[]]`).
+- Pokud je toto pole vloženo do here-stringu nebo uvozovek (`@"... $ipconfigText ... "@`), PowerShell všechny řádky automaticky spojí pomocí `$OFS` (což je ve výchozím stavu jedna mezera `" "`). Výsledkem je jediný dlouhý řádek, kde jsou zničeny veškeré odřádkování a sloupce.
+- Konzole Windows navíc používá OEM kódování (CP852 pro češtinu), takže se české znaky v datu (např. `pondělí`, `úterý`) v UTF-8 poškodí na nečitelné paznaky.
+- Chybové výpisy z `nslookup` navíc odchází do `stderr` a bez přesměrování `2>&1` je zachycený text prázdný.
+- **ŘEŠENÍ:** V dokumentačních skriptech vždy zachytávat konzolové příkazy přes pomocnou funkci:
+  ```powershell
+  function Invoke-ConsoleCmd {
+      param([string]$Command)
+      $prevEncoding = [Console]::OutputEncoding
+      try {
+          $oemCodePage = [System.Globalization.CultureInfo]::CurrentCulture.TextInfo.OEMCodePage
+          if ($oemCodePage) {
+              [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding($oemCodePage)
+          }
+          $lines = @(& cmd.exe /c "$Command 2>&1")
+          return ($lines -join "`r`n").Trim()
+      } catch {
+          return "Chyba pri spusteni '$Command': $_"
+      } finally {
+          [Console]::OutputEncoding = $prevEncoding
+      }
+  }
+  ```
+  Tato funkce zachová řádky a sloupce přesně jako v terminálu, správně přeloží českou diakritiku a zachytí případná varování i chyby z `stderr`.
+
 ---
 
 ## Ověřovací checklist pro AI před odevzdáním práce
@@ -331,5 +364,7 @@ Než označíte úkol za dokončený, zkontrolujte v terminálu:
 9. Ve složce `skripty/` existují funkční kontrolní skripty `XX_check_<VM>.bat` pro všechny VM modulu.
 10. Ve složce `skripty/` existují funkční dokumentační skripty `XX_doc_<VM>.bat` a šablony v `praxe/XX/doc_templates/` i `discord-bot/templates/XX/`.
 11. Webhook URL v dokumentačních skriptech je bezpečně obfuskována.
-12. Nikde v kódu, textech ani commitech nejsou použity emoji.
-13. Změny jsou otestovány, commitnuty pod autorem `samanbeer <tomas.pachomov@frengp.cz>` a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
+12. V markdown šablonách se nenachází žádné nezabalené HTML značky typu `<prijmeni>`.
+13. Konzolové výstupy (`ipconfig`, `nslookup`) jsou v PowerShell skriptech zachytávány přes `Invoke-ConsoleCmd` s `-join "\`r\`n"` a OEM kódováním.
+14. Nikde v kódu, textech ani commitech nejsou použity emoji.
+15. Změny jsou otestovány, commitnuty pod autorem `samanbeer <tomas.pachomov@frengp.cz>` a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).

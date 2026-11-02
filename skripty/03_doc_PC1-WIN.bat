@@ -62,6 +62,23 @@ function Report-Step {
     Write-Host "$Id - $Message" -ForegroundColor White
 }
 
+function Invoke-ConsoleCmd {
+    param([string]$Command)
+    $prevEncoding = [Console]::OutputEncoding
+    try {
+        $oemCodePage = [System.Globalization.CultureInfo]::CurrentCulture.TextInfo.OEMCodePage
+        if ($oemCodePage) {
+            [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding($oemCodePage)
+        }
+        $lines = @(& cmd.exe /c "$Command 2>&1")
+        return ($lines -join "`r`n").Trim()
+    } catch {
+        return "Chyba pri spusteni '$Command': $_"
+    } finally {
+        [Console]::OutputEncoding = $prevEncoding
+    }
+}
+
 Write-Header "WELL_OPS :: Automaticka dokumentace - KROK 2/2 (PC1-WIN)"
 Write-Host "Tento skript zaznamena klientske overeni DNS pro Modul 03." -ForegroundColor Gray
 Write-Host "Data budou odeslana k automatickemu spojeni se serverovou casti." -ForegroundColor Gray
@@ -183,11 +200,7 @@ Start-Sleep -Milliseconds 400
 # M3-PC1.V1 Klient pouziva spravny DNS server (ipconfig /all)
 Write-Host "  [PROBIHA]  M3-PC1.V1 Cteni konfigurace ipconfig /all..." -ForegroundColor DarkYellow
 Start-Sleep -Milliseconds 400
-$ipconfigText = try {
-    cmd.exe /c ipconfig /all
-} catch {
-    "Chyba pri spusteni ipconfig /all: $_"
-}
+$ipconfigText = Invoke-ConsoleCmd "ipconfig /all"
 
 $pc1V1Output = @"
 PS C:\Users\Administrator> ipconfig /all
@@ -201,11 +214,7 @@ Start-Sleep -Milliseconds 400
 # M3-PC1.V2 Preklad jmena na adresu (nslookup srv2-fs.<domena>)
 Write-Host "  [PROBIHA]  M3-PC1.V2 Preklad jmena srv2-fs.$studentDomain..." -ForegroundColor DarkYellow
 Start-Sleep -Milliseconds 400
-$nslookupFsText = try {
-    cmd.exe /c "nslookup srv2-fs.$studentDomain"
-} catch {
-    "Chyba pri nslookup srv2-fs.${studentDomain} : $_"
-}
+$nslookupFsText = Invoke-ConsoleCmd "nslookup srv2-fs.$studentDomain"
 
 $pc1V2Output = @"
 PS C:\Users\Administrator> nslookup srv2-fs.$studentDomain
@@ -219,11 +228,7 @@ Start-Sleep -Milliseconds 400
 # M3-PC1.V3 Preklad adresy na jmeno (nslookup 192.168.N.20)
 Write-Host "  [PROBIHA]  M3-PC1.V3 Reverzni preklad 192.168.$wsX.20..." -ForegroundColor DarkYellow
 Start-Sleep -Milliseconds 400
-$nslookupRevText = try {
-    cmd.exe /c "nslookup 192.168.$wsX.20"
-} catch {
-    "Chyba pri nslookup 192.168.${wsX}.20 : $_"
-}
+$nslookupRevText = Invoke-ConsoleCmd "nslookup 192.168.$wsX.20"
 
 $pc1V3Output = @"
 PS C:\Users\Administrator> nslookup 192.168.$wsX.20
@@ -238,12 +243,13 @@ Start-Sleep -Milliseconds 400
 Write-Host "  [PROBIHA]  M3-PC1.V4 Preklad aliasu ftp.$studentDomain..." -ForegroundColor DarkYellow
 Start-Sleep -Milliseconds 400
 $ftpResolveText = try {
-    Resolve-DnsName -Name "ftp.$studentDomain" -Server "192.168.$wsX.10" -ErrorAction Stop |
+    $res = Resolve-DnsName -Name "ftp.$studentDomain" -Server "192.168.$wsX.10" -ErrorAction Stop |
         Select-Object Name, Type, NameHost, IPAddress |
         Format-Table -AutoSize |
         Out-String
+    $res.Trim()
 } catch {
-    cmd.exe /c "nslookup ftp.$studentDomain 192.168.$wsX.10"
+    Invoke-ConsoleCmd "nslookup ftp.$studentDomain 192.168.$wsX.10"
 }
 
 $pc1V4Output = @"
@@ -258,10 +264,9 @@ Start-Sleep -Milliseconds 400
 # M3-PC1.V5 Novy zaznam se projevi
 Write-Host "  [PROBIHA]  M3-PC1.V5 Preklad zaznamu PC1-WIN..." -ForegroundColor DarkYellow
 Start-Sleep -Milliseconds 400
-$nslookupPcText = try {
-    cmd.exe /c "nslookup pc1-win.$studentDomain"
-} catch {
-    "Chyba pri nslookup pc1-win: $_"
+$nslookupPcText = Invoke-ConsoleCmd "nslookup pc1-win.$studentDomain"
+if ([string]::IsNullOrWhiteSpace($nslookupPcText)) {
+    $nslookupPcText = Invoke-ConsoleCmd "ping -n 1 pc1-win.$studentDomain"
 }
 
 $pc1V5Output = @"

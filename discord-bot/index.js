@@ -137,11 +137,44 @@ function removeDiacritics(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]/g, '_');
 }
 
+// Pomocna funkce: sanitizace a oprava konzolovych vystupu (ipconfig, nslookup)
+function sanitizeConsoleOutput(str) {
+  if (!str || typeof str !== 'string') return str;
+  let out = str
+    // Oprava poskozene diakritiky z OEM kodovani konzole Windows
+    .replace(/pond[\ufffd]l[\ufffd]/gi, 'pondělí')
+    .replace(/[\ufffd]ter[\ufffd]/gi, 'úterý')
+    .replace(/st[\ufffd]eda/gi, 'středa')
+    .replace(/[\ufffd]tvrtek/gi, 'čtvrtek');
+
+  // Detekce zplosteleho vystupu ipconfig /all (pokud vse skoncilo na jednom radku)
+  if (out.includes('Host Name . . . . . . . . . . . . :') && !out.includes('\n   Host Name') && !out.includes('\r\n   Host Name')) {
+    out = out
+      .replace(/([^\r\n])\s*(Windows IP Configuration)/g, '$1\r\n\r\n$2\r\n')
+      .replace(/([^\r\n])\s*(Ethernet adapter [^:]+:)/g, '$1\r\n\r\n$2')
+      .replace(/([^\r\n])\s*(\b[A-Za-z0-9][A-Za-z0-9\s()#-]+\s*\.\s*\.\s*\.\s*\.\s*\.\s*\.\s*:\s*)/g, '$1\r\n   $2')
+      .replace(/([^\r\n])\s*(PS [A-Z]:\\[^>]*>)/g, '$1\r\n$2');
+  }
+
+  // Detekce zplosteleho vystupu nslookup
+  if (out.includes('Server:') && out.includes('Address:') && !out.includes('\nAddress:') && !out.includes('\r\nAddress:')) {
+    out = out
+      .replace(/([^\r\n])\s*(Server:\s+)/g, '$1\r\n$2')
+      .replace(/([^\r\n])\s*(Address:\s+)/g, '$1\r\n$2')
+      .replace(/([^\r\n])\s*(Name:\s+)/g, '$1\r\n\r\n$2')
+      .replace(/([^\r\n])\s*(Aliases:\s+)/g, '$1\r\n$2')
+      .replace(/([^\r\n])\s*(PS [A-Z]:\\[^>]*>)/g, '$1\r\n$2');
+  }
+
+  return out;
+}
+
 // Pomocna funkce: bezpecne nahrazeni DOPLNIT v bloku podle znacky
 function fillDocBlock(content, marker, newText, markDone = true) {
   const esc = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const sanitized = sanitizeConsoleOutput(newText);
   const regex = new RegExp(`(${esc}[\\s\\S]*?\`\`\`text\\r?\\n)DOPLNIT(\\r?\\n\`\`\`)`);
-  let result = content.replace(regex, `$1${newText}$2`);
+  let result = content.replace(regex, `$1${sanitized}$2`);
   if (markDone) {
     const doneRegex = new RegExp(`(${esc}[\\s\\S]*?)- \\[ \\] Hotovo`);
     result = result.replace(doneRegex, `$1- [x] Hotovo`);
@@ -490,14 +523,21 @@ async function handleDocMessage(message, isBackfill = false) {
     const pc1O = state.pc1?.pc1_overeni || {};
     const pc1P = state.pc1?.pc1_postup || {};
 
-    // 1. Nahrazeni hlavicky studenta v obou souborech
+    const names = (st.fullName || 'Student_Jmeno').trim().split(/\s+/);
+    const surname = names.length > 1 ? names[names.length - 1] : names[0];
+    const surnameAscii = removeDiacritics(surname).toLowerCase();
+    const domainPrefix = (st.domain || '').split('.')[0] || surnameAscii || 'prijmeni';
+
+    // 1. Nahrazeni hlavicky studenta v obou souborech a sanitizace placeholderu
     const replaceStudentInfo = (doc) => {
       return doc
         .replace(/\| Jméno a příjmení \| DOPLNIT \|/g, `| Jméno a příjmení | ${st.fullName || 'Student'} |`)
         .replace(/\| Třída \| DOPLNIT \|/g, `| Třída | ${st.className || 'T3A'} |`)
         .replace(/\| Datum vypracování \| DOPLNIT \|/g, `| Datum vypracování | ${st.date || new Date().toLocaleDateString('cs-CZ')} |`)
         .replace(/\| Číslo vašeho pracoviště \(N\) \| DOPLNIT \(síť `192\.168\.N\.0\/24`\) \|/g, `| Číslo vašeho pracoviště (N) | ${st.workstationX || 2} (síť \`192.168.${st.workstationX || 2}.0/24\`) |`)
-        .replace(/\| Vaše doména \| DOPLNIT \(např\. `novak\.cyberschool\.internal`\) \|/g, `| Vaše doména | \`${st.domain || 'cyberschool.internal'}\` |`);
+        .replace(/\| Vaše doména \| DOPLNIT \(např\. `novak\.cyberschool\.internal`\) \|/g, `| Vaše doména | \`${st.domain || 'cyberschool.internal'}\` |`)
+        .replace(/<prijmeni>/gi, domainPrefix)
+        .replace(/prijmeni\.cyberschool\.internal/gi, st.domain || `${domainPrefix}.cyberschool.internal`);
     };
 
     overeni = replaceStudentInfo(overeni);
@@ -527,8 +567,6 @@ async function handleDocMessage(message, isBackfill = false) {
     if (pc1P.P2) postup = fillDocBlock(postup, '**M3-PC1.P2**', pc1P.P2, true);
 
     // 4. Vytvoreni ZIP archivu
-    const names = (st.fullName || 'Student_Jmeno').trim().split(/\s+/);
-    const surname = names.length > 1 ? names[names.length - 1] : names[0];
     const forename = names.length > 1 ? names[0] : 'Student';
     const cleanZipBase = `${removeDiacritics(surname)}_${removeDiacritics(forename)}_Modul${formattedModule}`;
     const zipFileName = `${cleanZipBase}.zip`;
