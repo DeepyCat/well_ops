@@ -140,7 +140,7 @@ Pro každý modul vytvořte skripty pro automatické vyplnění dokumentace ze v
   - Discord uživatelské jméno (např. `jannovak` pro spárování částí a doručení do DM).
 - **Živý výpis s PowerShell promptem:** Skript vypisuje kroky postupně (`Start-Sleep`) s barevnými stavy `[ OK ]` a `[ RUČNÍ ]` (pro screenshoty) a do markdownu vkládá výstupy i s promptem `PS C:\Users\Administrator> ...`.
 - **Odeslání na Discord Webhook:** Skript zabalí data do JSONu a přes vestavěný `curl.exe` je odešle na nastavený Discord Webhook.
-- **Discord Bot spojení:** Bot v `discord-bot/index.js` po přijetí obou částí (např. SRV1 i PC1) data automaticky spojí do `overeni.md` a `postup.md`, zabalí do ZIP archivu a pošle studentovi do soukromé zprávy (DM) i do kanálu.
+- **Discord Bot spojení:** Bot v `discord-bot/index.js` zachytí obě části, pinguje studenta (@mention), po obdržení všech částí odešle mezizprávu o generování, data spojí do `overeni.md` a `postup.md`, zabalí výhradně do ZIP archivu (bez samostatných .md souborů), upozorní na ruční screenshoty (např. bod `M3-SRV1.V1-D2` pro DNS Manager) a doručí studentovi do soukromé zprávy (DM) i do kanálu.
 - **Konfigurace v `praxe/modules.js` a `praxe/modules.json`:** Každý modul s dokumentací musí obsahovat pole `docWorkflow` s kroky pro spuštění na SRV1 a PC1.
 - **Šablony:** Čisté šablony dokumentace uložit do `praxe/XX/doc_templates/` a do `discord-bot/templates/XX/`.
 

@@ -98,8 +98,12 @@ Pro každý modul se školní dokumentací vytvořit:
    - **Čekání na Enter:** Před ukončením skript počká na stisk klávesy Enter.
 4. Discord bot (`discord-bot`):
    - Automaticky zachytí obě části (SRV1-DC i PC1-WIN) patřící danému uživateli.
+   - Pinguje uživatele (@mention) při každém přijatém kroku.
+   - Po obdržení obou částí pošle mezizprávu o zahájení generování dokumentace.
    - Spojí je do kompletních souborů `overeni.md` a `postup.md`.
    - Zabalí je do ZIP archivu `Prijmeni_Jmeno_ModulXX.zip`.
+   - Odesílá VÝHRADNĚ `.zip` archiv (neposílá `.md` soubory odděleně).
+   - Ve finální zprávě výslovně upozorní na body vyžadující ruční screenshot (např. `M3-SRV1.V1-D2` pro DNS Manager).
    - Doručí je studentovi do soukromé zprávy (DM) i do oznamovacího kanálu s označením (@mention).
 5. V `praxe/modules.js` definovat u modulu objekt `docWorkflow` s kroky pro SRV1-DC a PC1-WIN a varováním *„Všechny příkazy dělej postupně a nepřeskakuj!“*.
 

@@ -226,10 +226,11 @@ client.on('interactionCreate', async (interaction) => {
       const zipFiles = fs.readdirSync(userCompletedDir).filter(f => f.endsWith('.zip'));
 
       const files = [];
-      if (fs.existsSync(overeniPath)) files.push(new AttachmentBuilder(overeniPath, { name: 'overeni.md' }));
-      if (fs.existsSync(postupPath)) files.push(new AttachmentBuilder(postupPath, { name: 'postup.md' }));
       if (zipFiles.length > 0) {
         files.push(new AttachmentBuilder(path.join(userCompletedDir, zipFiles[0]), { name: zipFiles[0] }));
+      } else {
+        if (fs.existsSync(overeniPath)) files.push(new AttachmentBuilder(overeniPath, { name: 'overeni.md' }));
+        if (fs.existsSync(postupPath)) files.push(new AttachmentBuilder(postupPath, { name: 'postup.md' }));
       }
 
       return interaction.reply({
@@ -345,6 +346,36 @@ client.on('interactionCreate', async (interaction) => {
 // ------------------------------------------------------------
 const processedMessageIds = new Set();
 
+// Pomocna funkce: spolehlive vyhledani clena na serveru pro ping a DM
+async function findTargetMember(guild, userKey) {
+  if (!guild || !userKey) return null;
+  const cleanKey = userKey.toLowerCase().trim().replace(/^@/, '');
+  try {
+    const searchResult = await guild.members.fetch({ query: cleanKey, limit: 5 }).catch(() => null);
+    if (searchResult && searchResult.size > 0) {
+      const match = searchResult.find(m =>
+        m.user.username.toLowerCase() === cleanKey ||
+        (m.nickname && m.nickname.toLowerCase() === cleanKey) ||
+        m.displayName.toLowerCase() === cleanKey ||
+        m.id === cleanKey
+      );
+      if (match) return match;
+    }
+    const members = await guild.members.fetch().catch(() => null);
+    if (members) {
+      return members.find(m =>
+        m.user.username.toLowerCase() === cleanKey ||
+        (m.nickname && m.nickname.toLowerCase() === cleanKey) ||
+        m.displayName.toLowerCase() === cleanKey ||
+        m.id === cleanKey
+      ) || null;
+    }
+  } catch (e) {
+    console.warn(`[DOC] Nelze vyhledat clena ${cleanKey}:`, e.message);
+  }
+  return null;
+}
+
 async function handleDocMessage(message, isBackfill = false) {
   // Ignorujeme zpravy od sebe sama
   if (message.author.id === client.user.id) return;
@@ -378,6 +409,10 @@ async function handleDocMessage(message, isBackfill = false) {
     const userKey = data.discordUser.toLowerCase().trim().replace(/^@/, '');
     const pendingFile = path.join(PENDING_DOCS_DIR, `${userKey}_${formattedModule}.json`);
 
+    // Vyhledani clena pro ping
+    const targetMember = await findTargetMember(message.guild, userKey);
+    const userMention = targetMember ? `<@${targetMember.id}>` : `@${data.discordUser}`;
+
     let state = {};
     if (fs.existsSync(pendingFile)) {
       try {
@@ -409,14 +444,19 @@ async function handleDocMessage(message, isBackfill = false) {
       console.log(`[DOC] Zaznamenana cast ${data.part} pro ${userKey} (Modul ${formattedModule}). Cekam na druhou cast.`);
       if (!isBackfill) {
         await message.channel.send({
-          content: `**[KROK ${isSrv ? '1/2' : '2/2'} PRIJAT]**\n${readyPart} pro studenta **@${data.discordUser}** (Modul ${formattedModule}) byla uspesne zaznamenana!\n${nextStep}`
+          content: `**[KROK ${isSrv ? '1/2' : '2/2'} PRIJAT]**\n${readyPart} pro studenta ${userMention} (Modul ${formattedModule}) byla uspesne zaznamenana!\n${nextStep}`
         });
       }
       return;
     }
 
-    // 2. Mame OBE casti (SRV1-DC i PC1-WIN) -> spojime a posleme!
+    // 2. Mame OBE casti (SRV1-DC i PC1-WIN) -> oznamime zahajeni generovani a spojime!
     console.log(`[DOC] Mame obe casti pro ${userKey} (Modul ${formattedModule})! Generuji finalni dokumentaci...`);
+    if (!isBackfill) {
+      await message.channel.send({
+        content: `**[KROK 2/2 PRIJAT]**\n${userMention} Vsechny potrebne casti pro **Modul ${formattedModule}** byly uspesne prijaty!\nNyni automaticky propojuji zaznamy a generuji soubory dokumentace. Do 5 minut (behem par okamziku) zde bude pripraven tvuj finalni ZIP archiv.`
+      });
+    }
 
     const templatesDir = path.join(__dirname, 'templates', formattedModule);
     const overeniTemplatePath = path.join(templatesDir, 'overeni.md');
@@ -490,39 +530,24 @@ async function handleDocMessage(message, isBackfill = false) {
     fs.writeFileSync(path.join(userCompletedDir, 'postup.md'), postup, 'utf8');
     fs.writeFileSync(path.join(userCompletedDir, zipFileName), zipBuffer);
 
-    // 6. Vyhledani uzivatele na Discord serveru pro zaslani DM a ping
-    let targetMember = null;
-    if (message.guild) {
-      try {
-        const members = await message.guild.members.fetch().catch(() => null);
-        if (members) {
-          targetMember = members.find(m =>
-            m.user.username.toLowerCase() === userKey ||
-            (m.nickname && m.nickname.toLowerCase() === userKey) ||
-            m.displayName.toLowerCase() === userKey ||
-            m.id === userKey
-          );
-        }
-      } catch (e) {
-        console.warn('Nelze nacist seznam clenu:', e.message);
-      }
-    }
-
+    // 6. Odeslani pouze .zip archivu
     const attachments = [
-      new AttachmentBuilder(Buffer.from(overeni, 'utf8'), { name: 'overeni.md' }),
-      new AttachmentBuilder(Buffer.from(postup, 'utf8'), { name: 'postup.md' }),
       new AttachmentBuilder(zipBuffer, { name: zipFileName })
     ];
 
     const embed = new EmbedBuilder()
       .setColor(0x22c55e)
       .setTitle(`Dokumentace Modul ${formattedModule} je kompletni!`)
-      .setDescription(`Uspesne byly zaznamenany a spojeny vystupy ze serveru **SRV1-DC** i klienta **PC1-WIN**.`)
+      .setDescription(`Uspesne byly zaznamenany a spojeny vystupy ze serveru **SRV1-DC** i klienta **PC1-WIN** do archivu **${zipFileName}**.`)
       .addFields(
         { name: 'Resitel', value: `${st.fullName || userKey} (${st.className || 'T3A'})`, inline: true },
         { name: 'Pracoviste', value: `Pracoviste ${st.workstationX || 2}`, inline: true },
         { name: 'Domena', value: `\`${st.domain || 'cyberschool.internal'}\``, inline: true },
-        { name: 'Poznamka k odevzdani', value: 'V souboru `overeni.md` nezapomente vlozit screenshot DNS Manageru (bod M3-SRV1.V1-D2).', inline: false }
+        {
+          name: 'POVINNY SCREENSHOT K DOPLNENI',
+          value: 'V souboru `overeni.md` u bodu **M3-SRV1.V1-D2** (*Dukaz: Screenshot DNS Manageru s doprednou zonou*) je potreba udelat a vlozit screenshot z Windows Serveru. Vsechny ostatni overovaci vystupy a postupy jsou jiz kompletne vyplneny!',
+          inline: false
+        }
       )
       .setFooter({ text: 'OPS Portal - Automaticke generovani dokumentace' })
       .setTimestamp();
@@ -532,24 +557,28 @@ async function handleDocMessage(message, isBackfill = false) {
     if (targetMember) {
       try {
         await targetMember.send({
-          content: `Ahoj! Zde je tvoje vygenerovana a spojana dokumentace pro **Modul ${formattedModule}**:`,
+          content: `Ahoj ${userMention}! Zde je tvoje vygenerovana dokumentace pro **Modul ${formattedModule}** v ZIP archivu.\n\n` +
+            `> **Dulezite upozorneni:** V souboru \`overeni.md\` u bodu **M3-SRV1.V1-D2** – *Dukaz: Screenshot DNS Manageru s doprednou zonou* je potreba udelat screenshot.`,
           embeds: [embed],
           files: attachments
         });
         dmSent = true;
       } catch (dmErr) {
-        console.warn(`Nepodarilo se odeslat DM uzivateli ${userKey}: ${dmErr.message}`);
+        console.warn(`[DOC] Nepodarilo se odeslat DM uzivateli ${userKey}: ${dmErr.message}`);
       }
     }
 
     // Odeslani do kanalu
-    const userMention = targetMember ? `<@${targetMember.id}>` : `**@${data.discordUser}**`;
     const dmNote = dmSent
-      ? '(Zaroven byla odeslana do tve soukrome zpravy / DM!)'
-      : '(Pokud ti neprisla DM, mas v nastaveni Discordu vypnute prime zpravy. Soubory mas nize.)';
+      ? '(Archiv byl zaroven odeslan do tve soukrome zpravy / DM!)'
+      : '(Pokud ti neprisla DM, mas v nastaveni Discordu vypnute prime zpravy. Archiv najdes prilozen nize.)';
+
+    const channelContent = `${userMention} Tvoje dokumentace pro **Modul ${formattedModule}** je hotova a pripravena v prilozenem ZIP archivu!\n\n` +
+      `> **Dulezite upozorneni k odevzdani:** V souboru \`overeni.md\` u bodu **M3-SRV1.V1-D2** – *Dukaz: Screenshot DNS Manageru s doprednou zonou* je potreba udelat screenshot.\n` +
+      `${dmNote}`;
 
     await message.channel.send({
-      content: `${userMention} Tvoje dokumentace pro **Modul ${formattedModule}** je hotova a pripravena k odevzdani! ${dmNote}`,
+      content: channelContent,
       embeds: [embed],
       files: attachments
     });
