@@ -27,6 +27,14 @@ const COMPLETED_DOCS_DIR = path.join(__dirname, 'completed_docs');
 fs.mkdirSync(PENDING_DOCS_DIR, { recursive: true });
 fs.mkdirSync(COMPLETED_DOCS_DIR, { recursive: true });
 
+// Konfigurace pozadovanych casti pro moduly (podpora 1 VM, 2 VM i 3 VM)
+const MODULE_CONFIG = {
+  '00': { requiredParts: ['SRV1', 'SRV2', 'PC1'], vms: ['SRV1-DC', 'SRV2-FS', 'PC1-WIN'] },
+  '01': { requiredParts: ['SRV1'], vms: ['SRV1-DC'] },
+  '02': { requiredParts: ['SRV1', 'PC1'], vms: ['SRV1-DC', 'PC1-WIN'] },
+  '03': { requiredParts: ['SRV1', 'PC1'], vms: ['SRV1-DC', 'PC1-WIN'] }
+};
+
 // Seznam povolenych uzivatelskych ID pro publikovani oznameni
 const allowedUserIds = (process.env.ALLOWED_USER_IDS || '')
   .split(',')
@@ -422,39 +430,44 @@ async function handleDocMessage(message, isBackfill = false) {
       }
     }
 
-    // Ulozime danou cast
-    if (data.part === 'SRV1') {
-      state.srv1 = data;
-      state.srv1Time = new Date().toISOString();
-    } else if (data.part === 'PC1') {
-      state.pc1 = data;
-      state.pc1Time = new Date().toISOString();
-    }
+    // Ulozime danou cast (srv1, srv2, pc1)
+    const partUpper = String(data.part).toUpperCase();
+    const partKey = partUpper.toLowerCase();
+    state[partKey] = data;
+    state[`${partKey}Time`] = new Date().toISOString();
 
     fs.writeFileSync(pendingFile, JSON.stringify(state, null, 2), 'utf8');
 
-    // 1. Zkontrolujeme, zda mame pouze JEDNU cast
-    if (!state.srv1 || !state.pc1) {
-      const isSrv = Boolean(state.srv1);
-      const readyPart = isSrv ? 'Serverova cast (SRV1-DC)' : 'Klientska cast (PC1-WIN)';
-      const nextStep = isSrv
-        ? 'Nyni otevrete stroj **PC1-WIN** a spustte prikaz pro **Krok 2/2**.'
-        : 'Cekam jeste na dokonceni serverove casti (**SRV1-DC**).';
+    // Zjistime pozadovane casti pro dany modul
+    const modConfig = MODULE_CONFIG[formattedModule] || {
+      requiredParts: data.requiredParts || (data.totalParts === 1 ? [partUpper] : ['SRV1', 'PC1'])
+    };
+    const requiredParts = modConfig.requiredParts;
+    const receivedParts = requiredParts.filter(p => Boolean(state[p.toLowerCase()]));
+    const isComplete = receivedParts.length === requiredParts.length;
 
-      console.log(`[DOC] Zaznamenana cast ${data.part} pro ${userKey} (Modul ${formattedModule}). Cekam na druhou cast.`);
+    // 1. Zkontrolujeme, zda jeste chybi nejake casti
+    if (!isComplete) {
+      const currentStep = receivedParts.length;
+      const totalSteps = requiredParts.length;
+      const remaining = requiredParts.filter(p => !state[p.toLowerCase()]);
+      const nextPart = remaining[0];
+      const nextVmName = nextPart === 'PC1' ? 'PC1-WIN' : (nextPart === 'SRV2' ? 'SRV2-FS' : 'SRV1-DC');
+
+      console.log(`[DOC] Zaznamenana cast ${data.part} (${currentStep}/${totalSteps}) pro ${userKey} (Modul ${formattedModule}). Cekam na: ${remaining.join(', ')}`);
       if (!isBackfill) {
         await message.channel.send({
-          content: `**[KROK ${isSrv ? '1/2' : '2/2'} PRIJAT]**\n${readyPart} pro studenta ${userMention} (Modul ${formattedModule}) byla uspesne zaznamenana!\n${nextStep}`
+          content: `**[KROK ${currentStep}/${totalSteps} PRIJAT]**\nCast **${data.part}** pro studenta ${userMention} (Modul ${formattedModule}) byla uspesne zaznamenana!\nNyni otevrete stroj **${nextVmName}** a spustte dalsi prikaz.`
         });
       }
       return;
     }
 
-    // 2. Mame OBE casti (SRV1-DC i PC1-WIN) -> oznamime zahajeni generovani a spojime!
-    console.log(`[DOC] Mame obe casti pro ${userKey} (Modul ${formattedModule})! Generuji finalni dokumentaci...`);
-    if (!isBackfill) {
+    // 2. Mame VSECHNY potrebne casti (at uz 1, 2 nebo 3)!
+    console.log(`[DOC] Mame vsechny casti (${requiredParts.join(', ')}) pro ${userKey} (Modul ${formattedModule})! Generuji finalni dokumentaci...`);
+    if (!isBackfill && requiredParts.length > 1) {
       await message.channel.send({
-        content: `**[KROK 2/2 PRIJAT]**\n${userMention} Vsechny potrebne casti pro **Modul ${formattedModule}** byly uspesne prijaty!\nNyni automaticky propojuji zaznamy a generuji soubory dokumentace. Do 5 minut (behem par okamziku) zde bude pripraven tvuj finalni ZIP archiv.`
+        content: `**[KROK ${requiredParts.length}/${requiredParts.length} PRIJAT]**\n${userMention} Vsechny potrebne casti pro **Modul ${formattedModule}** byly uspesne prijaty!\nNyni automaticky propojuji zaznamy a generuji soubory dokumentace. Do 5 minut (behem par okamziku) zde bude pripraven tvuj finalni ZIP archiv.`
       });
     }
 
@@ -469,11 +482,13 @@ async function handleDocMessage(message, isBackfill = false) {
     let overeni = fs.readFileSync(overeniTemplatePath, 'utf8');
     let postup = fs.readFileSync(postupTemplatePath, 'utf8');
 
-    const st = state.srv1.student || {};
-    const srv1O = state.srv1.srv1_overeni || {};
-    const srv1P = state.srv1.srv1_postup || {};
-    const pc1O = state.pc1.pc1_overeni || {};
-    const pc1P = state.pc1.pc1_postup || {};
+    const st = state.srv1?.student || state.pc1?.student || state.srv2?.student || {};
+    const srv1O = state.srv1?.srv1_overeni || {};
+    const srv1P = state.srv1?.srv1_postup || {};
+    const srv2O = state.srv2?.srv2_overeni || {};
+    const srv2P = state.srv2?.srv2_postup || {};
+    const pc1O = state.pc1?.pc1_overeni || {};
+    const pc1P = state.pc1?.pc1_postup || {};
 
     // 1. Nahrazeni hlavicky studenta v obou souborech
     const replaceStudentInfo = (doc) => {

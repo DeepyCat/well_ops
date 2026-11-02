@@ -107,6 +107,52 @@ Pro každý modul se školní dokumentací vytvořit:
    - Doručí je studentovi do soukromé zprávy (DM) i do oznamovacího kanálu s označením (@mention).
 5. V `praxe/modules.js` definovat u modulu objekt `docWorkflow` s kroky pro SRV1-DC a PC1-WIN a varováním *„Všechny příkazy dělej postupně a nepřeskakuj!“*.
 
+### 8. Pravidla pro práci podle počtu zapojených strojů (1 VM vs 2 VM vs 3 VM)
+
+Každý modul má specifický počet zapojených strojů (definovaný v poli `vms` v `modules.js`). AI asistent **nesmí natvrdo předpokládat 2 stroje**, ale musí celou infrastrukturu přizpůsobit:
+
+#### Varianta A: Modul s 1 strojem (např. pouze `SRV1-DC`)
+- **Příklady:** Modul 01 (Active Directory Domain Services), instalace lokálních rolí, správa disků na serveru.
+- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC"]`, `defaultVM: "SRV1-DC"`.
+- **Stav ověření `verified.json`:** Obsahuje pouze klíč `{"SRV1-DC": false}`.
+- **Úkoly v `tasks.js`:** Všechny úkoly mají `forVMs: ["SRV1-DC"]`. Tabulka parametrů v `what` uvádí parametry pouze pro tento stroj.
+- **Skripty v `skripty/`:**
+  - Vzniká pouze 1 ověřovací skript: `XX_check_SRV1-DC.bat` (+ `.ps1`).
+  - Vzniká pouze 1 dokumentační skript: `XX_doc_SRV1-DC.bat` (+ `.ps1`).
+- **Workflow dokumentace (`docWorkflow`):**
+  - Obsahuje pouze **1 krok**: `Krok 1/1: Otevři SRV1-DC`.
+- **Discord Bot (`discord-bot`):**
+  - V `MODULE_CONFIG` má nastaveno `requiredParts: ['SRV1']`.
+  - Po obdržení této jediné části bot okamžitě generuje a odesílá hotový ZIP (žádné mezikroky ani čekání na další stroje).
+
+#### Varianta B: Modul se 2 stroji (např. `SRV1-DC` a `PC1-WIN`)
+- **Příklady:** Modul 02 (DHCP Server a Klient), Modul 03 (DNS Server a Klient).
+- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC", "PC1-WIN"]`.
+- **Stav ověření `verified.json`:** `{"SRV1-DC": false, "PC1-WIN": false}`.
+- **Úkoly v `tasks.js`:** Rozděleny na serverové (`forVMs: ["SRV1-DC"]`) a klientské (`forVMs: ["PC1-WIN"]`). Tabulka parametrů v `what` má 2 sloupce (`SRV1-DC`, `PC1-WIN`) a zvýraznění `.active-col`.
+- **Skripty v `skripty/`:**
+  - 2 ověřovací skripty: `XX_check_SRV1-DC.bat` a `XX_check_PC1-WIN.bat`.
+  - 2 dokumentační skripty: `XX_doc_SRV1-DC.bat` a `XX_doc_PC1-WIN.bat`.
+- **Workflow dokumentace (`docWorkflow`):**
+  - Obsahuje **2 kroky**: `Krok 1/2: SRV1-DC` a `Krok 2/2: PC1-WIN`.
+- **Discord Bot (`discord-bot`):**
+  - V `MODULE_CONFIG` má nastaveno `requiredParts: ['SRV1', 'PC1']`.
+  - Po 1. kroku ohlásí `[KROK 1/2 PRIJAT]`, po 2. kroku pošle mezizprávu `[KROK 2/2 PRIJAT]`, sloučí výstupy obou strojů a vytvoří finální ZIP.
+
+#### Varianta C: Modul se 3 stroji (`SRV1-DC`, `SRV2-FS` a `PC1-WIN`)
+- **Příklady:** Modul 00 (Příprava a instalace všech tří OS), souborové služby, DFS, zálohování a replikace.
+- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC", "SRV2-FS", "PC1-WIN"]`.
+- **Stav ověření `verified.json`:** `{"SRV1-DC": false, "SRV2-FS": false, "PC1-WIN": false}`.
+- **Úkoly v `tasks.js`:** Úkoly definovány pro všechny 3 stroje. Tabulka parametrů v `what` má 3 sloupce (`SRV1-DC`, `SRV2-FS`, `PC1-WIN`).
+- **Skripty v `skripty/`:**
+  - 3 ověřovací skripty: `XX_check_SRV1-DC.bat`, `XX_check_SRV2-FS.bat`, `XX_check_PC1-WIN.bat`.
+  - 3 dokumentační skripty: `XX_doc_SRV1-DC.bat`, `XX_doc_SRV2-FS.bat`, `XX_doc_PC1-WIN.bat`.
+- **Workflow dokumentace (`docWorkflow`):**
+  - Obsahuje **3 kroky**: `Krok 1/3: SRV1-DC`, `Krok 2/3: SRV2-FS`, `Krok 3/3: PC1-WIN`.
+- **Discord Bot (`discord-bot`):**
+  - V `MODULE_CONFIG` má nastaveno `requiredParts: ['SRV1', 'SRV2', 'PC1']`.
+  - Postupně hlásí průběh (`[KROK 1/3 PRIJAT]`, `[KROK 2/3 PRIJAT]`), po obdržení 3. části pošle mezizprávu a sloučí výstupy všech tří VM do finálního ZIPu.
+
 ---
 
 ##  Kritická pravidla a nejčastější chyby (POZOR):
@@ -168,6 +214,10 @@ Pro každý modul se školní dokumentací vytvořit:
     - V kódu bota (`discord-bot/index.js`) musí být `GatewayIntentBits.MessageContent`.
 14. **POVINNÝ GIT AUTOR COMMITŮ:**
     - Všechny commity musí být prováděny pod identitou autora: `samanbeer <tomas.pachomov@frengp.cz>` (`git commit --author="samanbeer <tomas.pachomov@frengp.cz>"`).
+15. **ADAPTABILITA PODLE POČTU STROJŮ (ZÁKAZ TVRDÉHO PŘEDPOKLÁDÁNÍ 2 STROJŮ):**
+    - Nikdy nepředpokládat natvrdo, že každý modul má právě 2 stroje (SRV1 a PC1).
+    - Pokud zadání řeší pouze 1 stroj (např. Modul 01: pouze SRV1-DC), nesmí se generovat klientské skripty pro PC1, docWorkflow má pouze 1 krok a Discord bot nesmí čekat na PC1, ale ihned vygenerovat ZIP.
+    - Pokud zadání zapojuje 3 stroje (včetně SRV2-FS), musí vzniknout skripty, úkoly i workflow pro všechny 3 stroje.
 
 ---
 
