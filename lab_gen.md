@@ -127,6 +127,23 @@ Pro každé zařízení (VM) definované v modulu vytvořte v kořenové složce
   obsahující univerzální jednořádkový příkaz pro stažení a spuštění přes curl (spustitelný v PowerShellu, CMD i Terminálu, s vizuálním průběhem stahování a automatickým úklidem):
   `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`
 
+### Krok 7: Skripty pro automatické vyplnění dokumentace a doručení přes Discord
+Pro každý modul vytvořte skripty pro automatické vyplnění dokumentace ze všech relevantních VM:
+- Formát názvů: `skripty/XX_doc_<VM>.ps1` a `skripty/XX_doc_<VM>.bat` (např. `03_doc_SRV1-DC.bat`, `03_doc_PC1-WIN.bat`).
+- **Nezávislost na Gitu:** Skript neklonuje repozitáře přes Git; vytváří lokální složku `Documents\Moje dokumentace\Modul XX ...` a pracuje s lokálními šablonami.
+- **Interaktivní dotazy na začátku:**
+  - Jméno a příjmení studenta (s výchozím návrhem).
+  - Třída (výchozí `T3A` – potvrzení klávesou Enter).
+  - Datum vypracování (výchozí dnešní datum – potvrzení Enter).
+  - Číslo pracoviště `X` (autodetekce z IP adresy rozhraní `Ethernet1`, např. 2).
+  - Doména (autodetekce z AD nebo DNS suffixu).
+  - Discord uživatelské jméno (pro spárování částí a doručení do DM).
+- **Živý výpis s PowerShell promptem:** Skript vypisuje kroky postupně (`Start-Sleep`) s barevnými stavy `[ OK ]` a `[ RUČNÍ ]` (pro screenshoty) a do markdownu vkládá výstupy i s promptem `PS C:\Users\Administrator> ...`.
+- **Odeslání na Discord Webhook:** Skript zabalí data do JSONu a přes vestavěný `curl.exe` je odešle na nastavený Discord Webhook.
+- **Discord Bot spojení:** Bot v `discord-bot/index.js` po přijetí obou částí (např. SRV1 i PC1) data automaticky spojí do `overeni.md` a `postup.md`, zabalí do ZIP archivu a pošle studentovi do soukromé zprávy (DM) i do kanálu.
+- **Konfigurace v `praxe/modules.js` a `praxe/modules.json`:** Každý modul s dokumentací musí obsahovat pole `docWorkflow` s kroky pro spuštění na SRV1 a PC1.
+- **Šablony:** Čisté šablony dokumentace uložit do `praxe/XX/doc_templates/` a do `discord-bot/templates/XX/`.
+
 ---
 
 ##  Striktní pravidla pro PowerShell příkazy a formátování
@@ -217,4 +234,5 @@ Než označíte úkol za dokončený, zkontrolujte v terminálu:
 7. Žádné heslo ani klíč nejsou v rozporu se zadáním (klíče z Teams, heslo `Pa55w.rd`).
 8. Všechny HTML stránky obsahují v `<head>` favicon odkazující na `bird.png` (`img/bird.png` resp. `../../img/bird.png`).
 9. Ve složce `skripty/` existují funkční kontrolní skripty `XX_check_<VM>.bat` pro všechny VM modulu.
-10. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
+10. Ve složce `skripty/` existují funkční dokumentační skripty `XX_doc_<VM>.bat` a šablony v `praxe/XX/doc_templates/` i `discord-bot/templates/XX/`.
+11. Změny jsou otestovány, commitnuty a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).

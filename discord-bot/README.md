@@ -22,8 +22,23 @@ Tento bot slouží pro třídní Discord server k automatickému publikování o
 
 ### 2. `/update`
 - **`zprava`** *(povinné)*: Text oznámení (co jste přidali, upravili, opravili na webu).
-- **`nadpis`** *(volitelné)*: Vlastní nadpis (výchozí: `🛠️ Aktualizace OPS Portálu`).
+- **`nadpis`** *(volitelné)*: Vlastní nadpis (výchozí: Aktualizace OPS Portálu).
 - **`ping`** *(volitelné)*: Výběr mezi `@everyone`, `@here` a *Bez označení*.
+
+### 3. `/moje-id`
+- Zobrazí studentovi jeho přesné uživatelské jméno a Discord ID pro zadání do PowerShell skriptu ve virtuálním stroji.
+
+### 4. `/posledni-dokumentace`
+- **`modul`** *(volitelné)*: Číslo modulu (výchozí `03`).
+- Znovu studentovi ephemerálně odešle naposledy vygenerované soubory (`overeni.md`, `postup.md` a ZIP archiv).
+
+---
+
+## Automatické zpracování a doručení dokumentace z VM
+Bot obsahuje integrovaný systém pro spojování dokumentace:
+1. Student ve virtuálním stroji (SRV1-DC) spustí Krok 1/2. Skript odešle serverová data na Webhook.
+2. Student na klientském stroji (PC1-WIN) spustí Krok 2/2. Skript odešle klientská data na Webhook.
+3. Bot automaticky spáruje obě části podle Discord uživatelského jména, spojí šablony `overeni.md` a `postup.md`, zabalí je do ZIP archivu a pošle studentovi přímo do soukromé zprávy (DM) i do oznamovacího kanálu s pingem.
 
 ---
 

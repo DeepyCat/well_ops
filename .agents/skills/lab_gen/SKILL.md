@@ -82,6 +82,27 @@ Pro každé zařízení (VM) definované v modulu vytvořit v kořenové složce
   obsahující jednořádkový příkaz pro stažení a spuštění přes curl (spustitelný v PowerShellu, CMD i Terminálu, s vizuálním průběhem stahování a automatickým úklidem):
   `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`
 
+### 7. Skripty pro automatické vyplnění dokumentace a doručení na Discord (POVINNÉ)
+Pro každý modul se školní dokumentací vytvořit:
+1. Čisté šablony v `praxe/XX/doc_templates/` (`overeni.md`, `postup.md`) a jejich zrcadla v `discord-bot/templates/XX/`.
+2. Pro každý zapojený stroj vytvořit skript `skripty/XX_doc_<VM>.ps1` a hybridní `.bat` zavaděč `skripty/XX_doc_<VM>.bat`.
+3. Pravidla pro skripty dokumentace:
+   - **Hybridní BAT hlavička:** Vždy přesně:
+     `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"`
+     (Pozor: proměnné `$script` a `$env:BAT_PATH` nesmí být ořezány!)
+   - **Autodetekce:** Zjištění čísla pracoviště z `Ethernet1` (striktně bez hvězdiček), domény a jména.
+   - **Dotaz na Discord username:** Vyzve studenta k zadání jeho Discord uživatelského jména (např. `samanbeer`).
+   - **Autentické výpisy:** Všechny textové důkazy vkládat i s PowerShell promptem (`PS C:\Users\Administrator> ...`).
+   - **Vizuální průběh:** Postupné spouštění kroků s prodlevou pro čitelnost (`[ OK ]`, `[ RUČNÍ ]` u screenshotů).
+   - **Odeslání na Webhook:** Zabalení do JSON a odeslání na Discord Webhook pomocí `curl.exe`.
+   - **Čekání na Enter:** Před ukončením skript počká na stisk klávesy Enter.
+4. Discord bot (`discord-bot`):
+   - Automaticky zachytí obě části (SRV1-DC i PC1-WIN) patřící danému uživateli.
+   - Spojí je do kompletních souborů `overeni.md` a `postup.md`.
+   - Zabalí je do ZIP archivu `Prijmeni_Jmeno_ModulXX.zip`.
+   - Doručí je studentovi do soukromé zprávy (DM) i do oznamovacího kanálu s označením (@mention).
+5. V `praxe/modules.js` definovat u modulu objekt `docWorkflow` s kroky pro SRV1-DC a PC1-WIN a varováním *„Všechny příkazy dělej postupně a nepřeskakuj!“*.
+
 ---
 
 ##  Kritická pravidla a nejčastější chyby (POZOR):

@@ -68,6 +68,27 @@
       "folders": [
         "Moje dokumentace / Modul 3 DNS (postup.md, overeni.md a složka images se screenshoty)"
       ]
+    },
+    "docWorkflow": {
+      "title": "Automatické vyplnění dokumentace & odeslání na Discord",
+      "warning": "Všechny příkazy dělej postupně a nepřeskakuj!",
+      "steps": [
+        {
+          "num": 1,
+          "vm": "SRV1-DC",
+          "title": "1. Krok: Otevři SRV1-DC",
+          "desc": "Vlož tento příkaz do PowerShellu a počkej, až se dokončí. Reaguj na dotazy (jméno, třída, Discord username). Jakmile se v PowerShellu vypíše HOTOVO, přejdi ke kroku 2:",
+          "command": "powershell -ExecutionPolicy Bypass -Command \"curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_doc_SRV1-DC.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue\""
+        },
+        {
+          "num": 2,
+          "vm": "PC1-WIN",
+          "title": "2. Krok: Otevři PC1-WIN",
+          "desc": "Vlož tento příkaz do PowerShellu na PC1-WIN a zadej stejné Discord uživatelské jméno:",
+          "command": "powershell -ExecutionPolicy Bypass -Command \"curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/03_doc_PC1-WIN.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue\""
+        }
+      ],
+      "footnote": "Po dokončení 2. kroku ti náš Discord bot automaticky pošle hotovou a spojenou dokumentaci (overeni.md, postup.md i ZIP) přímo na Discord!"
     }
   }
 ]

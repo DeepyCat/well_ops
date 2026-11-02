@@ -1919,6 +1919,112 @@
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
     }
 
+    .module-complete-docflow {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      border-left: 4px solid #a855f7;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      text-align: left;
+      font-size: 0.88rem;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .docflow-box-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #c084fc;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .docflow-warn-pill {
+      display: inline-block;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      margin-bottom: 12px;
+    }
+
+    .docflow-step {
+      background: rgba(2, 6, 23, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .docflow-step-header {
+      font-weight: 700;
+      color: #f8fafc;
+      font-size: 0.88rem;
+      margin-bottom: 4px;
+    }
+
+    .docflow-step-desc {
+      color: #94a3b8;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .docflow-cmd-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .docflow-cmd-code {
+      flex: 1;
+      background: #090d16;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-family: monospace;
+      font-size: 0.77rem;
+      color: #38bdf8;
+      word-break: break-all;
+      user-select: all;
+    }
+
+    .docflow-copy-btn {
+      background: #a855f7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .docflow-copy-btn:hover {
+      background: #9333ea;
+    }
+
+    .docflow-footnote {
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      line-height: 1.4;
+    }
+
     .submission-box-header {
       display: flex;
       align-items: center;
@@ -1956,6 +2062,131 @@
 
     .submission-list li {
       margin-bottom: 4px;
+    }
+
+    .module-complete-docworkflow {
+      background: rgba(13, 22, 33, 0.95);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      border-left: 4px solid #22c55e;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      text-align: left;
+      font-size: 0.88rem;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .docworkflow-box-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #22c55e;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .doc-warning-banner {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.82rem;
+      margin-bottom: 12px;
+    }
+
+    .doc-step-item {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .doc-step-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .doc-step-badge {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      font-family: var(--font-mono, monospace);
+    }
+
+    .doc-step-name {
+      color: #f8fafc;
+      font-size: 0.88rem;
+    }
+
+    .doc-step-desc {
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      margin: 0 0 8px 0;
+      line-height: 1.4;
+    }
+
+    .doc-code-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #090d16;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 6px;
+      padding: 6px 10px;
+    }
+
+    .doc-cmd-pre {
+      margin: 0;
+      flex: 1;
+      overflow-x: auto;
+      white-space: nowrap;
+      color: #7dd3fc;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.8rem;
+    }
+
+    .doc-copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .doc-copy-btn:hover {
+      background: #1d4ed8;
+    }
+
+    .doc-footnote {
+      color: #94a3b8;
+      font-size: 0.78rem;
+      margin: 8px 0 0 0;
+      font-style: italic;
+      text-align: center;
     }
 
     .module-complete-actions {
@@ -2391,6 +2622,13 @@
           <span>CO ODEVZDAT</span>
         </div>
         <div class="submission-box-body" id="module-complete-submission-body"></div>
+      </div>
+      <div id="module-complete-docworkflow" class="module-complete-docworkflow" style="display: none;">
+        <div class="docworkflow-box-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          <span id="docworkflow-box-title">AUTOMATICKÉ VYPLNĚNÍ DOKUMENTACE & ODESLÁNÍ NA DISCORD</span>
+        </div>
+        <div class="docworkflow-box-body" id="docworkflow-box-body"></div>
       </div>
       <div class="module-complete-actions">
         <a href="games.html" class="module-complete-btn module-complete-games-btn">
@@ -2961,8 +3199,108 @@ ping 192.168.2.10</code></pre>
         }
       }
 
+      const docflowBox = document.getElementById("module-complete-docworkflow");
+      const docflowBody = document.getElementById("docworkflow-box-body");
+      const docflowTitle = document.getElementById("docworkflow-box-title");
+      if (docflowBox && docflowBody) {
+        if (currentModuleConfig && currentModuleConfig.docWorkflow) {
+          const wf = currentModuleConfig.docWorkflow;
+          docflowBox.style.display = "block";
+          if (docflowTitle && wf.title) {
+            docflowTitle.textContent = wf.title.toUpperCase();
+          }
+          docflowBody.innerHTML = `
+            <div class="docflow-warn-pill">${wf.warning || "Všechny příkazy dělej postupně a nepřeskakuj!"}</div>
+            ${wf.steps.map(step => `
+              <div class="docflow-step">
+                <div class="docflow-step-header">${step.title}</div>
+                <div class="docflow-step-desc">${step.desc}</div>
+                <div class="docflow-cmd-row">
+                  <div class="docflow-cmd-code" id="docflow-cmd-${step.num}">${step.command}</div>
+                  <button type="button" class="docflow-copy-btn" onclick="copySnippetText(this, 'docflow-cmd-${step.num}')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    <span>Kopírovat</span>
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+            ${wf.footnote ? `<div class="docflow-footnote">${wf.footnote}</div>` : ''}
+          `;
+        } else {
+          docflowBox.style.display = "none";
+          docflowBody.innerHTML = "";
+        }
+      }
+
+      const docBox = document.getElementById("module-complete-docworkflow");
+      const docBody = document.getElementById("docworkflow-box-body");
+      if (docBox && docBody) {
+        if (currentModuleConfig && currentModuleConfig.docWorkflow) {
+          const dw = currentModuleConfig.docWorkflow;
+          docBox.style.display = "block";
+          docBody.innerHTML = `
+            <div class="doc-warning-banner">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>${dw.warning}</span>
+            </div>
+            <div class="doc-steps-list">
+              ${dw.steps.map(s => `
+                <div class="doc-step-item">
+                  <div class="doc-step-header">
+                    <span class="doc-step-badge">${s.vm}</span>
+                    <strong class="doc-step-name">${s.title}</strong>
+                  </div>
+                  <p class="doc-step-desc">${s.desc}</p>
+                  <div class="doc-code-row">
+                    <pre class="doc-cmd-pre"><code>${s.command}</code></pre>
+                    <button type="button" class="doc-copy-btn" onclick="copyDocCommand(this, '${encodeURIComponent(s.command)}')">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                      <span>Kopírovat</span>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <p class="doc-footnote">${dw.footnote}</p>
+          `;
+        } else {
+          docBox.style.display = "none";
+          docBody.innerHTML = "";
+        }
+      }
+
       modal.style.display = "flex";
       spawnFullscreenConfetti(4500);
+    }
+
+    function copyDocCommand(btn, encodedCmd) {
+      const cmd = decodeURIComponent(encodedCmd);
+      const showSuccess = () => {
+        const original = btn.innerHTML;
+        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg><span style="color:#22c55e">Zkopírováno!</span>`;
+        setTimeout(() => { btn.innerHTML = original; }, 2200);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(cmd).then(showSuccess).catch(() => {
+          fallbackCopyText(cmd);
+          showSuccess();
+        });
+      } else {
+        fallbackCopyText(cmd);
+        showSuccess();
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
     }
 
     function closeModuleCompleteModal() {
