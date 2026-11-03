@@ -18,7 +18,7 @@ const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID;
 const ANNOUNCEMENT_CHANNEL_ID = process.env.ANNOUNCEMENT_CHANNEL_ID;
-const DOCS_CHANNEL_ID = process.env.DOCS_CHANNEL_ID || '1566771935168299108';
+const DOCS_CHANNEL_ID = process.env.DOCS_CHANNEL_ID || '1567074623546196039';
 const PORTAL_URL = process.env.PORTAL_URL || 'https://deepycat.github.io/well_ops';
 
 // Slozky pro ukladani prubeznych a dokoncenych dokumentaci
