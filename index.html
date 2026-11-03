@@ -358,5 +358,424 @@
         applyMode(savedMode);
     })();
 </script>
+<!-- ===== JuchyAI widget (CSS + HTML + JS) ===== -->
+<style>
+  .jai-wurzel {
+    --jai-hintergrund: #212121;
+    --jai-flaeche: #2f2f2f;
+    --jai-blase: #3a3a3a;
+    --jai-akzent: #10a37f;
+    --jai-akzent-dunkel: #0d8c6d;
+    --jai-text: #ececec;
+    --jai-gedaempft: #8e8e8e;
+    --jai-rand: #3d3d3d;
+    --jai-schrift: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2147483000;
+    font-family: var(--jai-schrift);
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--jai-text);
+    text-align: left;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  .jai-wurzel > * { pointer-events: auto; }
+  .jai-wurzel *,
+  .jai-wurzel *::before,
+  .jai-wurzel *::after {
+    box-sizing: border-box;
+  }
+
+  /* ---------- Knopf (tlačítko "Zeptat se AI") ---------- */
+  .jai-wurzel .jai-knopf {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 20px 13px 16px;
+    border-radius: 999px;
+    background: var(--jai-akzent);
+    color: #fff;
+    font: 600 15px/1 var(--jai-schrift);
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .jai-wurzel .jai-knopf:hover { background: var(--jai-akzent-dunkel); }
+  .jai-wurzel .jai-knopf:active { transform: scale(0.97); }
+  .jai-wurzel .jai-knopf:focus-visible,
+  .jai-wurzel .jai-schliessen:focus-visible,
+  .jai-wurzel .jai-senden:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .jai-wurzel .jai-symbol {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex: none;
+    fill: currentColor;
+  }
+
+  /* ---------- Fenster (chat okno) ---------- */
+  .jai-wurzel .jai-fenster {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    max-width: calc(100vw - 24px);
+    height: 540px;
+    max-height: calc(100vh - 150px);
+    background: var(--jai-hintergrund);
+    border: 1px solid var(--jai-rand);
+    border-radius: 18px;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    transform-origin: center;
+    animation: jai-einblenden 0.18s ease-out;
+  }
+  .jai-wurzel .jai-fenster[hidden] { display: none; }
+
+  @keyframes jai-einblenden {
+    from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+    to   { opacity: 1; transform: translate(-50%, -50%); }
+  }
+
+  .jai-wurzel .jai-kopf {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 14px 14px 18px;
+    border-bottom: 1px solid var(--jai-rand);
+    background: var(--jai-hintergrund);
+  }
+  .jai-wurzel .jai-logo {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #10a37f, #2563eb);
+    color: #fff;
+    flex: none;
+  }
+  .jai-wurzel .jai-logo .jai-symbol { width: 16px; height: 16px; }
+  .jai-wurzel .jai-titel {
+    flex: 1;
+    font: 600 16px/1.2 var(--jai-schrift);
+    color: var(--jai-text);
+  }
+  .jai-wurzel .jai-schliessen {
+    all: unset;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: var(--jai-gedaempft);
+    font: 400 22px/1 var(--jai-schrift);
+    cursor: pointer;
+  }
+  .jai-wurzel .jai-schliessen:hover { background: var(--jai-flaeche); color: var(--jai-text); }
+
+  /* ---------- Nachrichten ---------- */
+  .jai-wurzel .jai-nachrichten {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a4a transparent;
+  }
+  .jai-wurzel .jai-zeile { display: flex; gap: 10px; align-items: flex-start; }
+  .jai-wurzel .jai-zeile-benutzer { justify-content: flex-end; }
+  .jai-wurzel .jai-avatar {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--jai-akzent);
+    color: #fff;
+    flex: none;
+    margin-top: 1px;
+  }
+  .jai-wurzel .jai-avatar .jai-symbol { width: 14px; height: 14px; }
+  .jai-wurzel .jai-text {
+    max-width: 82%;
+    margin: 0;
+    padding: 0;
+    color: var(--jai-text);
+    font: 400 15px/1.5 var(--jai-schrift);
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+  .jai-wurzel .jai-zeile-benutzer .jai-text {
+    background: var(--jai-blase);
+    padding: 9px 14px;
+    border-radius: 16px 16px 4px 16px;
+  }
+
+  /* "Přemýšlím" tečky */
+  .jai-wurzel .jai-punkte { display: inline-flex; gap: 4px; align-items: center; height: 22px; }
+  .jai-wurzel .jai-punkt {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--jai-gedaempft);
+    animation: jai-huepfen 1.1s infinite ease-in-out;
+  }
+  .jai-wurzel .jai-punkt:nth-child(2) { animation-delay: 0.15s; }
+  .jai-wurzel .jai-punkt:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes jai-huepfen {
+    0%, 70%, 100% { opacity: 0.35; transform: translateY(0); }
+    35% { opacity: 1; transform: translateY(-4px); }
+  }
+
+  /* ---------- Fuss (vstup) ---------- */
+  .jai-wurzel .jai-fuss { padding: 0 14px 10px; background: var(--jai-hintergrund); }
+  .jai-wurzel .jai-eingabefeld {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--jai-flaeche);
+    border-radius: 14px;
+    padding: 6px 6px 6px 14px;
+  }
+  .jai-wurzel .jai-eingabe {
+    all: unset;
+    box-sizing: border-box;
+    flex: 1;
+    min-width: 0;
+    padding: 8px 0;
+    color: var(--jai-text);
+    font: 400 15px/1.3 var(--jai-schrift);
+  }
+  .jai-wurzel .jai-eingabe::placeholder { color: var(--jai-gedaempft); }
+  .jai-wurzel .jai-senden {
+    all: unset;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--jai-akzent);
+    color: #fff;
+    cursor: pointer;
+    flex: none;
+  }
+  .jai-wurzel .jai-senden:hover { background: var(--jai-akzent-dunkel); }
+  .jai-wurzel .jai-senden[disabled] { opacity: 0.4; cursor: default; }
+  .jai-wurzel .jai-hinweis {
+    margin: 8px 0 0;
+    padding: 0;
+    text-align: center;
+    color: var(--jai-gedaempft);
+    font: 400 11px/1.3 var(--jai-schrift);
+  }
+
+  /* ---------- Mobil ---------- */
+  @media (max-width: 480px) {
+    .jai-wurzel { bottom: 12px; }
+    .jai-wurzel .jai-fenster {
+      width: calc(100vw - 24px);
+      height: 75vh;
+      height: 75dvh;
+      max-height: calc(100vh - 110px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jai-wurzel .jai-fenster,
+    .jai-wurzel .jai-punkt { animation: none; }
+    .jai-wurzel .jai-knopf { transition: none; }
+  }
+</style>
+
+<div class="jai-wurzel" id="jai-wurzel">
+  <div class="jai-fenster" id="jai-fenster" role="dialog" aria-label="JuchyAI" hidden>
+    <div class="jai-kopf">
+      <span class="jai-logo" aria-hidden="true">
+        <svg class="jai-symbol" viewBox="0 0 24 24"><path d="M12 2c.8 5.2 4.8 9.2 10 10-5.2.8-9.2 4.8-10 10-.8-5.2-4.8-9.2-10-10 5.2-.8 9.2-4.8 10-10z"/></svg>
+      </span>
+      <span class="jai-titel">JuchyAI</span>
+      <button class="jai-schliessen" id="jai-schliessen" type="button" aria-label="Zavřít okno">&times;</button>
+    </div>
+
+    <div class="jai-nachrichten" id="jai-nachrichten" aria-live="polite"></div>
+
+    <div class="jai-fuss">
+      <div class="jai-eingabefeld">
+        <input class="jai-eingabe" id="jai-eingabe" type="text" maxlength="500"
+               placeholder="Zeptej se na cokoliv…" autocomplete="off" aria-label="Tvoje otázka">
+        <button class="jai-senden" id="jai-senden" type="button" aria-label="Odeslat">
+          <svg class="jai-symbol" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 4l7 7-1.4 1.4L13 7.800V20h-2V7.800l-4.600 4.600L5 11z"/></svg>
+        </button>
+      </div>
+      <p class="jai-hinweis">JuchyAI může dělat chyby. Nebo taky ne. Nebude se ti chtít zjišťovat.</p>
+    </div>
+  </div>
+
+  <button class="jai-knopf" id="jai-knopf" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="jai-fenster">
+    <svg class="jai-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c.8 5.2 4.8 9.2 10 10-5.2.8-9.2 4.8-10 10-.8-5.2-4.8-9.2-10-10 5.2-.8 9.2-4.8 10-10z"/></svg>
+    <span>Zeptat se AI</span>
+  </button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  if (window.__juchyAiGeladen) return;      // ochrana proti dvojímu vložení
+  window.__juchyAiGeladen = true;
+
+  var antworten = [
+    'To je dobrá otázka, vypracuj si to sám.',
+    'Vážně chceš, abych ti řekl, jak se to dělá?',
+    'Zkus to vygooglit, ono to funguje.',
+    'Tohle bych ti řekl, ale nechce se mi.',
+    'Hmm… zajímavé. A co si myslíš ty?',
+    'Na tohle mám odpověď, ale nepovím ti ji.',
+    'To by ses měl naučit sám, budeš na sebe pyšný.',
+    'Moje kapacity jsou momentálně vyčerpané. Zkus to zítra.',
+    'Dobrý pokus. Další!',
+    'Já jsem AI, ne tvůj domácí úkol.',
+    'Ptáš se na špatném místě. Zkus zeď.',
+    'To je tak jednoduché, že se stydím odpovědět.',
+    'Počkej, musím se na to zeptat jiné AI… Ne, to nedám.',
+    'Odpověď je 42. Pro jistotu to platí vždycky.'
+  ];
+  var begruessung = 'Ahoj! Jsem JuchyAI. Zeptej se mě na cokoliv.';
+  var sternSvg = '<svg class="jai-symbol" viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M12 2c.8 5.2 4.8 9.2 10 10-5.2.8-9.2 4.8-10 10-.8-5.2-4.8-9.2-10-10 5.2-.8 9.2-4.8 10-10z"/></svg>';
+
+  function starten() {
+    var wurzel = document.getElementById('jai-wurzel');
+    if (!wurzel) return;
+    document.body.appendChild(wurzel);      // aby position: fixed nerozbil žádný rodič s transform
+
+    var fenster = document.getElementById('jai-fenster');
+    var knopf = document.getElementById('jai-knopf');
+    var schliessen = document.getElementById('jai-schliessen');
+    var nachrichten = document.getElementById('jai-nachrichten');
+    var eingabe = document.getElementById('jai-eingabe');
+    var senden = document.getElementById('jai-senden');
+
+    var beschaeftigt = false;
+    var begruesst = false;
+    var letzteAntwort = -1;
+
+    function nachUnten() { nachrichten.scrollTop = nachrichten.scrollHeight; }
+
+    function zeileErstellen(vonBenutzer, text) {
+      var zeile = document.createElement('div');
+      zeile.className = 'jai-zeile' + (vonBenutzer ? ' jai-zeile-benutzer' : '');
+      if (!vonBenutzer) {
+        var avatar = document.createElement('span');
+        avatar.className = 'jai-avatar';
+        avatar.innerHTML = sternSvg;
+        zeile.appendChild(avatar);
+      }
+      var inhalt = document.createElement('div');
+      inhalt.className = 'jai-text';
+      inhalt.textContent = text || '';
+      zeile.appendChild(inhalt);
+      nachrichten.appendChild(zeile);
+      nachUnten();
+      return { zeile: zeile, inhalt: inhalt };
+    }
+
+    function zufallsAntwort() {
+      var i;
+      do { i = Math.floor(Math.random() * antworten.length); }
+      while (i === letzteAntwort && antworten.length > 1);
+      letzteAntwort = i;
+      return antworten[i];
+    }
+
+    function tippen(inhalt, text, index) {
+      if (index < text.length) {
+        inhalt.textContent += text.charAt(index);
+        nachUnten();
+        setTimeout(function () { tippen(inhalt, text, index + 1); }, 15 + Math.random() * 30);
+      } else {
+        beschaeftigt = false;
+        senden.disabled = false;
+        eingabe.focus();
+      }
+    }
+
+    function antworten_(frage) {
+      var denkt = zeileErstellen(false, '');
+      denkt.inhalt.innerHTML = '<span class="jai-punkte"><span class="jai-punkt"></span><span class="jai-punkt"></span><span class="jai-punkt"></span></span>';
+      nachUnten();
+      setTimeout(function () {
+        denkt.inhalt.textContent = '';
+        tippen(denkt.inhalt, zufallsAntwort(), 0);
+      }, 1200 + Math.random() * 800);
+    }
+
+    function abschicken() {
+      var frage = eingabe.value.trim();
+      if (!frage || beschaeftigt) return;
+      beschaeftigt = true;
+      senden.disabled = true;
+      eingabe.value = '';
+      zeileErstellen(true, frage);
+      setTimeout(function () { antworten_(frage); }, 350);
+    }
+
+    function oeffnen() {
+      fenster.hidden = false;
+      knopf.setAttribute('aria-expanded', 'true');
+      if (!begruesst) {
+        begruesst = true;
+        zeileErstellen(false, begruessung);
+      }
+      eingabe.focus();
+    }
+
+    function schliessenFenster() {
+      fenster.hidden = true;
+      knopf.setAttribute('aria-expanded', 'false');
+      knopf.focus();
+    }
+
+    knopf.addEventListener('click', function () {
+      if (fenster.hidden) oeffnen(); else schliessenFenster();
+    });
+    schliessen.addEventListener('click', schliessenFenster);
+    senden.addEventListener('click', abschicken);
+    eingabe.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); abschicken(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !fenster.hidden) schliessenFenster();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', starten);
+  } else {
+    starten();
+  }
+})();
+</script>
 </body>
 </html>
