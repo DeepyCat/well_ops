@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+<base href="/hry/kasino/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#11131c">
@@ -159,7 +160,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
       <div class="panel">
         <div class="currency"><span>Školní body</span><strong><svg class="school-points-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:-0.18em;margin-right:2px;filter:drop-shadow(0 0 4px rgba(255,212,119,0.45));flex-shrink:0;" aria-hidden="true"><path d="M12 2L2 9L12 22L22 9L12 2Z" fill="#F59E0B" stroke="#FDE68A" stroke-width="0.8" stroke-linejoin="round"/><path d="M12 2L6 9H18L12 2Z" fill="#FDE68A"/><path d="M2 9L6 9L12 22L2 9Z" fill="#D97706"/><path d="M18 9L22 9L12 22L18 9Z" fill="#B45309"/><path d="M6 9L18 9L12 22L6 9Z" fill="#FBBF24"/><path d="M9 5.5L12 2L15 5.5" stroke="#FFFFFF" stroke-width="0.75" stroke-linecap="round" opacity="0.8"/></svg><span id="tokens">0</span></strong></div>
         <p class="who" id="who"></p>
-        <p class="notice hide" id="broke" style="color:var(--red);margin-top:10px">Došly ti body! Kup si další v obchodu nebo v <a href="/gacha" style="color:var(--gold);font-weight:700">náboru učitelů</a>.</p>
+        <p class="notice hide" id="broke" style="color:var(--red);margin-top:10px">Došly ti body! Kup si další v obchodu nebo v <a href="gacha.html" style="color:var(--gold);font-weight:700">náboru učitelů</a>.</p>
       </div>
 
       <div class="panel">
@@ -264,7 +265,7 @@ h1{font-size:clamp(2rem,5vw,3.2rem);margin:0 0 6px}
 
 <div class="toast" id="toast" role="status"></div>
 
-<script src="../js/ops-stats.js"></script>
+<script src="/js/ops-stats.js"></script>
 <script>if (!window.OPS_STATS) { document.write('<script src="/js/ops-stats.js"><\/script>'); }</script>
 <script>
 (() => {

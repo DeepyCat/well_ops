@@ -2,16 +2,21 @@
 var stratagems = undefined;
 
 var xhr = new XMLHttpRequest();
-xhr.open(method='GET', url='./data/HD2-Sequences.json', async=false); // false indicates synchronous request
+xhr.open('GET', './data/HD2-Sequences.json', false);
 xhr.send();
 
-if (xhr.status === 200) {
+if (xhr.status === 200 || xhr.status === 0) {
     stratagems = xhr.responseText;
 } else {
     console.error('Error reading file:', xhr.statusText);
 }
 
-stratagems = JSON.parse(stratagems);
+try {
+    stratagems = JSON.parse(stratagems);
+} catch (e) {
+    console.error('Error parsing JSON:', e);
+    stratagems = [];
+}
 // console.log(stratagems);
 
 // Install keypress listener
@@ -263,10 +268,10 @@ function refreshStratagemDisplay(){
     for(let i in currentStratagemsList){
         // Show the stratagem's picture in the correct slot
         if (currentStratagemsList[i].image) {
-            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem\ Icons/hd2/${currentStratagemsList[i].image}`;
+            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem Icons/hd2/${currentStratagemsList[i].image}`;
         }
         else {
-            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem\ Icons/hd2/placeholder.png`;
+            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem Icons/hd2/resupply.svg`;
         }
     }
 
