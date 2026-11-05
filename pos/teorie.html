@@ -3,58 +3,1346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teorie POS | OPS Portál</title>
-    <link rel="icon" type="image/png" href="/img/bird.png">
+    <title>POS – Teorie</title>
+    <meta name="description" content="POS Markdown reader – studijní materiály, hledání a obsah článků.">
+    <meta name="theme-color" content="#090909">
+    <link rel="icon" type="image/png" href="img/bird.png">
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+
     <style>
         :root {
-            color-scheme: dark;
-            --bg: #111113;
-            --surface: #19191c;
-            --surface-2: #212125;
-            --border: rgba(255,255,255,.08);
-            --border-strong: rgba(255,255,255,.16);
-            --text: #f2f2f4;
-            --muted: #8d8d97;
+            --bg: #090909;
+            --sidebar: #101010;
+            --box: rgba(20,20,21,.92);
+            --text: #eee;
+            --muted: #a3a3a3;
             --accent: #ef4444;
-            --accent-soft: rgba(239,68,68,.12);
+            --accent-hover: #ff6565;
+            --soft: rgba(255,255,255,.04);
+            --side-w: 300px;
+            --hdr: 60px;
+            --font-size: 16px;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            color-scheme: dark;
         }
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        [hidden] { display: none !important; }
+        button, input { font: inherit; color: inherit; }
+        button, a { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid rgba(239,68,68,.8); outline-offset: 2px; }
+        ::selection { background: rgba(239,68,68,.35); color: #fff; }
+
         body {
-            margin: 0; min-height: 100vh;
-            background: var(--bg); color: var(--text);
-            font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 24px; text-align: center;
+            margin: 0; background: var(--bg); color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden;
         }
-        .card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 18px; padding: 48px 36px; max-width: 540px; width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,.4);
+
+        /* ---------- HLAVIČKA ---------- */
+        header {
+            flex-shrink: 0; z-index: 10;
+            display: flex; justify-content: space-between; align-items: center; gap: 15px;
+            padding: 14px clamp(16px, 3vw, 34px);
+            background: rgba(17,17,17,.94); backdrop-filter: blur(14px);
+            box-shadow: 0 8px 28px rgba(0,0,0,.16);
         }
-        .badge {
-            display: inline-block; padding: 4px 12px; border-radius: 999px;
-            background: var(--accent-soft); color: var(--accent);
-            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-            margin-bottom: 20px;
+        header h1 { margin: 0; font-size: clamp(1rem, 2vw, 1.35rem); font-weight: 750; letter-spacing: -.02em; color: #f2f2f2; }
+        .back-btn, .tool-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,.06); border: 0; border-radius: 10px;
+            color: #d6d6d6; padding: 9px 13px; min-height: 40px; font-size: .9rem; font-weight: 600;
+            text-decoration: none; white-space: nowrap; cursor: pointer;
+            transition: background .18s ease, color .18s ease, transform .18s ease;
         }
-        h1 { margin: 0 0 12px; font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
-        p { color: var(--muted); font-size: 15px; line-height: 1.6; margin: 0 0 32px; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 24px; border-radius: 10px;
-            background: var(--surface-2); border: 1px solid var(--border-strong);
-            color: var(--text); font-size: 14px; font-weight: 600;
-            text-decoration: none; transition: background .15s ease, border-color .15s ease;
+        .back-btn:hover, .tool-btn:hover { background: rgba(239,68,68,.14); color: #fff; transform: translateY(-1px); }
+
+        #readingProgress {
+            position: fixed; top: 0; left: 0; width: 0; height: 3px; z-index: 2000; pointer-events: none;
+            background: #ef4444; border-radius: 0 3px 3px 0; transition: width .08s linear;
         }
-        .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        /* ---------- LAYOUT + SIDEBAR ---------- */
+        .app-layout { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; }
+
+        aside.sidebar {
+            width: var(--side-w); min-width: var(--side-w); flex-shrink: 0;
+            background: rgba(16,16,16,.96); overflow-y: auto; padding: 20px 16px;
+            display: flex; flex-direction: column; gap: 18px;
+            transition: width .25s ease, min-width .25s ease, padding .25s ease;
+        }
+        .search-container { position: sticky; top: -20px; z-index: 5; display: flex; gap: 8px; padding: 4px 0 12px; background: #101010; }
+        #mdSearchInput {
+            flex: 1; min-width: 0; padding: 12px 13px; font-size: .9rem; min-height: 44px;
+            background: rgba(0,0,0,.38); border: 0; border-radius: 11px; color: var(--text); outline: none;
+        }
+        #mdSearchInput:focus { box-shadow: 0 0 0 2px rgba(239,68,68,.5); }
+        .icon-btn {
+            flex: none; width: 44px; border: 0; border-radius: 11px; cursor: pointer;
+            background: rgba(255,255,255,.06); color: #d6d6d6; font-size: 1.1rem;
+        }
+        .icon-btn:hover { background: rgba(239,68,68,.14); color: #fff; }
+        .icon-btn.spin { animation: spin .7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .nav-group { margin-bottom: 7px; }
+        .nav-group-title {
+            display: flex; align-items: center; gap: 9px; margin: 0 7px 9px;
+            font-size: .72rem; font-weight: 700; letter-spacing: .105em; text-transform: uppercase;
+            color: #ff6262; line-height: 1.5;
+        }
+        .nav-group-title::before { content: ""; width: 3px; height: 15px; flex: 0 0 3px; border-radius: 3px; background: var(--accent); }
+        aside.sidebar ul { list-style: none; padding: 0; margin: 0; }
+        aside.sidebar li { margin-bottom: 3px; }
+        button.file-btn {
+            width: 100%; text-align: left; border: 0; border-radius: 10px; padding: 10px 11px;
+            background: rgba(255,255,255,.025); color: #dedede; cursor: pointer;
+            font-size: .84rem; line-height: 1.4; overflow-wrap: anywhere;
+            transition: background .18s ease, transform .18s ease;
+        }
+        button.file-btn:hover { background: rgba(255,255,255,.07); color: #fff; transform: translateX(2px); }
+        button.file-btn.active { background: rgba(239,68,68,.12); color: #fff; font-weight: 650; box-shadow: inset 3px 0 var(--accent); }
+        .completed-marker { color: #79d98b; }
+        .nav-note { color: var(--muted); font-size: .86rem; line-height: 1.6; padding: 4px 6px; }
+        .nav-note code { background: rgba(0,0,0,.35); padding: 1px 5px; border-radius: 4px; color: #ff9292; }
+
+        .sidebar-toggle {
+            position: fixed; top: 115px; left: var(--side-w); z-index: 1000; width: 30px; height: 52px;
+            display: flex; align-items: center; justify-content: center; padding: 0;
+            background: #191919; color: #ff7777; border: 0; border-radius: 0 10px 10px 0;
+            cursor: pointer; font-size: 19px; font-weight: bold;
+            transition: left .25s ease, background .2s ease, color .2s ease;
+        }
+        .sidebar-toggle:hover { background: var(--accent); color: #fff; }
+        .app-layout.sidebar-hidden aside.sidebar { width: 0; min-width: 0; padding: 0; overflow: hidden; }
+        .app-layout.sidebar-hidden .sidebar-toggle { left: 0; }
+
+        /* ---------- OBSAH ---------- */
+        main {
+            flex: 1 1 auto; min-width: 0; min-height: 0; overflow-y: auto; overflow-x: hidden; overflow-anchor: none;
+            padding: clamp(16px, 3vw, 38px);
+            display: flex; justify-content: center; align-items: flex-start;
+        }
+        .content-box {
+            max-width: 920px; width: 100%; min-height: 400px; height: fit-content;
+            background: var(--box); border-radius: 22px; padding: clamp(20px, 4vw, 44px);
+            overflow-wrap: anywhere; transition: max-width .2s ease;
+        }
+        .app-layout.sidebar-hidden .content-box { max-width: 1200px; }
+
+        .content-box h1, .content-box h2, .content-box h3, .content-box h4, .content-box h5, .content-box h6 {
+            color: #f4f4f4; margin: 25px 0 15px; padding-bottom: 8px; letter-spacing: -.02em; line-height: 1.3; scroll-margin-top: 20px;
+        }
+        .content-box h1:first-child, .content-box h2:first-child, .content-box h3:first-child { margin-top: 0; }
+        .content-box h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
+        .content-box h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); }
+        .content-box p { font-size: var(--font-size); line-height: 1.75; color: #d7d7d7; margin: 0 0 16px; }
+        .content-box ul, .content-box ol { margin: 10px 0 16px; padding-left: 25px; }
+        .content-box li { line-height: 1.65; color: #d7d7d7; margin-bottom: 8px; }
+        .content-box strong { color: #fff; }
+        .content-box code { background: rgba(0,0,0,.32); padding: 2px 6px; border-radius: 5px; color: #ff9292; font-size: .9em; }
+        .content-box pre { background: rgba(0,0,0,.32); padding: 15px; border-radius: 12px; overflow-x: auto; margin: 0 0 16px; max-width: 100%; }
+        .content-box pre code { background: none; color: #e6edf3; padding: 0; }
+        .content-box img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 10px; }
+        .content-box blockquote { margin: 0 0 16px; padding: 12px 16px; color: #c8c8c8; background: rgba(239,68,68,.07); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; }
+        .content-box table { border-collapse: collapse; display: block; width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 16px; }
+        .content-box th, .content-box td { border: 1px solid rgba(255,255,255,.08); padding: 8px 12px; text-align: left; }
+        .content-box th { background: rgba(255,255,255,.07); color: #fff; }
+        .content-box tr:nth-child(even) td { background: rgba(255,255,255,.018); }
+        .content-box a:not(.wiki-link) { color: #ff6b6b; text-decoration: underline; text-underline-offset: 3px; }
+        .content-box a:not(.wiki-link):hover { color: #ffaaaa; }
+        .wiki-link {
+            color: #ff9696; background: rgba(239,68,68,.09); padding: 1px 7px; margin: 0 1px; border-radius: 5px;
+            text-decoration: none; font-weight: 500; border-bottom: 1px dashed rgba(239,68,68,.5);
+            cursor: pointer; display: inline-block;
+        }
+        .wiki-link:hover { color: #fff; background: rgba(239,68,68,.3); border-bottom-style: solid; }
+        .wiki-link::after { content: " ↗"; font-size: .75em; opacity: .7; }
+        .muted { color: var(--muted); font-size: .88rem; }
+
+        /* ---------- HLEDÁNÍ ---------- */
+        .global-search { margin: 0 0 18px; padding: 14px 15px 12px; border-radius: 16px; background: rgba(10,10,10,.56); }
+        .global-search-heading { display: flex; align-items: center; gap: 9px; margin: 0 0 10px; }
+        .global-search h2 { margin: 0; padding: 0; font-size: 1rem; letter-spacing: -.02em; color: #ff5555; }
+        .global-search-tag { margin-left: auto; font-size: .62rem; letter-spacing: .09em; color: #ff7777; background: rgba(239,68,68,.1); padding: 3px 6px; border-radius: 5px; }
+        .global-search-row { display: flex; align-items: center; gap: 7px; padding: 4px; border-radius: 12px; background: rgba(0,0,0,.38); }
+        .global-search-icon { color: #ff6262; font-size: 1.35rem; line-height: 1; padding-left: 7px; }
+        #globalSearchInput { flex: 1; min-width: 0; min-height: 40px; padding: 8px 5px; font-size: .94rem; border: 0; background: transparent; color: #f2f2f2; outline: 0; }
+        #globalSearchButton { flex: none; min-height: 36px; padding: 8px 14px; border: 0; border-radius: 9px; background: #e53939; color: #fff; font-size: .84rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        #globalSearchButton:hover { filter: brightness(1.1); }
+        #globalSearchButton:disabled { opacity: .55; cursor: wait; }
+        #globalSearchStatus { margin: 8px 2px 0; font-size: .78rem; color: #a7a0a2; line-height: 1.4; }
+        #globalSearchResults { display: grid; gap: 6px; margin-top: 8px; }
+        .global-result { display: block; width: 100%; padding: 11px 13px; border: 0; border-radius: 12px; background: rgba(255,255,255,.035); text-align: left; cursor: pointer; }
+        .global-result:hover, .global-result:focus-visible { background: rgba(239,68,68,.1); }
+        .global-result-title { display: block; margin-bottom: 4px; color: #ff6262; font-weight: 700; font-size: .9rem; overflow-wrap: anywhere; }
+        .global-result-snippet { display: block; color: #c8c0c2; font-size: .84rem; line-height: 1.5; overflow-wrap: anywhere; }
+        .global-result-snippet mark { background: #ffd0d0; color: #281314; border-radius: 3px; padding: 0 2px; }
+
+        .reader-quick-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin: 14px 0 22px; }
+        .quick-action-btn {
+            appearance: none; border: 0; border-radius: 999px; padding: 8px 13px; min-height: 36px;
+            color: #e8e8e8; background: rgba(255,255,255,.055); cursor: pointer; font-size: .84rem; font-weight: 600;
+            transition: background .18s ease, color .18s ease, transform .18s ease;
+        }
+        .quick-action-btn:hover:not(:disabled) { background: rgba(239,68,68,.14); color: #fff; transform: translateY(-1px); }
+        .quick-action-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .quick-action-btn.read-status-quick { color: #ff8a8a; background: rgba(239,68,68,.09); }
+        .quick-action-btn.read-status-quick.read { color: #d8f7e5; background: rgba(50,160,95,.13); }
+
+        .placeholder-state { margin: 46px auto 25px; max-width: 570px; text-align: center; }
+        .placeholder-state h2 { color: #ff7777; border: 0; font-size: clamp(1.35rem, 3vw, 1.8rem); }
+        .quote { background: rgba(255,255,255,.035); border-left: 3px solid var(--accent); padding: 12px 14px; margin-top: 26px; border-radius: 0 8px 8px 0; font-style: italic; color: #bbb; text-align: left; }
+
+        /* ---------- STUDIJNÍ PANEL ---------- */
+        .study-panel { margin: 25px 0; padding: clamp(16px, 3vw, 24px); border-radius: 15px; background: rgba(255,255,255,.035); }
+        .study-panel h2 { margin-top: 0; }
+        .flashcard {
+            min-height: 170px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 25px; background: rgba(255,255,255,.04); border-radius: 14px;
+            cursor: pointer; user-select: none;
+        }
+        .flashcard:hover { background: rgba(239,68,68,.08); }
+        .card-label { color: #ff7777; font-size: .8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        .card-text { color: #fff; font-size: 1.15rem; line-height: 1.6; }
+        .study-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .quiz-question { background: rgba(255,255,255,.035); border-radius: 12px; padding: 15px; margin: 12px 0; }
+        .quiz-question label { display: block; margin: 8px 0; cursor: pointer; color: #ccc; }
+        .quiz-question input { accent-color: var(--accent); margin-right: 7px; }
+        #quizResult { margin-top: 15px; color: #ff7777; font-weight: bold; }
+
+        .download-container { display: none; text-align: center; margin-top: 40px; padding-top: 20px; }
+        .download-btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 10px;
+            background: rgba(255,255,255,.06); color: #fff; font-size: .95rem; font-weight: 600; text-decoration: none;
+        }
+        .download-btn:hover { background: rgba(239,68,68,.2); }
+
+        /* ---------- OBSAH ČLÁNKU (bublina) ---------- */
+        .toc-bubble-container { position: fixed; bottom: 24px; right: 24px; z-index: 1500; }
+        .toc-fab {
+            width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer; font-size: 22px;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff;
+            box-shadow: 0 8px 24px rgba(0,0,0,.4); transition: transform .2s ease;
+        }
+        .toc-fab:hover { transform: scale(1.06); }
+        .toc-popup {
+            position: absolute; bottom: 68px; right: 0; width: 320px; max-height: 420px;
+            background: rgba(18,18,18,.97); backdrop-filter: blur(16px); border-radius: 16px;
+            box-shadow: 0 10px 35px rgba(0,0,0,.45); display: flex; flex-direction: column; padding: 16px;
+            opacity: 0; visibility: hidden; transform: translateY(10px);
+            transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+        }
+        .toc-bubble-container.open .toc-popup { opacity: 1; visibility: visible; transform: none; }
+        .toc-header-title { display: flex; justify-content: space-between; align-items: center; margin: 0 0 10px; padding-bottom: 8px; font-size: .85rem; font-weight: bold; color: #fff; border-bottom: 1px solid rgba(255,255,255,.08); }
+        #tocList { padding: 0; margin: 0; list-style: none; overflow-y: auto; flex: 1; }
+        #tocList li { margin: 3px 0; }
+        #tocList button { display: block; width: 100%; border: 0; background: transparent; color: #bbb; text-align: left; padding: 6px 7px; cursor: pointer; font-size: .84rem; border-radius: 6px; line-height: 1.4; overflow-wrap: anywhere; }
+        #tocList button:hover { color: #fff; background: rgba(255,255,255,.07); }
+        #tocList .toc-h1 { color: #fff; font-weight: 700; }
+        #tocList .toc-h2 { padding-left: 17px; }
+        #tocList .toc-h3 { padding-left: 29px; font-size: .79rem; color: #aaa; }
+
+        /* ---------- MOBIL ---------- */
+        @media (max-width: 768px) {
+            :root { --hdr: 58px; }
+            header { min-height: var(--hdr); padding: 10px 14px; gap: 8px; }
+            header h1 { font-size: clamp(.88rem, 3.8vw, 1.05rem); line-height: 1.25; max-width: 70%; }
+            aside.sidebar, .app-layout.sidebar-hidden aside.sidebar {
+                position: fixed; z-index: 1200; top: var(--hdr); bottom: 0; left: 0;
+                width: min(88vw, 360px); min-width: 0; padding: 18px 16px calc(90px + var(--safe-bottom));
+                border-radius: 0 18px 0 0; box-shadow: 18px 0 50px rgba(0,0,0,.45);
+                transition: transform .24s ease, visibility .24s ease; overscroll-behavior: contain;
+            }
+            .app-layout.sidebar-hidden aside.sidebar { transform: translateX(-105%); visibility: hidden; }
+            .app-layout:not(.sidebar-hidden)::after {
+                content: ""; position: fixed; inset: var(--hdr) 0 0; z-index: 1100;
+                background: rgba(0,0,0,.58); backdrop-filter: blur(2px);
+            }
+            button.file-btn { min-height: 46px; padding: 11px 12px; font-size: .9rem; }
+            #mdSearchInput { font-size: 16px; }
+            .sidebar-toggle, .app-layout.sidebar-hidden .sidebar-toggle {
+                top: auto; bottom: calc(16px + var(--safe-bottom)); left: auto; right: 16px; z-index: 1300;
+                width: 54px; height: 54px; border-radius: 18px; background: var(--accent); color: #fff; font-size: 22px;
+                box-shadow: 0 8px 26px rgba(0,0,0,.42);
+            }
+            main { padding: 12px 10px calc(18px + var(--safe-bottom)); -webkit-overflow-scrolling: touch; }
+            .content-box, .app-layout.sidebar-hidden .content-box { max-width: none; min-height: 0; padding: 18px 16px 26px; border-radius: 16px; }
+            .content-box h1 { font-size: 1.65rem; }
+            .content-box h2 { font-size: 1.35rem; }
+            .content-box h3 { font-size: 1.12rem; }
+            .content-box pre { padding: 13px; font-size: .85rem; }
+            .global-search { padding: 12px; margin-bottom: 14px; }
+            #globalSearchInput { font-size: 16px; }
+            .reader-quick-actions { justify-content: stretch; margin: 10px 0 18px; }
+            .quick-action-btn { flex: 1 1 auto; min-height: 40px; }
+            .study-actions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); }
+            .study-actions .tool-btn { padding: 10px 5px; font-size: .8rem; min-width: 0; }
+            .quiz-question label { display: flex; align-items: flex-start; gap: 8px; padding: 9px 8px; background: rgba(255,255,255,.035); border-radius: 8px; }
+            .toc-bubble-container { right: 14px; bottom: calc(82px + var(--safe-bottom)); z-index: 1050; }
+            .toc-fab { width: 48px; height: 48px; font-size: 20px; }
+            .toc-popup { position: fixed; left: 12px; right: 12px; bottom: calc(138px + var(--safe-bottom)); width: auto; max-height: min(55dvh, 440px); }
+            #tocList button { min-height: 42px; padding: 10px; font-size: .9rem; }
+        }
+        @media (max-width: 380px) {
+            .content-box, .app-layout.sidebar-hidden .content-box { padding: 15px 13px 24px; }
+            .study-actions { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        }
     </style>
 </head>
+
 <body>
-    <div class="card">
-        <div class="badge">POS</div>
-        <h1>Teorie POS</h1>
-        <p>Teoretické podklady a studijní materiály pro POS.<br><strong style="color:var(--text);display:inline-block;margin-top:10px;">Připravujeme v další části.</strong></p>
-        <a href="/" class="btn">&larr; Zpět na hlavní portál</a>
+    <div id="readingProgress"></div>
+
+    <header>
+        <h1>POS – Teorie</h1>
+        <a href="index.html" class="back-btn">↩ Zpět na portál</a>
+    </header>
+
+    <div class="app-layout" id="appLayout">
+        <button class="sidebar-toggle" id="sidebarToggle" title="Schovat výběr souborů"
+            aria-label="Schovat nebo zobrazit výběr souborů" aria-expanded="true">◀</button>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="search-container">
+                <input type="text" id="mdSearchInput" placeholder="⌕ Hledat v názvech…" autocomplete="off">
+                <button class="icon-btn" id="refreshBtn" type="button" title="Znovu načíst seznam souborů" aria-label="Znovu načíst seznam souborů">↻</button>
+            </div>
+            <div id="nav"><p class="nav-note">Načítám seznam materiálů…</p></div>
+        </aside>
+
+        <main id="mainContent">
+            <div class="content-box" id="content">
+                <section class="global-search" aria-label="Vyhledávání v obsahu všech POS materiálů">
+                    <div class="global-search-heading">
+                        <h2>Hledat v POS materiálech</h2>
+                        <span class="global-search-tag">FULLTEXT</span>
+                    </div>
+                    <div class="global-search-row">
+                        <span class="global-search-icon" aria-hidden="true">⌕</span>
+                        <input id="globalSearchInput" type="search" placeholder="Hledat téma…" autocomplete="off" aria-label="Hledat ve všech POS Markdown materiálech">
+                        <button id="globalSearchButton" type="button">Hledat</button>
+                    </div>
+                    <div id="globalSearchStatus" role="status" aria-live="polite">Prohledá obsah všech .md materiálů ve složce md.</div>
+                    <div id="globalSearchResults"></div>
+                </section>
+
+                <div class="reader-quick-actions" aria-label="Nástroje ke studiu">
+                    <button class="quick-action-btn" id="studyBtn" type="button" aria-controls="studyPanel" hidden>✦ Učení a test</button>
+                    <button class="quick-action-btn read-status-quick" id="readStatusBtn" type="button" disabled aria-pressed="false">○ Nepřečteno</button>
+                </div>
+
+                <div class="placeholder-state" id="placeholderState">
+                    <h2>Vyber téma</h2>
+                    <p class="muted">Klikni na soubor v nabídce a jeho obsah se načte a vykreslí přímo tady.</p>
+                    <div class="quote">„Teorie je, když víte všechno, ale nic nefunguje.“</div>
+                </div>
+
+                <div id="markdownContent"></div>
+
+                <section class="study-panel" id="studyPanel" hidden>
+                    <h2>✦ Procvičování POS</h2>
+                    <p class="muted">Kartičky a krátký test.</p>
+                    <h3>▣ Kartičky</h3>
+                    <div class="flashcard" id="flashcard" role="button" tabindex="0" aria-label="Otočit kartičku">
+                        <div class="card-label" id="cardLabel">Otázka</div>
+                        <div class="card-text" id="cardText"></div>
+                    </div>
+                    <div class="study-actions">
+                        <button class="tool-btn" id="cardPrev" type="button">◀ Předchozí</button>
+                        <button class="tool-btn" id="cardFlip" type="button">⟳ Otočit</button>
+                        <button class="tool-btn" id="cardNext" type="button">Další ▶</button>
+                    </div>
+                    <p class="muted" id="cardCounter"></p>
+                    <h3>☑ Mini test</h3>
+                    <form id="quizForm"></form>
+                    <button class="tool-btn" id="quizGrade" type="button">✓ Vyhodnotit test</button>
+                    <button class="tool-btn" id="quizNew" type="button">⟳ Nový test</button>
+                    <div id="quizResult" aria-live="polite"></div>
+                </section>
+
+                <div id="downloadContainer" class="download-container">
+                    <a id="downloadBtn" class="download-btn" href="#" download>↓ Stáhnout .md</a>
+                </div>
+            </div>
+        </main>
     </div>
+
+    <div class="toc-bubble-container" id="tocBubbleContainer">
+        <div class="toc-popup">
+            <div class="toc-header-title">
+                <span>☷ Obsah článku</span>
+                <span id="tocItemCount" class="muted" style="font-size:.75rem;"></span>
+            </div>
+            <p class="muted" id="tocHint" style="margin:0;padding:4px 0;">Otevři článek, aby se zde zobrazily nadpisy.</p>
+            <ul id="tocList"></ul>
+        </div>
+        <button class="toc-fab" id="tocFabBtn" type="button" title="Obsah článku" aria-label="Otevřít obsah článku">☷</button>
+    </div>
+
+<script>
+/* =========================================================
+   POS reader – soubory se hledají automaticky ve složce md/
+   Stačí nahrát nový .md soubor, HTML není potřeba upravovat.
+   ========================================================= */
+const MD_DIR = 'md/';
+
+/* Volitelné: kartičky a test. Když jsou prázdné, tlačítko „Učení a test“ se skryje.
+   FLASHCARDS: { q: 'Otázka', a: 'Odpověď' }
+   QUIZ_QUESTIONS: { q: 'Otázka', options: ['A','B','C'], answer: 0 } */
+const FLASHCARDS = [];
+const QUIZ_QUESTIONS = [];
+
+const STORAGE_KEYS = {
+    completed: 'posCompletedTopics',
+    positions: 'posReadingPositions',
+    lastFile: 'posLastFile'
+};
+
+let FILES = [];               // { path, title, group }
+let WIKI_INDEX = new Map();   // normalizovaný název -> path
+let currentFilePath = '';
+let currentCard = 0, cardFlipped = false;
+let scrollSaveTimer, loadRequestId = 0, globalSearchRunId = 0;
+let lastDiscovery = 0, usedGitHub = false;
+const markdownSearchCache = new Map();
+
+const $ = id => document.getElementById(id);
+const isMobile = () => window.matchMedia('(max-width: 768px)').matches;
+
+/* ---------- pomocné funkce ---------- */
+function escapeHtml(v) {
+    return String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function normalizeSearchText(v) {
+    return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('cs');
+}
+function normKey(v) {
+    return normalizeSearchText(v).replace(/\\/g, '/').replace(/^\.?\/?md\//, '').replace(/\.md$/, '').replace(/[_\s-]+/g, ' ').trim();
+}
+function fileUrl(path) { return MD_DIR + path.split('/').map(encodeURIComponent).join('/'); }
+function prettify(name) { return name.replace(/\.md$/i, '').replace(/_+/g, ' ').replace(/\s+/g, ' ').trim(); }
+function readJson(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } }
+function writeStore(key, value) { try { localStorage.setItem(key, value); } catch {} }
+const getCompleted = () => readJson(STORAGE_KEYS.completed);
+const getPositions = () => readJson(STORAGE_KEYS.positions);
+
+/* ---------- automatické zjištění souborů ---------- */
+async function listDir(relDir, depth) {
+    const base = new URL(MD_DIR + relDir, location.href);
+    const res = await fetch(base.href, { cache: 'no-store' });
+    if (!res.ok || !/html/i.test(res.headers.get('content-type') || '')) return null;
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/html');
+    const out = [];
+    for (const a of doc.querySelectorAll('a[href]')) {
+        const href = a.getAttribute('href');
+        if (!href || href[0] === '?' || href[0] === '#') continue;
+        let u, rest;
+        try {
+            u = new URL(href, base.href);
+            if (u.origin !== base.origin || !u.pathname.startsWith(base.pathname) || u.pathname === base.pathname) continue;
+            rest = decodeURIComponent(u.pathname.slice(base.pathname.length));
+        } catch { continue; }
+        if (rest.endsWith('/')) {
+            if (depth < 3 && !rest.slice(0, -1).includes('/')) {
+                const sub = await listDir(relDir + rest, depth + 1);
+                if (sub) out.push(...sub);
+            }
+        } else if (/\.md$/i.test(rest) && !rest.includes('/')) {
+            out.push(relDir + rest);
+        }
+    }
+    return [...new Set(out)];
+}
+async function fromDirectoryListing() { return listDir('', 0); }
+
+async function fromGitHub(force) {
+    if (!/\.github\.io$/i.test(location.hostname)) return null;
+    const user = location.hostname.split('.')[0];
+    const parts = location.pathname.split('/').filter(Boolean);
+    if (parts.length && /\.[a-z0-9]+$/i.test(parts[parts.length - 1])) parts.pop();
+    const project = parts.length > 0;
+    const repo = project ? parts[0] : location.hostname;
+    const sub = (project ? parts.slice(1) : []).concat(MD_DIR.replace(/\/$/, '')).join('/') + '/';
+    const cacheKey = 'posGhTree:' + user + '/' + repo + '/' + sub;
+    if (!force) {
+        try {
+            const c = JSON.parse(sessionStorage.getItem(cacheKey));
+            if (c && Date.now() - c.t < 5 * 60 * 1000) return c.files;
+        } catch {}
+    }
+    const res = await fetch(`https://api.github.com/repos/${user}/${repo}/git/trees/HEAD?recursive=1`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const files = (data.tree || [])
+        .filter(t => t.type === 'blob' && t.path.startsWith(sub) && /\.md$/i.test(t.path))
+        .map(t => t.path.slice(sub.length));
+    try { sessionStorage.setItem(cacheKey, JSON.stringify({ t: Date.now(), files })); } catch {}
+    usedGitHub = true;
+    return files;
+}
+
+async function fromManifest() {
+    for (const name of ['index.json', 'manifest.json']) {
+        try {
+            const res = await fetch(MD_DIR + name, { cache: 'no-store' });
+            if (!res.ok) continue;
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.files || []);
+            const files = list.map(String).map(p => p.replace(/^\.?\//, '').replace(/^md\//, '')).filter(p => /\.md$/i.test(p));
+            if (files.length) return files;
+        } catch {}
+    }
+    return null;
+}
+
+async function discoverFiles(force) {
+    const strategies = [fromDirectoryListing, () => fromGitHub(force), fromManifest];
+    for (const strategy of strategies) {
+        try {
+            const result = await strategy();
+            if (result && result.length) {
+                return [...new Set(result)]
+                    .sort((a, b) => a.localeCompare(b, 'cs', { numeric: true, sensitivity: 'base' }))
+                    .map(path => {
+                        const i = path.lastIndexOf('/');
+                        return { path, title: prettify(path.slice(i + 1)), group: i > 0 ? path.slice(0, path.indexOf('/')) : '' };
+                    });
+            }
+        } catch (e) { console.warn('Zjišťování souborů selhalo:', e); }
+    }
+    return [];
+}
+
+function buildWikiIndex() {
+    WIKI_INDEX = new Map();
+    FILES.forEach(f => {
+        const base = f.path.split('/').pop();
+        [normKey(f.path), normKey(base), normKey(base).replace(/^\d+\s*/, '')].forEach(k => {
+            if (k && !WIKI_INDEX.has(k)) WIKI_INDEX.set(k, f.path);
+        });
+    });
+}
+
+/* ---------- sidebar ---------- */
+function buildSidebar() {
+    const nav = $('nav');
+    if (!FILES.length) {
+        nav.innerHTML = `<p class="nav-note"><b>Žádné .md soubory.</b><br>Nahraj Markdown soubory do složky <code>md/</code> vedle tohoto HTML.<br><br>
+            Pokud tvůj server nezobrazuje obsah složek, vytvoř soubor <code>md/index.json</code> se seznamem souborů (viz <code>md-index.py</code>).</p>`;
+        return;
+    }
+    const groups = new Map();
+    FILES.forEach(f => {
+        if (!groups.has(f.group)) groups.set(f.group, []);
+        groups.get(f.group).push(f);
+    });
+    const names = [...groups.keys()].sort((a, b) => (a === '' ? -1 : b === '' ? 1 : a.localeCompare(b, 'cs', { numeric: true })));
+    nav.innerHTML = names.map(g => `
+        <div class="nav-group">
+            <div class="nav-group-title">${escapeHtml(g ? prettify(g) : 'Materiály')}</div>
+            <ul>${groups.get(g).map(f =>
+                `<li><button class="file-btn" type="button" data-path="${escapeHtml(f.path)}">▤ ${escapeHtml(f.title)}</button></li>`).join('')}
+            </ul>
+        </div>`).join('');
+    updateSidebarReadMarkers();
+    markActiveButton();
+    filterMarkdownDocs();
+}
+function findButton(path) {
+    return Array.from(document.querySelectorAll('#nav button.file-btn')).find(b => b.dataset.path === path) || null;
+}
+function markActiveButton() {
+    document.querySelectorAll('#nav button.file-btn').forEach(b => b.classList.toggle('active', b.dataset.path === currentFilePath));
+}
+function filterMarkdownDocs() {
+    const filter = normalizeSearchText($('mdSearchInput').value.trim());
+    document.querySelectorAll('#nav .nav-group').forEach(group => {
+        let any = false;
+        group.querySelectorAll('li').forEach(li => {
+            const btn = li.querySelector('button.file-btn');
+            const ok = normalizeSearchText(btn.dataset.path).includes(filter) || normalizeSearchText(btn.textContent).includes(filter);
+            li.style.display = ok ? '' : 'none';
+            if (ok) any = true;
+        });
+        group.style.display = any ? '' : 'none';
+    });
+}
+function setSidebarHidden(hidden) {
+    const layout = $('appLayout'), btn = $('sidebarToggle');
+    layout.classList.toggle('sidebar-hidden', hidden);
+    btn.textContent = isMobile() ? (hidden ? '☰' : '×') : (hidden ? '▶' : '◀');
+    btn.title = hidden ? 'Otevřít nabídku témat' : 'Zavřít nabídku témat';
+    btn.setAttribute('aria-expanded', String(!hidden));
+    btn.setAttribute('aria-label', hidden ? 'Otevřít výběr souborů' : 'Zavřít výběr souborů');
+}
+function toggleSidebar() {
+    const main = $('mainContent'), pos = main.scrollTop, file = currentFilePath;
+    const hidden = !$('appLayout').classList.contains('sidebar-hidden');
+    setSidebarHidden(hidden);
+    if (isMobile() && !hidden) setTimeout(() => $('mdSearchInput').focus(), 180);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (currentFilePath === file) { main.scrollTop = pos; updateReadingProgress(); }
+    }));
+}
+
+/* ---------- přečteno / pozice ---------- */
+function updateReadButton() {
+    const btn = $('readStatusBtn');
+    const has = Boolean(currentFilePath), read = has && Boolean(getCompleted()[currentFilePath]);
+    btn.disabled = !has;
+    btn.classList.toggle('read', read);
+    btn.setAttribute('aria-pressed', String(read));
+    btn.textContent = read ? '✓ Přečteno' : '○ Nepřečteno';
+    btn.title = !has ? 'Nejdřív otevři článek' : read ? 'Kliknutím označení zrušíš' : 'Označit jako přečtený';
+}
+function toggleCurrentRead() {
+    if (!currentFilePath) return;
+    const c = getCompleted();
+    c[currentFilePath] = !c[currentFilePath];
+    writeStore(STORAGE_KEYS.completed, JSON.stringify(c));
+    updateReadButton();
+    updateSidebarReadMarkers();
+}
+function updateSidebarReadMarkers() {
+    const c = getCompleted();
+    document.querySelectorAll('#nav button.file-btn').forEach(b => {
+        let m = b.querySelector('.completed-marker');
+        if (c[b.dataset.path] && !m) {
+            m = document.createElement('span');
+            m.className = 'completed-marker';
+            m.textContent = ' ✓';
+            b.appendChild(m);
+        } else if (!c[b.dataset.path] && m) m.remove();
+    });
+}
+function updateReadingProgress() {
+    const main = $('mainContent'), max = main.scrollHeight - main.clientHeight;
+    $('readingProgress').style.width = (max > 0 ? Math.min(100, Math.max(0, main.scrollTop / max * 100)) : 0) + '%';
+}
+function saveReadingPosition() {
+    if (!currentFilePath) return;
+    const p = getPositions();
+    p[currentFilePath] = $('mainContent').scrollTop;
+    writeStore(STORAGE_KEYS.positions, JSON.stringify(p));
+    writeStore(STORAGE_KEYS.lastFile, currentFilePath);
+}
+function restoreReadingPosition(path) {
+    const pos = getPositions()[path] || 0;
+    requestAnimationFrame(() => { $('mainContent').scrollTop = pos; updateReadingProgress(); });
+}
+
+/* ---------- obsah článku ---------- */
+function buildTableOfContents() {
+    const list = $('tocList'), hint = $('tocHint'), badge = $('tocItemCount');
+    list.innerHTML = '';
+    const headings = Array.from($('markdownContent').querySelectorAll('h1,h2,h3'));
+    if (!headings.length) {
+        hint.style.display = 'block';
+        hint.textContent = 'V tomto článku nejsou žádné nadpisy.';
+        badge.textContent = '';
+        return;
+    }
+    hint.style.display = 'none';
+    badge.textContent = '(' + headings.length + ')';
+    headings.forEach((h, i) => {
+        h.id = 'pos-heading-' + i;
+        const li = document.createElement('li'), b = document.createElement('button');
+        b.className = 'toc-h' + h.tagName.substring(1);
+        b.textContent = h.textContent;
+        b.title = 'Přejít na: ' + h.textContent;
+        b.onclick = () => {
+            const main = $('mainContent');
+            const top = h.getBoundingClientRect().top - main.getBoundingClientRect().top + main.scrollTop;
+            main.scrollTo({ top: top - 15, behavior: 'smooth' });
+            $('tocBubbleContainer').classList.remove('open');
+        };
+        li.appendChild(b);
+        list.appendChild(li);
+    });
+}
+
+/* ---------- wiki odkazy [[...]] ---------- */
+function processMarkdownWikilinks(raw) {
+    if (!raw) return '';
+    let c = raw.replace(/!\[\[([^\]]+)\]\]/g, '');
+    c = c.replace(/(?<!\!)\[\[([^\]|]+)\|([^\]]+)\]\]/g,
+        (m, t, l) => `<a href="#" class="wiki-link" data-wiki="${escapeHtml(t.trim())}">${escapeHtml(l.trim())}</a>`);
+    c = c.replace(/(?<!\!)\[\[([^\]]+)\]\]/g,
+        (m, t) => `<a href="#" class="wiki-link" data-wiki="${escapeHtml(t.trim())}">${escapeHtml(t.trim())}</a>`);
+    return c;
+}
+function resolveTarget(target) {
+    const key = normKey(target);
+    if (!key) return null;
+    if (WIKI_INDEX.has(key)) return WIKI_INDEX.get(key);
+    for (const [k, p] of WIKI_INDEX) if (k.includes(key) || key.includes(k)) return p;
+    return null;
+}
+function navigateToWikiTarget(target) {
+    const path = resolveTarget(target);
+    if (path) { loadMarkdown(path); return; }
+    setSidebarHidden(false);
+    const s = $('mdSearchInput');
+    s.value = target;
+    filterMarkdownDocs();
+    s.focus();
+}
+
+/* ---------- načtení článku ---------- */
+async function loadMarkdown(path) {
+    if (!path) return;
+    if (currentFilePath) saveReadingPosition();
+    const requestId = ++loadRequestId;
+    currentFilePath = path;
+    writeStore(STORAGE_KEYS.lastFile, path);
+    updateReadButton();
+    markActiveButton();
+    const hash = '#' + encodeURIComponent(path);
+    if (location.hash !== hash) history.pushState(null, '', hash);
+    if (isMobile()) setSidebarHidden(true);
+
+    const content = $('markdownContent'), dl = $('downloadContainer');
+    $('placeholderState').style.display = 'none';
+    dl.style.display = 'none';
+    $('studyPanel').hidden = true;
+    content.innerHTML = '<p class="muted" style="text-align:center;padding:40px">Načítám…</p>';
+
+    try {
+        const res = await fetch(fileUrl(path), { cache: 'no-cache' });
+        if (!res.ok) throw new Error('Soubor nebyl nalezen');
+        const md = await res.text();
+        if (requestId !== loadRequestId) return;
+        content.innerHTML = marked.parse(processMarkdownWikilinks(md));
+        buildTableOfContents();
+        const name = path.split('/').pop();
+        const a = $('downloadBtn');
+        a.href = fileUrl(path);
+        a.download = name;
+        a.textContent = '↓ Stáhnout ' + name;
+        dl.style.display = 'block';
+        updateReadButton();
+        updateSidebarReadMarkers();
+        restoreReadingPosition(path);
+    } catch (err) {
+        if (requestId !== loadRequestId) return;
+        console.error('Chyba při načítání:', err);
+        content.innerHTML = `<div style="text-align:center;padding:30px"><h3 style="color:#f87171">Soubor se nepodařilo načíst</h3>
+            <p class="muted">Zkontroluj, zda existuje:</p><code>${escapeHtml(MD_DIR + path)}</code>
+            <p class="muted">Pokud otevíráš HTML přímo jako file://, spusť ho přes lokální webový server.</p></div>`;
+        $('tocList').innerHTML = '';
+        $('tocHint').style.display = 'block';
+        $('tocHint').textContent = 'Obsah se nepodařilo vytvořit.';
+        $('tocItemCount').textContent = '';
+    }
+    updateReadingProgress();
+}
+
+/* ---------- fulltext ---------- */
+function makeSearchSnippet(text, terms) {
+    const norm = normalizeSearchText(text);
+    let index = -1;
+    for (const t of terms) { const i = norm.indexOf(t); if (i >= 0 && (index < 0 || i < index)) index = i; }
+    if (index < 0) index = 0;
+    const start = Math.max(0, index - 95), end = Math.min(text.length, start + 240);
+    let s = escapeHtml((start > 0 ? '…' : '') + text.slice(start, end).replace(/\s+/g, ' ') + (end < text.length ? '…' : ''));
+    [...terms].sort((a, b) => b.length - a.length).forEach(t => {
+        try { s = s.replace(new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>'); } catch {}
+    });
+    return s;
+}
+async function searchAllMarkdown() {
+    const input = $('globalSearchInput'), status = $('globalSearchStatus'), box = $('globalSearchResults'), btn = $('globalSearchButton');
+    const query = input.value.trim(), runId = ++globalSearchRunId;
+    box.innerHTML = '';
+    if (!query) { status.textContent = 'Nejdřív napiš, co chceš hledat.'; input.focus(); return; }
+    if (!FILES.length) { status.textContent = 'Ve složce md zatím nejsou žádné soubory.'; return; }
+    const terms = normalizeSearchText(query).split(/\s+/).filter(Boolean);
+    btn.disabled = true;
+    status.textContent = `Prohledávám ${FILES.length} souborů…`;
+    const results = [];
+    let checked = 0;
+    await Promise.all(FILES.map(async file => {
+        try {
+            let text = markdownSearchCache.get(file.path);
+            if (text === undefined) {
+                const res = await fetch(fileUrl(file.path));
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                text = await res.text();
+                markdownSearchCache.set(file.path, text);
+            }
+            const norm = normalizeSearchText(text);
+            if (terms.every(t => norm.includes(t))) {
+                const line = text.split(/\r?\n/).find(l => { const n = normalizeSearchText(l); return terms.every(t => n.includes(t)); });
+                results.push({ ...file, snippet: makeSearchSnippet(line || text, terms), index: Math.min(...terms.map(t => norm.indexOf(t))) });
+            }
+        } catch (e) { console.warn('Vyhledávání přeskočilo soubor:', file.path, e); }
+        finally { checked++; }
+    }));
+    if (runId !== globalSearchRunId) return;
+    btn.disabled = false;
+    results.sort((a, b) => a.index - b.index || a.title.localeCompare(b.title, 'cs'));
+    status.textContent = results.length
+        ? `Nalezeno ${results.length} souborů obsahujících všechny výrazy. Prohledáno ${checked} souborů.`
+        : `Nic jsem nenašel. Prohledáno ${checked} souborů. Zkus kratší výraz.`;
+    results.slice(0, 40).forEach(r => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'global-result';
+        item.innerHTML = `<span class="global-result-title">${escapeHtml(r.title)}</span><span class="global-result-snippet">${r.snippet}</span>`;
+        item.addEventListener('click', async () => {
+            await loadMarkdown(r.path);
+            setTimeout(() => jumpToSearchMatch(terms), 100);
+        });
+        box.appendChild(item);
+    });
+    if (results.length > 40) {
+        const more = document.createElement('p');
+        more.className = 'muted';
+        more.textContent = `Zobrazeno prvních 40 výsledků z ${results.length}.`;
+        box.appendChild(more);
+    }
+}
+function jumpToSearchMatch(terms) {
+    const walker = document.createTreeWalker($('markdownContent'), NodeFilter.SHOW_TEXT, {
+        acceptNode(n) {
+            if (!n.nodeValue || !n.nodeValue.trim() || n.parentElement.closest('script,style,pre,code,mark')) return NodeFilter.FILTER_REJECT;
+            const t = normalizeSearchText(n.nodeValue);
+            return terms.some(x => t.includes(x)) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+    });
+    const first = walker.nextNode();
+    if (!first) return;
+    const target = first.parentElement.closest('p,li,td,th,blockquote,h1,h2,h3,h4,h5,h6,div') || first.parentElement;
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.style.transition = 'background-color .25s ease';
+    const old = target.style.backgroundColor;
+    target.style.backgroundColor = 'rgba(239,68,68,.18)';
+    setTimeout(() => { target.style.backgroundColor = old; }, 1800);
+}
+
+/* ---------- kartičky a test (volitelné) ---------- */
+function openStudyPanel() {
+    const p = $('studyPanel');
+    p.hidden = !p.hidden;
+    if (!p.hidden) {
+        if (!document.querySelector('.quiz-question')) buildQuiz();
+        renderCard();
+        p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+function renderCard() {
+    if (!FLASHCARDS.length) return;
+    const c = FLASHCARDS[currentCard];
+    $('cardLabel').textContent = cardFlipped ? 'Odpověď' : 'Otázka';
+    $('cardText').textContent = cardFlipped ? c.a : c.q;
+    $('cardCounter').textContent = 'Kartička ' + (currentCard + 1) + ' z ' + FLASHCARDS.length;
+}
+const flipCard = () => { cardFlipped = !cardFlipped; renderCard(); };
+const nextCard = () => { if (!FLASHCARDS.length) return; currentCard = (currentCard + 1) % FLASHCARDS.length; cardFlipped = false; renderCard(); };
+const previousCard = () => { if (!FLASHCARDS.length) return; currentCard = (currentCard - 1 + FLASHCARDS.length) % FLASHCARDS.length; cardFlipped = false; renderCard(); };
+function buildQuiz() {
+    const form = $('quizForm');
+    form.innerHTML = '';
+    $('quizResult').textContent = '';
+    [...QUIZ_QUESTIONS].sort(() => Math.random() - .5).slice(0, 5).forEach((q, i) => {
+        const w = document.createElement('div');
+        w.className = 'quiz-question';
+        const t = document.createElement('strong');
+        t.textContent = (i + 1) + '. ' + q.q;
+        w.appendChild(t);
+        q.options.forEach((o, oi) => {
+            const label = document.createElement('label'), input = document.createElement('input');
+            input.type = 'radio'; input.name = 'question-' + i; input.value = oi; input.dataset.answer = q.answer;
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(o));
+            w.appendChild(label);
+        });
+        form.appendChild(w);
+    });
+}
+function gradeQuiz() {
+    const qs = Array.from(document.querySelectorAll('.quiz-question'));
+    if (!qs.length) { buildQuiz(); return; }
+    let ok = 0, answered = 0;
+    qs.forEach(q => {
+        const s = q.querySelector('input:checked');
+        if (s) { answered++; if (Number(s.value) === Number(s.dataset.answer)) ok++; }
+    });
+    $('quizResult').textContent = `Výsledek: ${ok} / ${qs.length} správně. Zodpovězeno: ${answered} / ${qs.length}.`;
+}
+
+/* ---------- start / obnovení seznamu ---------- */
+async function refreshFiles(force, silent) {
+    const btn = $('refreshBtn');
+    if (!silent) btn.classList.add('spin');
+    const list = await discoverFiles(force);
+    lastDiscovery = Date.now();
+    btn.classList.remove('spin');
+    const changed = JSON.stringify(list.map(f => f.path)) !== JSON.stringify(FILES.map(f => f.path));
+    if (changed || !silent) {
+        FILES = list;
+        buildWikiIndex();
+        buildSidebar();
+    }
+    return changed;
+}
+function findFileFromHash(hash) {
+    if (!hash) return null;
+    const exact = FILES.find(f => f.path === hash);
+    if (exact) return exact.path;
+    const base = hash.split('/').pop().toLowerCase();
+    const alt = FILES.find(f => f.path.split('/').pop().toLowerCase() === base);
+    return alt ? alt.path : null;
+}
+function checkUrlHash() {
+    let hash = '';
+    try { hash = decodeURIComponent(location.hash.replace(/^#/, '')); } catch {}
+    const path = findFileFromHash(hash) || (!hash ? findFileFromHash(readLast()) : null);
+    if (path) loadMarkdown(path);
+}
+const readLast = () => { try { return localStorage.getItem(STORAGE_KEYS.lastFile) || ''; } catch { return ''; } };
+
+async function init() {
+    if (isMobile()) setSidebarHidden(true);
+    if (FLASHCARDS.length || QUIZ_QUESTIONS.length) $('studyBtn').hidden = false;
+    updateReadButton();
+    renderCard();
+    buildQuiz();
+    await refreshFiles(false, false);
+    checkUrlHash();
+}
+
+/* ---------- události ---------- */
+$('sidebarToggle').addEventListener('click', toggleSidebar);
+$('refreshBtn').addEventListener('click', () => refreshFiles(true, false));
+$('mdSearchInput').addEventListener('input', filterMarkdownDocs);
+$('nav').addEventListener('click', e => {
+    const b = e.target.closest('button.file-btn');
+    if (b) loadMarkdown(b.dataset.path);
+});
+$('readStatusBtn').addEventListener('click', toggleCurrentRead);
+$('studyBtn').addEventListener('click', openStudyPanel);
+$('flashcard').addEventListener('click', flipCard);
+$('flashcard').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flipCard(); } });
+$('cardPrev').addEventListener('click', previousCard);
+$('cardNext').addEventListener('click', nextCard);
+$('cardFlip').addEventListener('click', flipCard);
+$('quizGrade').addEventListener('click', gradeQuiz);
+$('quizNew').addEventListener('click', buildQuiz);
+$('globalSearchButton').addEventListener('click', searchAllMarkdown);
+$('globalSearchInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); searchAllMarkdown(); } });
+$('tocFabBtn').addEventListener('click', () => $('tocBubbleContainer').classList.toggle('open'));
+
+$('markdownContent').addEventListener('click', e => {
+    const link = e.target.closest('a');
+    if (!link) return;
+    const wiki = link.getAttribute('data-wiki');
+    if (wiki) { e.preventDefault(); navigateToWikiTarget(wiki); return; }
+    const href = link.getAttribute('href');
+    if (href && /^https?:\/\//i.test(href)) { link.target = '_blank'; link.rel = 'noopener noreferrer'; return; }
+    if (href && /\.md(?:#.*)?$/i.test(href)) {
+        e.preventDefault();
+        navigateToWikiTarget(decodeURIComponent(href.split('#')[0]));
+    }
+});
+$('mainContent').addEventListener('scroll', () => {
+    updateReadingProgress();
+    clearTimeout(scrollSaveTimer);
+    scrollSaveTimer = setTimeout(saveReadingPosition, 250);
+});
+window.addEventListener('beforeunload', saveReadingPosition);
+window.addEventListener('popstate', checkUrlHash);
+$('appLayout').addEventListener('click', e => {
+    if (isMobile() && e.target === $('appLayout') && !$('appLayout').classList.contains('sidebar-hidden')) setSidebarHidden(true);
+});
+document.addEventListener('click', e => {
+    const c = $('tocBubbleContainer');
+    if (c.classList.contains('open') && !c.contains(e.target)) c.classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        if (isMobile()) setSidebarHidden(true);
+        if (!$('studyPanel').hidden) $('studyPanel').hidden = true;
+        $('tocBubbleContainer').classList.remove('open');
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSidebarHidden(false);
+        $('mdSearchInput').focus();
+        $('mdSearchInput').select();
+    }
+});
+/* Když se vrátíš na záložku, seznam souborů se tiše zkontroluje (nové .md se objeví samy) */
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !usedGitHub && Date.now() - lastDiscovery > 30000) refreshFiles(false, true);
+});
+
+init();
+</script>
+
+<!-- ===== JuchyAI widget (CSS + HTML + JS) ===== -->
+<style>
+  .jai-wurzel {
+    --jai-hintergrund: #19191c;
+    --jai-flaeche: #26262b;
+    --jai-blase: #323238;
+    --jai-akzent: #ef4444;
+    --jai-akzent-dunkel: #dc2626;
+    --jai-text: #ececee;
+    --jai-gedaempft: #8d8d97;
+    --jai-rand: rgba(255,255,255,.1);
+    --jai-schrift: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2147483000;
+    font-family: var(--jai-schrift);
+    font-size: 15px;
+    line-height: 1.45;
+    color: var(--jai-text);
+    text-align: left;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  .jai-wurzel > * { pointer-events: auto; }
+  .jai-wurzel *,
+  .jai-wurzel *::before,
+  .jai-wurzel *::after { box-sizing: border-box; }
+
+  .jai-wurzel .jai-knopf {
+    all: unset;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px 12px 16px;
+    border-radius: 999px;
+    background: var(--jai-akzent);
+    color: #fff;
+    font: 600 14px/1 var(--jai-schrift);
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 8px 28px rgba(239,68,68,.35);
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .jai-wurzel .jai-knopf:hover { background: var(--jai-akzent-dunkel); }
+  .jai-wurzel .jai-knopf:active { transform: scale(0.97); }
+  .jai-wurzel .jai-knopf:focus-visible,
+  .jai-wurzel .jai-schliessen:focus-visible,
+  .jai-wurzel .jai-senden:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .jai-wurzel .jai-symbol { display: block; width: 20px; height: 20px; flex: none; fill: currentColor; }
+
+  .jai-wurzel .jai-fenster {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    max-width: calc(100vw - 24px);
+    height: 540px;
+    max-height: calc(100vh - 150px);
+    background: var(--jai-hintergrund);
+    border: 1px solid var(--jai-rand);
+    border-radius: 18px;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+    overflow: hidden;
+    transform-origin: center;
+    animation: jai-einblenden 0.18s ease-out;
+  }
+  .jai-wurzel .jai-fenster[hidden] { display: none; }
+
+  @keyframes jai-einblenden {
+    from { opacity: 0; transform: translate(-50%, -48%) scale(0.97); }
+    to   { opacity: 1; transform: translate(-50%, -50%); }
+  }
+
+  .jai-wurzel .jai-kopf {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 14px 14px 18px;
+    border-bottom: 1px solid var(--jai-rand);
+    background: var(--jai-hintergrund);
+  }
+  .jai-wurzel .jai-logo {
+    display: grid; place-items: center;
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, #ef4444, #991b1b);
+    color: #fff; flex: none;
+  }
+  .jai-wurzel .jai-logo .jai-symbol { width: 16px; height: 16px; }
+  .jai-wurzel .jai-titel { flex: 1; font: 600 16px/1.2 var(--jai-schrift); color: var(--jai-text); }
+  .jai-wurzel .jai-schliessen {
+    all: unset; box-sizing: border-box;
+    display: grid; place-items: center;
+    width: 32px; height: 32px; border-radius: 8px;
+    color: var(--jai-gedaempft);
+    font: 400 22px/1 var(--jai-schrift);
+    cursor: pointer;
+  }
+  .jai-wurzel .jai-schliessen:hover { background: var(--jai-flaeche); color: var(--jai-text); }
+
+  .jai-wurzel .jai-nachrichten {
+    flex: 1; overflow-y: auto; padding: 18px;
+    display: flex; flex-direction: column; gap: 14px;
+    scrollbar-width: thin; scrollbar-color: #4a4a50 transparent;
+  }
+  .jai-wurzel .jai-zeile { display: flex; gap: 10px; align-items: flex-start; }
+  .jai-wurzel .jai-zeile-benutzer { justify-content: flex-end; }
+  .jai-wurzel .jai-avatar {
+    display: grid; place-items: center;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--jai-akzent); color: #fff; flex: none; margin-top: 1px;
+  }
+  .jai-wurzel .jai-avatar .jai-symbol { width: 14px; height: 14px; }
+  .jai-wurzel .jai-text {
+    max-width: 82%; margin: 0; padding: 0;
+    color: var(--jai-text);
+    font: 400 15px/1.5 var(--jai-schrift);
+    word-wrap: break-word; overflow-wrap: anywhere; white-space: pre-wrap;
+  }
+  .jai-wurzel .jai-zeile-benutzer .jai-text {
+    background: var(--jai-blase);
+    padding: 9px 14px;
+    border-radius: 16px 16px 4px 16px;
+  }
+
+  .jai-wurzel .jai-punkte { display: inline-flex; gap: 4px; align-items: center; height: 22px; }
+  .jai-wurzel .jai-punkt {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--jai-gedaempft);
+    animation: jai-huepfen 1.1s infinite ease-in-out;
+  }
+  .jai-wurzel .jai-punkt:nth-child(2) { animation-delay: 0.15s; }
+  .jai-wurzel .jai-punkt:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes jai-huepfen {
+    0%, 70%, 100% { opacity: 0.35; transform: translateY(0); }
+    35% { opacity: 1; transform: translateY(-4px); }
+  }
+
+  .jai-wurzel .jai-fuss { padding: 0 14px 10px; background: var(--jai-hintergrund); }
+  .jai-wurzel .jai-eingabefeld {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--jai-flaeche);
+    border-radius: 14px;
+    padding: 6px 6px 6px 14px;
+  }
+  .jai-wurzel .jai-eingabe {
+    all: unset; box-sizing: border-box;
+    flex: 1; min-width: 0; padding: 8px 0;
+    color: var(--jai-text);
+    font: 400 15px/1.3 var(--jai-schrift);
+  }
+  .jai-wurzel .jai-eingabe::placeholder { color: var(--jai-gedaempft); }
+  .jai-wurzel .jai-senden {
+    all: unset; box-sizing: border-box;
+    display: grid; place-items: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--jai-akzent); color: #fff; cursor: pointer; flex: none;
+  }
+  .jai-wurzel .jai-senden:hover { background: var(--jai-akzent-dunkel); }
+  .jai-wurzel .jai-senden[disabled] { opacity: 0.4; cursor: default; }
+  .jai-wurzel .jai-hinweis {
+    margin: 8px 0 0; padding: 0; text-align: center;
+    color: var(--jai-gedaempft);
+    font: 400 11px/1.3 var(--jai-schrift);
+  }
+
+  @media (max-width: 480px) {
+    .jai-wurzel { bottom: 12px; }
+    .jai-wurzel .jai-fenster {
+      width: calc(100vw - 24px);
+      height: 75vh;
+      height: 75dvh;
+      max-height: calc(100vh - 110px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .jai-wurzel .jai-fenster,
+    .jai-wurzel .jai-punkt { animation: none; }
+    .jai-wurzel .jai-knopf { transition: none; }
+  }
+</style>
+
+<div class="jai-wurzel" id="jai-wurzel">
+  <div class="jai-fenster" id="jai-fenster" role="dialog" aria-label="JuchyAI" hidden>
+    <div class="jai-kopf">
+      <span class="jai-logo" aria-hidden="true">
+        <svg class="jai-symbol" viewBox="0 0 24 24"><path d="M12 2c.8 5.2 4.8 9.2 10 10-5.2.8-9.2 4.8-10 10-.8-5.2-4.8-9.2-10-10 5.2-.8 9.2-4.8 10-10z"/></svg>
+      </span>
+      <span class="jai-titel">JuchyAI</span>
+      <button class="jai-schliessen" id="jai-schliessen" type="button" aria-label="Zavřít okno">&times;</button>
+    </div>
+
+    <div class="jai-nachrichten" id="jai-nachrichten" aria-live="polite"></div>
+
+    <div class="jai-fuss">
+      <div class="jai-eingabefeld">
+        <input class="jai-eingabe" id="jai-eingabe" type="text" maxlength="500"
+               placeholder="Zeptej se na cokoliv…" autocomplete="off" aria-label="Tvoje otázka">
+        <button class="jai-senden" id="jai-senden" type="button" aria-label="Odeslat">
+          <svg class="jai-symbol" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 4l7 7-1.4 1.4L13 7.800V20h-2V7.800l-4.600 4.600L5 11z"/></svg>
+        </button>
+      </div>
+      <p class="jai-hinweis">JuchyAI může dělat chyby. Nebo taky ne. Nebude se ti chtít zjišťovat.</p>
+    </div>
+  </div>
+
+  <button class="jai-knopf" id="jai-knopf" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="jai-fenster">
+    <svg class="jai-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c.8 5.2 4.8 9.2 10 10-5.2.8-9.2 4.8-10 10-.8-5.2-4.8-9.2-10-10 5.2-.8 9.2-4.8 10-10z"/></svg>
+    <span>Zeptat se AI</span>
+  </button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  if (window.__juchyAiGeladen) return;
+  window.__juchyAiGeladen = true;
+
+  var antworten = [
+    'To je dobrá otázka, vypracuj si to sám.',
+    'Vážně chceš, abych ti řekl, jak se to dělá?',
+    'Zkus to vygooglit, ono to funguje.',
+    'Tohle bych ti řekl, ale nechce se mi.',
+    'Hmm… zajímavé. A co si myslíš ty?',
+    'Na tohle mám odpověď, ale nepovím ti ji.',
+    'To by ses měl naučit sám, budeš na sebe pyšný.',
+    'Moje kapacity jsou momentálně vyčerpané. Zkus to zítra.',
+    'Dobrý pokus. Další!',
+    'Já jsem AI, ne tvůj domácí úkol.',
+    'Ptáš se na špatném místě. Zkus zeď.',
+    'To je tak jednoduché, že se stydím odpovědět.',
+    'Počkej, musím se na to zeptat jiné AI… Ne, to nedám.',
+    'Odpověď je 42. Pro jistotu to platí vždycky.'
+  ];
+  var begruessung = 'Ahoj! Jsem JuchyAI. Zeptej se mě na cokoliv.';
+  var sternSvg = '<svg class="jai-symbol" viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M12 2c.8 5.2 4.8 9.2 10 10-5.2.8-9.2 4.8-10 10-.8-5.2-4.8-9.2-10-10 5.2-.8 9.2-4.8 10-10z"/></svg>';
+
+  function starten() {
+    var wurzel = document.getElementById('jai-wurzel');
+    if (!wurzel) return;
+    document.body.appendChild(wurzel);
+
+    var fenster = document.getElementById('jai-fenster');
+    var knopf = document.getElementById('jai-knopf');
+    var schliessen = document.getElementById('jai-schliessen');
+    var nachrichten = document.getElementById('jai-nachrichten');
+    var eingabe = document.getElementById('jai-eingabe');
+    var senden = document.getElementById('jai-senden');
+
+    var beschaeftigt = false;
+    var begruesst = false;
+    var letzteAntwort = -1;
+
+    function nachUnten() { nachrichten.scrollTop = nachrichten.scrollHeight; }
+
+    function zeileErstellen(vonBenutzer, text) {
+      var zeile = document.createElement('div');
+      zeile.className = 'jai-zeile' + (vonBenutzer ? ' jai-zeile-benutzer' : '');
+      if (!vonBenutzer) {
+        var avatar = document.createElement('span');
+        avatar.className = 'jai-avatar';
+        avatar.innerHTML = sternSvg;
+        zeile.appendChild(avatar);
+      }
+      var inhalt = document.createElement('div');
+      inhalt.className = 'jai-text';
+      inhalt.textContent = text || '';
+      zeile.appendChild(inhalt);
+      nachrichten.appendChild(zeile);
+      nachUnten();
+      return { zeile: zeile, inhalt: inhalt };
+    }
+
+    function zufallsAntwort() {
+      var i;
+      do { i = Math.floor(Math.random() * antworten.length); }
+      while (i === letzteAntwort && antworten.length > 1);
+      letzteAntwort = i;
+      return antworten[i];
+    }
+
+    function tippen(inhalt, text, index) {
+      if (index < text.length) {
+        inhalt.textContent += text.charAt(index);
+        nachUnten();
+        setTimeout(function () { tippen(inhalt, text, index + 1); }, 15 + Math.random() * 30);
+      } else {
+        beschaeftigt = false;
+        senden.disabled = false;
+        eingabe.focus();
+      }
+    }
+
+    function antworten_(frage) {
+      var denkt = zeileErstellen(false, '');
+      denkt.inhalt.innerHTML = '<span class="jai-punkte"><span class="jai-punkt"></span><span class="jai-punkt"></span><span class="jai-punkt"></span></span>';
+      nachUnten();
+      setTimeout(function () {
+        denkt.inhalt.textContent = '';
+        tippen(denkt.inhalt, zufallsAntwort(), 0);
+      }, 1200 + Math.random() * 800);
+    }
+
+    function abschicken() {
+      var frage = eingabe.value.trim();
+      if (!frage || beschaeftigt) return;
+      beschaeftigt = true;
+      senden.disabled = true;
+      eingabe.value = '';
+      zeileErstellen(true, frage);
+      setTimeout(function () { antworten_(frage); }, 350);
+    }
+
+    function oeffnen() {
+      fenster.hidden = false;
+      knopf.setAttribute('aria-expanded', 'true');
+      if (!begruesst) {
+        begruesst = true;
+        zeileErstellen(false, begruessung);
+      }
+      eingabe.focus();
+    }
+
+    function schliessenFenster() {
+      fenster.hidden = true;
+      knopf.setAttribute('aria-expanded', 'false');
+      knopf.focus();
+    }
+
+    knopf.addEventListener('click', function () {
+      if (fenster.hidden) oeffnen(); else schliessenFenster();
+    });
+    schliessen.addEventListener('click', schliessenFenster);
+    senden.addEventListener('click', abschicken);
+    eingabe.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); abschicken(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !fenster.hidden) schliessenFenster();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', starten);
+  } else {
+    starten();
+  }
+})();
+</script>
 </body>
 </html>
