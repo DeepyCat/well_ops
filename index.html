@@ -267,6 +267,22 @@
         .cal-tab-txt { writing-mode: vertical-rl; font-size: 12.5px; font-weight: 600; letter-spacing: .04em; }
         body.cal-open .cal-tab { right: var(--cal-w); }
 
+        /* ---------- NAS (odkaz pod kalendářem) ---------- */
+        .nas-tab {
+            position: fixed; top: calc(50% + 105px); right: 0; z-index: 44;
+            transform: translateY(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            padding: 14px 9px; border-radius: 12px 0 0 12px;
+            background: var(--surface); border: 1px solid var(--border-strong); border-right: 0;
+            color: var(--text-2); cursor: pointer;
+            box-shadow: -6px 0 24px rgba(0,0,0,.25);
+            transition: right .25s ease, background .15s ease, color .15s ease;
+        }
+        .nas-tab:hover { background: var(--surface-2); color: var(--text); }
+        .nas-tab .ico { color: var(--accent); }
+        .nas-tab-txt { writing-mode: vertical-rl; font-size: 12.5px; font-weight: 600; letter-spacing: .04em; }
+        body.cal-open .nas-tab { right: var(--cal-w); }
+
         .cal {
             position: fixed; top: 0; right: 0; bottom: 0; z-index: 45;
             width: var(--cal-w);
@@ -360,6 +376,10 @@
     </aside>
     <div class="scrim" id="scrim"></div>
 
+    <a class="nas-tab" id="nas-tab" href="https://salat.fit/" target="_blank" rel="noopener noreferrer" aria-label="Otevřít NAS v nové kartě">
+        <span class="nas-tab-icon" aria-hidden="true">🗄</span>
+        <span class="nas-tab-txt">NAS</span>
+    </a>
     <button class="cal-tab" id="cal-tab" type="button" aria-label="Otevřít kalendář" aria-expanded="false" aria-controls="cal"></button>
     <aside class="cal" id="cal" aria-label="Kalendář">
         <div class="cal-head">
