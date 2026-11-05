@@ -10,23 +10,33 @@
     { "source": "/ops/img/(.*)", "destination": "/img/$1" },
     { "source": "/hry/js/(.*)", "destination": "/js/$1" },
     { "source": "/hry/img/(.*)", "destination": "/img/$1" },
+    { "source": "/icon.svg", "destination": "/hry/maturita/icon.svg" },
     { "source": "/gd", "destination": "/hry/gd/index.html" },
+    { "source": "/gd/", "destination": "/hry/gd/index.html" },
     { "source": "/gd/(.*)", "destination": "/hry/gd/$1" },
     { "source": "/kasino", "destination": "/hry/kasino/index.html" },
+    { "source": "/kasino/", "destination": "/hry/kasino/index.html" },
     { "source": "/kasino/(.*)", "destination": "/hry/kasino/$1" },
     { "source": "/stratagem", "destination": "/hry/stratagem/index.html" },
+    { "source": "/stratagem/", "destination": "/hry/stratagem/index.html" },
     { "source": "/stratagem/(.*)", "destination": "/hry/stratagem/$1" },
     { "source": "/mc", "destination": "/hry/mc/index.html" },
+    { "source": "/mc/", "destination": "/hry/mc/index.html" },
     { "source": "/mc/(.*)", "destination": "/hry/mc/$1" },
     { "source": "/hyperdrive", "destination": "/hry/hyperdrive/index.html" },
+    { "source": "/hyperdrive/", "destination": "/hry/hyperdrive/index.html" },
     { "source": "/hyperdrive/(.*)", "destination": "/hry/hyperdrive/$1" },
     { "source": "/clicker", "destination": "/hry/clicker/index.html" },
+    { "source": "/clicker/", "destination": "/hry/clicker/index.html" },
     { "source": "/clicker/(.*)", "destination": "/hry/clicker/$1" },
     { "source": "/maturita", "destination": "/hry/maturita/index.html" },
+    { "source": "/maturita/", "destination": "/hry/maturita/index.html" },
     { "source": "/maturita/(.*)", "destination": "/hry/maturita/$1" }
   ],
   "redirects": [
     { "source": "/games.html", "destination": "/", "permanent": true },
-    { "source": "/ops/games.html", "destination": "/", "permanent": true }
+    { "source": "/ops/games.html", "destination": "/", "permanent": true },
+    { "source": "/hry/games.html", "destination": "/", "permanent": true },
+    { "source": "/hry/(.*)/games.html", "destination": "/", "permanent": true }
   ]
 }

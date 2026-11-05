@@ -290,7 +290,7 @@
  
   document.addEventListener('keydown', e => {
     if (e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
-    const a = {'1': '/kasino/blackjack.html', '2': '/kasino/slot.html', '3': '/kasino/gacha.html', '4': '/kasino/roulette.html', '5': '/kasino/wheel.html'}[e.key];
+    const a = {'1': 'blackjack.html', '2': 'slot.html', '3': 'gacha.html', '4': 'roulette.html', '5': 'wheel.html'}[e.key];
     const shopOpen = $('opsShopModal') && $('opsShopModal').classList.contains('open');
     if (a && !shopOpen && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) location.href = a;
   });

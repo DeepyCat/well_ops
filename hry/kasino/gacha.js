@@ -306,7 +306,7 @@
   }
   function agentById(id) { return agents.find(a => a.id === id) || agents[agents.length - 1]; }
   function art(a) {
-    return `<div class="art"><span class="sym">${a.symbol}</span><img src="${IMG_DIR}${a.rank}-${a.file}.png" alt="" draggable="false"></div>`;
+    return `<div class="art"><span class="sym">${a.symbol}</span><img src="${IMG_DIR}${a.rank}-${a.file}.png" alt="" draggable="false" onerror="this.classList.add('gone')"></div>`;
   }
   document.addEventListener("load", e => {
     if (e.target.tagName === "IMG" && e.target.closest(".art")) e.target.closest(".art").parentElement.classList.add("has-img");
