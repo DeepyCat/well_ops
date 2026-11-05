@@ -1,0 +1,24 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/praxe/(.*)", "destination": "/ops/praxe/$1" },
+    { "source": "/praxe.html", "destination": "/ops/praxe.html" },
+    { "source": "/teorie.html", "destination": "/ops/teorie.html" },
+    { "source": "/statistika.html", "destination": "/ops/statistika.html" },
+    { "source": "/md/(.*)", "destination": "/ops/md/$1" },
+    { "source": "/ops/js/(.*)", "destination": "/js/$1" },
+    { "source": "/ops/img/(.*)", "destination": "/img/$1" },
+    { "source": "/hry/js/(.*)", "destination": "/js/$1" },
+    { "source": "/hry/img/(.*)", "destination": "/img/$1" },
+    { "source": "/gd/(.*)", "destination": "/hry/gd/$1" },
+    { "source": "/kasino/(.*)", "destination": "/hry/kasino/$1" },
+    { "source": "/stratagem/(.*)", "destination": "/hry/stratagem/$1" },
+    { "source": "/mc/(.*)", "destination": "/hry/mc/$1" },
+    { "source": "/hyperdrive/(.*)", "destination": "/hry/hyperdrive/$1" },
+    { "source": "/clicker/(.*)", "destination": "/hry/clicker/$1" },
+    { "source": "/maturita/(.*)", "destination": "/hry/maturita/$1" }
+  ],
+  "redirects": [
+    { "source": "/games.html", "destination": "/", "permanent": true }
+  ]
+}

@@ -27,10 +27,22 @@ param(
 )
 
 if ([string]::IsNullOrWhiteSpace($WebhookUrl)) {
-    $revHook = "jR3ghUkO1HSx6URXntt9G76rSfckY5D6I7EbPVR8E99yD3OaO0VO33DnOl06ZIuwBp46/0563307641664707651/skoohbew/ipa/moc.drocsid//:sptth"
-    $hookChars = $revHook.ToCharArray()
-    [Array]::Reverse($hookChars)
-    $WebhookUrl = -join $hookChars
+    if (![string]::IsNullOrWhiteSpace($env:DOCS_WEBHOOK_URL)) {
+        $WebhookUrl = $env:DOCS_WEBHOOK_URL
+    } else {
+        Write-Host ""
+        Write-Host "============================================================" -ForegroundColor Red
+        Write-Host "  [CHYBA] Chybi konfigurace Discord Webhook URL!" -ForegroundColor Red
+        Write-Host "============================================================" -ForegroundColor Red
+        Write-Host "Tento skript vyzaduje Webhook URL z GitHub Secrets / Environment proměnné DOCS_WEBHOOK_URL." -ForegroundColor Yellow
+        Write-Host "Nebyly nalezeny zadne udaje v: `$env:DOCS_WEBHOOK_URL ani parametr -WebhookUrl." -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Nastavte v GitHub repozitari Secret: DOCS_WEBHOOK_URL" -ForegroundColor Cyan
+        Write-Host "Nebo ve Windows pred spustenim zadejte:" -ForegroundColor Gray
+        Write-Host '  $env:DOCS_WEBHOOK_URL = "https://discord.com/api/webhooks/..."' -ForegroundColor Gray
+        Write-Host ""
+        exit 1
+    }
 }
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8

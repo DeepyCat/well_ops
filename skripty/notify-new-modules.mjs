@@ -19,13 +19,17 @@ if (!CURRENT_SHA || !REPOSITORY) {
 
 // Načtení a kontrola modulů z konkrétního commitu.
 function readModules(revision) {
-  const filePath = `${revision}:praxe/modules.json`;
+  let filePath = `${revision}:ops/praxe/modules.json`;
+  let json;
 
-  console.log(`\nNačítám praxe/modules.json z commitu: ${revision}`);
-
-  const json = execFileSync("git", ["show", filePath], {
-    encoding: "utf8"
-  });
+  try {
+    json = execFileSync("git", ["show", filePath], { encoding: "utf8" });
+    console.log(`\nNačítám ${filePath}`);
+  } catch {
+    filePath = `${revision}:praxe/modules.json`;
+    console.log(`\nZkouším starou cestu: ${filePath}`);
+    json = execFileSync("git", ["show", filePath], { encoding: "utf8" });
+  }
 
   let modules;
 

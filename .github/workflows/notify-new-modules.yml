@@ -6,6 +6,7 @@ on:
     branches:
       - main
     paths:
+      - "ops/praxe/modules.json"
       - "praxe/modules.json"
 
 permissions:

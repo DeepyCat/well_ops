@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webové stránky – Čeština | OPS Portál</title>
+    <link rel="icon" type="image/png" href="/img/bird.png">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #111113;
+            --surface: #19191c;
+            --surface-2: #212125;
+            --border: rgba(255,255,255,.08);
+            --border-strong: rgba(255,255,255,.16);
+            --text: #f2f2f4;
+            --muted: #8d8d97;
+            --accent: #ef4444;
+            --accent-soft: rgba(239,68,68,.12);
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh;
+            background: var(--bg); color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px; text-align: center;
+        }
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 18px; padding: 48px 36px; max-width: 540px; width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,.4);
+        }
+        .badge {
+            display: inline-block; padding: 4px 12px; border-radius: 999px;
+            background: var(--accent-soft); color: var(--accent);
+            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+            margin-bottom: 20px;
+        }
+        h1 { margin: 0 0 12px; font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
+        p { color: var(--muted); font-size: 15px; line-height: 1.6; margin: 0 0 32px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 24px; border-radius: 10px;
+            background: var(--surface-2); border: 1px solid var(--border-strong);
+            color: var(--text); font-size: 14px; font-weight: 600;
+            text-decoration: none; transition: background .15s ease, border-color .15s ease;
+        }
+        .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="badge">Čeština</div>
+        <h1>Webové stránky – Čeština</h1>
+        <p>Doporučené studijní zdroje a online nástroje pro český jazyk.<br><strong style="color:var(--text);display:inline-block;margin-top:10px;">Připravujeme v další části.</strong></p>
+        <a href="/" class="btn">&larr; Zpět na hlavní portál</a>
+    </div>
+</body>
+</html>
