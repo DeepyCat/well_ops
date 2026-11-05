@@ -1,60 +1,493 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="cs">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Materiály – Juchelka | OPS Portál</title>
-    <link rel="icon" type="image/png" href="/img/bird.png">
-    <style>
-        :root {
-            color-scheme: dark;
-            --bg: #111113;
-            --surface: #19191c;
-            --surface-2: #212125;
-            --border: rgba(255,255,255,.08);
-            --border-strong: rgba(255,255,255,.16);
-            --text: #f2f2f4;
-            --muted: #8d8d97;
-            --accent: #ef4444;
-            --accent-soft: rgba(239,68,68,.12);
-        }
-        * { box-sizing: border-box; }
-        body {
-            margin: 0; min-height: 100vh;
-            background: var(--bg); color: var(--text);
-            font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 24px; text-align: center;
-        }
-        .card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 18px; padding: 48px 36px; max-width: 540px; width: 100%;
-            box-shadow: 0 10px 30px rgba(0,0,0,.4);
-        }
-        .badge {
-            display: inline-block; padding: 4px 12px; border-radius: 999px;
-            background: var(--accent-soft); color: var(--accent);
-            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-            margin-bottom: 20px;
-        }
-        h1 { margin: 0 0 12px; font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
-        p { color: var(--muted); font-size: 15px; line-height: 1.6; margin: 0 0 32px; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 24px; border-radius: 10px;
-            background: var(--surface-2); border: 1px solid var(--border-strong);
-            color: var(--text); font-size: 14px; font-weight: 600;
-            text-decoration: none; transition: background .15s ease, border-color .15s ease;
-        }
-        .btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Školní zápisník</title>
+<style>
+:root{--bg:#f5f4ef;--sf:#fff;--tx:#1d1d1b;--mt:#6b6a64;--bd:#e0ded5;--ac:#2f5bea;--acs:#e7edfd;--dg:#c0392b;--ok:#1e8e5a;--wn:#b36b00;--cb:#16181d;--ct:#e8e8e8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181b;--sf:#202226;--tx:#ececea;--mt:#9a9a94;--bd:#33353a;--ac:#7c9bff;--acs:#262c45;--dg:#ff7b6b;--ok:#4cc38a;--wn:#f0b45a;--cb:#0e0f12;--ct:#e8e8e8}}
+:root[data-theme="dark"]{--bg:#17181b;--sf:#202226;--tx:#ececea;--mt:#9a9a94;--bd:#33353a;--ac:#7c9bff;--acs:#262c45;--dg:#ff7b6b;--ok:#4cc38a;--wn:#f0b45a;--cb:#0e0f12;--ct:#e8e8e8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:14px 16px 60px}
+#top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.dev{display:inline-flex;align-items:center;gap:8px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:5px 10px;font-size:.8rem;color:var(--mt);cursor:pointer}
+.dev code{font:600 .85rem ui-monospace,Menlo,Consolas,monospace;color:var(--tx);letter-spacing:.04em}
+.role{font-size:.72rem;font-weight:600;border-radius:99px;padding:2px 9px;color:#fff}
+.role.ed{background:var(--ok)}
+.role.ro{background:var(--mt)}
+#stat{font-size:.8rem;color:var(--mt)}
+#stat.warn{color:var(--wn)}
+h1{font-size:1.5rem;margin:6px 0 14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;border-bottom:1px solid var(--bd);margin-bottom:16px}
+.tab{flex:none;border:0;background:none;color:var(--mt);font:inherit;font-weight:600;padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer;display:flex;gap:8px;align-items:center}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+.cnt{font-size:.72rem;background:var(--bd);color:var(--mt);border-radius:99px;padding:1px 8px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+h2{margin:0;font-size:1.2rem}
+h3{margin:18px 0 8px;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mt)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.btn{font:inherit;font-size:.9rem;border:1px solid var(--bd);background:var(--sf);color:var(--tx);border-radius:8px;padding:7px 12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap}
+.btn:hover{border-color:var(--ac)}
+.btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+.btn.dng{color:var(--dg)}
+.btn.off{opacity:.4;pointer-events:none}
+.empty{color:var(--mt);text-align:center;padding:40px 0}
+.mut{color:var(--mt)}
+.grow{flex:1;min-width:0}
+.txt{white-space:pre-wrap;word-break:break-word}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;margin-bottom:12px;overflow:hidden}
+summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:10px;font-weight:600}
+summary::-webkit-details-marker{display:none}
+.chev{display:inline-block;transition:transform .15s;color:var(--mt)}
+details[open]>summary .chev{transform:rotate(90deg)}
+.tt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge{font-size:.72rem;background:var(--ok);color:#fff;border-radius:99px;padding:2px 9px}
+.body{padding:0 16px 16px;border-top:1px solid var(--bd)}
+.f{display:block;margin-top:14px}
+.f>span{display:block;font-size:.8rem;color:var(--mt);margin-bottom:4px}
+input,textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px 11px}
+input:focus,textarea:focus{outline:2px solid var(--ac);outline-offset:-1px}
+textarea{resize:vertical;min-height:5rem;field-sizing:content}
+.ti{font-weight:600}
+.lk{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px}
+.lk input,.lk textarea{background:var(--sf)}
+.lkh{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.num{flex:none;width:26px;height:26px;border-radius:50%;background:var(--acs);color:var(--ac);font-weight:700;font-size:.85rem;display:grid;place-items:center}
+.row{display:flex;gap:8px;margin-bottom:8px}
+.go{background:var(--acs);color:var(--ac);border-color:transparent}
+textarea.code,pre.codero{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--cb);color:var(--ct);border:1px solid var(--cb);border-radius:8px;tab-size:4}
+textarea.code{min-height:9rem;white-space:pre;overflow:auto}
+pre.codero{margin:0;padding:12px;overflow:auto}
+.ch{display:flex;gap:8px;align-items:end;margin-top:14px}
+.ch .f{margin:0;flex:1}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:10px}
+.foot label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.foot input{width:auto}
+
+:root{--thb:#1c2538;--thg:#88cc14;--thx:#e8ecf4;--thm:#9fb0cc}
+.tn{flex:none;background:var(--thg);color:#0b1220;border-radius:6px;padding:1px 9px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.room{border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin:14px 0;background:var(--sf)}
+.rh{background:linear-gradient(135deg,#141b2b,#1f2b44);color:var(--thx);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rh .num{background:var(--thg);color:#0b1220}
+.rt{flex:1;min-width:0;font-weight:700;font-size:1.05rem}
+.rs{font-size:.78rem;font-weight:400;color:var(--thm)}
+.rh .btn.thm{background:var(--thg);border-color:var(--thg);color:#0b1220;font-weight:700}
+.prog{height:4px;background:#2c3956}
+.prog i{display:block;height:100%;background:var(--thg)}
+.tk{border-top:1px solid var(--bd)}
+.tk>summary{background:var(--thb);color:var(--thx);padding:11px 14px;font-weight:600}
+.tk .chev{color:var(--thm)}
+.tc{font-size:.75rem;font-weight:400;color:var(--thm);flex:none}
+.tb{padding:14px 14px 4px;background:var(--sf)}
+.note{border-left:3px solid var(--thg);padding:6px 12px;margin-bottom:14px;color:var(--mt);font-style:italic}
+.q{margin-bottom:16px}
+.qq{display:flex;gap:10px}
+.qn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--thb);color:var(--thx);font-size:.78rem;font-weight:700;display:grid;place-items:center;margin-top:1px}
+.qt{flex:1;min-width:0}
+.ar{display:flex;gap:8px;align-items:stretch;margin:7px 0 0 34px}
+.ar .btn{min-width:108px;justify-content:center}
+.av{flex:1;min-width:0;background:var(--cb);color:var(--ct);border-left:3px solid var(--thg);border-radius:6px;padding:8px 12px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-all}
+.av.empty{border-left-color:var(--bd);color:var(--mt);font-family:inherit}
+.ek{border:1px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--sf)}
+.ek input,.ek textarea{background:var(--bg)}
+.ek textarea{min-height:0;field-sizing:content}
+.ei{display:flex;gap:8px;align-items:flex-start;margin:12px 0}
+.ei .qn{margin-top:6px}
+.ar2{display:flex;gap:8px;margin-top:6px}
+.av1{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.bulkd>summary{padding:10px 0 4px;font-weight:500;color:var(--ac);font-size:.9rem}
+.bulkd textarea{font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;margin-bottom:8px}
+.tools2{display:flex;gap:8px;flex-wrap:wrap}
+select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px 11px}
+#q{margin-bottom:14px}
+#top .btn.sm{margin:0}
+.sn{max-width:320px;font-size:1.1rem}
+.due{flex:none;font-size:.75rem;font-weight:500;color:var(--mt)}
+.due.late{color:var(--dg)}
+.due.soon{color:var(--wn)}
+.rh .btn.ghost{background:transparent;color:var(--thx);border-color:#3b4a6b}
+.hit{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:10px 14px;margin-bottom:8px;cursor:pointer}
+.hit:hover{border-color:var(--ac)}
+.hw{font-size:.75rem;color:var(--mt);margin-bottom:2px}
+.hk{font-size:.7rem;font-weight:700;color:var(--ac);background:var(--acs);border-radius:5px;padding:0 6px;margin-right:6px}
+mark{background:#ffe27a;color:#1d1d1b;border-radius:3px}
+.tools{margin-bottom:6px}
+.sadd{margin-top:6px}
+.inw.sol textarea{font-style:normal;border-left-color:var(--ac)}
+.sol{margin:8px 0 0 34px;border:1px dashed var(--bd);border-radius:8px}
+.sol>summary{padding:7px 12px;font-weight:500;font-size:.85rem;color:var(--ac)}
+.sol .txt{padding:0 12px 10px}
+.q .note{margin-bottom:10px}
+.btn.sm{font-size:.78rem;padding:3px 9px;margin-bottom:6px;color:var(--mt)}
+.inw{margin-bottom:6px}
+.inw textarea{border-left:3px solid var(--thg);font-style:italic}
+</style>
 </head>
 <body>
-    <div class="card">
-        <div class="badge">Kyberbezpečnost</div>
-        <h1>Materiály – Juchelka</h1>
-        <p>Přednášky a cvičení kyberbezpečnosti od p. uč. Juchelky.<br><strong style="color:var(--text);display:inline-block;margin-top:10px;">Připravujeme v další části.</strong></p>
-        <a href="/" class="btn">&larr; Zpět na hlavní portál</a>
-    </div>
+<div class="wrap">
+  <div id="top"></div>
+  <h1>📓 Školní zápisník</h1>
+  <input id="q" type="search" placeholder="Hledat ve všech předmětech…" autocomplete="off">
+  <div id="app"></div>
+</div>
+
+<script src="zarizeni.js"></script>
+<script src="data.js"></script>
+<script>
+const DEF=[{id:'kyb',name:'Kybernetika',type:'links'},{id:'prog',name:'Programování',type:'code'},{id:'mpt',name:'Mikroprocesorová technika',type:'code'}];
+const KEY='skolni-zapisnik-lokalni-v2',DEVKEY='skolni-zapisnik-zarizeni';
+const uid=()=>Math.random().toString(36).slice(2,10);
+const newLink=n=>({id:uid(),label:n?'Odkaz '+n:'',url:'',tasks:[]});
+const openTasks=new Set();
+const openIds=new Set();
+let focusId=null;
+
+/* ---------- ID zařízení ---------- */
+function devId(){
+  let id=null;
+  try{id=localStorage.getItem(DEVKEY);}catch(e){}
+  if(!id||!/^ZAP-[A-Z0-9]{6}$/.test(id)){
+    const a=new Uint8Array(6);
+    (window.crypto||{getRandomValues:x=>x.map(()=>Math.random()*256)}).getRandomValues(a);
+    id='ZAP-'+Array.from(a,b=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b%32]).join('');
+    try{localStorage.setItem(DEVKEY,id);}catch(e){}
+  }
+  return id;
+}
+const myId=devId();
+const allowed=Array.isArray(window.POVOLENA_ZARIZENI)?window.POVOLENA_ZARIZENI:[];
+const canEdit=allowed.some(x=>String(x).trim().toUpperCase()===myId);
+
+/* ---------- data ---------- */
+/* starý textový formát odpovědí -> úlohy (nadpis bez odsazení, otázka odsazená, odpověď odsazená víc) */
+function parseAnswer(txt){
+  const tasks=[];let tk=null,it=null;
+  String(txt||'').split(/\r?\n/).forEach(raw=>{
+    if(!raw.trim())return;
+    const ind=raw.match(/^\s*/)[0].replace(/\t/g,'   ').length,s=raw.trim();
+    if(ind===0||!tk){
+      let title=s,note='';const i=s.indexOf(' - "');
+      if(i>0){title=s.slice(0,i);note=s.slice(i+3).replace(/^"|"$/g,'');}
+      tk={id:uid(),title:title,note:note,items:[]};tasks.push(tk);it=null;
+    }else if(ind<6||!it){it={id:uid(),q:s,a:''};tk.items.push(it);}
+    else it.a=it.a?it.a+'\n'+s:s;
+  });
+  return tasks;
+}
+function norm(x){
+  x=x&&typeof x==='object'?JSON.parse(JSON.stringify(x)):{};
+  const sb=(Array.isArray(x.subjects)?x.subjects:[]).filter(q=>q&&q.id&&q.name&&(q.type==='links'||q.type==='code'));
+  const s={cur:'',subjects:sb.length?sb:DEF.map(q=>Object.assign({},q))};
+  for(const q of s.subjects){
+    s[q.id]=Array.isArray(x[q.id])?x[q.id]:[];
+    if(q.type==='links')s[q.id].forEach(t=>(t.links||[]).forEach(l=>{if(!Array.isArray(l.tasks))l.tasks=parseAnswer(l.answer);delete l.answer;}));
+  }
+  s.cur=s.subjects.some(q=>q.id===x.cur)?x.cur:s.subjects[0].id;
+  return s;
+}
+const FILE=norm(window.ZAPISNIK_DATA);
+function loadLocal(){try{const r=localStorage.getItem(KEY);if(r)return norm(JSON.parse(r));}catch(e){}return null;}
+let S=canEdit?(loadLocal()||norm(FILE)):norm(FILE);
+const strip=o=>JSON.stringify(Object.assign({},o,{cur:''}));
+const dirty=()=>strip(S)!==strip(FILE);
+
+function setStat(t,warn){const e=document.getElementById('stat');e.textContent=t;e.className=warn?'warn':'';}
+function updateStat(){
+  if(!canEdit)return setStat('Režim jen pro čtení');
+  dirty()?setStat('● Změny zatím nejsou v data.js – stáhni ho a nahraj do složky',true):setStat('✓ Shodné se souborem data.js');
+}
+function save(quiet){
+  if(!canEdit)return;
+  try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  if(!quiet)updateStat();
+}
+function exportData(){
+  const txt='// Obsah zápisníku. Nahraď tímto souborem data.js ve složce s index.html.\nwindow.ZAPISNIK_DATA = '+JSON.stringify(S,null,2)+';\n';
+  const a=h('a',{href:URL.createObjectURL(new Blob([txt],{type:'text/javascript'})),download:'data.js'});
+  document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+
+/* ---------- pomocné ---------- */
+function h(t,a={},...c){
+  const e=document.createElement(t);
+  for(const k in a){
+    const v=a[k];
+    if(k==='class')e.className=v;
+    else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);
+    else if(v===true)e.setAttribute(k,'');
+    else if(v!==false&&v!=null)e.setAttribute(k,v);
+  }
+  for(const x of c.flat())if(x!=null)e.append(x.nodeType?x:document.createTextNode(x));
+  return e;
+}
+function bind(el,o,k){el.addEventListener('input',()=>{o[k]=el.value;save();});return el;}
+function inp(o,k,ph,cls){return bind(h('input',{class:cls||'',value:o[k]||'',placeholder:ph,type:'text',autocomplete:'off',spellcheck:'false'}),o,k);}
+function field(label,el){return h('label',{class:'f'},h('span',{},label),el);}
+function fixUrl(u){u=(u||'').trim();if(!u)return '';return /^https?:\/\//i.test(u)?u:'https://'+u;}
+function delBtn(fn,txt){
+  txt=txt||'Smazat';
+  const b=h('button',{class:'btn dng',type:'button'},txt);
+  let t;
+  b.addEventListener('click',()=>{
+    if(b.dataset.arm){clearTimeout(t);fn();return;}
+    b.dataset.arm='1';b.textContent='Opravdu?';
+    t=setTimeout(()=>{delete b.dataset.arm;b.textContent=txt;},3000);
+  });
+  return b;
+}
+async function copy(txt,el){
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true;}
+  catch(e){
+    const ta=h('textarea',{style:'position:fixed;opacity:0'},txt);
+    document.body.append(ta);ta.select();
+    try{ok=document.execCommand('copy');}catch(e2){}
+    ta.remove();
+  }
+  const o=el.dataset.o||el.textContent;el.dataset.o=o;
+  el.textContent=ok?'Zkopírováno ✓':'Nepodařilo se';
+  setTimeout(()=>{el.textContent=o;},1500);
+}
+
+/* ---------- režim úprav ---------- */
+const cnt=r=>{let n=0,a=0;(r.tasks||[]).forEach(k=>k.items.forEach(i=>{n++;if((i.a||'').trim())a++;}));return [a,n];};
+function edItem(k,it,n,redraw){
+  const ans=bind(h('textarea',{class:'av1',rows:1,spellcheck:'false',placeholder:'Odpověď / flag'},it.a||''),it,'a');
+  const cb=h('button',{class:'btn',type:'button',onclick:()=>copy(ans.value.trim(),cb)},'Kopírovat');
+  const nt=bind(h('textarea',{rows:2,placeholder:'Pokyn nad touto otázkou'},it.note||''),it,'note');
+  const nw=h('div',{class:'inw'},nt);
+  const add=h('button',{class:'btn sm',type:'button',onclick:()=>{nw.style.display='block';add.style.display='none';nt.focus();}},'+ Pokyn nad otázku');
+  const sync=()=>{const has=!!(it.note||'').trim();nw.style.display=has?'block':'none';add.style.display=has?'none':'inline-flex';};
+  nt.addEventListener('blur',sync);sync();
+  const st=bind(h('textarea',{rows:3,placeholder:'Postup, jak se dostat k řešení…'},it.sol||''),it,'sol');
+  const sw=h('div',{class:'inw sol'},st);
+  const sadd=h('button',{class:'btn sm sadd',type:'button',onclick:()=>{sw.style.display='block';sadd.style.display='none';st.focus();}},'+ Postup řešení');
+  const ssync=()=>{const has=!!(it.sol||'').trim();sw.style.display=has?'block':'none';sadd.style.display=has?'none':'inline-flex';};
+  st.addEventListener('blur',ssync);ssync();
+  return h('div',{class:'ei'},h('span',{class:'qn'},String(n+1)),
+    h('div',{class:'grow'},nw,add,bind(h('textarea',{rows:2,placeholder:'Otázka'},it.q||''),it,'q'),h('div',{class:'ar2'},ans,cb),sadd,sw),
+    delBtn(()=>{k.items.splice(n,1);save();redraw();},'×'));
+}
+function edTask(l,k,j,redraw){
+  const il=h('div');
+  const draw=()=>{il.replaceChildren();k.items.forEach((it,n)=>il.append(edItem(k,it,n,draw)));};
+  draw();
+  return h('div',{class:'ek','data-k':k.id},
+    h('div',{class:'lkh'},h('span',{class:'tn'},'Task '+(j+1)),inp(k,'title','Název tasku'),delBtn(()=>{l.tasks.splice(j,1);save();redraw();},'×')),
+    bind(h('textarea',{rows:2,placeholder:'Pokyn k tasku (volitelné)'},k.note||''),k,'note'),
+    il,
+    h('button',{class:'btn',type:'button',onclick:()=>{k.items.push({id:uid(),q:'',a:''});save();draw();}},'+ Přidat otázku'));
+}
+function linkBox(t,l,i,redraw){
+  if(!Array.isArray(l.tasks))l.tasks=[];
+  const a=h('a',{class:'btn go',target:'_blank',rel:'noopener noreferrer'},'Otevřít ↗');
+  const setA=()=>{const u=fixUrl(l.url);if(u){a.href=u;a.classList.remove('off');}else{a.removeAttribute('href');a.classList.add('off');}};
+  const url=inp(l,'url','https://tryhackme.com/room/…');
+  url.addEventListener('input',setA);setA();
+  const tl=h('div');
+  const draw=()=>{tl.replaceChildren();l.tasks.forEach((k,j)=>tl.append(edTask(l,k,j,draw)));};
+  draw();
+  const bulk=h('textarea',{rows:6,spellcheck:'false',placeholder:'Nadpis tasku (bez odsazení)\n   Otázka (3 mezery)\n      Odpověď (6 mezer)'});
+  const bd=h('details',{class:'bulkd'},h('summary',{},'Vložit hromadně z textu'),bulk,
+    h('button',{class:'btn',type:'button',onclick:()=>{const p=parseAnswer(bulk.value);if(!p.length)return;l.tasks.push(...p);bulk.value='';bd.open=false;save();draw();}},'Převést a přidat'));
+  return h('div',{class:'lk'},
+    h('div',{class:'lkh'},h('span',{class:'num'},String(i+1)),inp(l,'label','Název odkazu (např. Wireshark 01)'),delBtn(()=>{t.links.splice(i,1);save();redraw();},'×')),
+    h('div',{class:'row'},url,a),
+    tl,
+    h('div',{class:'tools2'},h('button',{class:'btn',type:'button',onclick:()=>{l.tasks.push({id:uid(),title:'',note:'',items:[{id:uid(),q:'',a:''}]});save();draw();}},'+ Přidat task')),
+    bd);
+}
+function editBody(sub,t,body,sum){
+  const ti=h('input',{class:'ti','data-id':t.id,value:t.title||'',placeholder:'Název zadání',type:'text'});
+  ti.addEventListener('input',()=>{t.title=ti.value;sum.textContent=ti.value||'Nové zadání';save();});
+  body.append(field('Název',ti),field('Zadání',bind(h('textarea',{rows:4,placeholder:'Text zadání…'},t.desc||''),t,'desc')));
+  if(sub.type==='links'){
+    if(!Array.isArray(t.links))t.links=[];
+    const ls=h('div');
+    const draw=()=>{ls.replaceChildren();t.links.forEach((l,i)=>ls.append(linkBox(t,l,i,draw)));};
+    draw();
+    body.append(h('h3',{},'Odkazy a odpovědi'),ls,
+      h('button',{class:'btn',type:'button',onclick:()=>{t.links.push(newLink(t.links.length+1));save();draw();}},'+ Přidat odkaz'));
+  }else{
+    const dl=h('datalist',{id:'dl-'+t.id},['C','C++','Python','Java','JavaScript','Assembler'].map(x=>h('option',{value:x})));
+    const lang=inp(t,'lang','Jazyk (volitelné)');lang.setAttribute('list','dl-'+t.id);
+    const code=bind(h('textarea',{class:'code',rows:10,spellcheck:'false',wrap:'off',placeholder:'Sem vlož kód…'},t.code||''),t,'code');
+    code.addEventListener('keydown',e=>{
+      if(e.key==='Tab'){e.preventDefault();code.setRangeText('    ',code.selectionStart,code.selectionEnd,'end');t.code=code.value;save();}
+    });
+    const cb=h('button',{class:'btn pri',type:'button',onclick:()=>copy(code.value,cb)},'Kopírovat kód');
+    body.append(h('h3',{},'Kód'),code,h('div',{class:'ch'},field('Jazyk',lang),dl,cb));
+  }
+  const chk=h('input',{type:'checkbox',checked:!!t.done});
+  chk.addEventListener('change',()=>{t.done=chk.checked;save();render();});
+  const di=h('input',{type:'date',value:t.due||''});
+  di.addEventListener('change',()=>{t.due=di.value;save();render();});
+  const mv=dir=>()=>{const l=S[sub.id],i=l.indexOf(t),j=i+dir;if(j<0||j>=l.length)return;[l[i],l[j]]=[l[j],l[i]];save();render();};
+  body.append(field('Termín odevzdání (volitelné)',di));
+  body.append(h('div',{class:'foot'},h('label',{},chk,'Hotovo'),
+    sortMode==='manual'?h('span',{},h('button',{class:'btn',type:'button',onclick:mv(-1)},'↑'),' ',h('button',{class:'btn',type:'button',onclick:mv(1)},'↓')):null,
+    delBtn(()=>{const l=S[sub.id];l.splice(l.indexOf(t),1);save();render();},'Smazat zadání')));
+}
+
+/* ---------- režim jen pro čtení ---------- */
+function solBox(it){
+  if(!(it.sol||'').trim())return null;
+  return h('details',{class:'sol'},h('summary',{},'💡 Postup řešení'),h('div',{class:'txt'},it.sol));
+}
+function ansRow(it){
+  const a=(it.a||'').trim();
+  if(!a)return h('div',{class:'ar'},h('div',{class:'av empty'},'— zatím bez odpovědi —'));
+  const b=h('button',{class:'btn',type:'button',onclick:()=>copy(a,b)},'Kopírovat');
+  return h('div',{class:'ar'},h('div',{class:'av'},a),b);
+}
+function roTask(k,j){
+  const items=k.items||[],done=items.filter(i=>(i.a||'').trim()).length;
+  const d=h('details',{class:'tk','data-k':k.id,open:openTasks.has(k.id)},
+    h('summary',{},h('span',{class:'chev'},'▸'),h('span',{class:'tn'},'Task '+(j+1)),h('span',{class:'tt'},k.title||''),h('span',{class:'tc'},done+'/'+items.length)));
+  d.addEventListener('toggle',()=>{d.open?openTasks.add(k.id):openTasks.delete(k.id);});
+  const b=h('div',{class:'tb'});
+  if(k.note)b.append(h('div',{class:'note txt'},k.note));
+  items.forEach((it,n)=>b.append(h('div',{class:'q'},it.note?h('div',{class:'note txt'},it.note):null,h('div',{class:'qq'},h('span',{class:'qn'},String(n+1)),h('div',{class:'qt txt'},it.q)),ansRow(it),solBox(it))));
+  d.append(b);
+  return d;
+}
+function roRoom(l,i){
+  const u=fixUrl(l.url),c=cnt(l),tasks=l.tasks||[];
+  const tg=h('button',{class:'btn ghost',type:'button'},'');
+  const upd=()=>{tg.textContent=[...r.querySelectorAll('details.tk')].every(d=>d.open)?'Sbalit vše':'Rozbalit vše';};
+  tg.onclick=()=>{const ds=[...r.querySelectorAll('details.tk')],all=ds.every(d=>d.open);ds.forEach(d=>{d.open=!all;});};
+  const r=h('div',{class:'room'},
+    h('div',{class:'rh'},h('span',{class:'num'},String(i+1)),
+      h('div',{class:'rt'},l.label||'Odkaz '+(i+1),c[1]?h('div',{class:'rs'},c[0]+' / '+c[1]+' odpovědí'):null),
+      tasks.length>1?tg:null,
+      u?h('a',{class:'btn thm',href:u,target:'_blank',rel:'noopener noreferrer'},'Otevřít ↗'):null));
+  if(c[1])r.append(h('div',{class:'prog'},h('i',{style:'width:'+Math.round(c[0]/c[1]*100)+'%'})));
+  tasks.forEach((k,j)=>r.append(roTask(k,j)));
+  if(!tasks.length)r.append(h('div',{class:'tb mut'},'Zatím bez odpovědí.'));
+  r.addEventListener('toggle',upd,true);upd();
+  return r;
+}
+function roBody(sub,t,body){
+  if(t.desc)body.append(h('div',{class:'f'},h('span',{},'Zadání'),h('div',{class:'txt'},t.desc)));
+  if(sub.type==='links'){
+    (t.links||[]).forEach((l,i)=>body.append(roRoom(l,i)));
+  }else{
+    const cb=h('button',{class:'btn pri',type:'button',onclick:()=>copy(t.code||'',cb)},'Kopírovat kód');
+    body.append(h('h3',{},'Kód'+(t.lang?' · '+t.lang:'')),
+      t.code?h('pre',{class:'codero'},t.code):h('div',{class:'mut'},'Zatím bez kódu.'),
+      t.code?h('div',{class:'foot'},cb):null);
+  }
+}
+
+function card(sub,t){
+  const sum=h('span',{class:'tt'},t.title||'Nové zadání');
+  const d=h('details',{class:'card','data-k':t.id,open:openIds.has(t.id)},
+    h('summary',{},h('span',{class:'chev'},'▸'),sum,dueBadge(t),t.done?h('span',{class:'badge'},'hotovo'):null));
+  d.addEventListener('toggle',()=>{d.open?openIds.add(t.id):openIds.delete(t.id);});
+  const body=h('div',{class:'body'});
+  canEdit?editBody(sub,t,body,sum):roBody(sub,t,body);
+  d.append(body);
+  return d;
+}
+function addTask(sub){
+  const t={id:uid(),title:'',desc:'',done:false};
+  if(sub.type==='links')t.links=[newLink(1)];else{t.lang='';t.code='';}
+  S[sub.id].unshift(t);openIds.add(t.id);focusId=t.id;save();render();
+}
+
+let query='',sortMode='manual';
+const fold=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function dueBadge(t){
+  if(!t.due)return null;
+  const d=new Date(t.due+'T00:00:00');if(isNaN(d))return null;
+  const td=new Date();td.setHours(0,0,0,0);
+  const days=Math.round((d-td)/864e5);
+  return h('span',{class:'due'+(t.done?'':days<0?' late':days<=3?' soon':'')},'do '+d.toLocaleDateString('cs-CZ'));
+}
+function subjForm(){
+  const nm=h('input',{type:'text',placeholder:'Název předmětu'});
+  const ty=h('select',{},h('option',{value:'code'},'Zadání a kód'),h('option',{value:'links'},'Odkazy a odpovědi (jako Kybernetika)'));
+  return h('details',{class:'bulkd'},h('summary',{},'+ Nový předmět'),
+    h('div',{class:'ch'},h('div',{class:'f grow'},nm),h('div',{class:'f'},ty),
+      h('button',{class:'btn pri',type:'button',onclick:()=>{const n=nm.value.trim();if(!n)return;const id='s'+uid();S.subjects.push({id:id,name:n,type:ty.value});S[id]=[];S.cur=id;save();render();}},'Přidat')));
+}
+function jump(x){
+  S.cur=x.sid;openIds.add(x.tid);if(x.kid)openTasks.add(x.kid);
+  query='';document.getElementById('q').value='';render();
+  const el=document.querySelector('[data-k="'+(x.kid||x.tid)+'"]');if(el)el.scrollIntoView({block:'start'});
+}
+function renderSearch(root){
+  const qt=query.trim(),qf=fold(qt),hits=[];
+  const add=(sub,t,kind,text,where,kid)=>{
+    if(!text)return;const o=String(text),f=fold(o);
+    const i=f.length===o.length?f.indexOf(qf):o.toLowerCase().indexOf(qt.toLowerCase());
+    if(i>=0)hits.push({sid:sub.id,tid:t.id,kid:kid,kind:kind,text:o,i:i,where:where,sub:sub.name});
+  };
+  S.subjects.forEach(sub=>S[sub.id].forEach(t=>{
+    add(sub,t,'Zadání',t.title,t.title);add(sub,t,'Zadání',t.desc,t.title);
+    if(sub.type==='links')(t.links||[]).forEach(l=>{
+      add(sub,t,'Odkaz',l.label,t.title);
+      (l.tasks||[]).forEach((k,j)=>{
+        const w=t.title+' › '+(l.label||'')+' › Task '+(j+1);
+        add(sub,t,'Task',k.title,w,k.id);add(sub,t,'Pokyn',k.note,w,k.id);
+        (k.items||[]).forEach(it=>{add(sub,t,'Pokyn',it.note,w,k.id);add(sub,t,'Otázka',it.q,w,k.id);add(sub,t,'Odpověď',it.a,w,k.id);add(sub,t,'Postup',it.sol,w,k.id);});
+      });
+    });
+    else{add(sub,t,'Kód',t.code,t.title);add(sub,t,'Jazyk',t.lang,t.title);}
+  }));
+  root.append(h('p',{class:'mut'},hits.length?hits.length+' výsledků pro „'+qt+'“':'Nic nenalezeno pro „'+qt+'“'));
+  hits.slice(0,60).forEach(x=>{
+    const a=Math.max(0,x.i-40),e=Math.min(x.text.length,x.i+qf.length+90);
+    root.append(h('div',{class:'hit',tabindex:'0',onclick:()=>jump(x)},
+      h('div',{class:'hw'},x.sub+' › '+x.where),
+      h('div',{class:'txt'},h('span',{class:'hk'},x.kind),(a?'…':'')+x.text.slice(a,x.i),h('mark',{},x.text.slice(x.i,x.i+qf.length)),x.text.slice(x.i+qf.length,e)+(e<x.text.length?'…':''))));
+  });
+}
+function render(){
+  const root=document.getElementById('app');
+  root.replaceChildren();
+  if(query.trim())return renderSearch(root);
+  const sub=S.subjects.find(q=>q.id===S.cur)||S.subjects[0];
+  const raw=S[sub.id],k=t=>t.due||'9999';
+  const list=sortMode==='due'?raw.slice().sort((x,y)=>k(x)<k(y)?-1:k(x)>k(y)?1:0):raw;
+  let title=h('h2',{},sub.name);
+  if(canEdit){title=h('input',{class:'ti sn',value:sub.name,'aria-label':'Název předmětu'});title.addEventListener('change',()=>{sub.name=title.value.trim()||sub.name;save();render();});}
+  root.append(
+    h('nav',{class:'tabs'},S.subjects.map(q=>h('button',{class:'tab'+(q.id===sub.id?' on':''),type:'button',onclick:()=>{S.cur=q.id;save(true);render();}},q.name,h('span',{class:'cnt'},String(S[q.id].length))))),
+    h('div',{class:'bar'},title,h('div',{class:'tools2'},
+      h('button',{class:'btn',type:'button',onclick:()=>{sortMode=sortMode==='due'?'manual':'due';render();}},sortMode==='due'?'Řazení: podle termínu':'Řazení: ručně'),
+      canEdit?h('button',{class:'btn pri',type:'button',onclick:()=>addTask(sub)},'+ Nové zadání'):null)));
+  if(canEdit)root.append(h('div',{class:'tools'},
+    h('button',{class:'btn',type:'button',onclick:exportData},'⬇ Stáhnout data.js'),
+    delBtn(()=>{S=norm(FILE);try{localStorage.removeItem(KEY);}catch(e){}render();updateStat();},'Zahodit lokální změny'),
+    S.subjects.length>1?delBtn(()=>{S.subjects.splice(S.subjects.findIndex(q=>q.id===sub.id),1);delete S[sub.id];S.cur=S.subjects[0].id;save();render();},'Smazat předmět'):null),
+    subjForm());
+  if(!list.length)root.append(h('p',{class:'empty'},canEdit?'Zatím tu nic není. Přidej první zadání tlačítkem nahoře.':'Zatím tu nic není.'));
+  list.forEach(t=>root.append(card(sub,t)));
+  if(focusId){const el=root.querySelector('[data-id="'+focusId+'"]');if(el)el.focus();focusId=null;}
+}
+
+/* ---------- horní lišta ---------- */
+const TK='skolni-zapisnik-tema',TH=['auto','dark','light'],TL={auto:'◐ Auto',dark:'☾ Tmavý',light:'☀ Světlý'};
+let th='auto';try{th=localStorage.getItem(TK)||'auto';}catch(e){}
+const applyTh=()=>{th==='auto'?document.documentElement.removeAttribute('data-theme'):document.documentElement.setAttribute('data-theme',th);};
+applyTh();
+const thB=h('button',{class:'btn sm',type:'button',onclick:()=>{th=TH[(TH.indexOf(th)+1)%3];try{localStorage.setItem(TK,th);}catch(e){}applyTh();thB.textContent=TL[th];}},TL[th]);
+const idEl=h('code',{},myId);
+document.getElementById('top').append(
+  h('div',{class:'dev',title:'Klikni pro zkopírování ID zařízení',onclick:()=>copy(myId,idEl)},h('span',{},'ID zařízení'),idEl),
+  h('span',{class:'role '+(canEdit?'ed':'ro')},canEdit?'Úpravy povoleny':'Jen čtení'),
+  h('span',{id:'stat'}),thB);
+const qi=document.getElementById('q');
+qi.addEventListener('input',()=>{query=qi.value;render();});
+qi.addEventListener('keydown',e=>{if(e.key==='Escape'){qi.value='';query='';render();}});
+render();
+updateStat();
+</script>
 </body>
 </html>
