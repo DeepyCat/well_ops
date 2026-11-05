@@ -53,7 +53,16 @@ export default async function handler(req, res) {
       return res.status(discordResponse.status).send(responseText);
     }
 
-    return res.status(200).send(responseText || 'OK');
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const data = JSON.parse(responseText);
+      return res.status(200).json(data);
+    } catch {
+      return res.status(200).json({
+        success: true,
+        message: responseText || 'OK'
+      });
+    }
   } catch (error) {
     console.error('[SUBMIT-DOC] Chyba pri preposilani na Discord:', error);
     return res.status(502).json({

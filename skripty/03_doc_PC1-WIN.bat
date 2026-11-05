@@ -348,20 +348,66 @@ $pc1Payload | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $tempJsonPath 
 
 Write-Host "Odesilam klientska data pres Discord Webhook..." -ForegroundColor Cyan
 $curlArgs = @(
-    "-s",
+    "-s", "-S",
+    "-w", "`n%{http_code}",
     "-X", "POST",
     "-F", "content=[WELL_OPS_DOC_PART2] Modul 03 | PC1-WIN | $targetDiscord",
     "-F", "file1=@$tempJsonPath;filename=pc1_data.json",
     $WebhookUrl
 )
 
-$curlOutput = & curl.exe @curlArgs 2>&1
+$curlRaw = & curl.exe @curlArgs 2>&1
+$curlExitCode = $LASTEXITCODE
 Remove-Item -LiteralPath $tempJsonPath -Force -ErrorAction SilentlyContinue
 
-if ($curlOutput -match 'error' -or $curlOutput -match 'Chyba' -or $curlOutput -match '500') {
+# Rozparsovani vystupu curl (telo odpovedi a HTTP status na poslednim radku)
+$outputStr = ($curlRaw | Out-String).Trim()
+$lines = $outputStr -split "`r?`n"
+$httpCode = ""
+$responseBody = ""
+
+if ($lines.Length -gt 0) {
+    $candidate = $lines[-1].Trim()
+    if ($candidate -match '^\d{3}$') {
+        $httpCode = $candidate
+        if ($lines.Length -gt 1) {
+            $responseBody = ($lines[0..($lines.Length - 2)] -join "`r`n").Trim()
+        }
+    } else {
+        $responseBody = $outputStr
+    }
+}
+
+$isSuccess = ($curlExitCode -eq 0) -and ($httpCode -eq "200" -or $httpCode -eq "204")
+
+if (-not $isSuccess) {
     Write-Host ""
-    Write-Host "[VAROVANI] Odpoved serveru / webhooku:" -ForegroundColor Yellow
-    Write-Host $curlOutput -ForegroundColor DarkYellow
+    Write-Host "============================================================" -ForegroundColor Red
+    Write-Host "  CHYBA: ODESLANI DAT SE NEZDARILO!" -ForegroundColor Red
+    Write-Host "============================================================" -ForegroundColor Red
+    Write-Host "Exit Code:       $curlExitCode" -ForegroundColor Red
+    Write-Host "HTTP Status:     $(if ($httpCode) { $httpCode } else { 'Neznamy / Zadny' })" -ForegroundColor Red
+    if (-not [string]::IsNullOrWhiteSpace($responseBody)) {
+        Write-Host "Odpoved serveru: $responseBody" -ForegroundColor Red
+    }
+    Write-Host "============================================================" -ForegroundColor Red
+
+    if ($curlExitCode -eq 6) {
+        Write-Host ""
+        Write-Host "[HINT - CHYBA PREKLADU DNS (Exit code 6)]" -ForegroundColor Yellow
+        Write-Host "Klientska stanice nemuze prelozit adresu ciloveho portalu/webhooku ($WebhookUrl)." -ForegroundColor Yellow
+        Write-Host "Zkontrolujte nastaveni DNS Forwarders (Predavani) na SRV1-DC:" -ForegroundColor White
+        Write-Host "  1. PC1-WIN pouziva jako DNS server SRV1-DC (192.168.$wsX.10)." -ForegroundColor White
+        Write-Host "  2. Na stroji SRV1-DC otevrete DNS Manager (dnsmgmt.msc)." -ForegroundColor White
+        Write-Host "  3. Kliknete pravym tlacitkem na SRV1-DC -> Vlastnosti (Properties) -> zalozka Forwarders (Predavani)." -ForegroundColor White
+        Write-Host "  4. Pridejte verejny DNS resolver (napr. 8.8.8.8 nebo 1.1.1.1) a potvrdte OK." -ForegroundColor White
+        Write-Host "  5. Na PC1-WIN spustte 'ipconfig /flushdns' a skript opakujte." -ForegroundColor White
+    }
+
+    Write-Host ""
+    Write-Host "Stisknete klavesu ENTER pro ukonceni..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
+    exit 1
 }
 
 Write-Host ""

@@ -127,8 +127,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.DirectMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.DirectMessages
   ]
 });
 
@@ -388,31 +387,36 @@ client.on('interactionCreate', async (interaction) => {
 const processedMessageIds = new Set();
 
 // Pomocna funkce: spolehlive vyhledani clena na serveru pro ping a DM
-async function findTargetMember(guild, userKey) {
-  if (!guild || !userKey) return null;
-  const cleanKey = userKey.toLowerCase().trim().replace(/^@/, '');
+async function findTargetMember(guild, cleanKey) {
+  if (!guild || !cleanKey) return null;
+  const key = String(cleanKey).toLowerCase().trim().replace(/^@/, '');
   try {
-    const searchResult = await guild.members.fetch({ query: cleanKey, limit: 5 }).catch(() => null);
+    if (/^\d{17,20}$/.test(key)) {
+      const directMember = await guild.members.fetch(key).catch(() => null);
+      if (directMember) return directMember;
+    }
+
+    const searchResult = await guild.members.fetch({ query: key, limit: 5 }).catch(() => null);
     if (searchResult && searchResult.size > 0) {
       const match = searchResult.find(m =>
-        m.user.username.toLowerCase() === cleanKey ||
-        (m.nickname && m.nickname.toLowerCase() === cleanKey) ||
-        m.displayName.toLowerCase() === cleanKey ||
-        m.id === cleanKey
+        m.user.username.toLowerCase() === key ||
+        (m.nickname && m.nickname.toLowerCase() === key) ||
+        m.displayName.toLowerCase() === key ||
+        m.id === key
       );
       if (match) return match;
     }
     const members = await guild.members.fetch().catch(() => null);
     if (members) {
       return members.find(m =>
-        m.user.username.toLowerCase() === cleanKey ||
-        (m.nickname && m.nickname.toLowerCase() === cleanKey) ||
-        m.displayName.toLowerCase() === cleanKey ||
-        m.id === cleanKey
+        m.user.username.toLowerCase() === key ||
+        (m.nickname && m.nickname.toLowerCase() === key) ||
+        m.displayName.toLowerCase() === key ||
+        m.id === key
       ) || null;
     }
   } catch (e) {
-    console.warn(`[DOC] Nelze vyhledat clena ${cleanKey}:`, e.message);
+    console.warn(`[DOC] Nelze vyhledat clena ${key}:`, e.message);
   }
   return null;
 }
