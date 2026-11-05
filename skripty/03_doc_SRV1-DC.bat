@@ -397,8 +397,14 @@ if (-not $isSuccess) {
     Write-Host "============================================================" -ForegroundColor Red
     Write-Host "  CHYBA: ODESLANI DAT SE NEZDARILO!" -ForegroundColor Red
     Write-Host "============================================================" -ForegroundColor Red
-    Write-Host "Exit Code:       $curlExitCode" -ForegroundColor Red
-    Write-Host "HTTP Status:     $(if ($httpCode) { $httpCode } else { 'Neznamy / Zadny' })" -ForegroundColor Red
+    $statusDisplay = if ($httpCode -and $httpCode -ne "000") {
+        $httpCode
+    } elseif ($httpCode -eq "000") {
+        "000 (Zadna HTTP odpoved / Spojeni se nezdarilo)"
+    } else {
+        "Neznamy / Zadny"
+    }
+    Write-Host "HTTP Status:     $statusDisplay" -ForegroundColor Red
     if (-not [string]::IsNullOrWhiteSpace($responseBody)) {
         Write-Host "Odpoved serveru: $responseBody" -ForegroundColor Red
     }

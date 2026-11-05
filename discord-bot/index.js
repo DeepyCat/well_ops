@@ -389,11 +389,10 @@ const processedMessageIds = new Set();
 // Pomocna funkce: spolehlive vyhledani clena na serveru pro ping a DM
 async function findTargetMember(guild, cleanKey) {
   if (!guild || !cleanKey) return null;
-  const key = String(cleanKey).toLowerCase().trim().replace(/^@/, '');
+  const key = String(cleanKey).toLowerCase().trim().replace(/^<@!?(\d+)>$/, '$1').replace(/^@/, '');
   try {
     if (/^\d{17,20}$/.test(key)) {
-      const directMember = await guild.members.fetch(key).catch(() => null);
-      if (directMember) return directMember;
+      return await guild.members.fetch(key).catch(() => null);
     }
 
     const searchResult = await guild.members.fetch({ query: key, limit: 5 }).catch(() => null);
@@ -426,10 +425,13 @@ async function handleDocMessage(message, isBackfill = false) {
   if (message.author.id === client.user.id) return;
   if (processedMessageIds.has(message.id)) return;
 
-  // Kontrola, zda zprava patri do dokumentacniho kanalu nebo nese identifikator
+  // Kontrola, zda zprava patri do dokumentacniho kanalu nebo nese identifikator / doc prilohu
   const isDocChannel = message.channelId === DOCS_CHANNEL_ID;
   const hasDocTag = message.content && (message.content.includes('[WELL_OPS_DOC') || message.content.includes('WELL_OPS_DOC'));
-  if (!isDocChannel && !hasDocTag) return;
+  const hasDocAttachment = Boolean(message.attachments && message.attachments.some(a =>
+    a.name && (a.name.endsWith('.json') && (a.name.includes('data') || a.name.includes('doc') || a.name.startsWith('srv') || a.name.startsWith('pc')))
+  ));
+  if (!isDocChannel && !hasDocTag && !hasDocAttachment) return;
 
   // Zkontrolujeme, zda zprava obsahuje JSON prilohu
   if (!message.attachments || message.attachments.size === 0) return;
