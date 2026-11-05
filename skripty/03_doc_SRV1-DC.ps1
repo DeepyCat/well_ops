@@ -29,7 +29,7 @@ if ([string]::IsNullOrWhiteSpace($WebhookUrl)) {
     } elseif (![string]::IsNullOrWhiteSpace($env:PORTAL_API_URL)) {
         $WebhookUrl = $env:PORTAL_API_URL
     } else {
-        $WebhookUrl = "https://well-ops.vercel.app/api/submit-doc"
+        $WebhookUrl = "https://ops.peakdle.site/api/submit-doc"
     }
 }
 
