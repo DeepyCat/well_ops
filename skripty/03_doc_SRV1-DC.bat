@@ -31,19 +31,10 @@ param(
 if ([string]::IsNullOrWhiteSpace($WebhookUrl)) {
     if (![string]::IsNullOrWhiteSpace($env:DOCS_WEBHOOK_URL)) {
         $WebhookUrl = $env:DOCS_WEBHOOK_URL
+    } elseif (![string]::IsNullOrWhiteSpace($env:PORTAL_API_URL)) {
+        $WebhookUrl = $env:PORTAL_API_URL
     } else {
-        Write-Host ""
-        Write-Host "============================================================" -ForegroundColor Red
-        Write-Host "  [CHYBA] Chybi konfigurace Discord Webhook URL!" -ForegroundColor Red
-        Write-Host "============================================================" -ForegroundColor Red
-        Write-Host "Tento skript vyzaduje Webhook URL z GitHub Secrets / Environment proměnné DOCS_WEBHOOK_URL." -ForegroundColor Yellow
-        Write-Host "Nebyly nalezeny zadne udaje v: `$env:DOCS_WEBHOOK_URL ani parametr -WebhookUrl." -ForegroundColor Yellow
-        Write-Host ""
-        Write-Host "Nastavte v GitHub repozitari Secret: DOCS_WEBHOOK_URL" -ForegroundColor Cyan
-        Write-Host "Nebo ve Windows pred spustenim zadejte:" -ForegroundColor Gray
-        Write-Host '  $env:DOCS_WEBHOOK_URL = "https://discord.com/api/webhooks/..."' -ForegroundColor Gray
-        Write-Host ""
-        exit 1
+        $WebhookUrl = "https://well-ops.vercel.app/api/submit-doc"
     }
 }
 
@@ -378,6 +369,12 @@ $curlArgs = @(
 
 $curlOutput = & curl.exe @curlArgs 2>&1
 Remove-Item -LiteralPath $tempJsonPath -Force -ErrorAction SilentlyContinue
+
+if ($curlOutput -match 'error' -or $curlOutput -match 'Chyba' -or $curlOutput -match '500') {
+    Write-Host ""
+    Write-Host "[VAROVANI] Odpoved serveru / webhooku:" -ForegroundColor Yellow
+    Write-Host $curlOutput -ForegroundColor DarkYellow
+}
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
