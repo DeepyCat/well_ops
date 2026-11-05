@@ -3810,7 +3810,7 @@
                 const res = await importMinecraftBackup(file, OPS_STATS.getUsername());
                 showStatus(`Záloha byla úspěšně importována (${res.filesCount} souborů).`, true);
                 refreshMinecraftModalData();
-                if (window.location.pathname.includes("/mc/")) {
+                if (/\/(?:hry\/)?mc(?:\/|$|\.html)/.test(window.location.pathname)) {
                     setTimeout(() => {
                         if (confirm("Data byla obnovena. Restartovat hru nyní pro načtení světů?")) {
                             window.location.reload();
@@ -3833,7 +3833,7 @@
                 if (res.success) {
                     showStatus(`Data byla úspěšně obnovena (${res.filesCount} souborů).`, true);
                     refreshMinecraftModalData();
-                    if (window.location.pathname.includes("/mc/")) {
+                    if (/\/(?:hry\/)?mc(?:\/|$|\.html)/.test(window.location.pathname)) {
                         setTimeout(() => {
                             if (confirm("Data byla obnovena. Restartovat hru nyní pro načtení světů?")) {
                                 window.location.reload();
@@ -3910,16 +3910,11 @@
 
         const currentUser = OPS_STATS.getUsername();
 
-        const isGameOrHub = window.location.pathname.endsWith("games.html") || 
-                            window.location.pathname.includes("games.html") || 
+        const pathname = window.location.pathname;
+        const isGameOrHub = pathname.endsWith("games.html") || 
+                            pathname.includes("games.html") || 
                             !!document.querySelector(".landing-page") || 
-                            window.location.pathname.includes("/gd/") || 
-                            window.location.pathname.includes("/stratagem/") || 
-                            window.location.pathname.includes("/hyperdrive/") || 
-                            window.location.pathname.includes("/mc/") ||
-                            window.location.pathname.includes("/maturita/") ||
-                            window.location.pathname.includes("/clicker/") ||
-                            window.location.pathname.includes("/kasino/");
+                            /\/(?:hry\/)?(?:gd|stratagem|hyperdrive|mc|maturita|clicker|kasino)(?:\/|$|\.html)/.test(pathname);
 
         if (!currentUser) {
             updateCloudSyncBadge("offline");
@@ -3942,9 +3937,9 @@
 
         let sessionSeconds = 0;
         let activeGame = null;
-        if (window.location.pathname.includes("/hyperdrive/")) activeGame = "hyperdrive";
-        else if (window.location.pathname.includes("/mc/")) activeGame = "mc";
-        else if (window.location.pathname.includes("/clicker/")) activeGame = "clicker";
+        if (/\/(?:hry\/)?hyperdrive(?:\/|$|\.html)/.test(pathname)) activeGame = "hyperdrive";
+        else if (/\/(?:hry\/)?mc(?:\/|$|\.html)/.test(pathname)) activeGame = "mc";
+        else if (/\/(?:hry\/)?clicker(?:\/|$|\.html)/.test(pathname)) activeGame = "clicker";
 
         if (activeGame) {
             OPS_STATS.recordSession(activeGame);

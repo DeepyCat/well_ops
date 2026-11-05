@@ -268,10 +268,10 @@ function refreshStratagemDisplay(){
     for(let i in currentStratagemsList){
         // Show the stratagem's picture in the correct slot
         if (currentStratagemsList[i].image) {
-            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem Icons/hd2/${currentStratagemsList[i].image}`;
+            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem%20Icons/hd2/${currentStratagemsList[i].image}`;
         }
         else {
-            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem Icons/hd2/resupply.svg`;
+            document.getElementById(`stratagem-icon-${i}`).src = `./data/Images/Stratagem%20Icons/hd2/resupply.svg`;
         }
     }
 
