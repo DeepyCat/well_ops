@@ -348,6 +348,7 @@ $pc1Payload | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $tempJsonPath 
 
 Write-Host "Odesilam klientska data pres Discord Webhook..." -ForegroundColor Cyan
 $curlArgs = @(
+    "-k",
     "-s", "-S",
     "-w", "`n%{http_code}",
     "-X", "POST",
