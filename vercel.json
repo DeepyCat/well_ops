@@ -1,4 +1,6 @@
 {
+  "buildCommand": "node pos/md-index.js",
+  "outputDirectory": ".",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/praxe/(.*)", "destination": "/ops/praxe/$1" },
