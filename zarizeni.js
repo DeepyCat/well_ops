@@ -15,5 +15,5 @@ window.POVOLENA_ZARIZENI = [
   //"ZAP-4NJBHK", //mobil Matty
   "ZAP-3ZE2YY", //pc doma muj
   //"ZAP-G3L6N7",
-  //"ZAP-5SFX5M", //skola_kybernetika V504
+  //"ZAP-5SFX5M", //skola_kybernetika
 ];
