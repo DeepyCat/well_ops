@@ -42,6 +42,27 @@ window.OPS_MODULES = [
         "<code>Moje dokumentace / Modul 2 DHCP</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)",
         "<code>Moje dokumentace / Modul 0 Příprava</code> (část <code>PC1-WIN</code>)"
       ]
+    },
+    docWorkflow: {
+      title: "Automatické vygenerování dokumentace & odeslání na Discord",
+      warning: "DŮLEŽITÉ PRAVIDLO: Příkazy provádějte POSTUPNĚ jeden po druhém! Nikdy nespouštějte skripty na více strojích naráz. Počkejte, až bot potvrdí Krok 1, a teprve poté spusťte Krok 2.",
+      steps: [
+        {
+          num: 1,
+          vm: "SRV1-DC",
+          title: "Krok 1: Spusťte na serveru SRV1-DC",
+          desc: "Otevřete PowerShell jako Správce na stroji SRV1-DC, spusťte níže uvedený příkaz a vyplňte své jméno, třídu (T3A) a přesné Discord uživatelské jméno. Skript provede audit konfigurace DHCP serveru a odešle data na Discord do kanálu #dokumentace. Vyčkejte, až se v kanálu zobrazí potvrzení od bota '[KROK 1/2 PRIJAT]'.",
+          command: 'powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_doc_SRV1-DC.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue"'
+        },
+        {
+          num: 2,
+          vm: "PC1-WIN",
+          title: "Krok 2: Spusťte na stanici PC1-WIN (až po potvrzení Kroku 1!)",
+          desc: "Přepněte se na klientskou stanici PC1-WIN a otevřete PowerShell jako Správce. Spusťte níže uvedený příkaz a zadejte STEJNÉ uživatelské jméno na Discordu jako v prvním kroku. Skript provede klientské testy převzetí a obnovení DHCP a odešle druhou část botovi.",
+          command: 'powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/02_doc_PC1-WIN.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue"'
+        }
+      ],
+      footnote: "Po přijetí obou částí bot zahájí generování a do 5 minut vám do kanálu doručí hotový ZIP archiv. DŮLEŽITÉ: U bodu M2-SRV1.V1-D1 nezapomeňte ručně vložit screenshot DHCP Manageru!"
     }
   },
   {
