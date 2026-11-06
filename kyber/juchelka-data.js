@@ -1,24 +1,6 @@
-// Obsah zápisníku. Nahraď tímto souborem data.js ve složce s index.html.
+// Obsah předmětu Kybernetika. Nahraď tímto souborem kybernetika-data.js ve složce stránky.
 window.ZAPISNIK_DATA = {
-  "cur": "kyb",
-  "subjects": [
-    {
-      "id": "kyb",
-      "name": "Kybernetika",
-      "type": "links"
-    },
-    {
-      "id": "prog",
-      "name": "Programování",
-      "type": "code"
-    },
-    {
-      "id": "mpt",
-      "name": "Mikroprocesorová technika",
-      "type": "code"
-    }
-  ],
-  "kyb": [
+  "zadani": [
     {
       "id": "kld0clbo",
       "title": "FGP-Data, hrozba, riziko",
@@ -757,32 +739,5 @@ window.ZAPISNIK_DATA = {
       ],
       "done": false
     }
-  ],
-  "prog": [
-    {
-      "id": "bnnc6x99",
-      "title": "Písemka C# - 2026/11/03",
-      "desc": "1. Vytvořte program pro\n       A – součet\n       B – součin\n       C – průměr tří čísel\n2. Uživatel zadá 3 desetinná čísla a zvolí z nabídky, co se má vypočítat. Výsledek se zobrazí.\n3. V případě, že uživatel zvolí jiné písmeno, tak vypíše se chyba a ukončí se program.   ",
-      "done": false,
-      "lang": "",
-      "code": "using System;\n\nnamespace PrgT3aSwitch\n{\n    class Program\n    {\n        static void Main(string[] args)\n        {\n            // Načtení tří desetinných čísel od uživatele\n            Console.Write(\"Zadej první desetinné číslo: \");\n            double cislo1 = double.Parse(Console.ReadLine());\n\n            Console.Write(\"Zadej druhé desetinné číslo: \");\n            double cislo2 = double.Parse(Console.ReadLine());\n\n            Console.Write(\"Zadej třetí desetinné číslo: \");\n            double cislo3 = double.Parse(Console.ReadLine());\n\n            // Výpis menu\n            Console.WriteLine(\"\\nVyber operaci:\");\n            Console.WriteLine(\"A - součet\");\n            Console.WriteLine(\"B - součin\");\n            Console.WriteLine(\"C - průměr tří čísel\");\n            Console.Write(\"Tvoje volba: \");\n            \n            // Načtení volby přesně tak, jak ji uživatel zadá (bez úprav)\n            string volba = Console.ReadLine();\n\n            // Zpracování volby pomocí switche\n            switch (volba)\n            {\n                case \"A\":\n                    double soucet = cislo1 + cislo2 + cislo3;\n                    Console.WriteLine(\"Výsledek (součet): \" + soucet);\n                    break;\n                \n                case \"B\":\n                    double soucin = cislo1 * cislo2 * cislo3;\n                    Console.WriteLine(\"Výsledek (součin): \" + soucin);\n                    break;\n                \n                case \"C\":\n                    double prumer = (cislo1 + cislo2 + cislo3) / 3;\n                    Console.WriteLine(\"Výsledek (průměr): \" + prumer);\n                    break;\n                \n                default:\n                    // Chybová hláška při zadání jiného znaku (včetně malých písmen)\n                    Console.WriteLine(\"Chyba: Byla zadána neplatná volba.\");\n                    break;\n            }\n\n            // Aby se konzole hned nezavřela\n            Console.ReadKey();\n        }\n    }\n}"
-    },
-    {
-      "id": "rdu958bj",
-      "title": "Písemka C# - 2026/10/20",
-      "desc": "1. Vytvořte program, který načte zadané číslo a rozhodne, zda je kladné, záporné nebo nula a vypíše tuto informaci.\n2. Pokud je číslo kladné, dále zjistí, zda je dělitelné 10 a vypíše tuto informaci.\n3. Pokud je číslo záporné, zjistí, zda je menší než -50 a vypíše tuto informaci.\n4. Určí, zda číslo končí číslicí 3 a zároveň je větší než 100, v případě, že ano, tak vypíše tuto informaci.   ",
-      "done": false,
-      "lang": "",
-      "code": "using System;\n\nclass Program\n{\n    static void Main()\n    {\n        // Načtení zadaného čísla[cite: 2]\n        Console.Write(\"Zadej číslo: \");\n        int cislo = int.Parse(Console.ReadLine());\n\n        // 1. Rozhodne, zda je kladné, záporné nebo nula a vypíše tuto informaci[cite: 2]\n        if (cislo > 0)\n        {\n            Console.WriteLine(\"Číslo je kladné.\");\n\n            // 2. Pokud je číslo kladné, dále zjistí, zda je dělitelné 10 a vypíše tuto informaci[cite: 2]\n            if (cislo % 10 == 0)\n            {\n                Console.WriteLine(\"Číslo je dělitelné 10.\");\n            }\n        }\n        else if (cislo < 0)\n        {\n            Console.WriteLine(\"Číslo je záporné.\");\n\n            // 3. Pokud je číslo záporné, zjistí, zda je menší než -50 a vypíše tuto informaci[cite: 2]\n            if (cislo < -50)\n            {\n                Console.WriteLine(\"Číslo je menší než -50.\");\n            }\n        }\n        else\n        {\n            Console.WriteLine(\"Číslo je nula.\");\n        }\n\n        // 4. Určí, zda číslo končí číslicí 3 a zároveň je větší než 100[cite: 2]\n        if (cislo % 10 == 3 && cislo > 100)\n        {\n            Console.WriteLine(\"Číslo končí číslicí 3 a je větší než 100.\");\n        }\n    }\n}"
-    },
-    {
-      "id": "msghjy60",
-      "title": "Písemka C# - 2026/10/13",
-      "desc": "1. Načtěte 3 celá čísla do proměnných x1, x2 a x3 zadáním z klávesnice.\n2. Vypočtěte součet těchto tří čísel a uložte ho do proměnné soucet.\n3. Vypočtěte průměr těchto tří čísel a uložte ho do proměnné průměr (float nebo double!).\n4. Vypočtěte dvojnásobek součtu těchto tří čísel a uložte ho do proměnné dvojnasobek.\n\nJak by to mělo vypadat:\n\n===================\n== TEST CISLO 1 ==\n===================\n//vynechany radek\nzadejte 1. číslo: x1\nzadejte 2. číslo: x2\nzadejte 3. číslo: x3\n(vynechany radek)\nx1 + x2 + x3 = soucet\nPrumer je prumer.\nDvojnasobek souctu cisel je dvojnasobek.\n//vynechany radek\n*** KONEC PROGRAMU ***",
-      "done": false,
-      "lang": "",
-      "code": "using System;\n\nnamespace VstupVystupA\n{\n    class Program\n    {\n        static void Main(string[] args)\n        {\n            // Hlavička programu\n            Console.WriteLine(\"===================\");\n            Console.WriteLine(\"== TEST CISLO 1 ==\");\n            Console.WriteLine(\"===================\");\n            Console.WriteLine(); // vynechaný řádek\n\n            // 1. Načtení 3 celých čísel\n            Console.Write(\"zadejte 1. číslo: \");\n            int x1 = int.Parse(Console.ReadLine());\n\n            Console.Write(\"zadejte 2. číslo: \");\n            int x2 = int.Parse(Console.ReadLine());\n\n            Console.Write(\"zadejte 3. číslo: \");\n            int x3 = int.Parse(Console.ReadLine());\n\n            // 2. Výpočet součtu\n            int soucet = x1 + x2 + x3;\n\n            // 3. Výpočet průměru (přetypování na double pro přesné dělení)\n            double prumer = (double)soucet / 3;\n\n            // 4. Výpočet dvojnásobku součtu\n            int dvojnasobek = soucet * 2;\n\n            // Výstup výsledků podle vzoru\n            Console.WriteLine(); // vynechaný řádek\n            Console.WriteLine($\"{x1} + {x2} + {x3} = {soucet}\");\n            Console.WriteLine($\"Prumer je {prumer}.\");\n            Console.WriteLine($\"Dvojnasobek souctu cisel je {dvojnasobek}.\");\n            Console.WriteLine(); // vynechaný řádek\n            Console.WriteLine(\"*** KONEC PROGRAMU ***\");\n        }\n    }\n}"
-    }
-  ],
-  "mpt": []
+  ]
 };
