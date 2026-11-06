@@ -146,7 +146,9 @@ function sanitizeConsoleOutput(str) {
     .replace(/pond[\ufffd]l[\ufffd]/gi, 'pondělí')
     .replace(/[\ufffd]ter[\ufffd]/gi, 'úterý')
     .replace(/st[\ufffd]eda/gi, 'středa')
-    .replace(/[\ufffd]tvrtek/gi, 'čtvrtek');
+    .replace(/[\ufffd]tvrtek/gi, 'čtvrtek')
+    .replace(/p[\ufffd]tek/gi, 'pátek')
+    .replace(/ned[\ufffd]le/gi, 'neděle');
 
   // Detekce zplosteleho vystupu ipconfig /all (pokud vse skoncilo na jednom radku)
   if (out.includes('Host Name . . . . . . . . . . . . :') && !out.includes('\n   Host Name') && !out.includes('\r\n   Host Name')) {
@@ -552,27 +554,50 @@ async function handleDocMessage(message, isBackfill = false) {
     postup = replaceStudentInfo(postup);
 
     // 2. Vyplneni overeni.md
-    if (srv1O.V0_otisk) overeni = fillDocBlock(overeni, '**M3-SRV1.V0-O**', srv1O.V0_otisk, true);
-    if (srv1O.V1_d1) overeni = fillDocBlock(overeni, '**M3-SRV1.V1-D1**', srv1O.V1_d1, false);
-    if (srv1O.V2_d1) overeni = fillDocBlock(overeni, '**M3-SRV1.V2-D1**', srv1O.V2_d1, false);
-    if (srv1O.V2_d2) overeni = fillDocBlock(overeni, '**M3-SRV1.V2-D2**', srv1O.V2_d2, true);
+    if (formattedModule === '02') {
+      if (srv1O.V0_otisk) overeni = fillDocBlock(overeni, '**M2-SRV1.V0-O**', srv1O.V0_otisk, true);
+      if (srv1O.V1_d2) overeni = fillDocBlock(overeni, '**M2-SRV1.V1-D2**', srv1O.V1_d2, false);
+      if (srv1O.V2_d1) overeni = fillDocBlock(overeni, '**M2-SRV1.V2-D1**', srv1O.V2_d1, true);
+      if (srv1O.V3_d1) overeni = fillDocBlock(overeni, '**M2-SRV1.V3-D1**', srv1O.V3_d1, true);
+      if (srv1O.V4_d1) overeni = fillDocBlock(overeni, '**M2-SRV1.V4-D1**', srv1O.V4_d1, true);
 
-    if (pc1O.V0_otisk) overeni = fillDocBlock(overeni, '**M3-PC1.V0-O**', pc1O.V0_otisk, true);
-    if (pc1O.V1_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V1-D1**', pc1O.V1_d1, true);
-    if (pc1O.V2_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V2-D1**', pc1O.V2_d1, true);
-    if (pc1O.V3_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V3-D1**', pc1O.V3_d1, true);
-    if (pc1O.V4_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V4-D1**', pc1O.V4_d1, true);
-    if (pc1O.V5_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V5-D1**', pc1O.V5_d1, true);
+      if (pc1O.V0_otisk) overeni = fillDocBlock(overeni, '**M2-PC1.V0-O**', pc1O.V0_otisk, true);
+      if (pc1O.V1_d1) overeni = fillDocBlock(overeni, '**M2-PC1.V1-D1**', pc1O.V1_d1, false);
+      if (pc1O.V1_d2) overeni = fillDocBlock(overeni, '**M2-PC1.V1-D2**', pc1O.V1_d2, true);
+      if (pc1O.V2_d1) overeni = fillDocBlock(overeni, '**M2-PC1.V2-D1**', pc1O.V2_d1, true);
 
-    // 3. Vyplneni postup.md
-    if (srv1P.P1) postup = fillDocBlock(postup, '**M3-SRV1.P1**', srv1P.P1, true);
-    if (srv1P.P2) postup = fillDocBlock(postup, '**M3-SRV1.P2**', srv1P.P2, true);
-    if (srv1P.P3) postup = fillDocBlock(postup, '**M3-SRV1.P3**', srv1P.P3, true);
-    if (srv1P.P4) postup = fillDocBlock(postup, '**M3-SRV1.P4**', srv1P.P4, true);
-    if (srv1P.P5) postup = fillDocBlock(postup, '**M3-SRV1.P5**', srv1P.P5, true);
+      // 3. Vyplneni postup.md
+      if (srv1P.P1) postup = fillDocBlock(postup, '**M2-SRV1.P1**', srv1P.P1, true);
+      if (srv1P.P2) postup = fillDocBlock(postup, '**M2-SRV1.P2**', srv1P.P2, true);
+      if (srv1P.P3) postup = fillDocBlock(postup, '**M2-SRV1.P3**', srv1P.P3, true);
+      if (srv1P.P4) postup = fillDocBlock(postup, '**M2-SRV1.P4**', srv1P.P4, true);
+      if (srv1P.P5) postup = fillDocBlock(postup, '**M2-SRV1.P5**', srv1P.P5, true);
 
-    if (pc1P.P1) postup = fillDocBlock(postup, '**M3-PC1.P1**', pc1P.P1, true);
-    if (pc1P.P2) postup = fillDocBlock(postup, '**M3-PC1.P2**', pc1P.P2, true);
+      if (pc1P.P1) postup = fillDocBlock(postup, '**M2-PC1.P1**', pc1P.P1, true);
+      if (pc1P.P2) postup = fillDocBlock(postup, '**M2-PC1.P2**', pc1P.P2, true);
+    } else if (formattedModule === '03') {
+      if (srv1O.V0_otisk) overeni = fillDocBlock(overeni, '**M3-SRV1.V0-O**', srv1O.V0_otisk, true);
+      if (srv1O.V1_d1) overeni = fillDocBlock(overeni, '**M3-SRV1.V1-D1**', srv1O.V1_d1, false);
+      if (srv1O.V2_d1) overeni = fillDocBlock(overeni, '**M3-SRV1.V2-D1**', srv1O.V2_d1, false);
+      if (srv1O.V2_d2) overeni = fillDocBlock(overeni, '**M3-SRV1.V2-D2**', srv1O.V2_d2, true);
+
+      if (pc1O.V0_otisk) overeni = fillDocBlock(overeni, '**M3-PC1.V0-O**', pc1O.V0_otisk, true);
+      if (pc1O.V1_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V1-D1**', pc1O.V1_d1, true);
+      if (pc1O.V2_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V2-D1**', pc1O.V2_d1, true);
+      if (pc1O.V3_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V3-D1**', pc1O.V3_d1, true);
+      if (pc1O.V4_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V4-D1**', pc1O.V4_d1, true);
+      if (pc1O.V5_d1) overeni = fillDocBlock(overeni, '**M3-PC1.V5-D1**', pc1O.V5_d1, true);
+
+      // 3. Vyplneni postup.md
+      if (srv1P.P1) postup = fillDocBlock(postup, '**M3-SRV1.P1**', srv1P.P1, true);
+      if (srv1P.P2) postup = fillDocBlock(postup, '**M3-SRV1.P2**', srv1P.P2, true);
+      if (srv1P.P3) postup = fillDocBlock(postup, '**M3-SRV1.P3**', srv1P.P3, true);
+      if (srv1P.P4) postup = fillDocBlock(postup, '**M3-SRV1.P4**', srv1P.P4, true);
+      if (srv1P.P5) postup = fillDocBlock(postup, '**M3-SRV1.P5**', srv1P.P5, true);
+
+      if (pc1P.P1) postup = fillDocBlock(postup, '**M3-PC1.P1**', pc1P.P1, true);
+      if (pc1P.P2) postup = fillDocBlock(postup, '**M3-PC1.P2**', pc1P.P2, true);
+    }
 
     // 4. Vytvoreni ZIP archivu
     const forename = names.length > 1 ? names[0] : 'Student';
@@ -596,6 +621,14 @@ async function handleDocMessage(message, isBackfill = false) {
       new AttachmentBuilder(zipBuffer, { name: zipFileName })
     ];
 
+    let screenshotNotice = 'V souboru `overeni.md` u bodu **M3-SRV1.V1-D2** (*Dukaz: Screenshot DNS Manageru s doprednou zonou*) je potreba udelat a vlozit screenshot z Windows Serveru. Vsechny ostatni overovaci vystupy a postupy jsou jiz kompletne vyplneny!';
+    let dmWarning = '> **Dulezite upozorneni:** V souboru `overeni.md` u bodu **M3-SRV1.V1-D2** – *Dukaz: Screenshot DNS Manageru s doprednou zonou* je potreba udelat screenshot.';
+
+    if (formattedModule === '02') {
+      screenshotNotice = 'V souboru `overeni.md` u bodu **M2-SRV1.V1-D1** (*Dukaz: Server Manager — role DHCP bez varovani a DHCP konzole se zelene oznacenym serverem*) je potreba udelat a vlozit screenshot z Windows Serveru. Vsechny ostatni overovaci vystupy a postupy jsou jiz kompletne vyplneny!';
+      dmWarning = '> **Dulezite upozorneni:** V souboru `overeni.md` u bodu **M2-SRV1.V1-D1** – *Dukaz: Server Manager — role DHCP bez varovani a DHCP konzole se zelene oznacenym serverem* je potreba udelat screenshot.';
+    }
+
     const embed = new EmbedBuilder()
       .setColor(0x22c55e)
       .setTitle(`Dokumentace Modul ${formattedModule} je kompletni!`)
@@ -606,7 +639,7 @@ async function handleDocMessage(message, isBackfill = false) {
         { name: 'Domena', value: `\`${st.domain || 'cyberschool.internal'}\``, inline: true },
         {
           name: 'POVINNY SCREENSHOT K DOPLNENI',
-          value: 'V souboru `overeni.md` u bodu **M3-SRV1.V1-D2** (*Dukaz: Screenshot DNS Manageru s doprednou zonou*) je potreba udelat a vlozit screenshot z Windows Serveru. Vsechny ostatni overovaci vystupy a postupy jsou jiz kompletne vyplneny!',
+          value: screenshotNotice,
           inline: false
         }
       )
@@ -619,7 +652,7 @@ async function handleDocMessage(message, isBackfill = false) {
       try {
         await targetMember.send({
           content: `Ahoj ${userMention}! Zde je tvoje vygenerovana dokumentace pro **Modul ${formattedModule}** v ZIP archivu.\n\n` +
-            `> **Dulezite upozorneni:** V souboru \`overeni.md\` u bodu **M3-SRV1.V1-D2** – *Dukaz: Screenshot DNS Manageru s doprednou zonou* je potreba udelat screenshot.`,
+            `${dmWarning}`,
           embeds: [embed],
           files: attachments
         });
@@ -635,7 +668,7 @@ async function handleDocMessage(message, isBackfill = false) {
       : '(Pokud ti neprisla DM, mas v nastaveni Discordu vypnute prime zpravy. Archiv najdes prilozen nize.)';
 
     const channelContent = `${userMention} Tvoje dokumentace pro **Modul ${formattedModule}** je hotova a pripravena v prilozenem ZIP archivu!\n\n` +
-      `> **Dulezite upozorneni k odevzdani:** V souboru \`overeni.md\` u bodu **M3-SRV1.V1-D2** – *Dukaz: Screenshot DNS Manageru s doprednou zonou* je potreba udelat screenshot.\n` +
+      `${dmWarning}\n` +
       `${dmNote}`;
 
     await message.channel.send({
