@@ -177,10 +177,10 @@ function fillDocBlock(content, marker, newText, markDone = true) {
   const esc = marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const sanitized = sanitizeConsoleOutput(newText);
   const regex = new RegExp(`(${esc}[\\s\\S]*?\`\`\`text\\r?\\n)DOPLNIT(\\r?\\n\`\`\`)`);
-  let result = content.replace(regex, `$1${sanitized}$2`);
+  let result = content.replace(regex, (match, p1, p2) => `${p1}${sanitized}${p2}`);
   if (markDone) {
     const doneRegex = new RegExp(`(${esc}[\\s\\S]*?)- \\[ \\] Hotovo`);
-    result = result.replace(doneRegex, `$1- [x] Hotovo`);
+    result = result.replace(doneRegex, (match, p1) => `${p1}- [x] Hotovo`);
   }
   return result;
 }
@@ -258,8 +258,12 @@ client.on('interactionCreate', async (interaction) => {
     const userCompletedDir = path.join(COMPLETED_DOCS_DIR, `${userKey}_${formattedModule}`);
 
     if (!fs.existsSync(userCompletedDir)) {
+      const modCfg = MODULE_CONFIG[formattedModule];
+      const stepsNote = modCfg && modCfg.vms
+        ? (modCfg.vms.length === 1 ? `Krok 1 (${modCfg.vms[0]})` : `všechny požadované kroky (${modCfg.vms.join(', ')})`)
+        : 'příslušné skripty';
       return interaction.reply({
-        content: `Zatim pro tebe nemam zadnou hotovou dokumentaci pro **Modul ${formattedModule}**.\nNejprve prosim spust Krok 1 (SRV1-DC) a Krok 2 (PC1-WIN) ve virtualnim stroji.`,
+        content: `Zatim pro tebe nemam zadnou hotovou dokumentaci pro **Modul ${formattedModule}**.\nNejprve prosim spust ${stepsNote} ve virtualnim stroji.`,
         flags: MessageFlags.Ephemeral
       });
     }
@@ -554,7 +558,83 @@ async function handleDocMessage(message, isBackfill = false) {
     postup = replaceStudentInfo(postup);
 
     // 2. Vyplneni overeni.md
-    if (formattedModule === '02') {
+    if (formattedModule === '00') {
+      if (srv1O.V0_otisk) overeni = fillDocBlock(overeni, '**M0-SRV1.V0-O**', srv1O.V0_otisk, true);
+      if (srv1O.V2_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V2-D1**', srv1O.V2_d1, true);
+      if (srv1O.V3_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V3-D1**', srv1O.V3_d1, true);
+      if (srv1O.V4_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V4-D1**', srv1O.V4_d1, true);
+      if (srv1O.V5_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V5-D1**', srv1O.V5_d1, true);
+      if (srv1O.V6_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V6-D1**', srv1O.V6_d1, true);
+      if (srv1O.V7_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V7-D1**', srv1O.V7_d1, true);
+      if (srv1O.V8_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V8-D1**', srv1O.V8_d1, true);
+      if (srv1O.V9_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V9-D1**', srv1O.V9_d1, true);
+      if (srv1O.V10_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V10-D1**', srv1O.V10_d1, true);
+      if (srv1O.V11_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V11-D1**', srv1O.V11_d1, true);
+      if (srv1O.V13_d1) overeni = fillDocBlock(overeni, '**M0-SRV1.V13-D1**', srv1O.V13_d1, true);
+
+      if (srv2O.V0_otisk) overeni = fillDocBlock(overeni, '**M0-SRV2.V0-O**', srv2O.V0_otisk, true);
+      if (srv2O.V1_d2) overeni = fillDocBlock(overeni, '**M0-SRV2.V1-D2**', srv2O.V1_d2, true);
+      if (srv2O.V2_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V2-D1**', srv2O.V2_d1, true);
+      if (srv2O.V3_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V3-D1**', srv2O.V3_d1, true);
+      if (srv2O.V4_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V4-D1**', srv2O.V4_d1, true);
+      if (srv2O.V5_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V5-D1**', srv2O.V5_d1, true);
+      if (srv2O.V6_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V6-D1**', srv2O.V6_d1, true);
+      if (srv2O.V7_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V7-D1**', srv2O.V7_d1, true);
+      if (srv2O.V8_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V8-D1**', srv2O.V8_d1, true);
+      if (srv2O.V9_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V9-D1**', srv2O.V9_d1, true);
+      if (srv2O.V10_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V10-D1**', srv2O.V10_d1, true);
+      if (srv2O.V11_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V11-D1**', srv2O.V11_d1, true);
+      if (srv2O.V13_d1) overeni = fillDocBlock(overeni, '**M0-SRV2.V13-D1**', srv2O.V13_d1, true);
+
+      if (pc1O.V0_otisk) overeni = fillDocBlock(overeni, '**M0-PC1.V0-O**', pc1O.V0_otisk, true);
+      if (pc1O.V2_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V2-D1**', pc1O.V2_d1, true);
+      if (pc1O.V3_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V3-D1**', pc1O.V3_d1, true);
+      if (pc1O.V4_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V4-D1**', pc1O.V4_d1, true);
+      if (pc1O.V5_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V5-D1**', pc1O.V5_d1, true);
+      if (pc1O.V6_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V6-D1**', pc1O.V6_d1, true);
+      if (pc1O.V7_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V7-D1**', pc1O.V7_d1, true);
+      if (pc1O.V8_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V8-D1**', pc1O.V8_d1, true);
+      if (pc1O.V9_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V9-D1**', pc1O.V9_d1, true);
+      if (pc1O.V10_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V10-D1**', pc1O.V10_d1, true);
+      if (pc1O.V11_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V11-D1**', pc1O.V11_d1, true);
+      if (pc1O.V13_d1) overeni = fillDocBlock(overeni, '**M0-PC1.V13-D1**', pc1O.V13_d1, true);
+
+      // 3. Vyplneni postup.md pro Modul 00
+      if (srv1P.P1) postup = fillDocBlock(postup, '**M0-SRV1.P1**', srv1P.P1, true);
+      if (srv1P.P2) postup = fillDocBlock(postup, '**M0-SRV1.P2**', srv1P.P2, true);
+      if (srv1P.P3) postup = fillDocBlock(postup, '**M0-SRV1.P3**', srv1P.P3, true);
+      if (srv1P.P4) postup = fillDocBlock(postup, '**M0-SRV1.P4**', srv1P.P4, true);
+      if (srv1P.P5) postup = fillDocBlock(postup, '**M0-SRV1.P5**', srv1P.P5, true);
+      if (srv1P.P6) postup = fillDocBlock(postup, '**M0-SRV1.P6**', srv1P.P6, true);
+      if (srv1P.P7) postup = fillDocBlock(postup, '**M0-SRV1.P7**', srv1P.P7, true);
+
+      if (srv2P.P1) postup = fillDocBlock(postup, '**M0-SRV2.P1**', srv2P.P1, true);
+      if (srv2P.P2) postup = fillDocBlock(postup, '**M0-SRV2.P2**', srv2P.P2, true);
+      if (srv2P.P3) postup = fillDocBlock(postup, '**M0-SRV2.P3**', srv2P.P3, true);
+      if (srv2P.P4) postup = fillDocBlock(postup, '**M0-SRV2.P4**', srv2P.P4, true);
+      if (srv2P.P5) postup = fillDocBlock(postup, '**M0-SRV2.P5**', srv2P.P5, true);
+      if (srv2P.P6) postup = fillDocBlock(postup, '**M0-SRV2.P6**', srv2P.P6, true);
+      if (srv2P.P7) postup = fillDocBlock(postup, '**M0-SRV2.P7**', srv2P.P7, true);
+
+      if (pc1P.P1) postup = fillDocBlock(postup, '**M0-PC1.P1**', pc1P.P1, true);
+      if (pc1P.P2) postup = fillDocBlock(postup, '**M0-PC1.P2**', pc1P.P2, true);
+      if (pc1P.P3) postup = fillDocBlock(postup, '**M0-PC1.P3**', pc1P.P3, true);
+      if (pc1P.P4) postup = fillDocBlock(postup, '**M0-PC1.P4**', pc1P.P4, true);
+      if (pc1P.P5) postup = fillDocBlock(postup, '**M0-PC1.P5**', pc1P.P5, true);
+      if (pc1P.P6) postup = fillDocBlock(postup, '**M0-PC1.P6**', pc1P.P6, true);
+      if (pc1P.P7) postup = fillDocBlock(postup, '**M0-PC1.P7**', pc1P.P7, true);
+    } else if (formattedModule === '01') {
+      if (srv1O.V0_otisk) overeni = fillDocBlock(overeni, '**M1-SRV1.V0-O**', srv1O.V0_otisk, true);
+      if (srv1O.V1_d1) overeni = fillDocBlock(overeni, '**M1-SRV1.V1-D1**', srv1O.V1_d1, true);
+      if (srv1O.V4_d1) overeni = fillDocBlock(overeni, '**M1-SRV1.V4-D1**', srv1O.V4_d1, true);
+      if (srv1O.V4_d2) overeni = fillDocBlock(overeni, '**M1-SRV1.V4-D2**', srv1O.V4_d2, true);
+      if (srv1O.V6_d1) overeni = fillDocBlock(overeni, '**M1-SRV1.V6-D1**', srv1O.V6_d1, true);
+
+      // 3. Vyplneni postup.md pro Modul 01
+      if (srv1P.P1) postup = fillDocBlock(postup, '**M1-SRV1.P1**', srv1P.P1, true);
+      if (srv1P.P2) postup = fillDocBlock(postup, '**M1-SRV1.P2**', srv1P.P2, true);
+      if (srv1P.P3) postup = fillDocBlock(postup, '**M1-SRV1.P3**', srv1P.P3, true);
+    } else if (formattedModule === '02') {
       if (srv1O.V0_otisk) overeni = fillDocBlock(overeni, '**M2-SRV1.V0-O**', srv1O.V0_otisk, true);
       if (srv1O.V1_d2) overeni = fillDocBlock(overeni, '**M2-SRV1.V1-D2**', srv1O.V1_d2, false);
       if (srv1O.V2_d1) overeni = fillDocBlock(overeni, '**M2-SRV1.V2-D1**', srv1O.V2_d1, true);
@@ -623,8 +703,17 @@ async function handleDocMessage(message, isBackfill = false) {
 
     let screenshotNotice = 'V souboru `overeni.md` u bodu **M3-SRV1.V1-D2** (*Dukaz: Screenshot DNS Manageru s doprednou zonou*) je potreba udelat a vlozit screenshot z Windows Serveru. Vsechny ostatni overovaci vystupy a postupy jsou jiz kompletne vyplneny!';
     let dmWarning = '> **Dulezite upozorneni:** V souboru `overeni.md` u bodu **M3-SRV1.V1-D2** – *Dukaz: Screenshot DNS Manageru s doprednou zonou* je potreba udelat screenshot.';
+    let embedDesc = `Uspesne byly zaznamenany a spojeny vystupy ze serveru **SRV1-DC** i klienta **PC1-WIN** do archivu **${zipFileName}**.`;
 
-    if (formattedModule === '02') {
+    if (formattedModule === '00') {
+      screenshotNotice = 'V souboru `overeni.md` je nekolik bodu vyzadujicich rucni screenshoty (napr. parametry VM v hypervizoru a nastaveni PC1). Textove overovaci vystupy a postupy ze vsech 3 stroju jsou jiz kompletne vyplneny!';
+      dmWarning = '> **Upozorneni:** V souboru `overeni.md` nezapomente rucne vlozit pozadovane screenshoty z hypervizoru/nastaveni.';
+      embedDesc = `Uspesne byly zaznamenany a spojeny vystupy ze stroju **SRV1-DC**, **SRV2-FS** i **PC1-WIN** do archivu **${zipFileName}**.`;
+    } else if (formattedModule === '01') {
+      screenshotNotice = 'V souboru `overeni.md` u bodu **M1-SRV1.V2-D1**, **M1-SRV1.V3-D1** a **M1-SRV1.V5-D1** je potreba vlozit screenshoty z Windows Serveru (Server Manager a ADUC). Vsechny textove overovaci vystupy a postupy jsou jiz kompletne vyplneny!';
+      dmWarning = '> **Dulezite upozorneni:** V souboru `overeni.md` u bodu **M1-SRV1.V2-D1**, **V3-D1** a **V5-D1** (Server Manager / ADUC) je potreba vlozit screenshoty.';
+      embedDesc = `Uspesne byly zaznamenany a pripraveny vystupy ze serveru **SRV1-DC** do archivu **${zipFileName}**.`;
+    } else if (formattedModule === '02') {
       screenshotNotice = 'V souboru `overeni.md` u bodu **M2-SRV1.V1-D1** (*Dukaz: Server Manager — role DHCP bez varovani a DHCP konzole se zelene oznacenym serverem*) je potreba udelat a vlozit screenshot z Windows Serveru. Vsechny ostatni overovaci vystupy a postupy jsou jiz kompletne vyplneny!';
       dmWarning = '> **Dulezite upozorneni:** V souboru `overeni.md` u bodu **M2-SRV1.V1-D1** – *Dukaz: Server Manager — role DHCP bez varovani a DHCP konzole se zelene oznacenym serverem* je potreba udelat screenshot.';
     }
@@ -632,7 +721,7 @@ async function handleDocMessage(message, isBackfill = false) {
     const embed = new EmbedBuilder()
       .setColor(0x22c55e)
       .setTitle(`Dokumentace Modul ${formattedModule} je kompletni!`)
-      .setDescription(`Uspesne byly zaznamenany a spojeny vystupy ze serveru **SRV1-DC** i klienta **PC1-WIN** do archivu **${zipFileName}**.`)
+      .setDescription(embedDesc)
       .addFields(
         { name: 'Resitel', value: `${st.fullName || userKey} (${st.className || 'T3A'})`, inline: true },
         { name: 'Pracoviste', value: `Pracoviste ${st.workstationX || 2}`, inline: true },
