@@ -511,7 +511,7 @@
           <tr>
             <td>Účet (PC1-WIN)</td>
             <td><code>Administrator</code></td>
-            <td>u Windows 11 je vestavěný účet <code>Administrator</code> ve výchozím stavu <strong>vypnutý</strong> a OOBE nedovolí založit nový účet pod tímto jménem — musí se <strong>ručně povolit</strong> po instalaci</td>
+            <td>u Windows 11 je vestavěný účet <code>Administrator</code> ve výchozím stavu <strong>vypnutý</strong> a OOBE nedovolí založit nový účet pod tímto jménem — musí se vytvořit dočasný účet a Administrator se <strong>ručně povolí</strong> po instalaci (viz podrobný návod níže)</td>
           </tr>
           <tr>
             <td>Heslo</td>
@@ -522,6 +522,52 @@
       </table>
 
       <p>Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný administrátorský účet.</p>
+
+      <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-left: 4px solid #38bdf8; border-radius: 6px; padding: 14px 18px; margin: 18px 0; color: #e0e0e0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+          <strong style="color: #38bdf8; font-size: 1.05rem;">POSTUP PRO PC1-WIN: OBEJITÍ MICROSOFT ÚČTU A LOKÁLNÍ ADMINISTRATOR</strong>
+          <span style="font-size: 0.8rem; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 2px 8px; border-radius: 4px; font-weight: 600;">OOBE &amp; PowerShell</span>
+        </div>
+        <p style="margin: 0 0 10px 0; line-height: 1.5; font-size: 0.92rem;">Při instalaci <strong>Windows 11 Education N</strong> průvodce OOBE standardně vynucuje přihlášení cloudovým Microsoft účtem a nedovolí zadat rezervované jméno <code>Administrator</code>. Postupujte podle těchto kroků:</p>
+        
+        <ol style="margin: 0 0 12px 20px; padding: 0; line-height: 1.6; font-size: 0.92rem;">
+          <li><strong>Dočasné odpojení NIC 1 v hypervizoru:</strong> V managementu CyLabu před spuštěním/v OOBE <strong>odpojte adaptér NIC 1</strong> (odškrtnout <em>Connected</em>), aby stroj neměl internet a nevynucoval Microsoft účet.</li>
+          <li><strong>Obejití sítě v OOBE:</strong> Na obrazovce připojení k síti stiskněte <kbd>Shift</kbd> + <kbd>F10</kbd> (příp. <kbd>Fn</kbd> + <kbd>Shift</kbd> + <kbd>F10</kbd>), zadejte <code>oobe\bypassnro</code> a stiskněte Enter (stroj se restartuje).</li>
+          <li><strong>Omezené nastavení:</strong> Po restartu na obrazovce sítě klikněte na <em>"I don't have internet"</em> a poté <em>"Continue with limited setup"</em>.</li>
+          <li><strong>Dočasný účet:</strong> Jako uživatele zadejte <code>temp</code> (jméno <em>Administrator</em> systém v OOBE nepovolí), heslo <code>Pa55w.rd</code> a dokončete průvodce.</li>
+          <li><strong>Aktivace Administratora:</strong> Ve Windows otevřete PowerShell jako Správce a aktivujte vestavěný účet s heslem <code>Pa55w.rd</code>.</li>
+          <li><strong>Odhlášení a úklid:</strong> Odhlaste se z <code>temp</code>, přihlaste se jako <code>Administrator</code> a smažte dočasný účet (<code>Remove-LocalUser -Name "temp"</code>).</li>
+          <li><strong>Opětovné zapnutí NIC 1:</strong> V hypervizoru (CyLab) <strong>znovu zaškrtněte Connected u adaptéru NIC 1</strong> pro obnovení internetu (pro aktivaci Windows a stahování skriptů).</li>
+        </ol>
+
+        <p style="margin: 12px 0 6px 0; font-size: 0.86rem; color: #94a3b8;">1. Příkaz v CMD během OOBE (Shift + F10):</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span>CMD (OOBE)</span>
+            <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+          </div>
+          <pre><code>oobe\bypassnro</code></pre>
+        </div>
+
+        <p style="margin: 12px 0 6px 0; font-size: 0.86rem; color: #94a3b8;">2. Příkazy v PowerShellu (Run as Administrator) z dočasného účtu temp:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span>PowerShell (Spuštěno z účtu temp)</span>
+            <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+          </div>
+          <pre><code>Enable-LocalUser -Name "Administrator"
+Set-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)</code></pre>
+        </div>
+
+        <p style="margin: 12px 0 6px 0; font-size: 0.86rem; color: #94a3b8;">3. Příkaz po přihlášení pod Administrator pro odstranění dočasného účtu:</p>
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span>PowerShell (Spuštěno z účtu Administrator)</span>
+            <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+          </div>
+          <pre><code>Remove-LocalUser -Name "temp"</code></pre>
+        </div>
+      </div>
 
       <h3>Jméno počítače a síť</h3>
       <table>

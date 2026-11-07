@@ -119,10 +119,27 @@ slmgr.vbs /xpr
 Vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u KMS/LAB KEY s omezenou platností) — ne "notification experience" upozorňující na neaktivovaný Windows. V **Settings → System → Activation** je zobrazeno **"Windows is activated"** (server), resp. **"Windows is activated with a digital license"** (klient), bez tlačítka "Activate" navíc.
 
 ### 12. PC1-WIN: lokální účet, žádný Microsoft účet (jen u klienta)
+
+Postup provedený při instalaci a přípravě PC1-WIN:
+1. **Dočasné odpojení NIC 1 v hypervizoru:** V nastavení virtuálního stroje (CyLab) byl před instalací/v OOBE odpojen síťový adaptér NIC 1 (zrušeno zaškrtnutí *Connected*), aby byl PC bez internetu a nedocházelo k vynucování Microsoft účtu.
+2. **Obejití Microsoft účtu v OOBE:** Na obrazovce připojení k síti stisknuto `Shift + F10`, spuštěn příkaz `oobe\bypassnro` a po automatickém restartu zvoleno *"I don't have internet"* → *"Continue with limited setup"*.
+3. **Vytvoření dočasného účtu:** Jelikož systém Windows 11 v OOBE nedovolí zadat rezervované jméno `Administrator`, byl vytvořen dočasný lokální účet `temp` (s heslem `Pa55w.rd`).
+4. **Povolení a nastavení Administratora:** Po přihlášení do Windows byly v PowerShellu se zvýšenými právy (Run as administrator) spuštěny příkazy:
+   ```powershell
+   Enable-LocalUser -Name "Administrator"
+   Set-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)
+   ```
+5. **Přihlášení a smazání dočasného účtu:** Po odhlášení z účtu `temp` a přihlášení pod vestavěným účtem `Administrator` byl dočasný účet odstraněn:
+   ```powershell
+   Remove-LocalUser -Name "temp"
+   ```
+6. **Opětovné zapnutí NIC 1 v hypervizoru:** V CyLabu byl adaptér NIC 1 opět připojen (*Connected*), aby stanice měla internetové připojení pro aktivaci a labové testy.
+
+Ověření stavu lokálních účtů v PowerShellu:
 ```powershell
 Get-LocalUser | Select-Object Name, Enabled
 ```
-Výstup obsahuje aktivní `Administrator` a **neobsahuje** žádný dočasný účet (`Setup` byl odstraněn). V **Settings → Accounts → Your info** je typ účtu **"Local account"**, nikoli e-mailová adresa Microsoft účtu — přihlášení do Windows nevyžaduje žádné internetové ověření.
+Výstup obsahuje aktivní `Administrator` (`True`) a **neobsahuje** žádný dočasný účet (`temp` byl odstraněn). V **Settings → Accounts → Your info** je typ účtu **"Local account"**, nikoli e-mailová adresa Microsoft účtu — přihlášení do Windows nevyžaduje žádné internetové ověření.
 
 ### 13. (Nepovinné) Rychlé ověření celého stroje
 Pro komplexní a automatické ověření celé základní konfigurace Modulu 00 můžete spustit ověřovací skript přímo z repozitáře. Příkaz můžete spustit v **PowerShellu, CMD i Terminálu** – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je **striktně read-only** (pouze čte stav, nic nemění) a po použití se **neukládá na disk** (smaže se automaticky po dokončení běhu):

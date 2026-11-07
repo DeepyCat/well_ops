@@ -607,6 +607,34 @@ slmgr.vbs /xpr</code></pre>
       <p>Příkaz <code>slmgr.vbs /xpr</code> vypíše, že stroj je aktivovaný (trvale, nebo s datem příští kontroly u multilicence). V <strong>Settings → System → Activation</strong> je zobrazeno <strong>"Windows is activated"</strong> (server), resp. <strong>"Windows is activated with a digital license"</strong> (klient), bez varovných hlášek či vodoznaku na ploše.</p>
 
       <h3>12. PC1-WIN: lokální účet, žádný Microsoft účet (jen u klienta)</h3>
+      <p>Postup provedený při instalaci a přípravě PC1-WIN:</p>
+      <ol style="margin: 0 0 14px 20px; line-height: 1.6;">
+        <li><strong>Dočasné odpojení NIC 1 v hypervizoru:</strong> V CyLabu byl odpojen adaptér NIC 1 (odškrtnuto <em>Connected</em>), aby PC neměl internet a nevynucoval cloudový účet.</li>
+        <li><strong>Obejití Microsoft účtu v OOBE:</strong> Na obrazovce sítě stisknuto <kbd>Shift</kbd> + <kbd>F10</kbd>, spuštěn příkaz <code>oobe\bypassnro</code> a po restartu zvoleno <em>"I don't have internet"</em> → <em>"Continue with limited setup"</em>.</li>
+        <li><strong>Vytvoření dočasného účtu:</strong> V OOBE byl vytvořen dočasný lokální účet <code>temp</code> (s heslem <code>Pa55w.rd</code>), jelikož jméno <code>Administrator</code> systém v OOBE odmítne.</li>
+        <li><strong>Povolení a nastavení Administratora:</strong> V PowerShellu se zvýšenými právy aktivován účet Administrator a nastaveno heslo <code>Pa55w.rd</code>.</li>
+        <li><strong>Přihlášení a smazání dočasného účtu:</strong> Po odhlášení z <code>temp</code> a přihlášení pod <code>Administrator</code> byl dočasný účet odebrán (<code>Remove-LocalUser -Name "temp"</code>).</li>
+        <li><strong>Opětovné zapnutí NIC 1:</strong> V CyLabu byl adaptér NIC 1 znovu připojen (zaškrtnuto <em>Connected</em>).</li>
+      </ol>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (Aktivace Administratora z účtu temp)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Enable-LocalUser -Name "Administrator"
+Set-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)</code></pre>
+      </div>
+
+      <div class="code-block-wrapper" style="margin-top: 10px;">
+        <div class="code-block-header">
+          <span>PowerShell (Smazání účtu temp po přihlášení pod Administrator)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Remove-LocalUser -Name "temp"</code></pre>
+      </div>
+
+      <p style="margin-top: 12px;">Ověření stavu lokálních účtů v PowerShellu:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
           <span>PowerShell</span>
@@ -614,7 +642,7 @@ slmgr.vbs /xpr</code></pre>
         </div>
         <pre><code>Get-LocalUser | Select-Object Name, Enabled</code></pre>
       </div>
-      <p>Výstup obsahuje aktivní <code>Administrator</code> a <strong>neobsahuje</strong> žádný dočasný účet (<code>Setup</code> byl odstraněn). V <strong>Settings → Accounts → Your info</strong> je typ účtu <strong>"Local account"</strong>, nikoli e-mailová adresa Microsoft účtu — přihlášení do Windows nevyžaduje žádné internetové ověření.</p>
+      <p>Výstup obsahuje aktivní <code>Administrator</code> (<code>True</code>) a <strong>neobsahuje</strong> žádný dočasný účet (<code>temp</code> byl odstraněn). V <strong>Settings → Accounts → Your info</strong> je typ účtu <strong>"Local account"</strong>, nikoli e-mailová adresa Microsoft účtu — přihlášení do Windows nevyžaduje žádné internetové ověření.</p>
 
       <h3>13. (Nepovinné) Rychlé ověření celého stroje</h3>
       <p>Pro komplexní a automatické ověření celé základní konfigurace Modulu 00 můžete spustit ověřovací skript přímo z repozitáře. Příkaz lze spustit v <strong>PowerShellu, CMD i Terminálu</strong> – vždy automaticky běží v prostředí PowerShell, zobrazuje vizuální průběh stahování, je <strong>striktně read-only</strong> (pouze čte stav, nic nemění) a po použití se <strong>neukládá na disk</strong> (smaže se automaticky po dokončení běhu):</p>
