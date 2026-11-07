@@ -189,7 +189,9 @@ Každé AI je **povinno** si před zahájením příslušné práce daný skill 
 | Měnit konfiguraci systému v kontrolních `XX_check_*.ps1` skriptech | Kontrolní skripty jsou **striktně READ-ONLY** (pouze `Get-*`, `Test-*`, audit stavu) |
 | Používat emoji v PowerShell a BAT skriptech (`✅`, `❌`, `⚠️`) | Používat **výhradně ASCII** značení: `[ OK ]`, `[CHYBA]`, `[KONTROLA]`, `[WARN]` |
 | Používat složené logické výrazy bez závorek: `if (Test-Path a -or Test-Path b)` | Vždy uzavírat volání do závorek: `if ((Test-Path a) -or (Test-Path b))` |
-| Poškodit hybridní BAT hlavičku pro PowerShell | Vždy dodržet přesný formát: `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH \| Select-Object -Skip 5 \| Out-String)); & $script %*"` |
+| Používat u `curl.exe` parametr `-w "%{http_code}"` (způsobí chybu 43) | Používat `curl.exe -i -s -k` s regex parsováním HTTP kódu a .NET `HttpClient` fallbackem |
+| Poškodit hybridní BAT hlavičku nebo nechat visící `&` | Vždy dodržet přesný formát: `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH \| Select-Object -Skip 5 \| Out-String)); & $script %*"` |
+| Upravovat `docker-compose.yml` bota (přidávat volumes) | `docker-compose.yml` neměnit, šablony a `index.js` kopírovat ručně přes `docker cp` a kontejner restartovat |
 | Vytvořit nový modul a nastavit mu ve `verified.json` hodnotu `true` | Nový modul má ve `verified.json` **vždy `false`**, dokud ho uživatel fyzicky neotestuje v reálném labu |
 | Dělat neohlášené změny v cizích souborech nebo odstraňovat komentáře | Provádět pouze explicitně vyžádané úpravy a zachovávat stávající kód |
 | Hádat nebo předpokládat, jak mají věci fungovat, když chybí zadání | **Zastavit se a položit uživateli dotaz (Pravidlo #0)** |

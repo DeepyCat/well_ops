@@ -306,7 +306,7 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 - V kódu bota (`discord-bot/index.js`) musí být `GatewayIntentBits.MessageContent`.
 
 ### 14. POVINNÝ GIT AUTOR COMMITŮ
-- Všechny commity musí být prováděny pod identitou autora: `samanbeer <tomas.pachomov@frengp.cz>` (`git commit --author="samanbeer <tomas.pachomov@frengp.cz>"`).
+- Všechny commity musí být prováděny pod identitou autora: `samanbeer <343.ptom@gmail.com>` (`git commit --author="samanbeer <343.ptom@gmail.com>"`).
 
 ### 15. ADAPTABILITA PODLE POČTU STROJŮ (ZÁKAZ TVRDÉHO PŘEDPOKLÁDÁNÍ 2 STROJŮ)
 - Nikdy nepředpokládat natvrdo, že každý modul má právě 2 stroje (SRV1 a PC1).
@@ -353,6 +353,26 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
   ```
   Tato funkce zachová řádky a sloupce přesně jako v terminálu, správně přeloží českou diakritiku a zachytí případná varování i chyby z `stderr`.
 
+### 19. BEZPEČNÉ ODESÍLÁNÍ PŘES CURL.EXE A HTTP PARSOVÁNÍ (ZÁKAZ `-w`, CHYBA 43)
+- V prostředí Windows PowerShell/CMD NIKDY nepoužívat u `curl.exe` parametr `-w "%{http_code}"` – ve Windows způsobuje pád `curl: (43) A libcurl function was given a bad argument` a návratový kód 000.
+- VŽDY volat `curl.exe -i -s -k` (přidá HTTP hlavičky do výstupu) a stavový kód parsovat regulárním výrazem:
+  ```powershell
+  if ($output -match "HTTP\/\d(?:\.\d)?\s+(\d{3})") { $statusCode = [int]$matches[1] }
+  ```
+- VŽDY implementovat záložní odeslání přes .NET `System.Net.Http.HttpClient` pro případ, že curl selže nebo vrátí kód 000.
+
+### 20. STRIKTNÍ INTEGRITA HYBRIDNÍ BAT HLAVIČKY (ZÁKAZ OSAMOCENÉHO `&`)
+- Řádek 3 v každém `.bat` zavaděči musí mít VŽDY přesnou syntaxi:
+  `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"`
+- ZÁKAZ jakýchkoliv neuvážených zásahů či zkracování tohoto řádku. Zanechání visícího ampersandu `&` na konci roury způsobí pád parseru `Missing expression after '&'` a skript na VM vůbec nenastartuje.
+
+### 21. PLNÁ SYNCHRONIZACE DISCORD BOTA NA SERVERU (KÓD I ŠABLONY V KONTEJNERU)
+- Docker kontejner bota na produkčním serveru (NAS) nemá namountované svazky (`docker-compose.yml` se NIKDY nemění, svazky se nepřidávají!).
+- Při přidání nového modulu (např. 00, 01, 02) nestačí mít soubory pouze v repozitáři:
+  1. **Šablony:** AI MUSÍ uživatele vyzvat ke zkopírování šablon: `docker cp discord-bot/templates/XX ops-discord-bot:/app/templates/`
+  2. **Kód bota (`index.js`):** AI MUSÍ ověřit a uživatele upozornit na nutnost nahrát do kontejneru i aktualizovaný kód `index.js` s logikou pro daný modul. Pokud v kontejneru běží starý kód, bot sice ZIP vytvoří, ale šablony zůstanou nevyplněné (s textem `DOPLNIT`)!
+  3. **Restart:** Po nakopírování souborů je nutné provést `docker restart ops-discord-bot`.
+
 ---
 
 ## Ověřovací checklist pro AI před odevzdáním práce
@@ -372,4 +392,4 @@ Než označíte úkol za dokončený, zkontrolujte v terminálu:
 12. V markdown šablonách se nenachází žádné nezabalené HTML značky typu `<prijmeni>`.
 13. Konzolové výstupy (`ipconfig`, `nslookup`) jsou v PowerShell skriptech zachytávány přes `Invoke-ConsoleCmd` s `-join "\`r\`n"` a OEM kódováním.
 14. Nikde v kódu, textech ani commitech nejsou použity emoji.
-15. Změny jsou otestovány, commitnuty pod autorem `samanbeer <tomas.pachomov@frengp.cz>` a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
+15. Změny jsou otestovány, commitnuty pod autorem `samanbeer <343.ptom@gmail.com>` a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
