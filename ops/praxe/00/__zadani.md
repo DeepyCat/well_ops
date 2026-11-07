@@ -35,10 +35,62 @@ Jazyk instalačního média je u všech tří strojů **English (United States)*
 | Položka | Hodnota | Poznámka |
 |---|---|---|
 | Účet (SRV1-DC, SRV2-FS) | vestavěný `Administrator` | vytváří ho přímo instalace serveru |
-| Účet (PC1-WIN) | `Administrator` | u Windows 11 je vestavěný účet `Administrator` ve výchozím stavu **vypnutý** a OOBE nedovolí založit nový účet pod tímto jménem — musí se **ručně povolit** po instalaci (viz `cast2.md`, Krok 4) |
+| Účet (PC1-WIN) | `Administrator` | u Windows 11 je vestavěný účet `Administrator` ve výchozím stavu **vypnutý** a OOBE nedovolí založit nový účet pod tímto jménem — musí se vytvořit dočasný účet a Administrator se **ručně povolí** po instalaci (viz podrobný postup níže) |
 | Heslo | `Pa55w.rd` (u všech tří strojů stejné) | |
 
 Ani na jednom ze tří strojů se nevytváří žádný jiný/personalizovaný administrátorský účet.
+
+#### Postup pro PC1-WIN: Obejití Microsoft účtu a nastavení lokálního Administratora
+
+Při instalaci **Windows 11 Education N** instalační průvodce (OOBE) standardně vynucuje připojení k internetu a přihlášení cloudovým Microsoft účtem. Zároveň systém **odmítne zadání uživatelského jména `Administrator`**, protože toto jméno je rezervováno pro vestavěný účet systému, který je však z bezpečnostních důvodů vypnutý.
+
+Postupujte přesně podle těchto kroků:
+
+1. **Dočasné odpojení internetu (NIC 1 v hypervizoru):**
+   - V managementu vašeho hypervizoru (CyLab) před spuštěním instalace nebo během OOBE **dočasně odpojte síťový adaptér NIC 1** (zrušte zaškrtnutí *Connected* / odpojte síťový kabel).
+   - *Důvod:* Pokud má PC1-WIN aktivní internetové připojení, instalační průvodce Windows 11 se i po restartu může pokusit připojit a opět vynutit zadání Microsoft účtu. Odpojením NIC 1 tomuto chování 100% zabráníte.
+
+2. **Obejití požadavku na síť v OOBE:**
+   - Jakmile se po instalaci zobrazí průvodce nastavením (obrazovka výběru sítě *"Let's connect you to a network"*), stiskněte klávesovou zkratku **`Shift + F10`** (na některých noteboocích či klávesnicích **`Fn + Shift + F10`**).
+   - Otevře se okno Příkazového řádku (CMD). Do něj napište příkaz:
+     ```cmd
+     oobe\bypassnro
+     ```
+   - Stiskněte Enter. Virtuální počítač se automaticky restartuje.
+   - Po restartu znovu vyberte zemi (Region) a klávesnici (Keyboard layout). Na obrazovce sítě se nyní objeví nová možnost: klikněte na **"I don't have internet"** a na následující obrazovce zvolte **"Continue with limited setup"**.
+
+3. **Vytvoření dočasného lokálního účtu:**
+   - Na obrazovce *"Who's going to use this device?"* zadejte dočasné jméno uživatele: např. **`temp`** (nebo `setup`).
+   - *Poznámka: Jméno `Administrator` zde zadat nelze, Windows 11 zobrazí chybovou hlášku, že jméno je rezervované.*
+   - Zadejte heslo (např. `Pa55w.rd`), zvolte 3 bezpečnostní otázky a dokončete zbývající volby soukromí až na pracovní plochu Windows.
+
+4. **Povolení vestavěného účtu Administrator a nastavení hesla:**
+   - Na ploše Windows klikněte pravým tlačítkem myši na tlačítko Start a vyberte **Terminal (Admin)** nebo **PowerShell (Admin)**.
+   - Aktivujte vestavěný účet `Administrator` a nastavte mu předepsané heslo `Pa55w.rd`:
+     ```powershell
+     Enable-LocalUser -Name "Administrator"
+     Set-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)
+     ```
+     *(Ekvivalentně lze použít v CMD příkazy: `net user Administrator /active:yes` a `net user Administrator Pa55w.rd`)*
+
+5. **Přihlášení pod Administrator a odstranění dočasného účtu:**
+   - Odhlaste se z dočasného účtu: klikněte na **Start** → klikněte na ikonu uživatele `temp` → zvolte **Sign out**.
+   - Na zamykací / přihlašovací obrazovce zvolte v levém dolním rohu účet **Administrator**, zadejte heslo **`Pa55w.rd`** a přihlaste se.
+   - Po přihlášení otevřete opět PowerShell jako Správce a smažte dočasný instalační účet:
+     ```powershell
+     Remove-LocalUser -Name "temp"
+     ```
+     *(Případně v CMD: `net user temp /delete`)*
+
+6. **Opětovné zapnutí NIC 1 v hypervizoru:**
+   - V managementu hypervizoru (CyLab) **znovu připojte adaptér NIC 1** (zaškrtněte *Connected*). Počítač tak získá zpět přístup k internetu pro aktivaci Windows (LAB KEY), stahování kontrolních skriptů a další práci.
+
+7. **Kontrola výsledného stavu:**
+   - V PowerShellu ověřte seznam lokálních účtů:
+     ```powershell
+     Get-LocalUser | Select-Object Name, Enabled
+     ```
+   - Účet `Administrator` musí mít stav `True` a žádný účet `temp` ani Microsoft účet již v systému nesmí existovat.
 
 ### Jméno počítače a síť
 
@@ -120,7 +172,7 @@ Tato část je pro všechny tři stroje **stejná** (nezávisí na roli):
 
 ### Soukromí a telemetrie
 
-Instalace Windows Serveru **nenabízí přihlášení Microsoft účtem** — vestavěný účet `Administrator` je jediný účet, který instalace vytváří. Instalace **Windows 11** naopak přihlášení Microsoft účtem standardně **vynucuje** v OOBE, pokud počítač vidí síť — proto je pro PC1-WIN součástí `cast2.md` i konkrétní postup, jak vytvořit **lokální** účet místo Microsoft účtu. Na všech třech strojích navíc zkontrolujte/vypněte:
+Instalace Windows Serveru **nenabízí přihlášení Microsoft účtem** — vestavěný účet `Administrator` je jediný účet, který instalace vytváří. Instalace **Windows 11** naopak přihlášení Microsoft účtem standardně **vynucuje** v OOBE, pokud počítač vidí síť — proto je pro PC1-WIN v tomto zadání popsán konkrétní postup výše, jak v OOBE obejít Microsoft účet a aktivovat lokální účet Administrator. Na všech třech strojích navíc zkontrolujte/vypněte:
 
 | Nastavení | Požadovaná hodnota |
 |---|---|

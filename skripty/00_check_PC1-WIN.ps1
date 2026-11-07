@@ -181,6 +181,17 @@ if ($null -ne $adminUser -and $adminUser.Enabled) {
     Report-Fail "Ucet 'Administrator' nebyl v systemu nalezen"
 }
 
+# Kontrola odstraneni docasneho instalacniho uctu (temp, setup apod.)
+$extraUsers = Get-LocalUser -ErrorAction SilentlyContinue | Where-Object { 
+    $_.Name -notin @("Administrator", "DefaultAccount", "Guest", "WDAGUtilityAccount") 
+}
+if (($null -eq $extraUsers) -or ($extraUsers.Count -eq 0)) {
+    Report-Ok "Zadny docasny instalacni ucet (temp/setup) nezustal v systemu"
+} else {
+    $extraNames = ($extraUsers | ForEach-Object { $_.Name }) -join ", "
+    Report-Warn "V systemu byl nalezen dalsi lokalni ucet: $extraNames" "Docasny instalacni ucet po prihlaseni pod Administrator smazte: Remove-LocalUser -Name '<ucet>'"
+}
+
 Report-Warn "Heslo administratora: Z bezpecnostnich duvodu nelze precist heslo v plaintextu" "Overte, ze jste nastavili heslo 'Pa55w.rd'"
 
 # ------------------------------------------------------------

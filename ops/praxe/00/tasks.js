@@ -109,7 +109,16 @@ window.OPS_MODULE_TASKS["00"] = [
       </div>
     `,
     how: (vm) => {
-      if (vm === "PC1-WIN") return "Instalace Windows 11 Education N (jazyk: English - United States).";
+      if (vm === "PC1-WIN") {
+        return `# 1. V hypervizoru (CyLab) dočasně ODPOJTE adaptér NIC 1 (odškrtnout Connected), aby stroj neměl internet a nevynucoval Microsoft účet!
+# 2. Instalace Windows 11 Education N (jazyk: English - United States).
+# 3. V úvodním průvodci OOBE stiskněte Shift + F10 (nebo Fn + Shift + F10) a zadejte:
+oobe\\bypassnro
+# Počítač se automaticky restartuje.
+# 4. Na obrazovce sítě zvolte "I don't have internet" -> "Continue with limited setup".
+# 5. Zadejte dočasné jméno uživatele např. "temp" (jméno "Administrator" Windows 11 v OOBE nepovolí!).
+# 6. Po přihlášení a aktivaci účtu Administrator adaptér NIC 1 v hypervizoru opět připojte zpět.`;
+      }
       return "Instalace Windows Server 2025 Datacenter (Desktop Experience). Neinstalovat Server Core.";
     },
     verify: (vm) => {
@@ -260,16 +269,31 @@ New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (
     title: "5. Účet administrátora a heslo",
     forVMs: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
     what: (vm) => {
-      if (vm === "PC1-WIN") return "U Windows 11 je vestavěný účet Administrator vypnutý. Povolte jej, nastavte standardizované heslo Pa55w.rd, přihlaste se pod ním a odstraňte dočasný instalační účet.";
+      if (vm === "PC1-WIN") {
+        return `
+          <p>U Windows 11 je vestavěný účet <strong>Administrator</strong> ve výchozím stavu zakázán a instalační průvodce OOBE nedovolí zadat toto jméno (hlásí, že je rezervované systémem).</p>
+          <p>Při instalaci jste proto vytvořili dočasný lokální účet (např. <code>temp</code>). Nyní z něj povolte vestavěného Administratora, nastavte standardizované heslo <code>Pa55w.rd</code>, přihlaste se pod ním a dočasný účet <code>temp</code> odstraňte.</p>
+        `;
+      }
       return "Zajistěte funkční vestavěný účet Administrator s heslem Pa55w.rd. Žádný jiný/personalizovaný administrátorský účet se nevytváří.";
     },
     how: (vm) => {
-      if (vm === "PC1-WIN") return `Enable-LocalUser -Name "Administrator"\nSet-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)\n# Odhlásit se, přihlásit pod Administrator a odstranit dočasný účet.`;
+      if (vm === "PC1-WIN") {
+        return `# 1. V PowerShellu spuštěném jako Správce aktivujte Administratora a nastavte heslo Pa55w.rd:
+Enable-LocalUser -Name "Administrator"
+Set-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)
+
+# 2. Odhlaste se z dočasného účtu (Start -> ikona profilu temp -> Sign out)
+# 3. Na přihlašovací obrazovce zvolte Administrator a přihlaste se heslem: Pa55w.rd
+
+# 4. Po přihlášení jako Administrator odstraňte dočasný účet temp:
+Remove-LocalUser -Name "temp"`;
+      }
       return "Při instalaci nastavit heslo účtu Administrator na: Pa55w.rd";
     },
     verify: () => "Get-LocalUser | Select-Object Name, Enabled",
     expected: (vm) => {
-      if (vm === "PC1-WIN") return "Name          Enabled\n----          -------\nAdministrator True\n(Dočasný instalační účet Setup/User byl odstraněn, přihlášení s heslem Pa55w.rd funguje lokálně)";
+      if (vm === "PC1-WIN") return "Name          Enabled\n----          -------\nAdministrator True\n(Dočasný instalační účet temp byl odstraněn, přihlášení s heslem Pa55w.rd funguje lokálně pod Administrator)";
       return "Name          Enabled\n----          -------\nAdministrator True\n(Přihlášení s heslem Pa55w.rd funguje lokálně)";
     }
   },
@@ -332,12 +356,34 @@ New-NetFirewallRule -Name "Allow-Ping-Out-IPv6" -DisplayName "Allow ICMPv6-Out (
   },
   {
     id: "local-user-only",
-    title: "12. Pouze lokální účet (bez Microsoft Account)",
+    title: "12. Pouze lokální účet (Obejití Microsoft účtu a úklid temp)",
     forVMs: ["PC1-WIN"],
-    what: () => "Zajistěte, že klientský počítač PC1-WIN nepoužívá cloudový Microsoft účet, ale je provozován výhradně pod lokálním účtem Administrator.",
-    how: () => "V instalačním rozhraní OOBE nepoužívat Microsoft účet. Účet musí mít typ Local account.",
+    what: () => `
+      <p>Zajistěte, že klientský počítač <strong>PC1-WIN</strong> nepoužívá cloudový Microsoft účet, ale je provozován výhradně pod lokálním účtem <strong>Administrator</strong> bez jakýchkoliv zbytků dočasných účtů.</p>
+      <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.3); border-left: 4px solid #38bdf8; border-radius: 6px; padding: 12px 16px; margin: 12px 0;">
+        <strong style="color: #38bdf8;">Kompletní rekapitulace postupu bez Microsoft účtu v OOBE:</strong>
+        <ol style="margin: 8px 0 0 20px; padding: 0; line-height: 1.6;">
+          <li><strong>Odpojení NIC 1 v hypervizoru:</strong> V managementu hypervizoru (CyLab) před instalací nebo během OOBE dočasně <strong>odpojte adaptér NIC 1</strong> (odškrtnout <em>Connected</em>), aby počítač neměl internet a průvodce nevynucoval cloudový účet.</li>
+          <li><strong>Obejití sítě v OOBE:</strong> Na obrazovce sítě stiskněte <code>Shift + F10</code> (příp. <code>Fn + Shift + F10</code>), zadejte <code>oobe\\bypassnro</code> a stiskněte Enter (PC se restartuje).</li>
+          <li><strong>Omezené nastavení:</strong> Po restartu na obrazovce sítě zvolte <em>"I don't have internet"</em> a poté <em>"Continue with limited setup"</em>.</li>
+          <li><strong>Dočasný účet:</strong> Do pole uživatelského jména zadejte <code>temp</code> (jméno <em>Administrator</em> je v OOBE blokováno systémem).</li>
+          <li><strong>Aktivace Administratora:</strong> Ve Windows v PowerShellu (jako Správce):
+            <br><code>Enable-LocalUser -Name "Administrator"</code>
+            <br><code>Set-LocalUser -Name "Administrator" -Password ("Pa55w.rd" | ConvertTo-SecureString -AsPlainText -Force)</code>
+          </li>
+          <li><strong>Přepnutí:</strong> Odhlaste se z účtu <code>temp</code> a přihlaste se jako <code>Administrator</code> s heslem <code>Pa55w.rd</code>.</li>
+          <li><strong>Smazání dočasného účtu:</strong> V PowerShellu spusťte <code>Remove-LocalUser -Name "temp"</code>.</li>
+          <li><strong>Opětovné zapnutí NIC 1:</strong> V managementu hypervizoru (CyLab) <strong>znovu připojte adaptér NIC 1</strong> (zaškrtnout <em>Connected</em>), aby stroj měl opět internet pro aktivaci Windows a stahování skriptů.</li>
+        </ol>
+      </div>
+    `,
+    how: () => `# 1. Ověřte, že v systému existuje pouze účet Administrator a žádný dočasný účet:
+Get-LocalUser | Select-Object Name, Enabled
+
+# 2. Pokud dočasný účet 'temp' ještě nebyl smazán, odstraňte jej (nutno spustit pod účtem Administrator):
+Remove-LocalUser -Name "temp" -ErrorAction SilentlyContinue`,
     verify: () => "Get-LocalUser | Select-Object Name, Enabled",
-    expected: () => "Name          Enabled\n----          -------\nAdministrator True\n(V Settings -> Accounts -> Your info je uveden typ \"Local account\", nikoliv e-mailová adresa Microsoft účtu.)"
+    expected: () => "Name               Enabled\n----               -------\nAdministrator         True\nDefaultAccount       False\nGuest                False\nWDAGUtilityAccount   False\n\n(V systému zůstal pouze aktivní Administrator, účet temp je smazán a žádný Microsoft účet se nepoužívá.)"
   },
   {
     id: "quick-verification",
