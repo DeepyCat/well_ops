@@ -1,6 +1,6 @@
 @echo off
 set "BAT_PATH=%~f0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "=[scriptblock]::Create((Get-Content -LiteralPath :BAT_PATH | Select-Object -Skip 5 | Out-String)); &  %*"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"
 (goto) 2>nul & del "%~f0"
 exit /b %ERRORLEVEL%
 <#
