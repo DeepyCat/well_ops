@@ -143,6 +143,11 @@ Pro každý modul vytvořte skripty pro automatické vyplnění dokumentace ze v
 - **Discord Bot spojení:** Bot v `discord-bot/index.js` zachytí obě části, pinguje studenta (@mention), po obdržení všech částí odešle mezizprávu o generování, data spojí do `overeni.md` a `postup.md`, zabalí výhradně do ZIP archivu (bez samostatných .md souborů), upozorní na ruční screenshoty (např. bod `M3-SRV1.V1-D2` pro DNS Manager) a doručí studentovi do soukromé zprávy (DM) i do kanálu.
 - **Konfigurace v `praxe/modules.js` a `praxe/modules.json`:** Každý modul s dokumentací musí obsahovat pole `docWorkflow` s kroky pro spuštění na SRV1 a PC1.
 - **Šablony:** Čisté šablony dokumentace uložit do `praxe/XX/doc_templates/` a do `discord-bot/templates/XX/`.
+- **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE (Kopírování šablon do Docker kontejneru bota):** Kdykoliv AI vytvoří nebo upraví šablony dokumentace v `discord-bot/templates/XX/`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné zkopírovat tyto šablony do běžícího Docker kontejneru bota:
+  ```bash
+  docker cp templates/XX ops-discord-bot:/app/templates/
+  ```
+  *(resp. `docker cp discord-bot/templates/XX ops-discord-bot:/app/templates/` z kořene repozitáře).*
 
 ### Krok 8: Pravidla pro práci podle počtu zapojených strojů (1 VM vs 2 VM vs 3 VM)
 

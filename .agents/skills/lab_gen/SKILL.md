@@ -106,6 +106,12 @@ Pro každý modul se školní dokumentací vytvořit:
    - Ve finální zprávě výslovně upozorní na body vyžadující ruční screenshot (např. `M3-SRV1.V1-D2` pro DNS Manager).
    - Doručí je studentovi do soukromé zprávy (DM) i do oznamovacího kanálu s označením (@mention).
 5. V `praxe/modules.js` definovat u modulu objekt `docWorkflow` s kroky pro SRV1-DC a PC1-WIN a varováním *„Všechny příkazy dělej postupně a nepřeskakuj!“*.
+6. **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE (Kopírování šablon do Docker kontejneru bota):**
+   - Kdykoliv AI vytvoří nebo upraví šablony dokumentace v `discord-bot/templates/XX/`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné zkopírovat tyto šablony do běžícího Docker kontejneru bota, jinak bot šablony nenajde a generování dokumentace selže:
+     ```bash
+     docker cp templates/XX ops-discord-bot:/app/templates/
+     ```
+     *(resp. `docker cp discord-bot/templates/XX ops-discord-bot:/app/templates/` z kořene repozitáře).*
 
 ### 8. Pravidla pro práci podle počtu zapojených strojů (1 VM vs 2 VM vs 3 VM)
 

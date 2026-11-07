@@ -109,6 +109,8 @@ well_ops/
 - **`discord-bot/`**: Samostatná Node.js aplikace zajišťující:
   - Slash příkazy `/novy-modul`, `/update`, `/moje-id`, `/posledni-dokumentace`.
   - Příjem dat ze serveru (SRV1-DC) a stanice (PC1-WIN), jejich automatické spárování podle Discord ID studenta, vyplnění šablon `postup.md` + `overeni.md` a odeslání hotového `.zip` archivu studentovi do DM i na kanál.
+  - **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE:** Kdykoliv AI vytvoří nebo upraví šablony v `discord-bot/templates/XX/`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné zkopírovat tyto šablony do běžícího Docker kontejneru bota:
+    `docker cp templates/XX ops-discord-bot:/app/templates/` (případně `docker cp discord-bot/templates/XX ops-discord-bot:/app/templates/`).
 - **`api/submit-doc.js`**: Vercel Serverless Function chránící webhook URL bota. Skripty ve VM odesílají data na tuto proxy (`https://ops.peakdle.site/api/submit-doc`), která je přeposílá na Discord Webhook.
 
 ---
