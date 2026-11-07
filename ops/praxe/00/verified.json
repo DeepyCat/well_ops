@@ -1,5 +1,6 @@
 {
   "SRV1-DC": true,
   "SRV2-FS": true,
-  "PC1-WIN": true
+  "PC1-WIN": true,
+  "dokumentace": false
 }
