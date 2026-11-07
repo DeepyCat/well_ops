@@ -411,38 +411,89 @@ $tempJsonPath = Join-Path -Path $env:TEMP -ChildPath "well_ops_doc_srv1_02.json"
 $srv1Payload | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $tempJsonPath -Encoding UTF8
 
 Write-Host "Odesilam serverova data pres Discord Webhook..." -ForegroundColor Cyan
+$contentPayload = "[WELL_OPS_DOC_PART1] Modul 02 | SRV1-DC | $targetDiscord | $studentName"
+$jsonFileName = "srv1_data.json"
+
+# Nalezeni curl.exe (preferujeme systemovy C:\Windows\System32\curl.exe)
+$curlExe = "curl.exe"
+$sys32Curl = Join-Path $env:SystemRoot "System32\curl.exe"
+if (Test-Path -LiteralPath $sys32Curl) {
+    $curlExe = $sys32Curl
+}
+
+# Pouzivame -i misto -w, protoze parametr -w s HTTPS zpusobuje v curl 8.8.0 chybu 43 (CURLE_BAD_FUNCTION_ARGUMENT)
 $curlArgs = @(
     "-s", "-S",
-    "-w", "`n%{http_code}",
+    "-i",
     "-X", "POST",
-    "-F", "content=[WELL_OPS_DOC_PART1] Modul 02 | SRV1-DC | $targetDiscord | $studentName",
-    "-F", "file1=@$tempJsonPath;filename=srv1_data.json",
+    "-F", "content=$contentPayload",
+    "-F", "file1=@$tempJsonPath;filename=$jsonFileName",
     $WebhookUrl
 )
 
-$curlRaw = & curl.exe @curlArgs 2>&1
+$curlRaw = & $curlExe @curlArgs 2>&1
 $curlExitCode = $LASTEXITCODE
-Remove-Item -LiteralPath $tempJsonPath -Force -ErrorAction SilentlyContinue
 
-# Rozparsovani vystupu curl (telo odpovedi a HTTP status na poslednim radku)
+# Rozparsovani vystupu curl (-i vraci HTTP hlavicky vcetne stavoveho kodu a telo)
 $outputStr = ($curlRaw | Out-String).Trim()
-$lines = $outputStr -split "`r?`n"
 $httpCode = ""
 $responseBody = ""
 
-if ($lines.Length -gt 0) {
-    $candidate = $lines[-1].Trim()
-    if ($candidate -match '^\d{3}$') {
-        $httpCode = $candidate
-        if ($lines.Length -gt 1) {
-            $responseBody = ($lines[0..($lines.Length - 2)] -join "`r`n").Trim()
-        }
-    } else {
-        $responseBody = $outputStr
+$statusMatches = [regex]::Matches($outputStr, '(?m)^HTTP\/\S+\s+(\d{3})')
+if ($statusMatches.Count -gt 0) {
+    $lastMatch = $statusMatches[$statusMatches.Count - 1]
+    $httpCode = $lastMatch.Groups[1].Value
+    $afterHeader = $outputStr.Substring($lastMatch.Index)
+    $headerEnd = [regex]::Match($afterHeader, '(?:\r?\n){2}')
+    if ($headerEnd.Success) {
+        $responseBody = $afterHeader.Substring($headerEnd.Index + $headerEnd.Length).Trim()
     }
+} else {
+    $responseBody = $outputStr
 }
 
 $isSuccess = ($curlExitCode -eq 0) -and ($httpCode -eq "200" -or $httpCode -eq "204")
+
+# Fallback: Pokud curl selze nebo vrati chybu, odesleme data pres .NET HttpClient
+if (-not $isSuccess) {
+    try {
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
+        Add-Type -AssemblyName System.Net.Http -ErrorAction Stop
+
+        $clientHandler = New-Object System.Net.Http.HttpClientHandler
+        $httpClient = New-Object System.Net.Http.HttpClient($clientHandler)
+        $httpClient.Timeout = [TimeSpan]::FromSeconds(30)
+
+        $formContent = New-Object System.Net.Http.MultipartFormDataContent
+        $textContent = New-Object System.Net.Http.StringContent($contentPayload, [System.Text.Encoding]::UTF8)
+        $formContent.Add($textContent, "content")
+
+        $fileBytes = [System.IO.File]::ReadAllBytes($tempJsonPath)
+        $fileByteContent = New-Object System.Net.Http.ByteArrayContent($fileBytes)
+        $fileByteContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("application/json")
+        $formContent.Add($fileByteContent, "file1", $jsonFileName)
+
+        $postTask = $httpClient.PostAsync($WebhookUrl, $formContent)
+        $postResponse = $postTask.GetAwaiter().GetResult()
+        $netHttpCode = [int]$postResponse.StatusCode
+        $readTask = $postResponse.Content.ReadAsStringAsync()
+        $netResponseBody = $readTask.GetAwaiter().GetResult()
+
+        $httpClient.Dispose()
+        $clientHandler.Dispose()
+
+        if ($netHttpCode -eq 200 -or $netHttpCode -eq 204) {
+            $httpCode = [string]$netHttpCode
+            $responseBody = $netResponseBody
+            $isSuccess = $true
+            $curlExitCode = 0
+        }
+    } catch {
+        # Fallback se nezdaril, ponechame puvodni informace o chybe z curl
+    }
+}
+
+Remove-Item -LiteralPath $tempJsonPath -Force -ErrorAction SilentlyContinue
 
 if (-not $isSuccess) {
     Write-Host ""
