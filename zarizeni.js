@@ -13,6 +13,7 @@
 window.POVOLENA_ZARIZENI = [
   //"ZAP-Z7UZ3T", //skola_programovani S174
   //"ZAP-4NJBHK", //mobil Matty
+  "ZAP-LHNLSG",
   "ZAP-3ZE2YY", //pc doma muj
 <<<<<<< HEAD
   //"ZAP-G3L6N7",
