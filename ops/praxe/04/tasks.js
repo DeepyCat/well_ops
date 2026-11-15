@@ -232,6 +232,7 @@ Get-ADGroupMember -Identity "GG_Zamestnanci" | Select-Object Name, objectClass`;
         <p>Založte všech <strong>10 školních uživatelských účtů</strong> do příslušných OU, s heslem <code>Pa55w.rd</code>, povoleným účtem (<code>Enabled = $true</code>) a <strong>odškrtnutou</strong> volbou změny hesla při prvním přihlášení (<code>ChangePasswordAtLogon = $false</code>).</p>
         <p>Každého uživatele zařaďte pouze do nejmenší příslušné skupiny (žáky jen do oborové skupiny; do <code>GG_Studenti</code> a <code>GG_Zamestnanci</code> spadají automaticky díky vnoření).</p>
         <p><strong>Pravidlo administrace:</strong> Veškerá správa probíhá přes vestavěný účet <code>Administrator</code> — nevytvářejte žádný personalizovaný admin účet typu <code>*juchelka*</code> ani <code>*peclivy*</code>.</p>
+        <p><strong>Poznámka k diakritice ve VM konzoli:</strong> Česká jména jsou v kódu níže zapsána čistě v ASCII pomocí <code>\\uXXXX</code> (<code>[regex]::Unescape</code>), aby se při copy-paste do vzdálené konzole serveru neztratila diakritika. Pokud jste účty už dříve vytvořili s ořezanými jmény, opětovné spuštění příkazu je automaticky opraví.</p>
       `;
     },
     how: (vm, wsX) => {
@@ -241,30 +242,37 @@ $dnsRoot = $adDomain.DNSRoot
 $pass = ConvertTo-SecureString "Pa55w.rd" -AsPlainText -Force
 
 $users = @(
-    @{ Sam="jana.teacher";      Given="Jana";   Sur="Nováková";  OU="OU=Ucitele,OU=Zamestnanci,OU=Skola,$baseDN";      Groups=@("GG_Ucitele", "GG_PK_Informatika") },
-    @{ Sam="petr.teacher";      Given="Petr";   Sur="Dvořák";    OU="OU=Ucitele,OU=Zamestnanci,OU=Skola,$baseDN";      Groups=@("GG_Ucitele", "GG_PK_Matematika") },
-    @{ Sam="karel.zamestnanec"; Given="Karel";  Sur="Dlouhý";    OU="OU=Vedeni,OU=Zamestnanci,OU=Skola,$baseDN";       Groups=@("GG_Vedeni") },
-    @{ Sam="marie.zamestnanec"; Given="Marie";  Sur="Kučerová";  OU="OU=THP,OU=Zamestnanci,OU=Skola,$baseDN";          Groups=@("GG_THP", "GG_Sekretariat") },
-    @{ Sam="lucie.student";     Given="Lucie";  Sur="Horáková";  OU="OU=Gymnazium-8lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G8") },
-    @{ Sam="ondrej.student";    Given="Ondřej"; Sur="Malý";      OU="OU=Gymnazium-8lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G8") },
-    @{ Sam="adam.student";      Given="Adam";   Sur="Beneš";     OU="OU=Gymnazium-4lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G4") },
-    @{ Sam="klara.student";     Given="Klára";  Sur="Veselá";    OU="OU=Gymnazium-4lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G4") },
-    @{ Sam="tomas.student";     Given="Tomáš";  Sur="Král";      OU="OU=Elektrotechnika,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_EL") },
-    @{ Sam="eva.student";       Given="Eva";    Sur="Svobodová"; OU="OU=Informatika,OU=Studenti,OU=Skola,$baseDN";     Groups=@("GG_Studenti_IT") }
+    @{ Sam="jana.teacher";      Given="Jana";            Sur="Nov\\u00e1kov\\u00e1"; OU="OU=Ucitele,OU=Zamestnanci,OU=Skola,$baseDN";      Groups=@("GG_Ucitele", "GG_PK_Informatika") },
+    @{ Sam="petr.teacher";      Given="Petr";            Sur="Dvo\\u0159\\u00e1k";   OU="OU=Ucitele,OU=Zamestnanci,OU=Skola,$baseDN";      Groups=@("GG_Ucitele", "GG_PK_Matematika") },
+    @{ Sam="karel.zamestnanec"; Given="Karel";           Sur="Dlouh\\u00fd";        OU="OU=Vedeni,OU=Zamestnanci,OU=Skola,$baseDN";       Groups=@("GG_Vedeni") },
+    @{ Sam="marie.zamestnanec"; Given="Marie";           Sur="Ku\\u010derov\\u00e1"; OU="OU=THP,OU=Zamestnanci,OU=Skola,$baseDN";          Groups=@("GG_THP", "GG_Sekretariat") },
+    @{ Sam="lucie.student";     Given="Lucie";           Sur="Hor\\u00e1kov\\u00e1"; OU="OU=Gymnazium-8lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G8") },
+    @{ Sam="ondrej.student";    Given="Ond\\u0159ej";    Sur="Mal\\u00fd";          OU="OU=Gymnazium-8lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G8") },
+    @{ Sam="adam.student";      Given="Adam";            Sur="Bene\\u0161";         OU="OU=Gymnazium-4lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G4") },
+    @{ Sam="klara.student";     Given="Kl\\u00e1ra";     Sur="Vesel\\u00e1";        OU="OU=Gymnazium-4lete,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_G4") },
+    @{ Sam="tomas.student";     Given="Tom\\u00e1\\u0161"; Sur="Kr\\u00e1l";        OU="OU=Elektrotechnika,OU=Studenti,OU=Skola,$baseDN"; Groups=@("GG_Studenti_EL") },
+    @{ Sam="eva.student";       Given="Eva";             Sur="Svobodov\\u00e1";     OU="OU=Informatika,OU=Studenti,OU=Skola,$baseDN";     Groups=@("GG_Studenti_IT") }
 )
 
 foreach ($u in $users) {
+    $given = [regex]::Unescape($u.Given)
+    $sur   = [regex]::Unescape($u.Sur)
     if (-not (Get-ADUser -Filter "SamAccountName -eq '$($u.Sam)'" -ErrorAction SilentlyContinue)) {
-        New-ADUser -Name $u.Sam \`
-            -SamAccountName $u.Sam \`
-            -UserPrincipalName "$($u.Sam)@$dnsRoot" \`
-            -GivenName $u.Given \`
-            -Surname $u.Sur \`
-            -DisplayName "$($u.Given) $($u.Sur)" \`
-            -Path $u.OU \`
-            -AccountPassword $pass \`
-            -ChangePasswordAtLogon $false \`
-            -Enabled $true
+        $adParams = @{
+            Name                  = $u.Sam
+            SamAccountName        = $u.Sam
+            UserPrincipalName     = "$($u.Sam)@$dnsRoot"
+            GivenName             = $given
+            Surname               = $sur
+            DisplayName           = "$given $sur"
+            Path                  = $u.OU
+            AccountPassword       = $pass
+            ChangePasswordAtLogon = $false
+            Enabled               = $true
+        }
+        New-ADUser @adParams
+    } else {
+        Set-ADUser -Identity $u.Sam -GivenName $given -Surname $sur -DisplayName "$given $sur"
     }
     foreach ($g in $u.Groups) {
         $curMembers = @(Get-ADGroupMember -Identity $g -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SamAccountName)
@@ -439,7 +447,7 @@ New-Item -Path "H:\\test-eva.txt" -ItemType File -Value "Test zapisu" -Force
 Get-Content "H:\\test-eva.txt"
 # Pote se z PC1-WIN odhlaste (Sign out), aby vznikl kocovny profil eva.student.V6!
 
-# 2. Jako Tomas vyzkousejte cteni cizi domovské slozky (musi selhat s Access denied):
+# 2. Jako Tomas vyzkousejte cteni cizi domovske slozky (musi selhat s Access denied):
 Get-ChildItem "\\\\SRV1-DC\\home$\\eva.student"
 
 # 3. Jako Administrator overte profilovy atribut a ucty:
