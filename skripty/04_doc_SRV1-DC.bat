@@ -352,12 +352,12 @@ $promptPrefix Get-ADOrganizationalUnit -Identity "OU=Skola,$baseDN" | Select-Obj
 "@
 
 $p2Text = @"
-Pod OU=Skola,$baseDN vytvoreno kompletni rozcleneni podle spravy a GPO (celkem 16 OU pod Skola + Domain Controllers = 17 OU):
+Pod OU=Skola,$baseDN vytvoreno kompletni rozcleneni podle spravy a GPO (celkem 16 OU pod Skola + vychozi Domain Controllers = 17 OU):
 - Zamestnanci (Ucitele, Vedeni, THP)
 - Studenti (Gymnazium-8lete, Gymnazium-4lete, Elektrotechnika, Informatika)
 - Pocitace (Servery, Klienti-Ucebny, Klienti-Kancelare)
 - Skupiny, Sluzebni-ucty
-Vsechny OU maji ProtectedFromAccidentalDeletion = True.
+Vsech 16 vytvorenych OU pod Skola ma zapnute ProtectedFromAccidentalDeletion = True (vychozi Domain Controllers ponechana beze zmeny).
 "@
 
 $p3Text = @"

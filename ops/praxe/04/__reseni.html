@@ -387,7 +387,7 @@
         </div>
         <pre><code>Get-ADOrganizationalUnit -Filter * | Select-Object Name, ProtectedFromAccidentalDeletion, DistinguishedName | Sort-Object DistinguishedName</code></pre>
       </div>
-      <p>Výstup obsahuje přesně <strong>17 OU</strong> (kořenovou <code>Skola</code> + 15 podřízených OU + výchozí <code>Domain Controllers</code>), všechny s <code>ProtectedFromAccidentalDeletion : True</code>.</p>
+      <p>Výstup obsahuje přesně <strong>17 OU</strong> (kořenovou <code>Skola</code> + 15 podřízených OU se zapnutým <code>ProtectedFromAccidentalDeletion : True</code> + výchozí <code>Domain Controllers</code> z Modulu 1 beze změny).</p>
       <figure class="doc-figure">
         <img src="images/09-01-17-OU.png" alt="Get-ADOrganizationalUnit – výpis 17 OU včetně Domain Controllers">
         <figcaption>Get-ADOrganizationalUnit – výpis 17 OU včetně Domain Controllers</figcaption>

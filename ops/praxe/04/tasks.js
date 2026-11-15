@@ -114,7 +114,7 @@ if (Get-NetAdapter -Name "Ethernet0" -ErrorAction SilentlyContinue) {
     what: (vm, wsX) => {
       return `
         <p>Vytvořte v Active Directory čistou hierarchii organizačních jednotek (OU) pro školu <strong>CyberSchool</strong> podle zásad správy a GPO (nikoli podle ročníků, protože třídy se každý rok mění).</p>
-        <p>Pod kořenem domény vytvořte OU <code>Skola</code> a pod ní přesně 15 podřízených OU (celkem <strong>16 OU pod Skola</strong> + výchozí <code>Domain Controllers</code> = <strong>17 OU</strong>), všechny s aktivní ochranou proti nechtěnému smazání (<code>ProtectedFromAccidentalDeletion = True</code>):</p>
+        <p>Pod kořenem domény vytvořte OU <code>Skola</code> a pod ní přesně 15 podřízených OU (celkem <strong>16 OU pod Skola</strong> + výchozí <code>Domain Controllers</code> = <strong>17 OU</strong>), u všech 16 nově založených OU pod <code>Skola</code> se zapnutou ochranou proti nechtěnému smazání (<code>ProtectedFromAccidentalDeletion = True</code>; výchozí <code>Domain Controllers</code> z Modulu 1 necháváme beze změny):</p>
         <ul>
           <li><code>Skola &rarr; Zamestnanci</code>: <code>Ucitele</code>, <code>Vedeni</code>, <code>THP</code></li>
           <li><code>Skola &rarr; Studenti</code>: <code>Gymnazium-8lete</code>, <code>Gymnazium-4lete</code>, <code>Elektrotechnika</code>, <code>Informatika</code></li>
@@ -167,7 +167,7 @@ $pcDN = "OU=Pocitace,$skolaDN"
       return `$ous = Get-ADOrganizationalUnit -Filter * | Select-Object Name, ProtectedFromAccidentalDeletion | Sort-Object Name; $ous; "Celkem OU: $($ous.Count)"`;
     },
     expected: (vm, wsX) => {
-      return `(Všech 17 OU včetně Skola, 15 podřízených OU a Domain Controllers, všude ProtectedFromAccidentalDeletion : True)\nCelkem OU: 17`;
+      return `(Celkem 17 OU: u všech 16 OU pod Skola je ProtectedFromAccidentalDeletion : True; výchozí Domain Controllers zůstává beze změny)\nCelkem OU: 17`;
     }
   },
   {

@@ -6,7 +6,7 @@
 .DESCRIPTION
     Provadi detailni audit Active Directory domeny na radici SRV1-DC:
     - Predpoklady (hostname SRV1-DC, Ethernet1 IP, sluzby NTDS/ADWS/DNS/Netlogon/LanmanServer)
-    - Struktura OU: 16 OU pod Skola + Domain Controllers = 17 OU, vsechny s ProtectedFromAccidentalDeletion
+    - Struktura OU: 16 OU pod Skola (s ProtectedFromAccidentalDeletion) + Domain Controllers = 17 OU
     - Skupiny: 14 Global Security skupin v OU Skupiny a vnoreni GG_Studenti / GG_Zamestnanci
     - Ucty: 10 aktivnich uzivatelu ve spravnych OU, zadne personalizovane admin ucty (juchelka/peclivy)
     - Provizorni domovske slozky: sdileni home$, NTFS opravneni, H: a HomeDirectory na uctech
@@ -170,7 +170,7 @@ foreach ($ouDN in $expectedOUs) {
     $found = $allOUs | Where-Object { $_.DistinguishedName -ieq $ouDN } | Select-Object -First 1
     if (-not $found) {
         $missingOUs += $ouDN
-    } elseif (-not $found.ProtectedFromAccidentalDeletion) {
+    } elseif (-not ($ouDN -ieq "OU=Domain Controllers,$baseDN") -and -not $found.ProtectedFromAccidentalDeletion) {
         $unprotectedOUs += $ouDN
     }
 }
@@ -188,9 +188,9 @@ if (@($allOUs).Count -eq 17) {
 }
 
 if ((@($unprotectedOUs).Count -eq 0) -and (@($missingOUs).Count -eq 0)) {
-    Report-Ok "Vsechny OU maji zapnutou ochranu proti smazani (ProtectedFromAccidentalDeletion = True)"
+    Report-Ok "Vsech 16 vytvorenych OU pod Skola ma zapnutou ochranu proti smazani (ProtectedFromAccidentalDeletion = True)"
 } elseif (@($unprotectedOUs).Count -gt 0) {
-    Report-Fail "Nektere OU nemaji ochranu proti smazani: $($unprotectedOUs -join '; ')" "Nastavte Set-ADOrganizationalUnit -ProtectedFromAccidentalDeletion `$true"
+    Report-Fail "Nektere OU pod Skola nemaji ochranu proti smazani: $($unprotectedOUs -join '; ')" "Nastavte Set-ADOrganizationalUnit -ProtectedFromAccidentalDeletion `$true"
 }
 
 # ------------------------------------------------------------

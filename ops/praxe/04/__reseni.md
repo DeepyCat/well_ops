@@ -13,7 +13,7 @@ V **Active Directory Users and Computers** (zapněte **View -> Advanced Features
 Get-ADOrganizationalUnit -Filter * | Select-Object Name, ProtectedFromAccidentalDeletion, DistinguishedName | Sort-Object DistinguishedName
 ```
 
-Výstup obsahuje **17 OU**: kořenovou `Skola` + 15 podřízených OU + výchozí `Domain Controllers`, všechny mají `ProtectedFromAccidentalDeletion = True`.
+Výstup obsahuje **17 OU**: kořenovou `Skola` + 15 podřízených OU (všech 16 má `ProtectedFromAccidentalDeletion = True`) + výchozí `Domain Controllers` z Modulu 1 (ponecháváme beze změny).
 
 ![Get-ADOrganizationalUnit – výpis 17 OU včetně Domain Controllers](images/09-01-17-OU.png)
 
