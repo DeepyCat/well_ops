@@ -506,8 +506,13 @@
         <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/04_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
       </div>
 
-      <h2>Co odevzdat</h2>
-      <p>Po dokončení modulu se odevzdává jeden ZIP archiv s přesným názvem <code>Prijmeni_Jmeno_Modul4.zip</code> obsahující složku:</p>
+      <h2>Co odevzdat (a povinné kroky v labu)</h2>
+      <ul>
+        <li><strong>Před spuštěním dokumentačních skriptů (<code>04_doc_*</code>):</strong> Na stanici <strong>PC1-WIN</strong> se alespoň jednou skutečně přihlaste jako <code>eva.student</code> a následně ji <strong>odhlaste</strong>, aby se na serveru <strong>SRV1-DC</strong> vytvořil kočovný profil <code>C:\profiles\eva.student.V6</code>.</li>
+        <li><strong>Po vygenerování dokumentace:</strong> Bot vám na Discord doručí ZIP se soubory <code>postup.md</code> a <code>overeni.md</code>. Rozbalte je do složky ve svém repozitáři a do vygenerovaného <code>overeni.md</code> ručně vložte <strong>3 povinné screenshoty s viditelnými hodinami na hlavním panelu</strong> u bodů <code>M4-SRV1.V1-D2</code>, <code>M4-SRV1.V7-D2</code> a <code>M4-PC1.V1-D2</code> (obrázky uložte do podsložky <code>images/</code>).</li>
+        <li><strong>Odevzdání:</strong> Následně vault pushněte přes <strong>GitHub</strong> (Pull &rarr; Commit &rarr; Push) a odevzdejte kliknutím na <strong>Odevzdat</strong> v <strong>MS Teams</strong> (termín: <strong>skupina B 4. 1. 2027 v 8:00, skupina A 11. 1. 2027 v 8:00</strong>).</li>
+      </ul>
+      <p>Ve vašem repozitáři se odevzdává složka:</p>
       <ul>
         <li><code>Moje dokumentace / Modul 4 Active Directory</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)</li>
       </ul>

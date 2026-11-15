@@ -176,11 +176,15 @@ window.OPS_MODULES = [
       deadline: "skupina B 4. 1. 2027 v 8:00, skupina A 11. 1. 2027 v 8:00",
       folders: [
         "<code>Moje dokumentace / Modul 4 Active Directory</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)"
+      ],
+      notes: [
+        "<strong>Před spuštěním <code>04_doc_*</code>:</strong> Na <strong>PC1-WIN</strong> se alespoň jednou skutečně přihlaste jako <code>eva.student</code> a následně ji <strong>odhlaste</strong>, aby se na <strong>SRV1-DC</strong> vytvořil kočovný profil <code>C:\\profiles\\eva.student.V6</code>.",
+        "<strong>Po vygenerování dokumentace:</strong> Do vygenerovaného <code>overeni.md</code> ručně vložte <strong>3 povinné screenshoty s viditelnými hodinami na hlavním panelu</strong> u bodů <code>M4-SRV1.V1-D2</code>, <code>M4-SRV1.V7-D2</code> a <code>M4-PC1.V1-D2</code> (obrázky do <code>images/</code>), následně vault pushněte přes <strong>GitHub</strong> a odevzdejte v <strong>MS Teams</strong>."
       ]
     },
     docWorkflow: {
       title: "Automatické vygenerování dokumentace & odeslání na Discord",
-      warning: "DŮLEŽITÉ PRAVIDLO: Nejprve na PC1-WIN vyzkoušejte přihlášení postav (včetně eva.student + jejího odhlášení, aby vznikl kočovný profil v C:\\profiles na SRV1-DC) a pak teprve spouštějte skripty POSTUPNĚ jeden po druhém!",
+      warning: "DŮLEŽITÉ PRAVIDLO: Před spuštěním skriptů 04_doc_* se na PC1-WIN alespoň jednou skutečně přihlaste jako eva.student a následně ji odhlaste, aby se na SRV1-DC vytvořil kočovný profil C:\\profiles\\eva.student.V6. Poté spouštějte skripty POSTUPNĚ jeden po druhém!",
       steps: [
         {
           num: 1,
@@ -197,7 +201,8 @@ window.OPS_MODULES = [
           command: 'powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/04_doc_PC1-WIN.bat -o doc.bat; .\\doc.bat; Remove-Item -Force doc.bat -ErrorAction SilentlyContinue"'
         }
       ],
-      footnote: "Po dokončení 2. kroku vám náš Discord bot automaticky pošle hotovou dokumentaci v ZIP archivu přímo na Discord! DŮLEŽITÉ: U bodů M4-SRV1.V1-D2, M4-SRV1.V7-D2 a M4-PC1.V1-D2 nezapomeňte ručně vložit screenshoty s hodinami na hlavním panelu!"
+      submitNote: "<strong>Co udělat před a po vygenerování dokumentace:</strong> Před spuštěním <code>04_doc_*</code> se na <strong>PC1-WIN</strong> alespoň jednou skutečně přihlaste jako <code>eva.student</code> a následně ji <strong>odhlaste</strong>, aby se na <strong>SRV1-DC</strong> vytvořil kočovný profil <code>C:\\profiles\\eva.student.V6</code>. Po stažení ZIPu z Discordu do vygenerovaného <code>overeni.md</code> ručně vložte <strong>3 povinné screenshoty s viditelnými hodinami na hlavním panelu</strong> u bodů <code>M4-SRV1.V1-D2</code>, <code>M4-SRV1.V7-D2</code> a <code>M4-PC1.V1-D2</code> (obrázky do <code>images/</code>), následně vault pushněte přes <strong>GitHub</strong> a odevzdejte v <strong>MS Teams</strong>.",
+      footnote: "Po dokončení 2. kroku vám Discord bot pošle ZIP (postup.md, overeni.md). Do overeni.md ručně vložte 3 povinné screenshoty s viditelnými hodinami na hlavním panelu u bodů M4-SRV1.V1-D2, M4-SRV1.V7-D2 a M4-PC1.V1-D2 (do images/), následně vault pushněte přes GitHub a odevzdejte v MS Teams!"
     }
   }
 ];

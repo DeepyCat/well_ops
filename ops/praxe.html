@@ -3525,6 +3525,9 @@ ping 192.168.2.10</code></pre>
             const introHtml = sub.description
               ? sub.description
               : `Jeden ZIP s názvem <code>${sub.zipName}</code>, ve kterém budou složky:`;
+            const notesHtml = Array.isArray(sub.notes) && sub.notes.length
+              ? `<ul class="submission-list" style="margin-top: 8px;">${sub.notes.map(n => `<li>${n}</li>`).join('')}</ul>`
+              : '';
             const deadlineHtml = sub.deadline
               ? `<p class="submission-zip-desc" style="margin-top: 8px; margin-bottom: 0;"><strong>Termín odevzdání:</strong> ${sub.deadline}</p>`
               : '';
@@ -3533,6 +3536,7 @@ ping 192.168.2.10</code></pre>
               <ul class="submission-list">
                 ${sub.folders.map(f => `<li>${f}</li>`).join('')}
               </ul>
+              ${notesHtml}
               ${deadlineHtml}
             `;
           } else {
@@ -3980,7 +3984,7 @@ ping 192.168.2.10</code></pre>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
               <div>
-                <strong>Co udělat před odevzdáním:</strong> Stáhněte si doručený <code>.zip</code>, rozbalte jej, pořiďte případné chybějící screenshoty podle pokynů, uložte je do podsložky <code>images/</code> a hotovou práci odevzdejte.
+                ${wf.submitNote || '<strong>Co udělat před odevzdáním:</strong> Stáhněte si doručený <code>.zip</code>, rozbalte jej, pořiďte případné chybějící screenshoty podle pokynů, uložte je do podsložky <code>images/</code> a hotovou práci odevzdejte.'}
               </div>
             </div>
           </div>

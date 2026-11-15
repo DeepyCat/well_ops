@@ -427,7 +427,7 @@ if ($pc.DistinguishedName -ine "CN=PC1-WIN,$targetOU") {
         `;
       } else {
         return `
-          <p>Poté, co se uživatelka <code>eva.student</code> alespoň jednou přihlásila na <strong>PC1-WIN</strong> a <strong>odhlásila (Sign out)</strong>, ověřte na serveru <strong>SRV1-DC</strong>, že Windows automaticky vytvořil její složku kočovného profilu v <code>C:\\profiles</code> (např. <code>eva.student.V6</code>).</p>
+          <p><strong>Povinné před spuštěním <code>04_doc_*</code>:</strong> Poté, co se uživatelka <code>eva.student</code> alespoň jednou skutečně přihlásila na <strong>PC1-WIN</strong> a následně ji <strong>odhlásila (Sign out)</strong>, ověřte na serveru <strong>SRV1-DC</strong>, že se vytvořil kočovný profil <code>C:\\profiles\\eva.student.V6</code>.</p>
         `;
       }
     },
@@ -502,6 +502,48 @@ Get-ChildItem -Path "C:\\profiles" | Select-Object Name, LastWriteTime`;
     },
     expected: (vm, wsX) => {
       return `Všechny testované položky zakončeny stavem [ OK ] bez chyb.`;
+    }
+  },
+  {
+    id: "docs-screenshots-submit",
+    title: "11. Dokumentace (04_doc_*), 3 screenshoty a odevzdání (GitHub + MS Teams)",
+    forVMs: ["SRV1-DC", "PC1-WIN"],
+    what: (vm, wsX) => {
+      return `
+        <p>Před spuštěním automatické dokumentace a před finálním odevzdáním Modulu 04 dodržte tyto povinné kroky:</p>
+        <ol>
+          <li><strong>Před spuštěním <code>04_doc_*</code>:</strong> Na stanici <strong>PC1-WIN</strong> se alespoň jednou skutečně přihlaste jako <code>eva.student</code> a následně ji <strong>odhlaste</strong>, aby se na <strong>SRV1-DC</strong> vytvořil kočovný profil <code>C:\\profiles\\eva.student.V6</code>.</li>
+          <li><strong>Vygenerování dokumentace:</strong> Spusťte postupně skripty <code>04_doc_SRV1-DC.bat</code> (Krok 1) a <code>04_doc_PC1-WIN.bat</code> (Krok 2) ze sekce níže a stáhněte si ZIP z Discordu.</li>
+          <li><strong>3 povinné screenshoty:</strong> Do vygenerovaného <code>overeni.md</code> ručně vložte <strong>3 screenshoty s viditelnými hodinami na hlavním panelu</strong> u bodů <code>M4-SRV1.V1-D2</code>, <code>M4-SRV1.V7-D2</code> a <code>M4-PC1.V1-D2</code> (obrázky uložte do <code>images/</code>).</li>
+          <li><strong>Odevzdání:</strong> Následně vault pushněte přes <strong>GitHub</strong> (Pull &rarr; Commit &rarr; Push) a klikněte na <strong>Odevzdat</strong> v <strong>MS Teams</strong> (termín: <strong>skupina B 4. 1. 2027 v 8:00, skupina A 11. 1. 2027 v 8:00</strong>).</li>
+        </ol>
+      `;
+    },
+    how: (vm, wsX) => {
+      if (vm === "SRV1-DC") {
+        return `# 1. Nejprve overte na SRV1-DC existenci kocovniho profilu po odhlaseni eva.student z PC1-WIN:
+Get-ChildItem "C:\\profiles"
+
+# 2. Pote dole v sekci Dokumentace spuste Krok 1 (04_doc_SRV1-DC.bat).`;
+      } else {
+        return `# 1. Na PC1-WIN se prihlasit jako eva.student, otestovat disk H: a ODHLASTE SE (Sign out).
+# 2. Po dokonceni Kroku 1 na SRV1-DC spuste dole Krok 2 (04_doc_PC1-WIN.bat).
+# 3. Do overeni.md doplnit 3 screenshoty s hodinami: M4-SRV1.V1-D2, M4-SRV1.V7-D2, M4-PC1.V1-D2 -> GitHub Push -> MS Teams Odevzdat.`;
+      }
+    },
+    verify: (vm, wsX) => {
+      if (vm === "SRV1-DC") {
+        return `Test-Path "C:\\profiles\\eva.student.V6"`;
+      } else {
+        return `(Get-CimInstance Win32_ComputerSystem).Domain`;
+      }
+    },
+    expected: (vm, wsX) => {
+      if (vm === "SRV1-DC") {
+        return `True (slozka C:\\profiles\\eva.student.V6 existuje jeste pred spustenim 04_doc_SRV1-DC.bat)`;
+      } else {
+        return `<prijmeni>.cyberschool.internal + 3 screenshoty s hodinami (M4-SRV1.V1-D2, M4-SRV1.V7-D2, M4-PC1.V1-D2) pushnute na GitHub a odevzdane v MS Teams`;
+      }
     }
   }
 ];
