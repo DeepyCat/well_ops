@@ -133,7 +133,7 @@ window.OPS_MODULES = [
     verifiedFile: "praxe/03/verified.json",
     submission: {
       title: "CO ODEVZDAT",
-      zipName: "Prijmeni_Jmeno_Modul3.zip",
+      description: "Odevzdává se přes <strong>GitHub Push</strong> (do vašeho repozitáře) a potvrzením <strong>Odevzdat</strong> v MS Teams (Discord bot vám pošle ZIP se šablonami pro nahrání do vaultu):",
       folders: [
         "<code>Moje dokumentace / Modul 3 DNS</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)"
       ]
@@ -172,7 +172,8 @@ window.OPS_MODULES = [
     verifiedFile: "praxe/04/verified.json",
     submission: {
       title: "CO ODEVZDAT",
-      zipName: "Prijmeni_Jmeno_Modul4.zip",
+      description: "Odevzdává se přes <strong>GitHub Push</strong> (do vašeho repozitáře) a kliknutím na <strong>Odevzdat</strong> v MS Teams (Discord bot vám po 2. kroku pošle ZIP se soubory <code>postup.md</code> a <code>overeni.md</code> k rozbalení do složky a doplnění 3 screenshotů):",
+      deadline: "skupina B 4. 1. 2027 v 8:00, skupina A 11. 1. 2027 v 8:00",
       folders: [
         "<code>Moje dokumentace / Modul 4 Active Directory</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)"
       ]

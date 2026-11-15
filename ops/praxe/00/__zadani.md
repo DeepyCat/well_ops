@@ -1,6 +1,8 @@
 # [Co má být na konci modulu a jak to vypadá?]
 
-**Přibližný potřebný čas**: 1 vyučovací hodina na stroj — postup se v projektu opakuje **třikrát**: pro **SRV1-DC**, **SRV2-FS** a klienta **PC1-WIN**.
+> **Verze:** 2026-11-15
+
+**Přibližný potřebný čas**: 4 vyučovací hodiny celkem (cca 1 hodina na stroj, zaokrouhleno nahoru na sudý počet) — postup se v projektu opakuje **třikrát**: pro **SRV1-DC**, **SRV2-FS** a klienta **PC1-WIN**.
 
 ## Kontext (proč to děláme)
 
@@ -17,7 +19,7 @@ Na konci tohoto modulu jsou nainstalované a připravené tři virtuální stroj
 | vCPU | 2 jádra | 2 jádra | 2 jádra |
 | RAM | 8 GB | 8 GB | 8 GB |
 | Systémový disk | 100 GB | 100 GB | 60 GB |
-| Další disky | — | **5× 10 GB** (pro Storage Pool a simulaci výpadku disku v Modulu 6) | — |
+| Další disky | — | **5× 5 GB** (pro Storage Pool a simulaci výpadku disku v Modulu 6) | — |
 
 Všech 5 dodatečných disků u SRV2-FS se přidává do VM **už v tomto modulu**, spolu s vytvořením virtuálního stroje — v Modulu 6 se pak jen inicializují a poskládají do Storage Pool.
 

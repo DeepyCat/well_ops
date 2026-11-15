@@ -1,8 +1,8 @@
 # [Co má být na konci modulu a jak to vypadá?]
 
-> Verze: 2026-10-03
+> Verze: 2026-11-15
 
-**Přibližný potřebný čas**: 2 vyučovací hodiny
+**Přibližný potřebný čas**: 4 vyučovací hodiny
 
 ## Kontext (proč to děláme)
 

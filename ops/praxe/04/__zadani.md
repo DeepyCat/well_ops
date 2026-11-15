@@ -1,6 +1,6 @@
 # [Co má být na konci modulu a jak to vypadá?]
 
-> **Přibližný potřebný čas:** 6 vyučovacích hodin &nbsp;|&nbsp; **Verze:** 2026-11-15
+> **Přibližný potřebný čas:** 6 vyučovacích hodin &nbsp;|&nbsp; **Verze:** 2026-11-15 &nbsp;|&nbsp; **Termín odevzdání:** skupina B 4. 1. 2027 v 8:00, skupina A 11. 1. 2027 v 8:00 (GitHub Push + Teams)
 
 > [!WARNING] Modul ve vývoji
 > Materiály se v průběhu školního roku upravují, změny najdete v `CHANGELOG.md`. Hodnotí se podle verze platné v den termínu odevzdání modulu; pracujete-li dopředu, úpravy po pozdější změně jsou na vás.

@@ -435,7 +435,7 @@
       </div>
 
       <h3>1. Parametry virtuálního stroje odpovídají zadání</h3>
-      <p>V nastavení virtuálního stroje ve vašem hypervizoru (CyLab): <code>SRV1-DC</code> i <code>SRV2-FS</code> mají přiděleny <strong>2 vCPU</strong>, <strong>8 GB RAM</strong> a <strong>100 GB</strong> systémový disk. U <code>SRV2-FS</code> navíc existuje <strong>5 dalších disků po 10 GB</strong>, viditelných uvnitř hosta:</p>
+      <p>V nastavení virtuálního stroje ve vašem hypervizoru (CyLab): <code>SRV1-DC</code> i <code>SRV2-FS</code> mají přiděleny <strong>2 vCPU</strong>, <strong>8 GB RAM</strong> a <strong>100 GB</strong> systémový disk. U <code>SRV2-FS</code> navíc existuje <strong>5 dalších disků po 5 GB</strong>, viditelných uvnitř hosta:</p>
       <div class="code-block-wrapper">
         <div class="code-block-header">
           <span>PowerShell</span>
@@ -443,7 +443,7 @@
         </div>
         <pre><code>Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle</code></pre>
       </div>
-      <p>U SRV2-FS výstup obsahuje systémový disk (~100 GB) a 5 dalších disků o velikosti ~10 GB, zatím ve stavu <code>RAW</code>/neinicializované (inicializují se až v Modulu 6).</p>
+      <p>U SRV2-FS výstup obsahuje systémový disk (~100 GB) a 5 dalších disků o velikosti ~5 GB, zatím ve stavu <code>RAW</code>/neinicializované (inicializují se až v Modulu 6).</p>
 
       <h3>2. Edice a instalace odpovídá zadání</h3>
       <div class="code-block-wrapper">

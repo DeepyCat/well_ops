@@ -1,6 +1,6 @@
 # [Jak se pozná, že už to mám?]
 
-> Verze: 2026-10-03
+> Verze: 2026-11-15
 
 Tento modul se ověřuje přímo na serveru **SRV1-DC** (klient PC1-WIN ani server SRV2-FS v tomto modulu do domény ještě nevstupují — to následuje v dalších modulech).
 

@@ -295,9 +295,9 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
   - Vytváří payload s `part = "PC1"`.
   - Pro bezpečné provedení přes `[scriptblock]::Create` nesmí obsahovat žádné syntaktické kolize s prefixy scopes ani nekompatibilní cmdlety.
 
-### 12. OBFUSKACE DISCORD WEBHOOK URL S FALLBACKEM
-- GitHub Secret Scanner okamžitě zneplatní (revokuje) Discord webhooky, pokud je URL vložena do kódu jako plain-text řetězec `https://discord.com/api/webhooks/...`.
-- Ve všech `.ps1` a `.bat` skriptech je **POVINNÉ** Webhook URL načítat z proměnné prostředí `$env:DOCS_WEBHOOK_URL` (nebo parametru `-WebhookUrl`), s fallbackem na obfuskovanou URL otočeným řetězcem (`$revHook` a `[Array]::Reverse()`), aby skripty fungovaly přímo ve VM bez nutnosti zadávání proměnných a bez WAF blokování externími proxy.
+### 12. ŠIFROVANÉ ULOŽENÍ DISCORD WEBHOOK URL (ZÁKAZ PLAINTEXTU A .ENV)
+- GitHub Secret Scanner okamžitě zneplatní (revokuje) Discord webhooky, pokud je URL vložena do kódu, `.env`, `.env.example` nebo historie commitů jako plain-text řetězec i prostý reverzní řetězec (`$revHook`).
+- Ve všech `.ps1` a `.bat` skriptech je **POVINNÉ** Webhook URL ukládat výhradně v šifrované podobě (**XOR klíčem `well_ops_sec_2026` + Base64**) s dešifrováním až za běhu v paměti (plus volitelný parametr `-WebhookUrl` pro testování). NIKDY neukládejte webhook URL, tokeny ani skutečná hesla do `.env`, `.env.example` ani do commitů.
 
 ### 13. POVINNÉ PRIVILEGOVANÉ INTENTY PRO DISCORD BOTA
 - Discord bot vyžaduje v Discord Developer Portalu (záložka *Bot* -> *Privileged Gateway Intents*) aktivní přepínače:
@@ -373,6 +373,13 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
   2. **Kód bota (`index.js`):** AI MUSÍ ověřit a uživatele upozornit na nutnost nahrát do kontejneru i aktualizovaný kód `index.js` s logikou pro daný modul. Pokud v kontejneru běží starý kód, bot sice ZIP vytvoří, ale šablony zůstanou nevyplněné (s textem `DOPLNIT`)!
   3. **Restart:** Po nakopírování souborů je nutné provést `docker restart ops-discord-bot`.
 
+### 22. ŠKOLNÍ WORKFLOW VAULTU, GITHUBU A ODEVZDÁNÍ (PREREKVIZITY `10-` A `14-`)
+- **Zákaz zásahů do školního repozitáře a materiálů učitele:** Školní vault (např. `skolni-it-pachomov`) je při generování **strictly read-only** — nikdy v něm nic neupravujte (ani `00-PREREKVIZITY`, `Modul X/`, `index.md`, `CHANGELOG.md`, `.obsidian/`). Student píše pouze do `Moje dokumentace/Modul X .../`.
+- **Odevzdávání od Modulu 3 výše (GitHub Push + Teams):** ZIP archivy se odevzdávaly jen v Modulech 0–2. Od Modulu 3 včetně se odevzdává cyklem **Pull -> zápis do `Moje dokumentace` -> popisný Commit -> Push na GitHub -> tlačítko Odevzdat v MS Teams** (stav repozitáře se hodnotí k termínu odevzdání).
+- **Konfigurace na webu (`modules.js` / `modules.json` / `praxe.html`):** Pro Moduly 3+ používejte v `submission` pole `description` (instrukce GitHub Push + Teams místo `Prijmeni_Jmeno_ModulX.zip`) a `deadline` (pokud je znám termín odevzdání). Discord bot i nadále zasílá `ModulXX.zip` jen jako balíček předvyplněných `overeni.md` a `postup.md` ke vložení do studentova lokálního vaultu (mimo OneDrive).
+- **Integrita šablon a screenshotů:** Nadpisy a ID (`M4-SRV1.V1-D1` apod.) z `overeni.md` a `postup.md` **nesmí být měněny**. Kde školní šablona vyžaduje ruční screenshot (`DOPLNIT`), musí screenshot obsahovat **viditelné hodiny na hlavním panelu**; výpisy konzole zůstávají jako `\`\`\`text` blok i s promptem.
+- **Šedé odkazy a labové standardy:** Šedé odkazy ve školním vaultu značí dosud nevydané materiály — nevytvářejte prázdné cílové soubory. Parametry VM udržujte sjednocené podle aktuálního `CHANGELOG.md` (např. `SRV2-FS` má další disky **5× 5 GB**, Modul 0 = 4 h, Modul 1 = 4 h, celkem 40 h, heslo `Pa55w.rd`, doména malými písmeny bez diakritiky `<prijmeni>.cyberschool.internal`).
+
 ---
 
 ## Ověřovací checklist pro AI před odevzdáním práce
@@ -388,8 +395,8 @@ Než označíte úkol za dokončený, zkontrolujte v terminálu:
 8. Všechny HTML stránky obsahují v `<head>` favicon odkazující na `bird.png` (`img/bird.png` resp. `../../img/bird.png`).
 9. Ve složce `skripty/` existují funkční kontrolní skripty `XX_check_<VM>.bat` pro všechny VM modulu.
 10. Ve složce `skripty/` existují funkční dokumentační skripty `XX_doc_<VM>.bat` a šablony v `praxe/XX/doc_templates/` i `discord-bot/templates/XX/`.
-11. Webhook URL v dokumentačních skriptech je bezpečně obfuskována.
-12. V markdown šablonách se nenachází žádné nezabalené HTML značky typu `<prijmeni>`.
+11. Webhook URL v dokumentačních skriptech je bezpečně zašifrována (XOR + Base64) a nikde v repozitáři ani v `.env*` není v plaintextu.
+12. V markdown šablonách se nenachází žádné nezabalené HTML značky typu `<prijmeni>`, nadpisy a ID odpovídají školní šabloně a `modules.js`/`praxe.html` reflektuje termín i GitHub+Teams odevzdání (od M03+).
 13. Konzolové výstupy (`ipconfig`, `nslookup`) jsou v PowerShell skriptech zachytávány přes `Invoke-ConsoleCmd` s `-join "\`r\`n"` a OEM kódováním.
 14. Nikde v kódu, textech ani commitech nejsou použity emoji.
 15. Změny jsou otestovány, commitnuty pod autorem `samanbeer <343.ptom@gmail.com>` a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).

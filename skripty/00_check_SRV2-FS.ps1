@@ -157,9 +157,9 @@ try {
     if ($diskCount -ge 6) {
         Report-Ok "Detekovano $diskCount fyzickych disku (1 systemovy + 5 pridavnych pro Storage Pool)"
     } elseif ($diskCount -gt 1) {
-        Report-Warn "Detekovano $diskCount disku (zadani pozaduje 1 systemovy + 5 pridavnych po 5-10 GB)" "Pridejte zbyvajici disky v nastaveni virtualniho stroje v CyLabu"
+        Report-Warn "Detekovano $diskCount disku (zadani pozaduje 1 systemovy + 5 pridavnych po 5 GB)" "Pridejte zbyvajici disky v nastaveni virtualniho stroje v CyLabu"
     } else {
-        Report-Fail "Detekovan pouze 1 disk ($diskCount). Pro Storage Pool chybi 5 pridavnych disku!" "Vypnete VM a pridejte v CyLabu 5× virtualni disk (5-10 GB)"
+        Report-Fail "Detekovan pouze 1 disk ($diskCount). Pro Storage Pool chybi 5 pridavnych disku!" "Vypnete VM a pridejte v CyLabu 5x virtualni disk 5 GB"
     }
 } catch {
     Report-Warn "Chyba pri zjistovani disku: $($_.Exception.Message)"

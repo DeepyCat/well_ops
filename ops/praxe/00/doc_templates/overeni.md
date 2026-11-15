@@ -181,7 +181,7 @@ DOPLNIT
 
 DOPLNIT <!-- vložte screenshot (Ctrl+V), na snímku musí být vidět hodiny na hlavním panelu -->
 
-**M0-SRV2.V1-D2** – Důkaz: Uvnitř serveru je vidět systémový disk a 5 dalších disků po ~10 GB, zatím neinicializovaných
+**M0-SRV2.V1-D2** – Důkaz: Uvnitř serveru je vidět systémový disk a 5 dalších disků po ~5 GB, zatím neinicializovaných
 
 ```text
 DOPLNIT

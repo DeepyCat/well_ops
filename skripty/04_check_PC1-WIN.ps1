@@ -109,12 +109,6 @@ if ($dnsServers -contains "192.168.$WorkspaceX.10") {
     Report-Fail "DNS server na Ethernet1 neodpovida SRV1-DC (aktualne: $($dnsServers -join ', '))" "Nastavte DNS na 192.168.$WorkspaceX.10"
 }
 
-$eth1If = Get-NetIPInterface -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue
-$eth0If = Get-NetIPInterface -InterfaceAlias "Ethernet0" -AddressFamily IPv4 -ErrorAction SilentlyContinue
-if (($null -ne $eth1If) -and ($null -ne $eth0If) -and ($eth0If.InterfaceMetric -lt $eth1If.InterfaceMetric)) {
-    Report-Warn "Metrika Ethernet0 ($($eth0If.InterfaceMetric)) je nizsi nez Ethernet1 ($($eth1If.InterfaceMetric))" "Doporuceno: Set-NetIPInterface -InterfaceAlias 'Ethernet1' -InterfaceMetric 10"
-}
-
 $eth1If = Get-NetIPInterface -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -First 1
 $eth0If = Get-NetIPInterface -InterfaceAlias "Ethernet0" -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -First 1
 if (($null -ne $eth1If) -and ($null -ne $eth0If)) {

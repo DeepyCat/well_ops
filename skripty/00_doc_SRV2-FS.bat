@@ -411,7 +411,7 @@ $p1Text = @"
    - vCPU: 2 jadra
    - RAM: 8 GB
    - Systemovy disk: 100 GB
-   - Dalsi disky: pridano 5 dodatecnych virtualnich disku po 5-10 GB (pro Storage Pool v Modulu 6, zatim neinicializovane RAW).
+   - Dalsi disky: pridano 5 dodatecnych virtualnich disku po 5 GB (pro Storage Pool v Modulu 6, zatim neinicializovane RAW).
    - Sitovy adapter: interni sit (VMnet)
 2. Instalace OS:
    - Z instalacniho media vybrana edice Windows Server 2025 Datacenter (Desktop Experience).

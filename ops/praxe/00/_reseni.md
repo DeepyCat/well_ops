@@ -1,15 +1,15 @@
 # [Jak se pozná, že už to mám?]
 
-> Tento modul se ověřuje **přímo na konzoli připravovaného stroje** (SRV1-DC, SRV2-FS nebo PC1-WIN) — v tuto chvíli ještě neexistuje doména, ze které by šlo testovat vzdáleně. Body 1–10 platí pro oba servery, bod 11 navíc jen pro PC1-WIN.
+> **Verze:** 2026-11-15 · Tento modul se ověřuje **přímo na konzoli připravovaného stroje** (SRV1-DC, SRV2-FS nebo PC1-WIN) — v tuto chvíli ještě neexistuje doména, ze které by šlo testovat vzdáleně. Body 1–10 platí pro oba servery, bod 11 navíc jen pro PC1-WIN.
 
 > **Všechny stroje (SRV1-DC, SRV2-FS i PC1-WIN) jsou v labu ověřené:** Všechny PowerShell příkazy a konfigurace byly v praxi otestovány a jsou 100% OK!
 
 ### 1. Parametry virtuálního stroje odpovídají zadání
-V nastavení virtuálního stroje ve vašem hypervizoru: `SRV1-DC` i `SRV2-FS` mají přiděleny **2 vCPU**, **8 GB RAM** a **100 GB** systémový disk. U `SRV2-FS` navíc existuje **5 dalších disků po 10 GB**, viditelných uvnitř hosta:
+V nastavení virtuálního stroje ve vašem hypervizoru: `SRV1-DC` i `SRV2-FS` mají přiděleny **2 vCPU**, **8 GB RAM** a **100 GB** systémový disk. U `SRV2-FS` navíc existuje **5 dalších disků po 5 GB**, viditelných uvnitř hosta:
 ```powershell
 Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle
 ```
-U SRV2-FS výstup obsahuje systémový disk (~100 GB) a 5 dalších disků o velikosti ~10 GB, zatím ve stavu `RAW`/neinicializované (inicializují se až v Modulu 6).
+U SRV2-FS výstup obsahuje systémový disk (~100 GB) a 5 dalších disků o velikosti ~5 GB, zatím ve stavu `RAW`/neinicializované (inicializují se až v Modulu 6).
 
 ### 2. Edice a instalace odpovídá zadání
 ```powershell

@@ -42,7 +42,7 @@ window.OPS_MODULE_TASKS["00"] = [
             <tr>
               <td><strong>Další disky</strong></td>
               <td class="${vm === 'SRV1-DC' ? 'active-col' : ''}">—</td>
-              <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}"><strong>5× 5 GB (V zadání je 10, můžeme max 5)</strong> (Storage Pool)</td>
+              <td class="${vm === 'SRV2-FS' ? 'active-col' : ''}"><strong>5× 5 GB</strong> (Storage Pool)</td>
               <td class="${vm === 'PC1-WIN' ? 'active-col' : ''}">—</td>
             </tr>
             <tr>
@@ -57,15 +57,15 @@ window.OPS_MODULE_TASKS["00"] = [
     `,
     how: (vm) => {
       if (vm === "PC1-WIN") return "V hypervizoru (CyLab): 2 vCPU, 8 GB RAM, 60 GB systémový disk. Zkontrolujte, že je zapnutý síťový adaptér NIC 2.";
-      if (vm === "SRV2-FS") return "V hypervizoru (CyLab): 2 vCPU, 8 GB RAM, 100 GB systémový disk + 5x virtuální disk 10 GB. (V zadání je 10, můžeme max 5) Zkontrolujte, že je zapnutý adaptér NIC 2.";
+      if (vm === "SRV2-FS") return "V hypervizoru (CyLab): 2 vCPU, 8 GB RAM, 100 GB systémový disk + 5x virtuální disk 5 GB. Zkontrolujte, že je zapnutý adaptér NIC 2.";
       return "V hypervizoru (CyLab): 2 vCPU, 8 GB RAM, 100 GB systémový disk. Zkontrolujte, že je zapnutý síťový adaptér NIC 2.";
     },
     verify: (vm) => {
-      if (vm === "SRV2-FS") return "Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle\n# Ověřte systémový disk (~100 GB) a 5x RAW disků (~10 GB)";
+      if (vm === "SRV2-FS") return "Get-Disk | Select-Object Number, FriendlyName, Size, PartitionStyle\n# Ověřte systémový disk (~100 GB) a 5x RAW disků (~5 GB)";
       return "Get-Disk | Select-Object Number, FriendlyName, Size";
     },
     expected: (vm) => {
-      if (vm === "SRV2-FS") return "Výpis obsahuje systémový disk (~100 GB) a 5x neinicializovaných disků (~10 GB) ve stavu RAW:\nNumber  FriendlyName            Size  PartitionStyle\n------  ------------            ----  --------------\n0       ... (Systémový disk)  ~100 GB  GPT/MBR\n1-5     ... (5x datový disk)   ~10 GB  RAW";
+      if (vm === "SRV2-FS") return "Výpis obsahuje systémový disk (~100 GB) a 5x neinicializovaných disků (~5 GB) ve stavu RAW:\nNumber  FriendlyName            Size  PartitionStyle\n------  ------------            ----  --------------\n0       ... (Systémový disk)  ~100 GB  GPT/MBR\n1-5     ... (5x datový disk)   ~5 GB   RAW";
       if (vm === "PC1-WIN") return "Výpis obsahuje systémový disk o velikosti přibližně 60 GB:\nNumber  FriendlyName  Size\n0       ...          ~60 GB";
       return "Výpis obsahuje systémový disk o velikosti přibližně 100 GB:\nNumber  FriendlyName  Size\n0       ...          ~100 GB";
     }

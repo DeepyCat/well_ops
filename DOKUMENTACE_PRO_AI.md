@@ -109,9 +109,8 @@ well_ops/
 - **`discord-bot/`**: Samostatná Node.js aplikace zajišťující:
   - Slash příkazy `/novy-modul`, `/update`, `/moje-id`, `/posledni-dokumentace`.
   - Příjem dat ze serveru (SRV1-DC) a stanice (PC1-WIN), jejich automatické spárování podle Discord ID studenta, vyplnění šablon `postup.md` + `overeni.md` a odeslání hotového `.zip` archivu studentovi do DM i na kanál.
-  - **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE:** Kdykoliv AI vytvoří nebo upraví šablony v `discord-bot/templates/XX/`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné zkopírovat tyto šablony do běžícího Docker kontejneru bota:
-    `docker cp templates/XX ops-discord-bot:/app/templates/` (případně `docker cp discord-bot/templates/XX ops-discord-bot:/app/templates/`).
-- **`api/submit-doc.js`**: Vercel Serverless Function chránící webhook URL bota. Skripty ve VM odesílají data na tuto proxy (`https://ops.peakdle.site/api/submit-doc`), která je přeposílá na Discord Webhook.
+  - **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE:** Kdykoliv AI vytvoří nebo upraví šablony v `discord-bot/templates/XX/` nebo kód v `discord-bot/index.js`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné tyto soubory ručně zkopírovat do běžícího Docker kontejneru bota (`docker cp ... ops-discord-bot:/app/...`) a kontejner restartovat (`docker restart ops-discord-bot`), protože `docker-compose.yml` se nemění a NAS nemá napojení na GitHub.
+- **Zabezpečení Webhooku a zákaz tajných údajů v Gitu:** Skripty `skripty/XX_doc_*.{ps1,bat}` odesílají JSON výstupy přímo na Discord Webhook zašifrovaný pomocí **XOR (`well_ops_sec_2026`) + Base64** (dešifruje se až za běhu v paměti). Webhook URL, tokeny ani reálná hesla se NIKDY nesmí objevit v plaintextu v `.env`, `.env.example`, kódu ani v historii commitů (Git historii uchovává trvale).
 
 ---
 
@@ -192,6 +191,8 @@ Každé AI je **povinno** si před zahájením příslušné práce daný skill 
 | Používat u `curl.exe` parametr `-w "%{http_code}"` (způsobí chybu 43) | Používat `curl.exe -i -s -k` s regex parsováním HTTP kódu a .NET `HttpClient` fallbackem |
 | Poškodit hybridní BAT hlavičku nebo nechat visící `&` | Vždy dodržet přesný formát: `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH \| Select-Object -Skip 5 \| Out-String)); & $script %*"` |
 | Upravovat `docker-compose.yml` bota (přidávat volumes) | `docker-compose.yml` neměnit, šablony a `index.js` kopírovat ručně přes `docker cp` a kontejner restartovat |
+| Ukládat plaintext webhook, tokeny nebo reálná hesla do `.env*`/Gitu | Webhook v `skripty/` šifrovat pomocí XOR (`well_ops_sec_2026`) + Base64; v materiálech jen labové `Pa55w.rd` |
+| Upravit soubory ve školním vaultu mimo `Moje dokumentace` nebo slibovat ZIP odevzdání pro M03+ | Školní repo je read-only; od Modulu 3+ se odevzdává přes `Pull -> Moje dokumentace -> Commit -> Push` + Teams `Odevzdat` (bot posílá ZIP jen jako šablony k vložení) |
 | Vytvořit nový modul a nastavit mu ve `verified.json` hodnotu `true` | Nový modul má ve `verified.json` **vždy `false`**, dokud ho uživatel fyzicky neotestuje v reálném labu |
 | Dělat neohlášené změny v cizích souborech nebo odstraňovat komentáře | Provádět pouze explicitně vyžádané úpravy a zachovávat stávající kód |
 | Hádat nebo předpokládat, jak mají věci fungovat, když chybí zadání | **Zastavit se a položit uživateli dotaz (Pravidlo #0)** |

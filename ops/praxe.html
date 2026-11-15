@@ -3522,11 +3522,18 @@ ping 192.168.2.10</code></pre>
           submissionBox.style.display = "block";
           if (currentModuleConfig && currentModuleConfig.submission) {
             const sub = currentModuleConfig.submission;
+            const introHtml = sub.description
+              ? sub.description
+              : `Jeden ZIP s názvem <code>${sub.zipName}</code>, ve kterém budou složky:`;
+            const deadlineHtml = sub.deadline
+              ? `<p class="submission-zip-desc" style="margin-top: 8px; margin-bottom: 0;"><strong>Termín odevzdání:</strong> ${sub.deadline}</p>`
+              : '';
             submissionBody.innerHTML = `
-              <p class="submission-zip-desc">Jeden ZIP s názvem <code>${sub.zipName}</code>, ve kterém budou složky:</p>
+              <p class="submission-zip-desc">${introHtml}</p>
               <ul class="submission-list">
                 ${sub.folders.map(f => `<li>${f}</li>`).join('')}
               </ul>
+              ${deadlineHtml}
             `;
           } else {
             submissionBody.innerHTML = `
