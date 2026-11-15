@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Výsledek: Modul 04 – Active Directory (_vysledek.md)</title>
+  <link rel="icon" type="image/x-icon" href="../../img/bird.png">
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --card-bg: #222222;
+      --border: #333333;
+      --border-subtle: #2c2c2c;
+      --text: #e0e0e0;
+      --text-muted: #888888;
+      --text-bright: #ffffff;
+      --accent: #ff5555;
+      --accent-hover: #ff7777;
+      --accent-bg: rgba(255, 85, 85, 0.15);
+      --code-bg: #151515;
+      --table-header: #1e1e1e;
+      --table-row-alt: #181818;
+      --quote-border: #ff5555;
+      --quote-bg: rgba(255, 85, 85, 0.08);
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      scrollbar-width: thin;
+      scrollbar-color: #444 var(--bg);
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-main);
+      font-size: 15px;
+      line-height: 1.65;
+      margin: 0;
+      padding: 0;
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(34, 34, 34, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 2px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .nav-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .nav-breadcrumb a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-breadcrumb a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    .file-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-bg);
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: var(--accent-hover);
+      padding: 3px 9px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background-color: #242424;
+      border: 1px solid rgba(255, 85, 85, 0.35);
+      color: #f0f6fc;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 0.84rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #382222;
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(255, 85, 85, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #d32f2f 0%, #ff5555 100%);
+      border: 1px solid #ff7777;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 10px rgba(211, 47, 47, 0.45);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #b71c1c 0%, #ff6666 100%);
+      border-color: #ff9999;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(255, 85, 85, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 32px auto 80px auto;
+      padding: 0 24px;
+    }
+
+    .markdown-body {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 12px;
+      margin-top: 0;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-top: 36px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent-hover);
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    p { margin-top: 0; margin-bottom: 16px; }
+
+    blockquote {
+      margin: 20px 0;
+      padding: 12px 18px;
+      background-color: var(--quote-bg);
+      border-left: 4px solid var(--quote-border);
+      border-radius: 0 6px 6px 0;
+      color: #d1d5db;
+    }
+
+    blockquote p:last-child { margin-bottom: 0; }
+    ul, ol { margin-top: 0; margin-bottom: 16px; padding-left: 24px; }
+    li { margin-bottom: 6px; }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      background: var(--code-bg);
+      color: #fca5a5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #332222;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--table-header);
+      color: var(--text-bright);
+      font-weight: 600;
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    tr:nth-child(even) td { background-color: var(--table-row-alt); }
+    tr:last-child td { border-bottom: none; }
+
+    .code-block-wrapper {
+      position: relative;
+      margin: 18px 0;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: var(--code-bg);
+    }
+
+    .code-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 14px;
+      background-color: #1a1a1a;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .copy-code-btn {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #e0e0e0;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: var(--font-main);
+      transition: all 0.15s ease;
+    }
+
+    .copy-code-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #f0f6fc;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+      border: none;
+      color: inherit;
+    }
+
+    .alert-box {
+      background: rgba(255, 85, 85, 0.08);
+      border: 1px solid rgba(255, 85, 85, 0.3);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 18px 0;
+      font-size: 0.9rem;
+    }
+
+    .doc-figure {
+      margin: 22px 0;
+      background: #161616;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .doc-figure img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .doc-figure figcaption {
+      margin-top: 8px;
+      font-size: 0.84rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="top-nav">
+    <div class="nav-breadcrumb">
+      <a href="../../praxe.html?modul=04">OPS Lab</a>
+      <span>/</span>
+      <span>Modul 04</span>
+      <span>/</span>
+      <span class="file-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        _vysledek.md
+      </span>
+    </div>
+
+    <div class="nav-actions">
+      <a href="_zadani.html" class="btn" title="Zobrazit zadání modulu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        <span>Zobrazit zadání</span>
+      </a>
+      <a href="../../praxe.html?modul=04" class="btn btn-primary" title="Zpět do interaktivního portálu">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Zpět do labu</span>
+      </a>
+      <a href="_vysledek.md" class="btn" target="_blank" title="Zobrazit surový Markdown soubor">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <span>Raw .md</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Document Body -->
+  <main class="container">
+    <article class="markdown-body">
+      <h1>[Jak se pozná, že už to mám?]</h1>
+
+      <blockquote>
+        <p><strong>Verze:</strong> 2026-11-15 &nbsp;|&nbsp; <strong>Kontrolní seznam výsledku modulu</strong></p>
+      </blockquote>
+
+      <div class="alert-box">
+        <strong>Pravidlo pro pracoviště:</strong> Ve vzorovém postupu je číslo pracoviště <code>200</code> a příjmení <code>novak</code>. Vy všude dosaďte číslo svého pracoviště (<code>192.168.N.x</code>, kde <code>N</code> je číslo vašeho pracoviště) a své příjmení bez diakritiky (<code>prijmeni.cyberschool.internal</code>).
+      </div>
+
+      <p>Ověření tohoto modulu probíhá ve spolupráci mezi řadičem domény <strong>SRV1-DC</strong> a klientskou stanicí <strong>PC1-WIN</strong>.</p>
+
+      <h2>1. Struktura OU existuje a je kompletní (SRV1-DC)</h2>
+      <p>V <strong>Active Directory Users and Computers</strong> (zapněte <strong>View &rarr; Advanced Features</strong>) vidíte pod doménou <code>&lt;prijmeni&gt;.cyberschool.internal</code> OU <code>Skola</code> a pod ní kompletní strom: <code>Zamestnanci</code> (<code>Ucitele</code>, <code>Vedeni</code>, <code>THP</code>), <code>Studenti</code> (<code>Gymnazium-8lete</code>, <code>Gymnazium-4lete</code>, <code>Elektrotechnika</code>, <code>Informatika</code>), <code>Pocitace</code> (<code>Servery</code>, <code>Klienti-Ucebny</code>, <code>Klienti-Kancelare</code>), <code>Skupiny</code>, <code>Sluzebni-ucty</code>.</p>
+
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ADOrganizationalUnit -Filter * | Select-Object Name, ProtectedFromAccidentalDeletion, DistinguishedName | Sort-Object DistinguishedName</code></pre>
+      </div>
+      <p>Výstup obsahuje přesně <strong>17 OU</strong> (kořenovou <code>Skola</code> + 15 podřízených OU + výchozí <code>Domain Controllers</code>), všechny s <code>ProtectedFromAccidentalDeletion : True</code>.</p>
+      <figure class="doc-figure">
+        <img src="images/09-01-17-OU.png" alt="Get-ADOrganizationalUnit – výpis 17 OU včetně Domain Controllers">
+        <figcaption>Get-ADOrganizationalUnit – výpis 17 OU včetně Domain Controllers</figcaption>
+      </figure>
+
+      <h2>2. Skupiny existují se správným rozsahem a typem (SRV1-DC)</h2>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$baseDN = (Get-ADDomain).DistinguishedName
+Get-ADGroup -Filter * -SearchBase "OU=Skupiny,OU=Skola,$baseDN" | Select-Object Name, GroupScope, GroupCategory | Sort-Object Name</code></pre>
+      </div>
+      <p>Vrátí všech <strong>14 skupin</strong> (<code>GG_Studenti</code>, <code>GG_Studenti_G8</code>, <code>GG_Studenti_G4</code>, <code>GG_Studenti_EL</code>, <code>GG_Studenti_IT</code>, <code>GG_Ucitele</code>, <code>GG_Zamestnanci</code>, <code>GG_Vedeni</code>, <code>GG_THP</code>, <code>GG_Sekretariat</code>, <code>GG_PK_Matematika</code>, <code>GG_PK_Informatika</code>, <code>GG_PK_Jazyky</code>, <code>GG_IT-Sprava</code>), všechny <code>GroupScope = Global</code> a <code>GroupCategory = Security</code>.</p>
+      <figure class="doc-figure">
+        <img src="images/09-02-14-OU-Groups.png" alt="Get-ADGroup – 14 skupin v OU Skupiny, všechny Global a Security">
+        <figcaption>Get-ADGroup – 14 skupin v OU Skupiny, všechny Global a Security</figcaption>
+      </figure>
+
+      <h2>3. Členství ve skupinách odpovídá zadání (SRV1-DC)</h2>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ADGroupMember GG_Ucitele | Select-Object Name
+Get-ADGroupMember GG_PK_Informatika | Select-Object Name
+Get-ADGroupMember GG_Zamestnanci | Select-Object Name
+Get-ADGroupMember GG_Studenti | Select-Object Name
+Get-ADGroupMember GG_Studenti -Recursive | Select-Object Name</code></pre>
+      </div>
+      <ul>
+        <li><code>GG_Ucitele</code> obsahuje <code>jana.teacher</code> a <code>petr.teacher</code>.</li>
+        <li><code>GG_PK_Informatika</code> obsahuje <code>jana.teacher</code>; <code>GG_PK_Matematika</code> obsahuje <code>petr.teacher</code>.</li>
+        <li><code>GG_Zamestnanci</code> obsahuje vnořené skupiny <code>GG_Ucitele</code>, <code>GG_THP</code>, <code>GG_Vedeni</code> (rekurzivně i <code>marie.zamestnanec</code> a <code>karel.zamestnanec</code>).</li>
+        <li><code>GG_Studenti</code> obsahuje přímo pouze 4 oborové skupiny (<code>GG_Studenti_G8</code>, <code>GG_Studenti_G4</code>, <code>GG_Studenti_EL</code>, <code>GG_Studenti_IT</code>); s <code>-Recursive</code> vrátí všech 6 žáků.</li>
+        <li><code>GG_Vedeni</code> obsahuje <code>karel.zamestnanec</code>; <code>GG_Sekretariat</code> obsahuje <code>marie.zamestnanec</code>.</li>
+      </ul>
+      <figure class="doc-figure">
+        <img src="images/09-03-overeni-clenstvi.png" alt="Get-ADGroupMember – členství ve skupinách včetně rekurzivního výpisu GG_Studenti">
+        <figcaption>Get-ADGroupMember – členství ve skupinách včetně rekurzivního výpisu GG_Studenti</figcaption>
+      </figure>
+
+      <h2>4. Účty existují ve správných OU a jsou aktivní (SRV1-DC)</h2>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>$baseDN = (Get-ADDomain).DistinguishedName
+Get-ADUser -Filter * -SearchBase "OU=Skola,$baseDN" -Properties Enabled | Select-Object Name, Enabled, DistinguishedName | Sort-Object Name</code></pre>
+      </div>
+      <p>Vrátí <strong>10 účtů</strong> ve správných OU (všechny <code>Enabled = True</code>).</p>
+      <figure class="doc-figure">
+        <img src="images/09-04-overeni-uzivatele.png" alt="Get-ADUser – 10 aktivních účtů ve správných OU">
+        <figcaption>Get-ADUser – 10 aktivních účtů ve správných OU</figcaption>
+      </figure>
+
+      <h2>5. Přihlášení na klientovi funguje pro každou postavu (PC1-WIN)</h2>
+      <p>Na stanici <strong>PC1-WIN</strong> se postupně přihlásíte účty <code>eva.student@&lt;prijmeni&gt;.cyberschool.internal</code>, <code>lucie.student@...</code>, <code>jana.teacher@...</code> a <code>karel.zamestnanec@...</code> — vše se stejným heslem <code>Pa55w.rd</code>.</p>
+      <figure class="doc-figure">
+        <img src="images/22-03-Login-PC1-WIN.png" alt="Přihlášení jako eva.student">
+        <figcaption>Přihlášení na PC1-WIN jako eva.student</figcaption>
+      </figure>
+
+      <h2>6. Domovské složky fungují (SRV1-DC a PC1-WIN)</h2>
+      <p>Po přihlášení na <code>PC1-WIN</code> má <code>eva.student</code> připojený síťový disk <code>H:</code> (<code>\\SRV1-DC\home$\eva.student</code>) a může do něj zapisovat. Jiný uživatel (<code>tomas.student</code>) dostane při pokusu otevřít <code>\\SRV1-DC\home$\eva.student</code> chybu <strong>Access is denied</strong>.</p>
+      <figure class="doc-figure">
+        <img src="images/09-05-Eva-can-write.png" alt="Eva má přístup na disk H: a může do něj zapisovat">
+        <figcaption>eva.student má přístup na disk H: a může zapisovat</figcaption>
+      </figure>
+      <figure class="doc-figure">
+        <img src="images/09-06-tomas-access-denied.png" alt="tomas.student – Access denied">
+        <figcaption>tomas.student – Access denied při pokusu otevřít \\SRV1-DC\home$\eva.student</figcaption>
+      </figure>
+
+      <h2>7. Klient je viditelný ve správné OU (SRV1-DC)</h2>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ADComputer -Identity "PC1-WIN" | Select-Object Name, DistinguishedName</code></pre>
+      </div>
+      <p>V ADUC i ve výstupu je objekt <code>PC1-WIN</code> umístěn v <code>Skola\Pocitace\Klienti-Ucebny</code>.</p>
+      <figure class="doc-figure">
+        <img src="images/22-02-PC1-WIN-in-Klienti-Ucebny.png" alt="PC1-WIN v Klienti-Ucebny">
+        <figcaption>PC1-WIN v OU Skola\Pocitace\Klienti-Ucebny</figcaption>
+      </figure>
+
+      <h2>8. Žádný personalizovaný admin účet neexistuje (SRV1-DC)</h2>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-ADUser -Filter "SamAccountName -like '*juchelka*' -or SamAccountName -like '*peclivy*'"</code></pre>
+      </div>
+      <p>Vrátí prázdný výsledek — správa probíhá výhradně přes vestavěný účet <code>Administrator</code>.</p>
+      <figure class="doc-figure">
+        <img src="images/09-07-overeni-zadny-admin.png" alt="Get-ADUser – prázdný výsledek">
+        <figcaption>Žádný personalizovaný admin účet neexistuje</figcaption>
+      </figure>
+
+      <h2>9. Kočovné profily jsou nastavené a funkční (SRV1-DC a PC1-WIN)</h2>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-SmbShare -Name 'profiles$' | Select-Object Name, Path
+Get-ADUser eva.student -Properties ProfilePath | Select-Object SamAccountName, ProfilePath
+Get-ChildItem C:\profiles | Select-Object Name</code></pre>
+      </div>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>net user eva.student /domain</code></pre>
+      </div>
+      <figure class="doc-figure">
+        <img src="images/09-08-profiles-folder.png" alt="Složka eva.student.V6 v C:\profiles">
+        <figcaption>Složka eva.student.V6 na SRV1-DC po odhlášení z PC1-WIN</figcaption>
+      </figure>
+      <figure class="doc-figure">
+        <img src="images/09-09-overeni-kocovnych-profilu.png" alt="Ověření sdílené složky profiles$ a kočovných profilů">
+        <figcaption>Ověření sdílené složky profiles$ a složky profilu v PowerShellu</figcaption>
+      </figure>
+
+      <h2>10. Otisk konfigurace pro odevzdání (SRV1-DC a PC1-WIN)</h2>
+      <p><strong>Na SRV1-DC:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (SRV1-DC)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-Date
+whoami
+hostname
+(Get-CimInstance Win32_ComputerSystemProduct).UUID
+(Get-ADDomain).DNSRoot
+(Get-ADDomain).DomainSID.Value</code></pre>
+      </div>
+
+      <p><strong>Na PC1-WIN:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>PowerShell (PC1-WIN)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>Get-Date
+whoami
+hostname
+(Get-CimInstance Win32_ComputerSystemProduct).UUID
+(Get-CimInstance Win32_ComputerSystem).Domain</code></pre>
+      </div>
+
+      <h2>11. (Nepovinné) Rychlé automatické ověření celého stroje</h2>
+      <p><strong>Na serveru SRV1-DC:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/04_check_SRV1-DC.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+
+      <p><strong>Na klientovi PC1-WIN:</strong></p>
+      <div class="code-block-wrapper">
+        <div class="code-block-header">
+          <span>Univerzální příkaz (PowerShell / CMD / Terminál)</span>
+          <button class="copy-code-btn" onclick="copySnippet(this)">Kopírovat</button>
+        </div>
+        <pre><code>powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/04_check_PC1-WIN.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"</code></pre>
+      </div>
+    </article>
+  </main>
+
+  <script>
+    function copySnippet(btn) {
+      const code = btn.closest('.code-block-wrapper').querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = 'Zkopírováno!';
+        setTimeout(() => { btn.innerText = orig; }, 1400);
+      });
+    }
+  </script>
+</body>
+</html>

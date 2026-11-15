@@ -32,7 +32,8 @@ const MODULE_CONFIG = {
   '00': { requiredParts: ['SRV1', 'SRV2', 'PC1'], vms: ['SRV1-DC', 'SRV2-FS', 'PC1-WIN'] },
   '01': { requiredParts: ['SRV1'], vms: ['SRV1-DC'] },
   '02': { requiredParts: ['SRV1', 'PC1'], vms: ['SRV1-DC', 'PC1-WIN'] },
-  '03': { requiredParts: ['SRV1', 'PC1'], vms: ['SRV1-DC', 'PC1-WIN'] }
+  '03': { requiredParts: ['SRV1', 'PC1'], vms: ['SRV1-DC', 'PC1-WIN'] },
+  '04': { requiredParts: ['SRV1', 'PC1'], vms: ['SRV1-DC', 'PC1-WIN'] }
 };
 
 // Seznam povolenych uzivatelskych ID pro publikovani oznameni
@@ -117,7 +118,7 @@ const commands = [
     .addStringOption(option =>
       option
         .setName('modul')
-        .setDescription('Cislo modulu (vychozi: 03)')
+        .setDescription('Cislo modulu (vychozi: 04)')
         .setRequired(false)
     )
 ].map(cmd => cmd.toJSON());
@@ -252,7 +253,7 @@ client.on('interactionCreate', async (interaction) => {
 
   // 2. Prikaz: /posledni-dokumentace
   if (commandName === 'posledni-dokumentace') {
-    const rawModule = interaction.options.getString('modul') || '03';
+    const rawModule = interaction.options.getString('modul') || '04';
     const formattedModule = rawModule.padStart(2, '0');
     const userKey = interaction.user.username.toLowerCase();
     const userCompletedDir = path.join(COMPLETED_DOCS_DIR, `${userKey}_${formattedModule}`);
@@ -677,6 +678,46 @@ async function handleDocMessage(message, isBackfill = false) {
 
       if (pc1P.P1) postup = fillDocBlock(postup, '**M3-PC1.P1**', pc1P.P1, true);
       if (pc1P.P2) postup = fillDocBlock(postup, '**M3-PC1.P2**', pc1P.P2, true);
+    } else if (formattedModule === '04') {
+      if (srv1O.V0_otisk) overeni = fillDocBlock(overeni, '**M4-SRV1.V0-O**', srv1O.V0_otisk, true);
+      if (srv1O.V1_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V1-D1**', srv1O.V1_d1, false);
+      if (srv1O.V2_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V2-D1**', srv1O.V2_d1, true);
+      if (srv1O.V3_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V3-D1**', srv1O.V3_d1, false);
+      if (srv1O.V3_d2) overeni = fillDocBlock(overeni, '**M4-SRV1.V3-D2**', srv1O.V3_d2, false);
+      if (srv1O.V3_d3) overeni = fillDocBlock(overeni, '**M4-SRV1.V3-D3**', srv1O.V3_d3, false);
+      if (srv1O.V3_d4) overeni = fillDocBlock(overeni, '**M4-SRV1.V3-D4**', srv1O.V3_d4, true);
+      if (srv1O.V4_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V4-D1**', srv1O.V4_d1, true);
+      if (srv1O.V6_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V6-D1**', srv1O.V6_d1, false);
+      if (srv1O.V6_d2) overeni = fillDocBlock(overeni, '**M4-SRV1.V6-D2**', srv1O.V6_d2, true);
+      if (srv1O.V7_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V7-D1**', srv1O.V7_d1, false);
+      if (srv1O.V8_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V8-D1**', srv1O.V8_d1, true);
+      if (srv1O.V9_d1) overeni = fillDocBlock(overeni, '**M4-SRV1.V9-D1**', srv1O.V9_d1, false);
+      if (srv1O.V9_d2) overeni = fillDocBlock(overeni, '**M4-SRV1.V9-D2**', srv1O.V9_d2, false);
+      if (srv1O.V9_d3) overeni = fillDocBlock(overeni, '**M4-SRV1.V9-D3**', srv1O.V9_d3, Boolean(srv1O.V9_d3_ok));
+
+      if (pc1O.V0_otisk) overeni = fillDocBlock(overeni, '**M4-PC1.V0-O**', pc1O.V0_otisk, true);
+      if (pc1O.V1_d1) overeni = fillDocBlock(overeni, '**M4-PC1.V1-D1**', pc1O.V1_d1, false);
+      if (pc1O.V5_d1) overeni = fillDocBlock(overeni, '**M4-PC1.V5-D1**', pc1O.V5_d1, false);
+      if (pc1O.V5_d2) overeni = fillDocBlock(overeni, '**M4-PC1.V5-D2**', pc1O.V5_d2, false);
+      if (pc1O.V5_d3) overeni = fillDocBlock(overeni, '**M4-PC1.V5-D3**', pc1O.V5_d3, false);
+      if (pc1O.V5_d4) overeni = fillDocBlock(overeni, '**M4-PC1.V5-D4**', pc1O.V5_d4, Boolean(pc1O.V5_ok));
+      if (pc1O.V6_d1) overeni = fillDocBlock(overeni, '**M4-PC1.V6-D1**', pc1O.V6_d1, false);
+      if (pc1O.V6_d2) overeni = fillDocBlock(overeni, '**M4-PC1.V6-D2**', pc1O.V6_d2, Boolean(pc1O.V6_ok));
+      if (pc1O.V9_d1) overeni = fillDocBlock(overeni, '**M4-PC1.V9-D1**', pc1O.V9_d1, true);
+
+      // 3. Vyplneni postup.md
+      if (srv1P.P1) postup = fillDocBlock(postup, '**M4-SRV1.P1**', srv1P.P1, true);
+      if (srv1P.P2) postup = fillDocBlock(postup, '**M4-SRV1.P2**', srv1P.P2, true);
+      if (srv1P.P3) postup = fillDocBlock(postup, '**M4-SRV1.P3**', srv1P.P3, true);
+      if (srv1P.P4) postup = fillDocBlock(postup, '**M4-SRV1.P4**', srv1P.P4, true);
+      if (srv1P.P5) postup = fillDocBlock(postup, '**M4-SRV1.P5**', srv1P.P5, true);
+      if (srv1P.P6) postup = fillDocBlock(postup, '**M4-SRV1.P6**', srv1P.P6, true);
+      if (srv1P.P7) postup = fillDocBlock(postup, '**M4-SRV1.P7**', srv1P.P7, true);
+      if (srv1P.P8) postup = fillDocBlock(postup, '**M4-SRV1.P8**', srv1P.P8, true);
+
+      if (pc1P.P1) postup = fillDocBlock(postup, '**M4-PC1.P1**', pc1P.P1, true);
+      if (pc1P.P2) postup = fillDocBlock(postup, '**M4-PC1.P2**', pc1P.P2, true);
+      if (pc1P.P3) postup = fillDocBlock(postup, '**M4-PC1.P3**', pc1P.P3, true);
     }
 
     // 4. Vytvoreni ZIP archivu
@@ -716,6 +757,9 @@ async function handleDocMessage(message, isBackfill = false) {
     } else if (formattedModule === '02') {
       screenshotNotice = 'V souboru `overeni.md` u bodu **M2-SRV1.V1-D1** (*Dukaz: Server Manager — role DHCP bez varovani a DHCP konzole se zelene oznacenym serverem*) je potreba udelat a vlozit screenshot z Windows Serveru. Vsechny ostatni overovaci vystupy a postupy jsou jiz kompletne vyplneny!';
       dmWarning = '> **Dulezite upozorneni:** V souboru `overeni.md` u bodu **M2-SRV1.V1-D1** – *Dukaz: Server Manager — role DHCP bez varovani a DHCP konzole se zelene oznacenym serverem* je potreba udelat screenshot.';
+    } else if (formattedModule === '04') {
+      screenshotNotice = 'V souboru `overeni.md` u bodu **M4-SRV1.V1-D2** (*ADUC s rozbalenym stromem OU Skola*), **M4-SRV1.V7-D2** (*ADUC s OU Klienti-Ucebny a PC1-WIN*) a **M4-PC1.V1-D2** (*System Properties / About na PC1-WIN*) je potreba vlozit screenshoty. Vsechny textove vystupy a postupy jsou jiz automaticky vyplnene!';
+      dmWarning = '> **Dulezite upozorneni:** V souboru `overeni.md` u bodu **M4-SRV1.V1-D2**, **M4-SRV1.V7-D2** a **M4-PC1.V1-D2** je potreba rucne vlozit screenshoty (s viditelnymi hodinami).';
     }
 
     const embed = new EmbedBuilder()
