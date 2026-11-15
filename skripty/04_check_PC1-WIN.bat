@@ -84,21 +84,40 @@ if ($pcName -eq "PC1-WIN") {
     Report-Warn "Hostname stanice je '$pcName' (ocekava se 'PC1-WIN')"
 }
 
+$detectedX = 2
 $eth1IP = (Get-NetIPAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -First 1).IPAddress
-if ($eth1IP) {
-    if (($WorkspaceX -eq 0) -and ($eth1IP -match "^192\.168\.(\d+)\.\d+$")) {
-        $WorkspaceX = [int]$matches[1]
+if ($eth1IP -and ($eth1IP -match "^192\.168\.(\d+)\.")) {
+    $detectedX = [int]$matches[1]
+}
+if ($WorkspaceX -le 0) {
+    Write-Host "Zadejte cislo vaseho pracoviste (N) [vychozi: $detectedX]: " -ForegroundColor Yellow -NoNewline
+    $wsInput = Read-Host
+    if ((-not [string]::IsNullOrWhiteSpace($wsInput)) -and ($wsInput.Trim() -match "^\d+$")) {
+        $WorkspaceX = [int]$wsInput.Trim()
+    } else {
+        $WorkspaceX = $detectedX
     }
-    Report-Ok "Rozhrani Ethernet1 ma IPv4 adresu $eth1IP (Pracoviste X=$WorkspaceX)"
+}
+
+if ($eth1IP -and ($eth1IP -match "^192\.168\.$WorkspaceX\.")) {
+    Report-Ok "Rozhrani Ethernet1 ma IPv4 adresu $eth1IP (Pracoviste N=$WorkspaceX)"
+} elseif ($eth1IP) {
+    Report-Warn "Rozhrani Ethernet1 ma IPv4 adresu $eth1IP (ocekavano v siti 192.168.$WorkspaceX.0/24)" "Overte DHCP pridelovani od SRV1-DC nebo cislo pracoviste N=$WorkspaceX"
 } else {
     Report-Fail "Rozhrani Ethernet1 nema IPv4 adresu" "Zkontrolujte adapter Ethernet1 (NIC 2)"
 }
 
 $dnsServers = @((Get-DnsClientServerAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue).ServerAddresses)
-if (($WorkspaceX -gt 0) -and ($dnsServers -contains "192.168.$WorkspaceX.10")) {
+if ($dnsServers -contains "192.168.$WorkspaceX.10") {
     Report-Ok "DNS server na Ethernet1 je 192.168.$WorkspaceX.10 (SRV1-DC)"
 } else {
     Report-Fail "DNS server na Ethernet1 neodpovida SRV1-DC (aktualne: $($dnsServers -join ', '))" "Nastavte DNS na 192.168.$WorkspaceX.10"
+}
+
+$eth1If = Get-NetIPInterface -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue
+$eth0If = Get-NetIPInterface -InterfaceAlias "Ethernet0" -AddressFamily IPv4 -ErrorAction SilentlyContinue
+if (($null -ne $eth1If) -and ($null -ne $eth0If) -and ($eth0If.InterfaceMetric -lt $eth1If.InterfaceMetric)) {
+    Report-Warn "Metrika Ethernet0 ($($eth0If.InterfaceMetric)) je nizsi nez Ethernet1 ($($eth1If.InterfaceMetric))" "Doporuceno: Set-NetIPInterface -InterfaceAlias 'Ethernet1' -InterfaceMetric 10"
 }
 
 $eth1If = Get-NetIPInterface -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -First 1

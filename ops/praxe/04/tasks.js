@@ -201,9 +201,15 @@ foreach ($g in $groups) {
     }
 }
 
-# Vnoreni skupin do souhrnnych skupin
-Add-ADGroupMember -Identity "GG_Studenti" -Members "GG_Studenti_G8", "GG_Studenti_G4", "GG_Studenti_EL", "GG_Studenti_IT"
-Add-ADGroupMember -Identity "GG_Zamestnanci" -Members "GG_Ucitele", "GG_THP", "GG_Vedeni"`;
+# Vnoreni skupin do souhrnnych skupin (idempotentne)
+$curStu = @(Get-ADGroupMember -Identity "GG_Studenti" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SamAccountName)
+foreach ($sub in @("GG_Studenti_G8", "GG_Studenti_G4", "GG_Studenti_EL", "GG_Studenti_IT")) {
+    if ($curStu -notcontains $sub) { Add-ADGroupMember -Identity "GG_Studenti" -Members $sub }
+}
+$curZam = @(Get-ADGroupMember -Identity "GG_Zamestnanci" -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SamAccountName)
+foreach ($sub in @("GG_Ucitele", "GG_THP", "GG_Vedeni")) {
+    if ($curZam -notcontains $sub) { Add-ADGroupMember -Identity "GG_Zamestnanci" -Members $sub }
+}`;
     },
     verify: (vm, wsX) => {
       return `$baseDN = (Get-ADDomain).DistinguishedName
@@ -261,7 +267,10 @@ foreach ($u in $users) {
             -Enabled $true
     }
     foreach ($g in $u.Groups) {
-        Add-ADGroupMember -Identity $g -Members $u.Sam
+        $curMembers = @(Get-ADGroupMember -Identity $g -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SamAccountName)
+        if ($curMembers -notcontains $u.Sam) {
+            Add-ADGroupMember -Identity $g -Members $u.Sam
+        }
     }
 }`;
     },
@@ -362,8 +371,12 @@ $domain = "<prijmeni>.cyberschool.internal"
 Resolve-DnsName -Name "_ldap._tcp.dc._msdcs.$domain" -Type SRV
 
 # 3. Pripojeni do domeny a restart (po vyzve zadejte Administrator / Pa55w.rd):
-$cred = Get-Credential "$domain\\Administrator"
-Add-Computer -DomainName $domain -Credential $cred -Restart`;
+if (-not (Get-CimInstance Win32_ComputerSystem).PartOfDomain) {
+    $cred = Get-Credential "$domain\\Administrator"
+    Add-Computer -DomainName $domain -Credential $cred -Restart
+} else {
+    Write-Host "PC1-WIN jiz je v domene."
+}`;
     },
     verify: (vm, wsX) => {
       return `Get-CimInstance Win32_ComputerSystem | Select-Object Name, Domain, PartOfDomain`;
@@ -385,7 +398,10 @@ Add-Computer -DomainName $domain -Credential $cred -Restart`;
     how: (vm, wsX) => {
       return `$baseDN = (Get-ADDomain).DistinguishedName
 $targetOU = "OU=Klienti-Ucebny,OU=Pocitace,OU=Skola,$baseDN"
-Get-ADComputer -Identity "PC1-WIN" | Move-ADObject -TargetPath $targetOU`;
+$pc = Get-ADComputer -Identity "PC1-WIN"
+if ($pc.DistinguishedName -ine "CN=PC1-WIN,$targetOU") {
+    $pc | Move-ADObject -TargetPath $targetOU
+}`;
     },
     verify: (vm, wsX) => {
       return `Get-ADComputer -Identity "PC1-WIN" | Select-Object Name, DistinguishedName`;

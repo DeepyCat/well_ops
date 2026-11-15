@@ -127,6 +127,8 @@ function Invoke-ProbeAsDomainUser {
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
     Write-Host "[!] Spustte skript v PowerShellu jako Spravce (Run as Administrator)." -ForegroundColor Red
+    Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
     exit 1
 }
 
@@ -144,6 +146,8 @@ if ([string]::IsNullOrWhiteSpace($DiscordUser)) {
 $targetDiscord = ($DiscordUser -replace '^@', '').Trim()
 if ([string]::IsNullOrWhiteSpace($targetDiscord)) {
     Write-Host "[CHYBA] Nebylo zadano Discord uzivatelske jmeno." -ForegroundColor Red
+    Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
     exit 1
 }
 
@@ -154,7 +158,14 @@ $eth1IP = (Get-NetIPAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -Err
 if (($WorkspaceX -eq 0) -and ($eth1IP -match "^192\.168\.(\d+)\.")) {
     $WorkspaceX = [int]$matches[1]
 }
-if ($WorkspaceX -eq 0) { $WorkspaceX = 2 }
+if ($WorkspaceX -le 0) {
+    $inputX = Read-Host "  Cislo vaseho pracoviste N [vychozi: 2]"
+    if ((-not [string]::IsNullOrWhiteSpace($inputX)) -and ($inputX.Trim() -match "^\d+$")) {
+        $WorkspaceX = [int]$inputX.Trim()
+    } else {
+        $WorkspaceX = 2
+    }
+}
 
 try {
     $cs = Get-CimInstance Win32_ComputerSystem -ErrorAction Stop
@@ -163,6 +174,8 @@ try {
     $computerName = [string]$cs.Name
 } catch {
     Report-Step "FAIL" "Nelze nacist Win32_ComputerSystem: $($_.Exception.Message)"
+    Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
     exit 1
 }
 
@@ -291,7 +304,7 @@ $h
                 $v5Texts[$u] = "PS C:\Users\Administrator> [DirectoryServices.AccountManagement.PrincipalContext]`r`nValidateCredentials('$u'): True (Process logon fallback: $($probe.Error))"
                 Report-Step "WARN" "M4-PC1.V5 ($u): AD heslo overeno, ale Start-Process -Credential selhal ($($probe.Error))"
             } else {
-                $v5Texts[$u] = "CHYBA OVERENI UCET $u`: $($probe.Error)"
+                $v5Texts[$u] = "CHYBA OVERENI UCET ${u}: $($probe.Error)"
                 Report-Step "FAIL" "M4-PC1.V5 ($u): Prihlaseni nebo overeni hesla selhalo ($($probe.Error))"
             }
         }
@@ -308,13 +321,19 @@ if ([string]::IsNullOrWhiteSpace($netBefore)) { $netBefore = "(zadne namapovane 
 $outLines.Add($netBefore)
 $outLines.Add("")
 
+$hDrive = Get-PSDrive -Name "H" -ErrorAction SilentlyContinue
+$hIsHome = ($null -ne $hDrive) -and ($hDrive.DisplayRoot -ieq $unc)
 $mappedTempH = $false
-if (-not (Test-Path "H:\")) {
+if ($null -eq $hDrive) {
     & net.exe use H: $unc /persistent:no 2>&1 | Out-Null
-    if (Test-Path "H:\") { $mappedTempH = $true }
+    $hAfter = Get-PSDrive -Name "H" -ErrorAction SilentlyContinue
+    if (($null -ne $hAfter) -and (Test-Path "H:\")) {
+        $mappedTempH = $true
+        $hIsHome = $true
+    }
 }
 
-$targetRoot = if (Test-Path "H:\") { "H:\" } else { "$unc\" }
+$targetRoot = if ($hIsHome -and (Test-Path "H:\")) { "H:\" } else { "$unc\" }
 $outLines.Add("$p Test-Path `"$unc`"")
 $exists = Test-Path $unc
 $outLines.Add([string]$exists)
@@ -522,15 +541,21 @@ try {
     $responseBody = ""
     $curlExitCode = -1
 
-    if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
-        $curlOut = & curl.exe -s -S -i -X POST `
+    $curlExe = "curl.exe"
+    $sys32Curl = Join-Path $env:SystemRoot "System32\curl.exe"
+    if (Test-Path -LiteralPath $sys32Curl) { $curlExe = $sys32Curl }
+
+    if (Get-Command $curlExe -ErrorAction SilentlyContinue) {
+        $curlOut = & $curlExe -s -S -i -X POST `
             -F "payload_json=<$msgPath;type=application/json" `
-            -F "file1=@$jsonPath;type=application/json" `
+            -F "file1=@$jsonPath;filename=pc1_data.json;type=application/json" `
             $WebhookUrl 2>&1
         $curlExitCode = $LASTEXITCODE
         $curlText = ($curlOut | ForEach-Object { $_.ToString() }) -join "`n"
-        if ($curlText -match "HTTP/\S+\s+(\d{3})") {
-            $httpCode = $matches[1]
+        $statusMatches = [regex]::Matches($curlText, '(?m)^HTTP\/\S+\s+(\d{3})')
+        if ($statusMatches.Count -gt 0) {
+            $lastMatch = $statusMatches[$statusMatches.Count - 1]
+            $httpCode = $lastMatch.Groups[1].Value
         }
         $responseBody = $curlText
         if (($curlExitCode -eq 0) -and ($httpCode -match "^2\d\d$")) {
@@ -541,9 +566,10 @@ try {
     if (-not $sendOk) {
         try {
             Add-Type -AssemblyName System.Net.Http -ErrorAction Stop
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
             $handler = New-Object System.Net.Http.HttpClientHandler
             $client = New-Object System.Net.Http.HttpClient($handler)
+            $client.Timeout = [TimeSpan]::FromSeconds(30)
             $multipart = New-Object System.Net.Http.MultipartFormDataContent
 
             $payloadJsonStr = [System.IO.File]::ReadAllText($msgPath, $utf8NoBom)
@@ -555,13 +581,14 @@ try {
             $byteContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("application/json")
             $multipart.Add($byteContent, "file1", "pc1_data.json")
 
-            $resp = $client.PostAsync($WebhookUrl, $multipart).Result
+            $resp = $client.PostAsync($WebhookUrl, $multipart).GetAwaiter().GetResult()
             $httpCode = [int]$resp.StatusCode
-            $responseBody = $resp.Content.ReadAsStringAsync().Result
+            $responseBody = $resp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
             if (($httpCode -ge 200) -and ($httpCode -lt 300)) {
                 $sendOk = $true
             }
             $client.Dispose()
+            $handler.Dispose()
         } catch {
             $responseBody = "$responseBody`nHttpClient fallback error: $($_.Exception.Message)"
         }
@@ -574,6 +601,11 @@ try {
         Write-Host "============================================================" -ForegroundColor Red
         Write-Host "HTTP Status: $httpCode" -ForegroundColor Red
         Write-Host "Detail:      $responseBody" -ForegroundColor Red
+        if ($curlExitCode -eq 6) {
+            Write-Host ""
+            Write-Host "[HINT - DNS PREKLAD] Klient nemuze prelozit discord.com." -ForegroundColor Yellow
+            Write-Host "Overte na SRV1-DC DNS Manager -> Forwarders (napr. 8.8.8.8) a internet na Ethernet0." -ForegroundColor White
+        }
         Write-Host ""
         Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
         [void][System.Console]::ReadLine()

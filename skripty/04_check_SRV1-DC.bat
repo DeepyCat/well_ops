@@ -88,14 +88,35 @@ if ($pcName -eq "SRV1-DC") {
     Report-Warn "Hostname je '$pcName' (ocekava se 'SRV1-DC')"
 }
 
+$detectedX = 2
 $eth1IP = (Get-NetIPAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -First 1).IPAddress
-if ($eth1IP) {
-    if (($WorkspaceX -eq 0) -and ($eth1IP -match "^192\.168\.(\d+)\.10$")) {
-        $WorkspaceX = [int]$matches[1]
+if ($eth1IP -and ($eth1IP -match "^192\.168\.(\d+)\.")) {
+    $detectedX = [int]$matches[1]
+}
+if ($WorkspaceX -le 0) {
+    Write-Host "Zadejte cislo vaseho pracoviste (N) [vychozi: $detectedX]: " -ForegroundColor Yellow -NoNewline
+    $wsInput = Read-Host
+    if ((-not [string]::IsNullOrWhiteSpace($wsInput)) -and ($wsInput.Trim() -match "^\d+$")) {
+        $WorkspaceX = [int]$wsInput.Trim()
+    } else {
+        $WorkspaceX = $detectedX
     }
-    Report-Ok "Rozhrani Ethernet1 ma IPv4 adresu $eth1IP (Pracoviste X=$WorkspaceX)"
+}
+
+$expectedServerIP = "192.168.$WorkspaceX.10"
+if ($eth1IP -eq $expectedServerIP) {
+    Report-Ok "Rozhrani Ethernet1 ma spravnou IPv4 adresu $eth1IP (Pracoviste N=$WorkspaceX)"
+} elseif ($eth1IP) {
+    Report-Fail "Rozhrani Ethernet1 ma IPv4 adresu $eth1IP (ocekavano $expectedServerIP pro N=$WorkspaceX)" "Nastavte statickou IP $expectedServerIP/24 na Ethernet1"
 } else {
     Report-Fail "Rozhrani Ethernet1 nema IPv4 adresu" "Zkontrolujte sitovy adapter Ethernet1 (NIC 2)"
+}
+
+$eth1Dns = @((Get-DnsClientServerAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue).ServerAddresses)
+if (($eth1Dns -contains "127.0.0.1") -or ($eth1Dns -contains $expectedServerIP)) {
+    Report-Ok "DNS server na Ethernet1 miri na lokalni radic ($($eth1Dns -join ', '))"
+} else {
+    Report-Warn "DNS server na Ethernet1 je $($eth1Dns -join ', ') (doporuceno 127.0.0.1 nebo $expectedServerIP)" "Zkontrolujte nastaveni DNS na rozhrani Ethernet1"
 }
 
 foreach ($svcName in @("NTDS", "ADWS", "DNS", "Netlogon", "LanmanServer")) {
@@ -227,12 +248,16 @@ function Test-GroupMembersExact {
             $actual = @(Get-ADGroupMember -Identity $GroupName -ErrorAction Stop | Select-Object -ExpandProperty SamAccountName | Sort-Object)
         }
         $exp = @($ExpectedMembers | Sort-Object)
-        $diff = Compare-Object -ReferenceObject $exp -DifferenceObject $actual
+        $tag = if ($Recursive) { " (rekurzivne)" } else { "" }
+        if ($null -eq $actual) { $actual = @() }
+        $diff = if ((@($actual).Count -eq 0) -and (@($exp).Count -gt 0)) {
+            $exp
+        } else {
+            Compare-Object -ReferenceObject $exp -DifferenceObject @($actual)
+        }
         if ($null -eq $diff) {
-            $tag = if ($Recursive) { " (rekurzivne)" } else { "" }
             Report-Ok "Clenstvi ${GroupName}${tag} odpovida: $($exp -join ', ')"
         } else {
-            $tag = if ($Recursive) { " (rekurzivne)" } else { "" }
             Report-Fail "Clenstvi ${GroupName}${tag} neodpovida (aktualne: $($actual -join ', '); ocekavano: $($exp -join ', '))" "Upravte cleny skupiny $GroupName"
         }
     } catch {
@@ -289,13 +314,15 @@ foreach ($eu in $expectedUsers) {
     }
     $inExpectedOU = $uObj.DistinguishedName -like "*,$($eu.ParentOU)"
     $pwdChangeUnchecked = ($null -ne $uObj.pwdLastSet) -and ($uObj.pwdLastSet -ne 0)
-    if (($uObj.Enabled -eq $true) -and $inExpectedOU -and $pwdChangeUnchecked) {
-        Report-Ok "Ucet $sam je aktivni, ve spravne OU a nevyzaduje zmenu hesla pri prvnim prihlaseni"
+    $upnOk = ($uObj.UserPrincipalName -ieq "$sam@$dnsRoot")
+    if (($uObj.Enabled -eq $true) -and $inExpectedOU -and $pwdChangeUnchecked -and $upnOk) {
+        Report-Ok "Ucet $sam je aktivni, ve spravne OU, s UPN $sam@$dnsRoot a nevyzaduje zmenu hesla"
     } else {
         $issues = @()
         if ($uObj.Enabled -ne $true) { $issues += "Enabled=$($uObj.Enabled)" }
         if (-not $inExpectedOU) { $issues += "spatna OU ($($uObj.DistinguishedName))" }
         if (-not $pwdChangeUnchecked) { $issues += "zapnuta vynucena zmena hesla (pwdLastSet=0)" }
+        if (-not $upnOk) { $issues += "UPN=$($uObj.UserPrincipalName) (ocekavano $sam@$dnsRoot)" }
         Report-Fail "Ucet $sam ma problem: $($issues -join '; ')"
     }
 }

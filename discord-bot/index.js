@@ -530,7 +530,21 @@ async function handleDocMessage(message, isBackfill = false) {
     let overeni = fs.readFileSync(overeniTemplatePath, 'utf8');
     let postup = fs.readFileSync(postupTemplatePath, 'utf8');
 
-    const st = state.srv1?.student || state.pc1?.student || state.srv2?.student || {};
+    const mergeStudent = (...sources) => {
+      const merged = {};
+      for (const src of sources) {
+        if (!src || typeof src !== 'object') continue;
+        for (const [k, v] of Object.entries(src)) {
+          if (v !== undefined && v !== null && v !== '' && v !== 0) {
+            merged[k] = v;
+          } else if (!(k in merged)) {
+            merged[k] = v;
+          }
+        }
+      }
+      return merged;
+    };
+    const st = mergeStudent(state.srv2?.student, state.pc1?.student, state.srv1?.student);
     const srv1O = state.srv1?.srv1_overeni || {};
     const srv1P = state.srv1?.srv1_postup || {};
     const srv2O = state.srv2?.srv2_overeni || {};
@@ -543,16 +557,18 @@ async function handleDocMessage(message, isBackfill = false) {
     const surnameAscii = removeDiacritics(surname).toLowerCase();
     const domainPrefix = (st.domain || '').split('.')[0] || surnameAscii || 'prijmeni';
 
-    // 1. Nahrazeni hlavicky studenta v obou souborech a sanitizace placeholderu
+    // 1. Nahrazeni hlavicky studenta v obou souborech a sanitizace placeholderu (callbacky kvuli $& / $' / $$)
     const replaceStudentInfo = (doc) => {
+      const wsX = st.workstationX || 2;
+      const resolvedDomain = st.domain || `${domainPrefix}.cyberschool.internal`;
       return doc
-        .replace(/\| Jméno a příjmení \| DOPLNIT \|/g, `| Jméno a příjmení | ${st.fullName || 'Student'} |`)
-        .replace(/\| Třída \| DOPLNIT \|/g, `| Třída | ${st.className || 'T3A'} |`)
-        .replace(/\| Datum vypracování \| DOPLNIT \|/g, `| Datum vypracování | ${st.date || new Date().toLocaleDateString('cs-CZ')} |`)
-        .replace(/\| Číslo vašeho pracoviště \(N\) \| DOPLNIT \(síť `192\.168\.N\.0\/24`\) \|/g, `| Číslo vašeho pracoviště (N) | ${st.workstationX || 2} (síť \`192.168.${st.workstationX || 2}.0/24\`) |`)
-        .replace(/\| Vaše doména \| DOPLNIT \(např\. `novak\.cyberschool\.internal`\) \|/g, `| Vaše doména | \`${st.domain || 'cyberschool.internal'}\` |`)
-        .replace(/<prijmeni>/gi, domainPrefix)
-        .replace(/prijmeni\.cyberschool\.internal/gi, st.domain || `${domainPrefix}.cyberschool.internal`);
+        .replace(/\| Jméno a příjmení \| DOPLNIT \|/g, () => `| Jméno a příjmení | ${st.fullName || 'Student'} |`)
+        .replace(/\| Třída \| DOPLNIT \|/g, () => `| Třída | ${st.className || 'T3A'} |`)
+        .replace(/\| Datum vypracování \| DOPLNIT \|/g, () => `| Datum vypracování | ${st.date || new Date().toLocaleDateString('cs-CZ')} |`)
+        .replace(/\| Číslo vašeho pracoviště \(N\) \| DOPLNIT \(síť `192\.168\.N\.0\/24`\) \|/g, () => `| Číslo vašeho pracoviště (N) | ${wsX} (síť \`192.168.${wsX}.0/24\`) |`)
+        .replace(/\| Vaše doména \| DOPLNIT \(např\. `novak\.cyberschool\.internal`\) \|/g, () => `| Vaše doména | \`${resolvedDomain}\` |`)
+        .replace(/<prijmeni>/gi, () => domainPrefix)
+        .replace(/prijmeni\.cyberschool\.internal/gi, () => resolvedDomain);
     };
 
     overeni = replaceStudentInfo(overeni);

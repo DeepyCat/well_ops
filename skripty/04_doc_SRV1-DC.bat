@@ -93,6 +93,8 @@ function Invoke-ConsoleCmd {
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
     Write-Host "[!] Spustte skript v PowerShellu jako Spravce (Run as Administrator)." -ForegroundColor Red
+    Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
     exit 1
 }
 
@@ -107,31 +109,47 @@ if ([string]::IsNullOrWhiteSpace($FullName)) {
     $FullName = Read-Host "  1) Vase jmeno a prijmeni (napr. Jan Novak)"
 }
 if ([string]::IsNullOrWhiteSpace($FullName)) { $FullName = "Student Neznamy" }
+$FullName = $FullName.Trim()
 
 if ([string]::IsNullOrWhiteSpace($ClassName)) {
-    $ClassName = Read-Host "  2) Trida (napr. T3A)"
+    $inputClass = Read-Host "  2) Trida [vychozi: T3A]"
+    $ClassName = if (-not [string]::IsNullOrWhiteSpace($inputClass)) { $inputClass.Trim() } else { "T3A" }
 }
 if ([string]::IsNullOrWhiteSpace($ClassName)) { $ClassName = "T3A" }
+
+$todayDate = (Get-Date).ToString("d. M. yyyy")
+$inputDate = Read-Host "  3) Datum vypracovani [vychozi: $todayDate]"
+$studentDate = if (-not [string]::IsNullOrWhiteSpace($inputDate)) { $inputDate.Trim() } else { $todayDate }
 
 if ([string]::IsNullOrWhiteSpace($DiscordUser)) {
     Write-Host ""
     Write-Host "  Tip: Svuj presny Discord username zjistite na Discordu prikazem /moje-id" -ForegroundColor DarkGray
-    $DiscordUser = Read-Host "  3) Vase Discord uzivatelske jmeno (bez @)"
+    $DiscordUser = Read-Host "  4) Vase Discord uzivatelske jmeno (bez @)"
 }
 $targetDiscord = ($DiscordUser -replace '^@', '').Trim()
 if ([string]::IsNullOrWhiteSpace($targetDiscord)) {
     Write-Host "[CHYBA] Nebylo zadano Discord uzivatelske jmeno." -ForegroundColor Red
+    Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
     exit 1
 }
 
 # ------------------------------------------------------------
 # 2. Detekce pracoviste a domeny
 # ------------------------------------------------------------
+$detectedX = 2
 $eth1IP = (Get-NetIPAddress -InterfaceAlias "Ethernet1" -AddressFamily IPv4 -ErrorAction SilentlyContinue | Select-Object -First 1).IPAddress
-if (($WorkspaceX -eq 0) -and ($eth1IP -match "^192\.168\.(\d+)\.")) {
-    $WorkspaceX = [int]$matches[1]
+if ($eth1IP -and ($eth1IP -match "^192\.168\.(\d+)\.")) {
+    $detectedX = [int]$matches[1]
 }
-if ($WorkspaceX -eq 0) { $WorkspaceX = 2 }
+if ($WorkspaceX -le 0) {
+    $inputX = Read-Host "  5) Cislo vaseho pracoviste N [vychozi: $detectedX]"
+    if ((-not [string]::IsNullOrWhiteSpace($inputX)) -and ($inputX.Trim() -match "^\d+$")) {
+        $WorkspaceX = [int]$inputX.Trim()
+    } else {
+        $WorkspaceX = $detectedX
+    }
+}
 
 try {
     Import-Module ActiveDirectory -ErrorAction Stop
@@ -142,8 +160,17 @@ try {
     Report-Step "OK" "Domena: $dnsRoot | Pracoviste N=$WorkspaceX"
 } catch {
     Report-Step "FAIL" "Nelze nacist Active Directory: $($_.Exception.Message)"
+    Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
+    [void][System.Console]::ReadLine()
     exit 1
 }
+
+try {
+    $docsDir = Join-Path -Path ([System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::MyDocuments)) -ChildPath "Moje dokumentace\Modul 4 Active Directory"
+    if (-not (Test-Path -LiteralPath $docsDir)) {
+        New-Item -ItemType Directory -Path $docsDir -Force | Out-Null
+    }
+} catch {}
 
 $dateStr = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
 $whoStr = (Invoke-ConsoleCmd "whoami").Trim()
@@ -382,7 +409,7 @@ $payload = [ordered]@{
     student      = [ordered]@{
         fullName     = $FullName
         className    = $ClassName
-        date         = (Get-Date).ToString("yyyy-MM-dd")
+        date         = $studentDate
         workstationX = $WorkspaceX
         domain       = $dnsRoot
     }
@@ -439,15 +466,21 @@ try {
     $responseBody = ""
     $curlExitCode = -1
 
-    if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
-        $curlOut = & curl.exe -s -S -i -X POST `
+    $curlExe = "curl.exe"
+    $sys32Curl = Join-Path $env:SystemRoot "System32\curl.exe"
+    if (Test-Path -LiteralPath $sys32Curl) { $curlExe = $sys32Curl }
+
+    if (Get-Command $curlExe -ErrorAction SilentlyContinue) {
+        $curlOut = & $curlExe -s -S -i -X POST `
             -F "payload_json=<$msgPath;type=application/json" `
-            -F "file1=@$jsonPath;type=application/json" `
+            -F "file1=@$jsonPath;filename=srv1_data.json;type=application/json" `
             $WebhookUrl 2>&1
         $curlExitCode = $LASTEXITCODE
         $curlText = ($curlOut | ForEach-Object { $_.ToString() }) -join "`n"
-        if ($curlText -match "HTTP/\S+\s+(\d{3})") {
-            $httpCode = $matches[1]
+        $statusMatches = [regex]::Matches($curlText, '(?m)^HTTP\/\S+\s+(\d{3})')
+        if ($statusMatches.Count -gt 0) {
+            $lastMatch = $statusMatches[$statusMatches.Count - 1]
+            $httpCode = $lastMatch.Groups[1].Value
         }
         $responseBody = $curlText
         if (($curlExitCode -eq 0) -and ($httpCode -match "^2\d\d$")) {
@@ -458,9 +491,10 @@ try {
     if (-not $sendOk) {
         try {
             Add-Type -AssemblyName System.Net.Http -ErrorAction Stop
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [System.Net.SecurityProtocolType]::Tls12
             $handler = New-Object System.Net.Http.HttpClientHandler
             $client = New-Object System.Net.Http.HttpClient($handler)
+            $client.Timeout = [TimeSpan]::FromSeconds(30)
             $multipart = New-Object System.Net.Http.MultipartFormDataContent
 
             $payloadJsonStr = [System.IO.File]::ReadAllText($msgPath, $utf8NoBom)
@@ -472,13 +506,14 @@ try {
             $byteContent.Headers.ContentType = [System.Net.Http.Headers.MediaTypeHeaderValue]::Parse("application/json")
             $multipart.Add($byteContent, "file1", "srv1_data.json")
 
-            $resp = $client.PostAsync($WebhookUrl, $multipart).Result
+            $resp = $client.PostAsync($WebhookUrl, $multipart).GetAwaiter().GetResult()
             $httpCode = [int]$resp.StatusCode
-            $responseBody = $resp.Content.ReadAsStringAsync().Result
+            $responseBody = $resp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
             if (($httpCode -ge 200) -and ($httpCode -lt 300)) {
                 $sendOk = $true
             }
             $client.Dispose()
+            $handler.Dispose()
         } catch {
             $responseBody = "$responseBody`nHttpClient fallback error: $($_.Exception.Message)"
         }
@@ -491,6 +526,11 @@ try {
         Write-Host "============================================================" -ForegroundColor Red
         Write-Host "HTTP Status: $httpCode" -ForegroundColor Red
         Write-Host "Detail:      $responseBody" -ForegroundColor Red
+        if ($curlExitCode -eq 6) {
+            Write-Host ""
+            Write-Host "[HINT - DNS PREKLAD] Server nemuze prelozit discord.com." -ForegroundColor Yellow
+            Write-Host "Overte v DNS Manageru -> SRV1-DC -> Properties -> Forwarders (napr. 8.8.8.8) a internet na Ethernet0." -ForegroundColor White
+        }
         Write-Host ""
         Write-Host "Stisknete ENTER pro ukonceni..." -ForegroundColor Yellow
         [void][System.Console]::ReadLine()
