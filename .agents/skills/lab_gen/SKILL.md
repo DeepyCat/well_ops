@@ -227,7 +227,7 @@ Každý modul má specifický počet zapojených strojů (definovaný v poli `vm
 16. **ODDĚLENÍ AUTOMATICKÉ DOKUMENTACE OD ÚKOLŮ (NEZAPOČÍTÁVÁ SE DO PROGRESS BARU):**
     - Automatická dokumentace se NIKDY nezařazuje jako běžný úkol (checkbox) do `tasks.js` – nesmí ovlivňovat procenta dokončení modulu!
     - Posledním krokem každého VM v `tasks.js` musí být VŽDY interaktivní ověřovací skript stroje (`XX_check_<VM>.bat`).
-    - Automatická dokumentace se na webu zobrazuje výhradně pod samostatným žlutě zvýrazněným tlačítkem `DOKUMENTACE (udělá se sama :O )` vedle tlačítek jednotlivých VM.
+    - Automatická dokumentace je na webu deaktivována pod žlutě zvýrazněným tlačítkem `DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude` vedle tlačítek jednotlivých VM.
     - V popUp okně po 100% dokončení úkolů se nezobrazuje inline návod, ale žluté tlačítko pro přechod do záložky dokumentace.
     - Instrukce v záložce dokumentace musí být jednoduché, zřetelné a striktně vyžadovat postupné provádění krok za krokem (spustit Krok 1, vyčkat na potvrzení od bota `[KROK 1/X PRIJAT]`, teprve poté spustit další krok).
 17. **ZÁKAZ NEZABALENÝCH OSTRÝCH ZÁVOREK V MARKDOWN ŠABLONÁCH (ROZBITÍ PARSERU):**

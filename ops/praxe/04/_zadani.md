@@ -109,8 +109,8 @@ powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://
 
 ## Co odevzdat (a povinné kroky v labu)
 
-- **Před spuštěním dokumentačních skriptů (`04_doc_*`):** Na stanici **PC1-WIN** se alespoň jednou skutečně přihlaste jako `eva.student` a následně ji **odhlaste**, aby se na serveru **SRV1-DC** automaticky vytvořil kočovný profil `C:\profiles\eva.student.V6`.
-- **Po vygenerování dokumentace:** Bot vám na Discord doručí ZIP se soubory `postup.md` a `overeni.md`. Rozbalte je do složky ve svém repozitáři a do vygenerovaného `overeni.md` ručně vložte **3 povinné screenshoty s viditelnými hodinami na hlavním panelu** u bodů **`M4-SRV1.V1-D2`**, **`M4-SRV1.V7-D2`** a **`M4-PC1.V1-D2`** (obrázky uložte do podsložky `images/`).
+- **Kočovný profil před odevzdáním:** Na stanici **PC1-WIN** se alespoň jednou skutečně přihlaste jako `eva.student` a následně ji **odhlaste**, aby se na serveru **SRV1-DC** automaticky vytvořil kočovný profil `C:\profiles\eva.student.V6`.
+- **Dokumentace a screenshoty:** Vyplňte `postup.md` vlastními slovy a do `overeni.md` vložte výstupy z PowerShellu včetně řádku s `OPS_PROMPT` a **3 povinné screenshoty s viditelnými hodinami na hlavním panelu** u bodů **`M4-SRV1.V1-D2`**, **`M4-SRV1.V7-D2`** a **`M4-PC1.V1-D2`** (obrázky uložte do podsložky `images/`).
 - **Odevzdání:** Následně vault pushněte přes **GitHub** (Pull → Commit → Push) a klikněte na **Odevzdat** v **MS Teams** (termín: **skupina B 4. 1. 2027 v 8:00, skupina A 11. 1. 2027 v 8:00**).
 
 Ve vašem repozitáři se odevzdává složka:
