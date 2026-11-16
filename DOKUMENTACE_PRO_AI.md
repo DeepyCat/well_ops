@@ -92,12 +92,12 @@ well_ops/
   - `__zadani.html` a `_zadani.html` – stylované verze zadání.
   - `_vysledek.md`, `__reseni.md`, `_reseni.md` – kontrolní seznam bod po bodu.
   - `__reseni.html`, `_reseni.html`, `_vysledek.html` – stylované verze vzorových řešení.
-  - `verified.json` – stav ověření jednotlivých VM (`true`/`false`). Ve výchozím stavu `false`.
+  - `verified.json` – stav ověření jednotlivých VM (`true`/`false`) a klíč `"dokumentace": false`. Ve výchozím stavu vše `false`.
   - `tasks.js` – definice interaktivních kroků (`window.OPS_MODULE_TASKS["XX"]`).
-  - `doc_templates/` – šablony `overeni.md` a `postup.md` pro odevzdání.
+  - *(Legacy)* `doc_templates/` – archivní šablony pro starší moduly 00–04. **Pro nové moduly se nevytváří.**
 - **`skripty/`**:
-  - `XX_check_<VM>.bat` a `.ps1` – interaktivní ověřovací skripty spouštěné studenty v labu. Jsou **striktně READ-ONLY** (pouze čtou stav, nikdy nic nemění).
-  - `XX_doc_<VM>.bat` a `.ps1` – skripty, které provedou příkazy z labu, nasbírají konzolové výstupy a odešlou je na Vercel endpoint / Discord webhook.
+  - `XX_check_<VM>.bat` a `.ps1` – interaktivní ověřovací skripty spouštěné studenty v labu. Jsou **striktně READ-ONLY** (pouze čtou stav, nikdy nic nemění). **Pro nové moduly se vytvářejí VÝHRADNĚ tyto `_check_` skripty.**
+  - *(Legacy / VYPNUTO)* `XX_doc_<VM>.bat` a `.ps1` – archivní dokumentační skripty pro moduly 00–04 (ponechány v repozitáři, ale na webu deaktivovány). **Pro nové moduly se dokumentační skripty `XX_doc_*` NESMÍ vytvářet!**
 
 ### 2. Školní předměty a modul Zápisník (`zapisnik/`)
 - Předměty `kyber`, `mit` a `prg` využívají jednotný engine **Zápisník**:
@@ -108,9 +108,9 @@ well_ops/
 ### 3. Discord Bot & API (`discord-bot/` & `api/`)
 - **`discord-bot/`**: Samostatná Node.js aplikace zajišťující:
   - Slash příkazy `/novy-modul`, `/update`, `/moje-id`, `/posledni-dokumentace`.
-  - Příjem dat ze serveru (SRV1-DC) a stanice (PC1-WIN), jejich automatické spárování podle Discord ID studenta, vyplnění šablon `postup.md` + `overeni.md` a odeslání hotového `.zip` archivu studentovi do DM i na kanál.
-  - **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE:** Kdykoliv AI vytvoří nebo upraví šablony v `discord-bot/templates/XX/` nebo kód v `discord-bot/index.js`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné tyto soubory ručně zkopírovat do běžícího Docker kontejneru bota (`docker cp ... ops-discord-bot:/app/...`) a kontejner restartovat (`docker restart ops-discord-bot`), protože `docker-compose.yml` se nemění a NAS nemá napojení na GitHub.
-- **Zabezpečení Webhooku a zákaz tajných údajů v Gitu:** Skripty `skripty/XX_doc_*.{ps1,bat}` odesílají JSON výstupy přímo na Discord Webhook zašifrovaný pomocí **XOR (`well_ops_sec_2026`) + Base64** (dešifruje se až za běhu v paměti). Webhook URL, tokeny ani reálná hesla se NIKDY nesmí objevit v plaintextu v `.env`, `.env.example`, kódu ani v historii commitů (Git historii uchovává trvale).
+  - *(Legacy / VYPNUTO pro nové moduly)* Automatické generování dokumentace (`pending_docs`, `templates/`, webhook spojení `SRV1-DC` + `PC1-WIN`) je na webu deaktivováno. Pro nové moduly se šablony do `discord-bot/templates/XX/` **nevytvářejí** a kód bota se o nové moduly pro dokumentaci nerozšiřuje.
+  - **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE (pouze při ruční úpravě bota):** Kdykoliv AI na výslovné přání upraví existující kód v `discord-bot/index.js`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné soubor ručně zkopírovat do běžícího Docker kontejneru bota (`docker cp ... ops-discord-bot:/app/...`) a kontejner restartovat (`docker restart ops-discord-bot`), protože `docker-compose.yml` se nemění a NAS nemá napojení na GitHub.
+- **Zabezpečení Webhooku a zákaz tajných údajů v Gitu:** Archivní skripty `skripty/XX_doc_*.{ps1,bat}` mají Discord Webhook uložen zašifrovaný pomocí **XOR (`well_ops_sec_2026`) + Base64** (dešifruje se až za běhu v paměti). Webhook URL, tokeny ani reálná hesla se NIKDY nesmí objevit v plaintextu v `.env`, `.env.example`, kódu ani v historii commitů (Git historii uchovává trvale).
 
 ---
 
@@ -134,7 +134,8 @@ Každé AI je **povinno** si před zahájením příslušné práce daný skill 
 - **K čemu slouží:** Kompletní standard a metodika tvorby nového praktického cvičení (Moduly 00, 01, 02, 03, 04...).
 - **Kdy ho AI MUSÍ použít:** Jakmile uživatel požádá o vytvoření, doplnění nebo úpravu praktického cvičení (např. *„Vytvoř Modul 04“*, *„Uprav úlohy v modulu 02“* apod.).
 - **Závazná pravidla:**
-  - AI musí vytvořit všech 7 povinných součástí (složku `ops/praxe/XX/`, obousměrná zrcadla souborů `__zadani.*`, `_reseni.*`, výchozí `verified.json` s `false`, definici `tasks.js`, registraci v `modules.js` a `modules.json`, vložení script tagu do `ops/praxe.html`, a vytvoření `skripty/XX_check_*` i `skripty/XX_doc_*`).
+  - AI musí vytvořit všech 6 povinných součástí: složku `ops/praxe/XX/` (obousměrná zrcadla `__zadani.*`, `_reseni.*`, výchozí `verified.json` s `false` včetně `"dokumentace": false`), definici `tasks.js`, registraci v `modules.js` a `modules.json` (s deaktivovaným `docWorkflow: { disabled: true, title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude", steps: [] }`), vložení `<script>` tagu do `ops/praxe.html` a vytvoření **pouze** read-only ověřovacích skriptů `skripty/XX_check_*`.
+  - **ZÁKAZ GENEROVÁNÍ DOKUMENTAČNÍCH SKRIPTŮ:** Při tvorbě nového modulu AI **NESMÍ** vytvářet `skripty/XX_doc_*`, `ops/praxe/XX/doc_templates/`, `discord-bot/templates/XX/` ani přidávat `curl ... *_doc_*.bat` příkazy nebo aktivní kroky do `docWorkflow` či `tasks.js`.
   - Webové stránky zadání a řešení musí mít jednotný OPS motiv (`#1a1a1a`), akcent `--accent: #ff5555`, breadcrumbs a povinný favicon `<link rel="icon" type="image/x-icon" href="../../img/bird.png">`.
 
 ### 2. Skill `powershell-windows` (`.agents/skills/powershell-windows/SKILL.md`)
@@ -192,7 +193,8 @@ Každé AI je **povinno** si před zahájením příslušné práce daný skill 
 | Poškodit hybridní BAT hlavičku nebo nechat visící `&` | Vždy dodržet přesný formát: `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH \| Select-Object -Skip 5 \| Out-String)); & $script %*"` |
 | Upravovat `docker-compose.yml` bota (přidávat volumes) | `docker-compose.yml` neměnit, šablony a `index.js` kopírovat ručně přes `docker cp` a kontejner restartovat |
 | Ukládat plaintext webhook, tokeny nebo reálná hesla do `.env*`/Gitu | Webhook v `skripty/` šifrovat pomocí XOR (`well_ops_sec_2026`) + Base64; v materiálech jen labové `Pa55w.rd` |
-| Upravit soubory ve školním vaultu mimo `Moje dokumentace` nebo slibovat ZIP odevzdání pro M03+ | Školní repo je read-only; od Modulu 3+ se odevzdává přes `Pull -> Moje dokumentace -> Commit -> Push` + Teams `Odevzdat` (bot posílá ZIP jen jako šablony k vložení) |
+| Vytvářet pro nové moduly dokumentační skripty `XX_doc_*`, `doc_templates/`, `discord-bot/templates/XX/` nebo aktivní `docWorkflow` kroky | Vytvářet **POUZE** read-only kontrolní skripty `XX_check_*`; `docWorkflow` v `modules.js`/`modules.json` nastavit jako `{ disabled: true, title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude", steps: [] }` |
+| Upravit soubory ve školním vaultu mimo `Moje dokumentace` nebo slibovat ZIP odevzdání / Discord bota pro M03+ | Školní repo je read-only; od Modulu 3+ se dokumentace píše ručně (s `OPS_PROMPT`) do `Moje dokumentace` a odevzdává přes `Pull -> Commit -> Push` + Teams `Odevzdat` |
 | Vytvořit nový modul a nastavit mu ve `verified.json` hodnotu `true` | Nový modul má ve `verified.json` **vždy `false`**, dokud ho uživatel fyzicky neotestuje v reálném labu |
 | Dělat neohlášené změny v cizích souborech nebo odstraňovat komentáře | Provádět pouze explicitně vyžádané úpravy a zachovávat stávající kód |
 | Hádat nebo předpokládat, jak mají věci fungovat, když chybí zadání | **Zastavit se a položit uživateli dotaz (Pravidlo #0)** |

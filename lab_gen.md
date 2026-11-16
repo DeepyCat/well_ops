@@ -31,15 +31,16 @@ Vytvořte složku `praxe/XX/` (např. `praxe/02/`) a v ní:
 4. `__reseni.html`, `_reseni.html` a `_vysledek.html` (plnohodnotná HTML stránka vzorového řešení v jednotném OPS tématu s červenými tlačítky a povinným faviconem `<link rel="icon" type="image/x-icon" href="../../img/bird.png">`).
 
 ### Krok 2: Vytvoření konfiguračního souboru `verified.json`
-Vytvořte `praxe/XX/verified.json`. **Ve výchozím stavu nastavte pro nově vytvořený modul všechny stroje na `false`** (protože ještě nebyly v reálném labu fyzicky otestovány):
+Vytvořte `praxe/XX/verified.json`. **Ve výchozím stavu nastavte pro nově vytvořený modul všechny stroje i klíč `dokumentace` na `false`** (protože ještě nebyly v reálném labu fyzicky otestovány a automatická dokumentace je vypnutá):
 ```json
 {
   "SRV1-DC": false,
   "SRV2-FS": false,
-  "PC1-WIN": false
+  "PC1-WIN": false,
+  "dokumentace": false
 }
 ```
-*(Pokud modul obsahuje jen např. `SRV1-DC` a `PC1-WIN`, uveďte pouze relevantní stroje).*
+*(Pokud modul obsahuje jen např. `SRV1-DC` a `PC1-WIN`, uveďte pouze relevantní stroje + `"dokumentace": false`).*
 
 ### Krok 3: Vytvoření definičního souboru úkolů `praxe/XX/tasks.js`
 Vytvořte skript `praxe/XX/tasks.js`, který zaregistruje úkoly do globálního objektu `window.OPS_MODULE_TASKS["XX"]`:
@@ -94,7 +95,19 @@ Přidejte nový modul do pole `window.OPS_MODULES` v `praxe/modules.js`:
     vms: ["SRV1-DC", "SRV2-FS", "PC1-WIN"],
     defaultVM: "SRV1-DC",
     tasksFile: "praxe/XX/tasks.js",
-    verifiedFile: "praxe/XX/verified.json"
+    verifiedFile: "praxe/XX/verified.json",
+    submission: {
+      title: "CO ODEVZDAT",
+      description: "Odevzdává se přes <strong>GitHub Push</strong> (do vašeho repozitáře) a kliknutím na <strong>Odevzdat</strong> v MS Teams:",
+      folders: [
+        "<code>Moje dokumentace / Modul XX Název</code> (<code>postup.md</code>, <code>overeni.md</code> a složka <code>images</code> se screenshoty)"
+      ]
+    },
+    docWorkflow: {
+      disabled: true,
+      title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude",
+      steps: []
+    }
   }
 ```
 A do `window.OPS_MODULE_VERIFIED["XX"]`:
@@ -102,10 +115,11 @@ A do `window.OPS_MODULE_VERIFIED["XX"]`:
   "XX": {
     "SRV1-DC": false,
     "SRV2-FS": false,
-    "PC1-WIN": false
+    "PC1-WIN": false,
+    "dokumentace": false
   }
 ```
-Stejný JSON objekt doplňte do `praxe/modules.json`.
+Stejný JSON objekt doplňte do `praxe/modules.json`. **V `docWorkflow` nikdy nevytvářejte `steps` ani příkazy na `XX_doc_*`.**
 
 ### Krok 5: Přidání skriptu do `praxe.html`
 V souboru [praxe.html](file:///D:/%21Documents/VSCode/well_ops/praxe.html) přidejte do hlavičky `<head>` tag pro načtení úkolů:
@@ -127,27 +141,20 @@ Pro každé zařízení (VM) definované v modulu vytvořte v kořenové složce
   obsahující univerzální jednořádkový příkaz pro stažení a spuštění přes curl (spustitelný v PowerShellu, CMD i Terminálu, s vizuálním průběhem stahování a automatickým úklidem):
   `powershell -ExecutionPolicy Bypass -Command "curl.exe --progress-bar -L https://raw.githubusercontent.com/DeepyCat/well_ops/main/skripty/XX_check_<VM>.bat -o check.bat; .\check.bat; Remove-Item -Force check.bat -ErrorAction SilentlyContinue"`
 
-### Krok 7: Skripty pro automatické vyplnění dokumentace a doručení přes Discord
-Pro každý modul vytvořte skripty pro automatické vyplnění dokumentace ze všech relevantních VM:
-- Formát názvů: `skripty/XX_doc_<VM>.ps1` a `skripty/XX_doc_<VM>.bat` (např. `03_doc_SRV1-DC.bat`, `03_doc_PC1-WIN.bat`).
-- **Nezávislost na Gitu:** Skript neklonuje repozitáře přes Git; vytváří lokální složku `Documents\Moje dokumentace\Modul XX ...` a pracuje s lokálními šablonami.
-- **Interaktivní dotazy na začátku:**
-  - Jméno a příjmení studenta (s výchozím návrhem).
-  - Třída (výchozí `T3A` – potvrzení klávesou Enter).
-  - Datum vypracování (výchozí dnešní datum – potvrzení Enter).
-  - Číslo pracoviště `X` (autodetekce z IP adresy rozhraní `Ethernet1`, např. 2).
-  - Doména (autodetekce z AD nebo DNS suffixu).
-  - Discord uživatelské jméno (např. `jannovak` pro spárování částí a doručení do DM).
-- **Živý výpis s PowerShell promptem:** Skript vypisuje kroky postupně (`Start-Sleep`) s barevnými stavy `[ OK ]` a `[ RUČNÍ ]` (pro screenshoty) a do markdownu vkládá výstupy i s promptem `PS C:\Users\Administrator> ...`.
-- **Odeslání na Discord Webhook:** Skript zabalí data do JSONu a přes vestavěný `curl.exe` je odešle na nastavený Discord Webhook.
-- **Discord Bot spojení:** Bot v `discord-bot/index.js` zachytí obě části, pinguje studenta (@mention), po obdržení všech částí odešle mezizprávu o generování, data spojí do `overeni.md` a `postup.md`, zabalí výhradně do ZIP archivu (bez samostatných .md souborů), upozorní na ruční screenshoty (např. bod `M3-SRV1.V1-D2` pro DNS Manager) a doručí studentovi do soukromé zprávy (DM) i do kanálu.
-- **Konfigurace v `praxe/modules.js` a `praxe/modules.json`:** Každý modul s dokumentací musí obsahovat pole `docWorkflow` s kroky pro spuštění na SRV1 a PC1.
-- **Šablony:** Čisté šablony dokumentace uložit do `praxe/XX/doc_templates/` a do `discord-bot/templates/XX/`.
-- **POVINNÉ UPOZORNĚNÍ PRO UŽIVATELE (Kopírování šablon do Docker kontejneru bota):** Kdykoliv AI vytvoří nebo upraví šablony dokumentace v `discord-bot/templates/XX/`, **MUSÍ uživateli na konci odpovědi VŽDY výslovně připomenout**, že je nutné zkopírovat tyto šablony do běžícího Docker kontejneru bota:
-  ```bash
-  docker cp templates/XX ops-discord-bot:/app/templates/
-  ```
-  *(resp. `docker cp discord-bot/templates/XX ops-discord-bot:/app/templates/` z kořene repozitáře).*
+### Krok 7: ZÁKAZ generování automatické dokumentace (`XX_doc_*`) — ruční dokumentace s `OPS_PROMPT`
+Automatické generování dokumentace a odesílání do Discord bota je **vypnuté**. Při vytváření nového modulu je **PŘÍSNĚ ZAKÁZÁNO**:
+- Vytvářet skripty `skripty/XX_doc_<VM>.ps1` a `skripty/XX_doc_<VM>.bat`.
+- Vytvářet šablony v `praxe/XX/doc_templates/` nebo `discord-bot/templates/XX/`.
+- Upravovat `discord-bot/index.js` o logiku skládání dokumentace nebo čekání na části nového modulu.
+- Vkládat do `modules.js`, `modules.json`, `tasks.js` nebo `__zadani.*` jakékoliv příkazy `curl ... *_doc_*.bat` či instrukce ke stahování ZIPu z Discordu.
+
+*(Pozn.: Původní soubory `00_doc_*` až `04_doc_*` v `skripty/` zůstávají v repozitáři pouze jako archivní legacy kód, ale na webu jsou deaktivované a u nových modulů se nic obdobného nevytváří.)*
+
+V zadání (`__zadani.md`, `_zadani.md`, `__zadani.html`, `_zadani.html`), `modules.js`/`modules.json` (`submission`) a závěrečném kroku `tasks.js` vždy uveďte pouze **ruční postup odevzdání**:
+- `postup.md` vypracovat vlastními slovy podle reálně provedených kroků.
+- Do `overeni.md` vkládat výstupy z PowerShellu včetně řádku s nastaveným `OPS_PROMPT` (`[yyyy-MM-dd HH:mm:ss] DOMÉNA\účet@POČÍTAČ PS ...>`).
+- Požadované screenshoty pořídit s **viditelnými hodinami na hlavním panelu** a vložit přes Obsidian do `images/`.
+- Odevzdat přes `Pull -> Commit -> Push` na **GitHub** a tlačítko **Odevzdat** v **MS Teams**.
 
 ### Krok 8: Pravidla pro práci podle počtu zapojených strojů (1 VM vs 2 VM vs 3 VM)
 
@@ -155,45 +162,27 @@ Každý modul má specifický počet zapojených strojů (definovaný v poli `vm
 
 #### Varianta A: Modul s 1 strojem (např. pouze `SRV1-DC`)
 - **Příklady:** Modul 01 (Active Directory Domain Services), instalace lokálních serverových rolí.
-- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC"]`, `defaultVM: "SRV1-DC"`.
-- **Stav ověření `verified.json`:** Obsahuje pouze klíč `{"SRV1-DC": false}`.
+- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC"]`, `defaultVM: "SRV1-DC"`, `docWorkflow: { disabled: true, title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude", steps: [] }`.
+- **Stav ověření `verified.json`:** Obsahuje klíče `{"SRV1-DC": false, "dokumentace": false}`.
 - **Úkoly v `tasks.js`:** Všechny úkoly mají `forVMs: ["SRV1-DC"]`. Tabulka parametrů v `what` uvádí parametry pouze pro tento stroj.
 - **Skripty v `skripty/`:**
-  - Vzniká pouze 1 ověřovací skript: `XX_check_SRV1-DC.bat` (+ `.ps1`).
-  - Vzniká pouze 1 dokumentační skript: `XX_doc_SRV1-DC.bat` (+ `.ps1`).
-- **Workflow dokumentace (`docWorkflow`):**
-  - Obsahuje pouze **1 krok**: `Krok 1/1: Otevři SRV1-DC`.
-- **Discord Bot (`discord-bot`):**
-  - V `MODULE_CONFIG` má nastaveno `requiredParts: ['SRV1']`.
-  - Po obdržení této jediné části bot okamžitě generuje a odesílá hotový ZIP (žádné mezikroky ani čekání na další stroje).
+  - Vzniká **pouze** 1 ověřovací skript: `XX_check_SRV1-DC.bat` (+ `.ps1`). Žádný `XX_doc_*` skript nevzniká.
 
 #### Varianta B: Modul se 2 stroji (např. `SRV1-DC` a `PC1-WIN`)
-- **Příklady:** Modul 02 (DHCP Server a Klient), Modul 03 (DNS Server a Klient).
-- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC", "PC1-WIN"]`.
-- **Stav ověření `verified.json`:** `{"SRV1-DC": false, "PC1-WIN": false}`.
+- **Příklady:** Modul 02 (DHCP Server a Klient), Modul 03 (DNS Server a Klient), Modul 04 (Active Directory).
+- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC", "PC1-WIN"]`, `docWorkflow: { disabled: true, title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude", steps: [] }`.
+- **Stav ověření `verified.json`:** `{"SRV1-DC": false, "PC1-WIN": false, "dokumentace": false}`.
 - **Úkoly v `tasks.js`:** Rozděleny na serverové (`forVMs: ["SRV1-DC"]`) a klientské (`forVMs: ["PC1-WIN"]`). Tabulka parametrů v `what` má 2 sloupce (`SRV1-DC`, `PC1-WIN`) a zvýraznění `.active-col`.
 - **Skripty v `skripty/`:**
-  - 2 ověřovací skripty: `XX_check_SRV1-DC.bat` a `XX_check_PC1-WIN.bat`.
-  - 2 dokumentační skripty: `XX_doc_SRV1-DC.bat` a `XX_doc_PC1-WIN.bat`.
-- **Workflow dokumentace (`docWorkflow`):**
-  - Obsahuje **2 kroky**: `Krok 1/2: SRV1-DC` a `Krok 2/2: PC1-WIN`.
-- **Discord Bot (`discord-bot`):**
-  - V `MODULE_CONFIG` má nastaveno `requiredParts: ['SRV1', 'PC1']`.
-  - Po 1. kroku ohlásí `[KROK 1/2 PRIJAT]`, po 2. kroku pošle mezizprávu `[KROK 2/2 PRIJAT]`, sloučí výstupy obou strojů a vytvoří finální ZIP.
+  - Vznikají **pouze** 2 ověřovací skripty: `XX_check_SRV1-DC.bat` (+ `.ps1`) a `XX_check_PC1-WIN.bat` (+ `.ps1`). Žádné `XX_doc_*` skripty nevznikají.
 
 #### Varianta C: Modul se 3 stroji (`SRV1-DC`, `SRV2-FS` a `PC1-WIN`)
 - **Příklady:** Modul 00 (Příprava a instalace všech tří OS), souborové služby, DFS, zálohování a replikace.
-- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC", "SRV2-FS", "PC1-WIN"]`.
-- **Stav ověření `verified.json`:** `{"SRV1-DC": false, "SRV2-FS": false, "PC1-WIN": false}`.
+- **Konfigurace v `modules.js` a `modules.json`:** `vms: ["SRV1-DC", "SRV2-FS", "PC1-WIN"]`, `docWorkflow: { disabled: true, title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude", steps: [] }`.
+- **Stav ověření `verified.json`:** `{"SRV1-DC": false, "SRV2-FS": false, "PC1-WIN": false, "dokumentace": false}`.
 - **Úkoly v `tasks.js`:** Úkoly definovány pro všechny 3 stroje. Tabulka parametrů v `what` má 3 sloupce (`SRV1-DC`, `SRV2-FS`, `PC1-WIN`).
 - **Skripty v `skripty/`:**
-  - 3 ověřovací skripty: `XX_check_SRV1-DC.bat`, `XX_check_SRV2-FS.bat`, `XX_check_PC1-WIN.bat`.
-  - 3 dokumentační skripty: `XX_doc_SRV1-DC.bat`, `XX_doc_SRV2-FS.bat`, `XX_doc_PC1-WIN.bat`.
-- **Workflow dokumentace (`docWorkflow`):**
-  - Obsahuje **3 kroky**: `Krok 1/3: SRV1-DC`, `Krok 2/3: SRV2-FS`, `Krok 3/3: PC1-WIN`.
-- **Discord Bot (`discord-bot`):**
-  - V `MODULE_CONFIG` má nastaveno `requiredParts: ['SRV1', 'SRV2', 'PC1']`.
-  - Postupně hlásí průběh (`[KROK 1/3 PRIJAT]`, `[KROK 2/3 PRIJAT]`), po obdržení 3. části pošle mezizprávu a sloučí výstupy všech tří VM do finálního ZIPu.
+  - Vznikají **pouze** 3 ověřovací skripty: `XX_check_SRV1-DC.bat`, `XX_check_SRV2-FS.bat`, `XX_check_PC1-WIN.bat` (+ `.ps1`). Žádné `XX_doc_*` skripty nevznikají.
 
 ---
 
@@ -288,21 +277,17 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 
 ### 11. SPECIFICKÝ FORMÁT PRO KLIENTSKÉ SKRIPTY (PC1-WIN vs SRV1-DC)
 - Klientské stroje (PC1-WIN) nemají nainstalované role AD DS ani DNS Server – cmdlety jako `Get-ADDomain`, `Get-DnsServerZone` a `Get-DnsServerResourceRecord` na nich neexistují a nesmí být volány.
-- Skripty pro PC1-WIN musí používat výhradně klientské nástroje: `Get-DnsClient`, `Get-DnsClientGlobalSetting`, `Resolve-DnsName`, `cmd.exe /c ipconfig`, `cmd.exe /c nslookup`.
-- Skript na PC1-WIN je Krok 2/2 workflow dokumentace:
-  - Nepožaduje znovu zadání jména ani třídy.
-  - Přebírá pouze Discord username (`$DiscordUser`) pro spárování s balíčkem ze SRV1-DC.
-  - Vytváří payload s `part = "PC1"`.
-  - Pro bezpečné provedení přes `[scriptblock]::Create` nesmí obsahovat žádné syntaktické kolize s prefixy scopes ani nekompatibilní cmdlety.
+- Ověřovací skripty (`XX_check_PC1-WIN`) musí používat výhradně klientské nástroje: `Get-DnsClient`, `Get-DnsClientGlobalSetting`, `Resolve-DnsName`, `Get-CimInstance Win32_ComputerSystem`, `cmd.exe /c ipconfig`, `cmd.exe /c nslookup`.
+- Pro bezpečné provedení přes `[scriptblock]::Create` v hybridním `.bat` zavaděči nesmí skript obsahovat syntaktické kolize s prefixy scopes ani nekompatibilní cmdlety.
 
 ### 12. ŠIFROVANÉ ULOŽENÍ DISCORD WEBHOOK URL (ZÁKAZ PLAINTEXTU A .ENV)
 - GitHub Secret Scanner okamžitě zneplatní (revokuje) Discord webhooky, pokud je URL vložena do kódu, `.env`, `.env.example` nebo historie commitů jako plain-text řetězec i prostý reverzní řetězec (`$revHook`).
-- Ve všech `.ps1` a `.bat` skriptech je **POVINNÉ** Webhook URL ukládat výhradně v šifrované podobě (**XOR klíčem `well_ops_sec_2026` + Base64**) s dešifrováním až za běhu v paměti (plus volitelný parametr `-WebhookUrl` pro testování). NIKDY neukládejte webhook URL, tokeny ani skutečná hesla do `.env`, `.env.example` ani do commitů.
+- V legacy dokumentačních skriptech je Webhook URL uloženo výhradně v šifrované podobě (**XOR klíčem `well_ops_sec_2026` + Base64**) s dešifrováním až za běhu v paměti. Pro nové moduly se žádné webhookové ani dokumentační skripty nevytvářejí. NIKDY neukládejte webhook URL, tokeny ani skutečná hesla do `.env`, `.env.example` ani do commitů.
 
-### 13. POVINNÉ PRIVILEGOVANÉ INTENTY PRO DISCORD BOTA
+### 13. PRIVILEGOVANÉ INTENTY PRO DISCORD BOTA (PRO OZNAMOVACÍ PŘÍKAZY)
 - Discord bot vyžaduje v Discord Developer Portalu (záložka *Bot* -> *Privileged Gateway Intents*) aktivní přepínače:
-  - **MESSAGE CONTENT INTENT** (pro čtení JSON příloh z webhooků a obsahu zpráv).
-  - **SERVER MEMBERS INTENT** (pro spolehlivé vyhledání studentů a doručení ZIP archivu do DM).
+  - **MESSAGE CONTENT INTENT**
+  - **SERVER MEMBERS INTENT**
 - V kódu bota (`discord-bot/index.js`) musí být `GatewayIntentBits.MessageContent`.
 
 ### 14. POVINNÝ GIT AUTOR COMMITŮ
@@ -310,29 +295,26 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 
 ### 15. ADAPTABILITA PODLE POČTU STROJŮ (ZÁKAZ TVRDÉHO PŘEDPOKLÁDÁNÍ 2 STROJŮ)
 - Nikdy nepředpokládat natvrdo, že každý modul má právě 2 stroje (SRV1 a PC1).
-- Pokud zadání řeší pouze 1 stroj (např. Modul 01: pouze SRV1-DC), nesmí se generovat klientské skripty pro PC1, docWorkflow má pouze 1 krok a Discord bot nesmí čekat na PC1, ale ihned po přijetí SRV1 vygenerovat ZIP.
-- Pokud zadání zapojuje 3 stroje (včetně SRV2-FS), musí vzniknout skripty, úkoly i workflow pro všechny 3 stroje.
+- Pokud zadání řeší pouze 1 stroj (např. Modul 01: pouze SRV1-DC), generuje se pouze 1 ověřovací skript `XX_check_SRV1-DC` a tabulka v `tasks.js` zobrazuje jen příslušné VM.
+- Pokud zadání zapojuje 3 stroje (včetně SRV2-FS), musí vzniknout úkoly a ověřovací `XX_check_<VM>` skripty pro všechny 3 stroje.
 
-### 16. ODDĚLENÍ AUTOMATICKÉ DOKUMENTACE OD ÚKOLŮ (NEZAPOČÍTÁVÁ SE DO PROGRESS BARU)
-- Automatická dokumentace se NIKDY nezařazuje jako běžný úkol (checkbox) do `tasks.js` – nesmí ovlivňovat procenta dokončení modulu!
-- Posledním krokem každého VM v `tasks.js` musí být VŽDY interaktivní ověřovací skript stroje (`XX_check_<VM>.bat`).
-- Automatická dokumentace je na webu deaktivována pod žlutě zvýrazněným tlačítkem `DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude` vedle tlačítek jednotlivých VM.
-- V popUp okně po 100% dokončení úkolů se nezobrazuje inline návod, ale žluté tlačítko pro přechod do záložky dokumentace.
-- Instrukce v záložce dokumentace musí být jednoduché, zřetelné a striktně vyžadovat postupné provádění krok za krokem (spustit Krok 1, vyčkat na potvrzení od bota `[KROK 1/X PRIJAT]`, teprve poté spustit další krok).
+### 16. DEAKTIVACE AUTOMATICKÉ DOKUMENTACE A ODDĚLENÍ OD ÚKOLŮ
+- Automatická dokumentace je v celém portálu **deaktivována** a **NESMÍ** se vytvářet ani jako úkol v `tasks.js`, ani jako `XX_doc_*` skript.
+- Posledním krokem každého VM v `tasks.js` musí být VŽDY interaktivní read-only ověřovací skript stroje (`XX_check_<VM>.bat`), případně závěrečný krok s pokyny pro ruční odevzdání (bez jakýchkoliv `XX_doc_*` skriptů).
+- Žluté tlačítko v liště VM i v modalu po 100% dokončení zůstává deaktivované s textem `DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude`, a v `modules.js` / `modules.json` má modul vždy:
+  `docWorkflow: { disabled: true, title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude", steps: [] }`.
 
-### 17. ZÁKAZ NEZABALENÝCH OSTRÝCH ZÁVOREK V MARKDOWN ŠABLONÁCH (ROZBITÍ PARSERU)
-- V markdown šablonách (`overeni.md`, `postup.md`) a textech NIKDY nepsat zástupné placeholdery v ostrých závorkách bez inline backticků (např. `<prijmeni>` nebo `<domena>`).
+### 17. ZÁKAZ NEZABALENÝCH OSTRÝCH ZÁVOREK V MARKDOWNU (ROZBITÍ PARSERU)
+- V markdown textech a šablonách NIKDY nepsat zástupné placeholdery v ostrých závorkách bez inline backticků (např. `<prijmeni>` nebo `<domena>`).
 - Parsery Markdownu (Obsidian, GitHub, VS Code) ostré závorky `<tag>` vyhodnocují jako otevírací HTML tag. Pokud tag není uzavřen (`</tag>`), markdown renderer přepne do režimu raw HTML a od tohoto místa až do konce souboru zcela přestane interpretovat Markdown značky (nadpisy `###`, bloky kódu ```text, checkboxy `- [x]`, tučné písmo `**`).
-- **ŘEŠENÍ:**
-  - V šablonách psát placeholdery bez ostrých závorek (např. `prijmeni.cyberschool.internal`) nebo je zabalit do kódu: `Resolve-DnsName ftp.prijmeni.cyberschool.internal`.
-  - V Discord botovi (`replaceStudentInfo`) dynamicky nahradit `<prijmeni>` i `prijmeni.cyberschool.internal` skutečným příjmením / doménou studenta.
+- **ŘEŠENÍ:** Psát placeholdery bez ostrých závorek (např. `prijmeni.cyberschool.internal`) nebo je zabalit do kódu: `` `Resolve-DnsName ftp.<prijmeni>.cyberschool.internal` ``.
 
 ### 18. SPRÁVNÝ ZÁCHYT VÍCEŘÁDKOVÝCH VÝSTUPŮ Z CMD V POWERSHELLU (ZPLOSTĚNÍ VÝSTUPŮ A KÓDOVÁNÍ)
 - Externí příkazy jako `ipconfig /all`, `nslookup`, `ping` vracejí v PowerShellu pole řádků (`[string[]]`).
 - Pokud je toto pole vloženo do here-stringu nebo uvozovek (`@"... $ipconfigText ... "@`), PowerShell všechny řádky automaticky spojí pomocí `$OFS` (což je ve výchozím stavu jedna mezera `" "`). Výsledkem je jediný dlouhý řádek, kde jsou zničeny veškeré odřádkování a sloupce.
 - Konzole Windows navíc používá OEM kódování (CP852 pro češtinu), takže se české znaky v datu (např. `pondělí`, `úterý`) v UTF-8 poškodí na nečitelné paznaky.
 - Chybové výpisy z `nslookup` navíc odchází do `stderr` a bez přesměrování `2>&1` je zachycený text prázdný.
-- **ŘEŠENÍ:** V dokumentačních skriptech vždy zachytávat konzolové příkazy přes pomocnou funkci:
+- **ŘEŠENÍ:** V `XX_check_*.ps1` skriptech při čtení CMD výstupů zachytávat konzolové příkazy přes pomocnou funkci:
   ```powershell
   function Invoke-ConsoleCmd {
       param([string]$Command)
@@ -355,29 +337,25 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 
 ### 19. BEZPEČNÉ ODESÍLÁNÍ PŘES CURL.EXE A HTTP PARSOVÁNÍ (ZÁKAZ `-w`, CHYBA 43)
 - V prostředí Windows PowerShell/CMD NIKDY nepoužívat u `curl.exe` parametr `-w "%{http_code}"` – ve Windows způsobuje pád `curl: (43) A libcurl function was given a bad argument` a návratový kód 000.
-- VŽDY volat `curl.exe -i -s -k` (přidá HTTP hlavičky do výstupu) a stavový kód parsovat regulárním výrazem:
+- Pokud skript potřebuje HTTP status kód přes `curl.exe`, vždy volat `curl.exe -i -s -k` a stavový kód parsovat regulárním výrazem:
   ```powershell
   if ($output -match "HTTP\/\d(?:\.\d)?\s+(\d{3})") { $statusCode = [int]$matches[1] }
   ```
-- VŽDY implementovat záložní odeslání přes .NET `System.Net.Http.HttpClient` pro případ, že curl selže nebo vrátí kód 000.
 
 ### 20. STRIKTNÍ INTEGRITA HYBRIDNÍ BAT HLAVIČKY (ZÁKAZ OSAMOCENÉHO `&`)
 - Řádek 3 v každém `.bat` zavaděči musí mít VŽDY přesnou syntaxi:
   `powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$script=[scriptblock]::Create((Get-Content -LiteralPath $env:BAT_PATH | Select-Object -Skip 5 | Out-String)); & $script %*"`
 - ZÁKAZ jakýchkoliv neuvážených zásahů či zkracování tohoto řádku. Zanechání visícího ampersandu `&` na konci roury způsobí pád parseru `Missing expression after '&'` a skript na VM vůbec nenastartuje.
 
-### 21. PLNÁ SYNCHRONIZACE DISCORD BOTA NA SERVERU (KÓD I ŠABLONY V KONTEJNERU)
+### 21. SYNCHRONIZACE DISCORD BOTA NA SERVERU (POUZE PŘI RUČNÍ ÚPRAVĚ BOTA)
 - Docker kontejner bota na produkčním serveru (NAS) nemá namountované svazky (`docker-compose.yml` se NIKDY nemění, svazky se nepřidávají!).
-- Při přidání nového modulu (např. 00, 01, 02) nestačí mít soubory pouze v repozitáři:
-  1. **Šablony:** AI MUSÍ uživatele vyzvat ke zkopírování šablon: `docker cp discord-bot/templates/XX ops-discord-bot:/app/templates/`
-  2. **Kód bota (`index.js`):** AI MUSÍ ověřit a uživatele upozornit na nutnost nahrát do kontejneru i aktualizovaný kód `index.js` s logikou pro daný modul. Pokud v kontejneru běží starý kód, bot sice ZIP vytvoří, ale šablony zůstanou nevyplněné (s textem `DOPLNIT`)!
-  3. **Restart:** Po nakopírování souborů je nutné provést `docker restart ops-discord-bot`.
+- Při tvorbě nového modulu se do bota **nic pro dokumentaci nepřidává ani nekopíruje**. Pokud však AI na výslovné přání upraví kód v `discord-bot/index.js`, musí uživatele upozornit na nahrání souboru (`docker cp discord-bot/index.js ops-discord-bot:/app/index.js`) a restart (`docker restart ops-discord-bot`).
 
 ### 22. ŠKOLNÍ WORKFLOW VAULTU, GITHUBU A ODEVZDÁNÍ (PREREKVIZITY `10-` A `14-`)
 - **Zákaz zásahů do školního repozitáře a materiálů učitele:** Školní vault (např. `skolni-it-pachomov`) je při generování **strictly read-only** — nikdy v něm nic neupravujte (ani `00-PREREKVIZITY`, `Modul X/`, `index.md`, `CHANGELOG.md`, `.obsidian/`). Student píše pouze do `Moje dokumentace/Modul X .../`.
-- **Odevzdávání od Modulu 3 výše (GitHub Push + Teams):** ZIP archivy se odevzdávaly jen v Modulech 0–2. Od Modulu 3 včetně se odevzdává cyklem **Pull -> zápis do `Moje dokumentace` -> popisný Commit -> Push na GitHub -> tlačítko Odevzdat v MS Teams** (stav repozitáře se hodnotí k termínu odevzdání).
-- **Konfigurace na webu (`modules.js` / `modules.json` / `praxe.html`):** Pro Moduly 3+ používejte v `submission` pole `description` (instrukce GitHub Push + Teams místo `Prijmeni_Jmeno_ModulX.zip`) a `deadline` (pokud je znám termín odevzdání). Discord bot i nadále zasílá `ModulXX.zip` jen jako balíček předvyplněných `overeni.md` a `postup.md` ke vložení do studentova lokálního vaultu (mimo OneDrive).
-- **Integrita šablon a screenshotů:** Nadpisy a ID (`M4-SRV1.V1-D1` apod.) z `overeni.md` a `postup.md` **nesmí být měněny**. Kde školní šablona vyžaduje ruční screenshot (`DOPLNIT`), musí screenshot obsahovat **viditelné hodiny na hlavním panelu**; výpisy konzole zůstávají jako `\`\`\`text` blok i s promptem.
+- **Odevzdávání od Modulu 3 výše (GitHub Push + Teams):** ZIP archivy se odevzdávaly jen v Modulech 0–2. Od Modulu 3 včetně se odevzdává ručně cyklem **Pull -> ruční zápis `postup.md` a `overeni.md` (s `OPS_PROMPT`) do `Moje dokumentace` -> popisný Commit -> Push na GitHub -> tlačítko Odevzdat v MS Teams** (stav repozitáře se hodnotí k termínu odevzdání).
+- **Konfigurace na webu (`modules.js` / `modules.json` / `praxe.html`):** Pro Moduly 3+ používejte v `submission` pole `description` (instrukce GitHub Push + Teams místo `Prijmeni_Jmeno_ModulX.zip`) a `deadline` (pokud je znám termín odevzdání), bez zmínek o Discord botovi či `XX_doc_*`.
+- **Integrita šablon, `OPS_PROMPT` a screenshotů:** Nadpisy a ID (`M4-SRV1.V1-D1` apod.) z `overeni.md` a `postup.md` **nesmí být měněny**. Kde školní šablona vyžaduje ruční screenshot (`DOPLNIT`), musí screenshot obsahovat **viditelné hodiny na hlavním panelu**; výpisy konzole zůstávají textem (`\`\`\`text`) i s reálným `OPS_PROMPT` (bez tohoto promptu jsou od Modulu 4 hodnoceny 0 body).
 - **Šedé odkazy a labové standardy:** Šedé odkazy ve školním vaultu značí dosud nevydané materiály — nevytvářejte prázdné cílové soubory. Parametry VM udržujte sjednocené podle aktuálního `CHANGELOG.md` (např. `SRV2-FS` má další disky **5× 5 GB**, Modul 0 = 4 h, Modul 1 = 4 h, celkem 40 h, heslo `Pa55w.rd`, doména malými písmeny bez diakritiky `<prijmeni>.cyberschool.internal`).
 
 ---
@@ -385,18 +363,18 @@ Při konfiguraci síťových rozhraní vždy do `what` vložte `.nic-warning-ban
 ## Ověřovací checklist pro AI před odevzdáním práce
 
 Než označíte úkol za dokončený, zkontrolujte v terminálu:
-1. `praxe/XX/verified.json` existuje a má platný JSON formát.
+1. `praxe/XX/verified.json` existuje, má platný JSON formát a všechny stroje i `"dokumentace"` mají hodnotu `false`.
 2. `praxe/XX/tasks.js` je syntakticky validní JS (`node -e "new Function(fs.readFileSync('praxe/XX/tasks.js'))"`).
-3. `praxe/modules.js` a `praxe/modules.json` obsahují nový modul a `docWorkflow`.
+3. `praxe/modules.js` a `praxe/modules.json` obsahují nový modul s deaktivovaným `docWorkflow` (`{ disabled: true, title: "DOKUMENTACE - Bude dostupná až vymyslíme jak obelstít juchyho claude", steps: [] }`).
 4. `praxe.html` má v `<head>` tag `<script src="praxe/XX/tasks.js"></script>`.
 5. V `praxe.html` nedošlo k syntaktické chybě v JS.
 6. Žádný příkaz neobsahuje `Ethernet*` (vždy přesně `Ethernet1`).
 7. Žádné heslo ani klíč nejsou v rozporu se zadáním (klíče z Teams, heslo `Pa55w.rd`).
 8. Všechny HTML stránky obsahují v `<head>` favicon odkazující na `bird.png` (`img/bird.png` resp. `../../img/bird.png`).
-9. Ve složce `skripty/` existují funkční kontrolní skripty `XX_check_<VM>.bat` pro všechny VM modulu.
-10. Ve složce `skripty/` existují funkční dokumentační skripty `XX_doc_<VM>.bat` a šablony v `praxe/XX/doc_templates/` i `discord-bot/templates/XX/`.
-11. Webhook URL v dokumentačních skriptech je bezpečně zašifrována (XOR + Base64) a nikde v repozitáři ani v `.env*` není v plaintextu.
-12. V markdown šablonách se nenachází žádné nezabalené HTML značky typu `<prijmeni>`, nadpisy a ID odpovídají školní šabloně a `modules.js`/`praxe.html` reflektuje termín i GitHub+Teams odevzdání (od M03+).
-13. Konzolové výstupy (`ipconfig`, `nslookup`) jsou v PowerShell skriptech zachytávány přes `Invoke-ConsoleCmd` s `-join "\`r\`n"` a OEM kódováním.
+9. Ve složce `skripty/` existují funkční read-only kontrolní skripty `XX_check_<VM>.bat` (+ `.ps1`) pro všechny VM modulu.
+10. **Nevznikly žádné dokumentační skripty `skripty/XX_doc_*`, šablony `praxe/XX/doc_templates/` ani `discord-bot/templates/XX/` a nikde v zadání, `tasks.js` ani `modules.js`/`modules.json` nejsou příkazy `curl ... *_doc_*`.**
+11. Nikde v repozitáři ani v `.env*` není plaintext webhook URL, token ani reálné heslo.
+12. Nadpisy a ID odpovídají školní šabloně a `modules.js`/`praxe.html` reflektuje termín, `OPS_PROMPT` i ruční GitHub+Teams odevzdání (od M03+).
+13. Konzolové výstupy (`ipconfig`, `nslookup`) jsou v `XX_check_*.ps1` skriptech zachytávány přes `Invoke-ConsoleCmd` s `-join "\`r\`n"` a OEM kódováním.
 14. Nikde v kódu, textech ani commitech nejsou použity emoji.
 15. Změny jsou otestovány, commitnuty pod autorem `samanbeer <343.ptom@gmail.com>` a pushnuty na větev `main` (`git pull --rebase origin main && git push origin main`).
