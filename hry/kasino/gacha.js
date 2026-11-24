@@ -41,7 +41,7 @@
     Object.freeze({id:"echo",name:"Kubačáková",file:"Echo",rank:"A",symbol:"[A]",type:"Angličtina"}),
     Object.freeze({id:"pixel",name:"Petrová",file:"Pixel",rank:"B",symbol:"[B]",type:"Angličtina"}),
     Object.freeze({id:"drift",name:"Romanovský",file:"Drift",rank:"B",symbol:"[B]",type:"DBS"}),
-    Object.freeze({id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"B",symbol:"[B]",type:"Robotika"}),
+    Object.freeze({id:"lahvac",name:"Lahváč",file:"Lahvac",image:"B-Lahvac.png",rank:"-1",symbol:"[-1]",type:"Robotika"}),
     Object.freeze({id:"Huvarova",name:"Huvarová",file:"Huvarova",rank:"B",symbol:"[B]",type:"Elektronika"})
   ]);
 
@@ -306,7 +306,7 @@
   }
   function agentById(id) { return agents.find(a => a.id === id) || agents[agents.length - 1]; }
   function art(a) {
-    return `<div class="art"><span class="sym">${a.symbol}</span><img src="${IMG_DIR}${a.rank}-${a.file}.png" alt="" draggable="false" onerror="this.classList.add('gone')"></div>`;
+    return `<div class="art"><span class="sym">${a.symbol}</span><img src="${IMG_DIR}${a.image || `${a.rank}-${a.file}.png`}" alt="" draggable="false" onerror="this.classList.add('gone')"></div>`;
   }
   document.addEventListener("load", e => {
     if (e.target.tagName === "IMG" && e.target.closest(".art")) e.target.closest(".art").parentElement.classList.add("has-img");
@@ -437,7 +437,7 @@
       agent = pick(agents.filter(a => a.rank === "A"));
       state.aPity = 0;
     } else {
-      agent = pick(agents.filter(a => a.rank === "B"));
+      agent = pick(agents.filter(a => a.rank === "B" || a.rank === "-1"));
     }
     state.inventory[agent.id] = (state.inventory[agent.id] || 0) + 1;
     const entry = {id:agent.id, rank:agent.rank, pull:state.totalPulls, time:Date.now(), featured};
@@ -447,9 +447,36 @@
   }
   function pick(list) { return list[_secureRng.int(0, list.length - 1)]; }
 
-  const RANK_COLOR = {Z:"#7ff0ff",S:"#ffd477",A:"#c084fc",B:"#8cbbff"};
-  const RANK_ORDER = ["Z","S","A","B"];
-  const RANK_STARS = {B:3,A:4,S:5,Z:6};
+  const RANK_COLOR = {Z:"#7ff0ff",S:"#ffd477",A:"#c084fc",B:"#8cbbff","-1":"#ff7b8a"};
+  const RANK_ORDER = ["Z","S","A","B","-1"];
+  const RANK_STARS = {"-1":-1,B:3,A:4,S:5,Z:6};
+  const rankClass = r => (r === "-1" ? "neg" : r);
+  const rankBadge = r => (r === "-1" ? "-1 ★" : r);
+  function renderStarsHtml(rank) {
+    const stars = RANK_STARS[rank] ?? 0;
+    if (stars < 0) {
+      return `<span class="rv-neg-stars">${stars} hvězd</span>` + Array.from({length:6}, (_,k) => `<i style="--i:${k}" class="neg"></i>`).join("");
+    }
+    return Array.from({length:6}, (_,k) => `<i style="--i:${k}" class="${k < stars ? "on" : ""}"></i>`).join("");
+  }
+  function renderTagsHtml(rank, extraTags = "") {
+    const stars = RANK_STARS[rank] ?? 0;
+    const starsTag = stars < 0 ? `<span class="rv-tag">${stars} HVĚZD</span>` : "";
+    return `<span class="rv-tag">${rank}-RANK</span>${starsTag}${extraTags}`;
+  }
+  function renderRevealAgent(agent, extraTags = "") {
+    const ov = $("reveal");
+    const isHigh = (agent.rank === "Z" || agent.rank === "S");
+    ov.style.setProperty("--c", RANK_COLOR[agent.rank] || RANK_COLOR.B);
+    ov.classList.toggle("hi", isHigh);
+    $("rvBig").textContent = agent.rank;
+    $("rvCard").innerHTML = art(agent) + `<span class="rk">${rankBadge(agent.rank)}</span>`;
+    $("rvName").innerHTML = [...agent.name].map((c,k) => `<span style="--i:${k}">${c === " " ? "&nbsp;" : escapeHtml(c)}</span>`).join("");
+    $("rvRole").textContent = agent.type;
+    $("rvTags").innerHTML = renderTagsHtml(agent.rank, extraTags);
+    $("rvPips").innerHTML = renderStarsHtml(agent.rank);
+    return ov;
+  }
   const STAGES = ["t-boot","t-streak","t-beam","t-reveal","t-out"];
   const REDUCE = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -543,23 +570,16 @@
   const rv = {q:[], i:0, results:[], ready:0};
 
   function showReveal(i) {
-    const r = rv.q[i], a = agentById(r.id), ov = $("reveal");
+    const r = rv.q[i], a = agentById(r.id);
     const isHighRank = (a.rank === "Z" || a.rank === "S");
     isSZAnimation = isHighRank;
-    const skipBtn = $("rvSkip");
-    skipBtn.classList.toggle("disabled", isHighRank);
+    $("rvSkip").classList.toggle("disabled", isHighRank);
 
-    ov.style.setProperty("--c", RANK_COLOR[a.rank]);
-    ov.classList.toggle("hi", isHighRank);
-    $("rvBig").textContent = a.rank;
-    $("rvCard").innerHTML = art(a) + `<span class="rk">${a.rank}</span>`;
-    $("rvName").innerHTML = [...a.name].map((c,k) => `<span style="--i:${k}">${c === " " ? "&nbsp;" : escapeHtml(c)}</span>`).join("");
-    $("rvRole").textContent = a.type;
-    $("rvTags").innerHTML = `<span class="rv-tag">${a.rank}-RANK</span>` + (r.featured ? '<span class="rv-tag">FEATURED</span>' : "") + (r.isNew ? '<span class="rv-tag">NOVÝ</span>' : "");
-    $("rvPips").innerHTML = Array.from({length:6}, (_,k) => `<i style="--i:${k}" class="${k < RANK_STARS[a.rank] ? "on" : ""}"></i>`).join("");
+    const extra = (r.featured ? '<span class="rv-tag">FEATURED</span>' : "") + (r.isNew ? '<span class="rv-tag">NOVÝ</span>' : "");
+    const ov = renderRevealAgent(a, extra);
     $("rvNext").textContent = rv.q.length > 1 ? `klepni pro pokračování · ${i+1} / ${rv.q.length}` : "klepni pro pokračování";
     ov.classList.remove("in"); void ov.offsetWidth; ov.classList.add("in");
-    fx.start(); fx.setColor(RANK_COLOR[a.rank]); fx.embers(true);
+    fx.start(); fx.setColor(RANK_COLOR[a.rank] || RANK_COLOR.B); fx.embers(true);
     sfx.card(a.rank);
     fx.burst(a.rank === "Z" ? 220 : a.rank === "S" ? 150 : 80, 480);
     rv.ready = Date.now() + (isHighRank ? 2500 : 650);
@@ -589,19 +609,11 @@
     rv.q = [{ id: agent.id, featured: false, isNew: false }];
     rv.i = 0; rv.results = []; isSZAnimation = false;
     $("rvSkip").classList.remove("disabled");
-    const ov = $("reveal");
-    ov.style.setProperty("--c", RANK_COLOR[agent.rank]);
-    ov.classList.toggle("hi", agent.rank === "Z" || agent.rank === "S");
-    $("rvBig").textContent = agent.rank;
-    $("rvCard").innerHTML = art(agent) + `<span class="rk">${agent.rank}</span>`;
-    $("rvName").innerHTML = [...agent.name].map((c,k) => `<span style="--i:${k}">${c === " " ? "&nbsp;" : escapeHtml(c)}</span>`).join("");
-    $("rvRole").textContent = agent.type;
-    $("rvTags").innerHTML = `<span class="rv-tag">${agent.rank}-RANK</span>`;
-    $("rvPips").innerHTML = Array.from({length:6}, (_,k) => `<i style="--i:${k}" class="${k < RANK_STARS[agent.rank] ? "on" : ""}"></i>`).join("");
+    const ov = renderRevealAgent(agent);
     $("rvNext").textContent = "klepni pro zavření";
     ov.classList.remove("in"); void ov.offsetWidth; ov.classList.add("in");
     ov.classList.add("open");
-    fx.start(); fx.setColor(RANK_COLOR[agent.rank]); fx.embers(true);
+    fx.start(); fx.setColor(RANK_COLOR[agent.rank] || RANK_COLOR.B); fx.embers(true);
     rv.ready = Date.now() + 200;
     sfx.tick();
   };
@@ -643,27 +655,29 @@
     render();
 
     const best = RANK_ORDER.find(r => results.some(x => x.rank === r)) || "B";
+    const bestStars = RANK_STARS[best] ?? 0;
     const sc = $("scan"), status = $("scanStatus");
     sc.classList.remove(...STAGES);
-    sc.style.setProperty("--c", RANK_COLOR[best]);
+    sc.style.setProperty("--c", RANK_COLOR[best] || RANK_COLOR.B);
     $("scanRank").textContent = best;
     $("scanCh").textContent = "CH " + String(_secureRng.int(1000, 9999));
     status.textContent = "ANALYZING SIGNAL"; status.classList.add("dots");
-    $("scanPips").querySelectorAll("i").forEach((p, i) => p.classList.toggle("on", i < RANK_STARS[best]));
+    $("scanPips").classList.toggle("neg", bestStars < 0);
+    $("scanPips").querySelectorAll("i").forEach((p, i) => p.classList.toggle("on", i < bestStars));
     sc.classList.add("show");
-    fx.start(); fx.setColor(RANK_COLOR[best]);
+    fx.start(); fx.setColor(RANK_COLOR[best] || RANK_COLOR.B);
     const total = count === 1 ? 3100 : 3600;
     const at = (ms, fn) => spinTimers.push(setTimeout(fn, ms));
     at(30,   () => { sc.classList.add("t-boot"); fx.setWarp(1); });
     at(600,  () => { sc.classList.add("t-streak"); fx.setMix(1); });
     at(1050, () => sc.classList.add("t-beam"));
-    at(1330, () => { sfx.impact(best); fx.setWarp(0); fx.burst(110 + RANK_STARS[best] * 28, 420 + RANK_STARS[best] * 40); });
+    at(1330, () => { sfx.impact(best); fx.setWarp(0); fx.burst(110 + bestStars * 28, 420 + bestStars * 40); });
     at(1650, () => {
       sfx.sting(best);
       sc.classList.add("t-reveal");
       fx.embers(true);
       status.classList.remove("dots");
-      status.textContent = count > 1 ? `BEST · ${best}-RANK` : `${best}-RANK · SIGNAL CONFIRMED`;
+      status.textContent = count > 1 ? `BEST · ${best}-RANK` : (bestStars < 0 ? `${best}-RANK (${bestStars} ★)` : `${best}-RANK · SIGNAL CONFIRMED`);
     });
     at(total - 380, () => sc.classList.add("t-out"));
     at(total, () => endSpin(results));
@@ -686,7 +700,7 @@
     $("resultSub").textContent = `${results.length} ${results.length === 1 ? "zápis" : "zápisy"} · ${zCount ? "Mimořádně vzácný zásah!" : sCount ? "Sbor je silnější." : "Další zvonění čeká."}`;
     $("resultGrid").innerHTML = results.map((r,i) => {
       const a = agentById(r.id);
-      return `<div class="result-card ${a.rank}" style="animation-delay:${i*65}ms">${art(a)}<span class="rk">${a.rank}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}${r.featured ? " · FEATURED" : ""}</small></div>`;
+      return `<div class="result-card ${rankClass(a.rank)}" style="animation-delay:${i*65}ms">${art(a)}<span class="rk">${rankBadge(a.rank)}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}${r.featured ? " · FEATURED" : ""}</small></div>`;
     }).join("");
     $("overlay").classList.add("open");
     $("closeResults").focus();
@@ -708,13 +722,13 @@
     $("shopCookies").textContent = Math.floor(readCookies().available).toLocaleString("cs-CZ") + " sušenek";
     $("singleBtn").disabled = busy || state.tokens < COST;
     $("tenBtn").disabled = busy || state.tokens < COST*10;
-    $("roster").innerHTML = agents.map(a => `<div class="char ${a.rank.toLowerCase()}${state.inventory[a.id] ? "" : " locked"}" onclick="inspectAgent('${a.id}')">${art(a)}<span class="rk">${a.rank}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}${a.id === activeBanner().featured ? " · Featured" : ""}</small><small>× ${state.inventory[a.id] || 0}</small></div>`).join("");
+    $("roster").innerHTML = agents.map(a => `<div class="char ${rankClass(a.rank).toLowerCase()}${state.inventory[a.id] ? "" : " locked"}" onclick="inspectAgent('${a.id}')">${art(a)}<span class="rk">${rankBadge(a.rank)}</span><b>${escapeHtml(a.name)}</b><small>${escapeHtml(a.type)}${a.id === activeBanner().featured ? " · Featured" : ""}</small><small>× ${state.inventory[a.id] || 0}</small></div>`).join("");
     const collected = agents.filter(a => state.inventory[a.id]).length;
     $("rosterCount").textContent = `${collected} / ${agents.length} získáno`;
     $("history").innerHTML = sessionHistory.length ? sessionHistory.slice(0,8).map(h => {
       const a = agentById(h.id);
       const date = new Date(h.time).toLocaleString("cs-CZ",{dateStyle:"short",timeStyle:"short"});
-      return `<div class="history-item"><div class="rarity-dot ${a.rank}">${a.rank}</div><div><b>${escapeHtml(a.name)}${h.featured ? " *" : ""}</b><small>${escapeHtml(a.type)} · #${h.pull} · ${date}</small></div></div>`;
+      return `<div class="history-item"><div class="rarity-dot ${rankClass(a.rank)}">${a.rank}</div><div><b>${escapeHtml(a.name)}${h.featured ? " *" : ""}</b><small>${escapeHtml(a.type)} · #${h.pull} · ${date}</small></div></div>`;
     }).join("") : '<div class="empty">Zatím žádné zápisy.<br>První zvonění čeká.</div>';
   }
 

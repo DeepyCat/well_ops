@@ -117,7 +117,7 @@
         {id:"echo",name:"Kubačáková",file:"Echo",rank:"A",symbol:"[A]",type:"Angličtina"},
         {id:"pixel",name:"Petrová",file:"Pixel",rank:"B",symbol:"[B]",type:"Angličtina"},
         {id:"drift",name:"Romanovský",file:"Drift",rank:"B",symbol:"[B]",type:"DBS"},
-        {id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"B",symbol:"[B]",type:"Robotika"},
+        {id:"lahvac",name:"Lahváč",file:"Lahvac",rank:"-1",symbol:"[-1]",type:"Robotika"},
         {id:"Huvarova",name:"Huvarová",file:"Huvarova",rank:"B",symbol:"[B]",type:"Elektronika"}
     ];
 
