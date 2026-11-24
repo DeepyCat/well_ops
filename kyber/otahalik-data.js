@@ -1,0 +1,1 @@
+window.ZAPISNIK_DATA = {};
