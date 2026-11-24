@@ -144,6 +144,12 @@ window.ZAPISNIK_DATA = {
               ]
             }
           ]
+        },
+        {
+          "id": "69aygfef",
+          "label": "Video - \"How Delta Force Captured Maduro in Just 3 Hours\"",
+          "url": "https://www.youtube.com/watch?v=fGmTVb2gv98",
+          "tasks": []
         }
       ],
       "due": "2026-11-25"
