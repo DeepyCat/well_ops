@@ -11,7 +11,7 @@
 // ============================================================
 
 window.POVOLENA_ZARIZENI = [
-  //"ZAP-Z7UZ3T", //skola_programovani S174
+  "ZAP-76R4V6", //skola_programovani S174
   //"ZAP-4NJBHK", //mobil Matty
   "ZAP-LHNLSG",
   "ZAP-3ZE2YY", //pc doma muj
