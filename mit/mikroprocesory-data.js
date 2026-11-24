@@ -2,6 +2,22 @@
 window.ZAPISNIK_DATA = {
   "zadani": [
     {
+      "id": "0324fqtj",
+      "title": "St - dynamický display",
+      "desc": "prostě čísla na té sedmi segmentovce",
+      "done": true,
+      "lang": "",
+      "code": "#include <avr/io.h>\n#include <avr/interrupt.h>\n#define F_CPU 16000000\n#include <util/delay.h>\n\nint main(void)\n{\n    DDRD = 0xff;\n    DDRB = 0xff;\n\n    unsigned char segmenty[17] = {\n        0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8,\n        0x80, 0x90, 0x88, 0x83, 0xC6, 0xC6, 0xA1, 0x86, 0x8E\n    };\n    unsigned char video[6] = {1, 2, 3, 4, 5, 6};\n\n    TCCR0A = 0x00;\n    TCCR0B = 0x03;\n\n    int i = 0;\n\n    while (1)\n    {\n        if (TIFR0 & (1 << 0)) // kontrola příznakového bitu interrupt\n        {\n            TCNT0 = 6;        // řídící registr\n            TIFR0 |= (1 << 0); // vynulování příznakového bitu\n\n            PORTD = ~(1 << i);\n            PORTB = segmenty[video[i]];\n\n            i++;\n            if (i > 5)\n            {\n                i = 0;\n            }\n        }\n    }\n}"
+    },
+    {
+      "id": "hfrhqbdx",
+      "title": "St - zmáčkne tlačítko a odpočítává do 0",
+      "desc": "Zmáčknese tlačítko a to se bude odečítavat do 0",
+      "done": false,
+      "lang": "",
+      "code": "#include <avr/io.h>\n#include <avr/interrupt.h>\n#define F_CPU 16000000\n#include <util/delay.h>\n\nchar klav()\n{\n    char vystup[16] = {1, 2, 3, 10, 4, 5, 6, 11, 7, 8, 9, 12, 14, 0, 15, 13};\n    int pokusy = 0;\n\n    for (int radek = 3; radek >= 0; radek--)\n    {\n        PORTE = ~(1 << radek);\n        _delay_us(1);\n\n        for (int sloupce = 4; sloupce < 8; sloupce++)\n        {\n            if (~PINE & (1 << sloupce))\n            {\n                return vystup[pokusy];\n            }\n            pokusy++;\n        }\n    }\n\n    return 255; // Nyní správně až po prohledání všech řádků\n}\n\nint main(void)\n{\n    unsigned char segmenty[17] = {\n        0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8,\n        0x80, 0x90, 0x88, 0x83, 0xC6, 0xC6, 0xA1, 0x86, 0x8E\n    };\n    int klave;\n\n    DDRE = 0x0f;\n    DDRB = 0xff;\n    DDRD = 0xff;\n    PORTD = 0xdf;\n    DDRC = 0xff;\n\n    /*\n    {\n        PORTC = 0b10000000;\n        _delay_ms(150);\n    }\n    */\n\n    while (1)\n    {\n        klave = klav();\n\n        if (klave >= 0 && klave <= 9)\n        {\n            for (int i = klave; i >= 0; i--)\n            {\n                PORTB = segmenty[i];\n                _delay_ms(500);\n            }\n        }\n        else\n        {\n            PORTB = 0xff;\n        }\n\n        _delay_ms(1000);\n    }\n}"
+    },
+    {
       "id": "mit10",
       "title": "10_Fr – Maticová klávesnice 4×4 → displej",
       "desc": "Číst maticovou klávesnici 4×4 (řádky PE0–PE3 jako výstupy, sloupce PE4–PE7 jako vstupy s pull-up rezistory) a stisknutou číslici 0–9 zobrazit na sedmisegmentovém displeji na PORTB. Klávesy A–D, * a # se nezobrazují.\n\nPoznámka: v původním souboru byly překlepy (uint8_7 místo uint8_t), takže se nepřeložil. Tady je opravený. Tabulka segmentů je navíc pro společnou katodu (1 = svítí), na rozdíl od předchozích úloh.",
