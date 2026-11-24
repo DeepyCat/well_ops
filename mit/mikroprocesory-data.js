@@ -5,7 +5,7 @@ window.ZAPISNIK_DATA = {
       "id": "0324fqtj",
       "title": "St - dynamický display",
       "desc": "prostě čísla na té sedmi segmentovce",
-      "done": true,
+      "done": false,
       "lang": "",
       "code": "#include <avr/io.h>\n#include <avr/interrupt.h>\n#define F_CPU 16000000\n#include <util/delay.h>\n\nint main(void)\n{\n    DDRD = 0xff;\n    DDRB = 0xff;\n\n    unsigned char segmenty[17] = {\n        0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8,\n        0x80, 0x90, 0x88, 0x83, 0xC6, 0xC6, 0xA1, 0x86, 0x8E\n    };\n    unsigned char video[6] = {1, 2, 3, 4, 5, 6};\n\n    TCCR0A = 0x00;\n    TCCR0B = 0x03;\n\n    int i = 0;\n\n    while (1)\n    {\n        if (TIFR0 & (1 << 0)) // kontrola příznakového bitu interrupt\n        {\n            TCNT0 = 6;        // řídící registr\n            TIFR0 |= (1 << 0); // vynulování příznakového bitu\n\n            PORTD = ~(1 << i);\n            PORTB = segmenty[video[i]];\n\n            i++;\n            if (i > 5)\n            {\n                i = 0;\n            }\n        }\n    }\n}"
     },
