@@ -21,6 +21,9 @@ function devId(){
 const myId=devId();
 const allowed=Array.isArray(window.POVOLENA_ZARIZENI)?window.POVOLENA_ZARIZENI:[];
 const canEdit=allowed.some(x=>String(x).trim().toUpperCase()===myId);
+/* admin si může přepnout na pohled návštěvníka; data (S) se přitom nemění */
+let preview=false;
+const editing=()=>canEdit&&!preview;
 
 /* ---------- data ---------- */
 /* starý textový formát odpovědí -> úlohy (nadpis bez odsazení, otázka odsazená, odpověď odsazená víc) */
@@ -53,6 +56,7 @@ const dirty=()=>strip(S)!==strip(FILE);
 function setStat(t,warn){const e=document.getElementById('stat');e.textContent=t;e.className=warn?'warn':'';}
 function updateStat(){
   if(!canEdit)return setStat('Režim jen pro čtení');
+  if(preview)return setStat('👁 Náhled návštěvníka'+(dirty()?' (včetně dosud neuložených změn)':''));
   dirty()?setStat('● Změny zatím nejsou v '+CFG.file+' – stáhni ho a nahraj do složky',true):setStat('✓ Shodné se souborem '+CFG.file);
 }
 function save(quiet){
@@ -110,9 +114,10 @@ async function copy(txt,el){
 }
 
 /* ---------- režim úprav ---------- */
-const cnt=r=>{let n=0,a=0;(r.tasks||[]).forEach(k=>k.items.forEach(i=>{n++;if((i.a||'').trim())a++;}));return [a,n];};
+const cnt=r=>{let n=0;(r.tasks||[]).forEach(k=>(k.items||[]).forEach(()=>n++));return n;};
+const pl=n=>n+(n===1?' otázka':n>=2&&n<=4?' otázky':' otázek');
 function edItem(k,it,n,redraw){
-  const ans=bind(h('textarea',{class:'av1',rows:1,spellcheck:'false',placeholder:'Odpověď / flag'},it.a||''),it,'a');
+  const ans=bind(h('textarea',{class:'av1',rows:1,spellcheck:'false',placeholder:'Odpověď / flag (prázdné = „No answer needed“)'},it.a||''),it,'a');
   const cb=h('button',{class:'btn',type:'button',onclick:()=>copy(ans.value.trim(),cb)},'Kopírovat');
   const nt=bind(h('textarea',{rows:2,placeholder:'Pokyn nad touto otázkou'},it.note||''),it,'note');
   const nw=h('div',{class:'inw'},nt);
@@ -196,14 +201,14 @@ function solBox(it){
 }
 function ansRow(it){
   const a=(it.a||'').trim();
-  if(!a)return h('div',{class:'ar'},h('div',{class:'av empty'},'— zatím bez odpovědi —'));
+  if(!a)return h('div',{class:'ar'},h('div',{class:'av na','aria-label':'No answer needed',role:'note'}));
   const b=h('button',{class:'btn',type:'button',onclick:()=>copy(a,b)},'Kopírovat');
   return h('div',{class:'ar'},h('div',{class:'av'},a),b);
 }
 function roTask(k,j){
-  const items=k.items||[],done=items.filter(i=>(i.a||'').trim()).length;
+  const items=k.items||[];
   const d=h('details',{class:'tk','data-k':k.id,open:openTasks.has(k.id)},
-    h('summary',{},h('span',{class:'chev'},'▸'),h('span',{class:'tn'},'Task '+(j+1)),h('span',{class:'tt'},k.title||''),h('span',{class:'tc'},done+'/'+items.length)));
+    h('summary',{},h('span',{class:'chev'},'▸'),h('span',{class:'tn'},'Task '+(j+1)),h('span',{class:'tt'},k.title||''),h('span',{class:'tc'},pl(items.length))));
   d.addEventListener('toggle',()=>{d.open?openTasks.add(k.id):openTasks.delete(k.id);});
   const b=h('div',{class:'tb'});
   if(k.note)b.append(h('div',{class:'note txt'},k.note));
@@ -218,12 +223,11 @@ function roRoom(l,i){
   tg.onclick=()=>{const ds=[...r.querySelectorAll('details.tk')],all=ds.every(d=>d.open);ds.forEach(d=>{d.open=!all;});};
   const r=h('div',{class:'room'},
     h('div',{class:'rh'},h('span',{class:'num'},String(i+1)),
-      h('div',{class:'rt'},l.label||'Odkaz '+(i+1),c[1]?h('div',{class:'rs'},c[0]+' / '+c[1]+' odpovědí'):null),
+      h('div',{class:'rt'},l.label||'Odkaz '+(i+1),c?h('div',{class:'rs'},pl(c)):null),
       tasks.length>1?tg:null,
       u?h('a',{class:'btn thm',href:u,target:'_blank',rel:'noopener noreferrer'},'Otevřít ↗'):null));
-  if(c[1])r.append(h('div',{class:'prog'},h('i',{style:'width:'+Math.round(c[0]/c[1]*100)+'%'})));
   tasks.forEach((k,j)=>r.append(roTask(k,j)));
-  if(!tasks.length)r.append(h('div',{class:'tb mut'},'Zatím bez odpovědí.'));
+  if(!tasks.length)r.append(h('div',{class:'tb mut'},'Zatím bez otázek.'));
   r.addEventListener('toggle',upd,true);upd();
   return r;
 }
@@ -245,7 +249,7 @@ function card(sub,t){
     h('summary',{},h('span',{class:'chev'},'▸'),sum,dueBadge(t),t.done?h('span',{class:'badge'},'hotovo'):null));
   d.addEventListener('toggle',()=>{d.open?openIds.add(t.id):openIds.delete(t.id);});
   const body=h('div',{class:'body'});
-  canEdit?editBody(sub,t,body,sum):roBody(sub,t,body);
+  editing()?editBody(sub,t,body,sum):roBody(sub,t,body);
   d.append(body);
   return d;
 }
@@ -302,13 +306,14 @@ function render(){
   if(query.trim())return renderSearch(root);
   const raw=S.zadani,k=t=>t.due||'9999';
   const list=sortMode==='due'?raw.slice().sort((x,y)=>k(x)<k(y)?-1:k(x)>k(y)?1:0):raw;
+  if(preview)root.append(h('div',{class:'pvbar'},h('span',{},'👁 Prohlížíš stránku jako návštěvník. Vše, co jsi vložil, zůstává zachované.'),h('button',{class:'btn sm',type:'button',onclick:()=>setPreview(false)},'← Zpět do úprav')));
   root.append(h('div',{class:'bar'},h('h2',{class:'group grow'},'Zadání · '+raw.length),
     h('div',{class:'tools2'},
       h('button',{class:'btn',type:'button',onclick:()=>{sortMode=sortMode==='due'?'manual':'due';render();}},sortMode==='due'?'Řazení: podle termínu':'Řazení: ručně'),
-      canEdit?h('button',{class:'btn pri',type:'button',onclick:()=>addTask(SUB)},'+ Nové zadání'):null,
-      canEdit?h('button',{class:'btn',type:'button',onclick:exportData},'⬇ Stáhnout '+CFG.file):null,
-      canEdit?delBtn(()=>{S=norm(FILE);try{localStorage.removeItem(KEY);}catch(e){}render();updateStat();},'Zahodit lokální změny'):null)));
-  if(!list.length)root.append(h('p',{class:'empty'},canEdit?'Zatím tu nic není. Přidej první zadání tlačítkem nahoře.':'Zatím tu nic není.'));
+      editing()?h('button',{class:'btn pri',type:'button',onclick:()=>addTask(SUB)},'+ Nové zadání'):null,
+      editing()?h('button',{class:'btn',type:'button',onclick:exportData},'⬇ Stáhnout '+CFG.file):null,
+      editing()?delBtn(()=>{S=norm(FILE);try{localStorage.removeItem(KEY);}catch(e){}render();updateStat();},'Zahodit lokální změny'):null)));
+  if(!list.length)root.append(h('p',{class:'empty'},editing()?'Zatím tu nic není. Přidej první zadání tlačítkem nahoře.':'Zatím tu nic není.'));
   list.forEach(t=>root.append(card(SUB,t)));
   if(focusId){const el=root.querySelector('[data-id="'+focusId+'"]');if(el)el.focus();focusId=null;}
 }
@@ -320,12 +325,28 @@ const applyTh=()=>document.documentElement.setAttribute('data-theme',th);
 applyTh();
 const thB=h('button',{class:'btn sm',type:'button',onclick:()=>{th=TH[(TH.indexOf(th)+1)%2];try{localStorage.setItem(TK,th);}catch(e){}applyTh();thB.textContent=TL[th];}},TL[th]);
 const idEl=h('code',{},myId);
+const roleEl=h('span',{class:'role'});
+const pvB=h('button',{class:'btn sm',type:'button',onclick:()=>setPreview(!preview)});
+function updateRole(){
+  roleEl.className='role '+(!canEdit?'ro':preview?'pv':'ed');
+  roleEl.textContent=!canEdit?'Jen čtení':preview?'Náhled návštěvníka':'Úpravy povoleny';
+  pvB.textContent=preview?'← Zpět do úprav':'👁 Zobrazit jako návštěvník';
+}
+function setPreview(v){
+  if(!canEdit)return;
+  preview=v;
+  const y=window.scrollY;
+  render();updateRole();updateStat();
+  window.scrollTo(0,y);
+}
 document.getElementById('top').append(
   h('div',{class:'dev',title:'Klikni pro zkopírování ID zařízení',onclick:()=>copy(myId,idEl)},h('span',{},'ID zařízení'),idEl),
-  h('span',{class:'role '+(canEdit?'ed':'ro')},canEdit?'Úpravy povoleny':'Jen čtení'),
+  roleEl,
+  canEdit?pvB:null,
   h('span',{id:'stat'}),thB);
 const qi=document.getElementById('q');
 qi.addEventListener('input',()=>{query=qi.value;render();});
 qi.addEventListener('keydown',e=>{if(e.key==='Escape'){qi.value='';query='';render();}});
 render();
+updateRole();
 updateStat();

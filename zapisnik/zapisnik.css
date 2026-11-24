@@ -135,3 +135,12 @@ h2.group::after{content:"";flex:1;height:1px;background:var(--bd)}
 .card{border-radius:14px}
 .card:hover{border-color:var(--mt)}
 @media(max-width:560px){.header-in{padding:10px 14px}.wrap{padding:0 14px 100px}.back span{display:none}}
+
+/* ---- náhled návštěvníka (admin) ---- */
+.role.pv{background:var(--wn)}
+.pvbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:18px 0 0;padding:10px 14px;border:1px solid var(--wn);border-radius:10px;background:var(--sf);font-size:.85rem;color:var(--wn)}
+.pvbar .btn.sm{margin:0;color:var(--tx)}
+
+/* ---- „No answer needed“ – nejde označit ani zkopírovat (text je jen v ::before) ---- */
+.av.na{border-left-color:var(--mt);color:var(--mt);font-family:inherit;font-style:italic;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:default}
+.av.na::before{content:"No answer needed"}
