@@ -20,7 +20,7 @@ window.ZAPISNIK_DATA = {
                 {
                   "id": "9xhn54bz",
                   "q": "Přečtěte si výše uvedený text.",
-                  "a": "No answer needed"
+                  "a": ""
                 }
               ]
             },
@@ -139,11 +139,17 @@ window.ZAPISNIK_DATA = {
                 {
                   "id": "70kmmaeh",
                   "q": "Supeer! Zvládli jsme to!",
-                  "a": "No answer needed"
+                  "a": ""
                 }
               ]
             }
           ]
+        },
+        {
+          "id": "69aygfef",
+          "label": "Video - \"How Delta Force Captured Maduro in Just 3 Hours\"",
+          "url": "https://www.youtube.com/watch?v=fGmTVb2gv98",
+          "tasks": []
         }
       ],
       "due": "2026-11-25"
