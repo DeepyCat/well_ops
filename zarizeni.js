@@ -14,7 +14,7 @@ window.POVOLENA_ZARIZENI = [
   "ZAP-76R4V6", //skola_programovani S174
   //"ZAP-4NJBHK", //mobil Matty
   "ZAP-LHNLSG",
-  "ZAP-Y4672V", //pc doma muj
+  //"ZAP-Y4672V", //pc doma muj
   "ZAP-5J6VQF", // WIN 11 - St
   //"ZAP-G3L6N7",
   //"ZAP-5SFX5M", //skola_kybernetika
