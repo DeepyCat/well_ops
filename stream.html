@@ -431,6 +431,18 @@
             color: #fca5a5;
         }
         .btn-stop:hover:not(:disabled) { background: rgba(239, 68, 68, .26); }
+        .btn-mic-live {
+            background: rgba(34, 197, 94, .14);
+            border-color: rgba(34, 197, 94, .45);
+            color: #86efac;
+        }
+        .btn-mic-live:hover:not(:disabled) { background: rgba(34, 197, 94, .22); }
+        .btn-mic-live.is-muted {
+            background: rgba(239, 68, 68, .16);
+            border-color: rgba(239, 68, 68, .45);
+            color: #fca5a5;
+        }
+        .btn-mic-live.is-muted:hover:not(:disabled) { background: rgba(239, 68, 68, .26); }
 
         .field {
             background: var(--surface-2);
@@ -1075,6 +1087,10 @@
                         <svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
                         <span>Ukončit stream</span>
                     </button>
+                    <button class="btn btn-mic-live" id="micLiveBtn" type="button" hidden title="Ztlumit nebo zapnout mikrofon během přenosu">
+                        <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        <span id="micLiveLabel">Mikrofon ON</span>
+                    </button>
                     <select class="field quality-select" id="sourceSelect" aria-label="Zdroj videa">
                         <option value="screen">Obrazovka</option>
                         <option value="both">Obrazovka + Webkamera</option>
@@ -1086,9 +1102,13 @@
                         <option value="480p">480p · 24 fps (Úsporný)</option>
                         <option value="1080p">1080p · 30 fps (Ostrý text)</option>
                     </select>
-                    <label class="check-pill" title="Sdílet zvuk z karty / mikrofonu">
+                    <label class="check-pill" title="Sdílet systémový zvuk karty nebo okna">
                         <input type="checkbox" id="audioToggle" checked>
-                        <span>Se zvukem</span>
+                        <span>Zvuk karty</span>
+                    </label>
+                    <label class="check-pill" id="micPill" title="Připojit mikrofon k přenosu">
+                        <input type="checkbox" id="micToggle" checked>
+                        <span>Mikrofon</span>
                     </label>
                 </div>
                 <div class="dock-right">
@@ -1236,10 +1256,14 @@
             reconnectBtn: $('reconnectBtn'),
             startBtn: $('startBtn'),
             stopBtn: $('stopBtn'),
+            micLiveBtn: $('micLiveBtn'),
+            micLiveLabel: $('micLiveLabel'),
             sourceSelect: $('sourceSelect'),
             streamTitleInput: $('streamTitleInput'),
             qualitySelect: $('qualitySelect'),
             audioToggle: $('audioToggle'),
+            micToggle: $('micToggle'),
+            micPill: $('micPill'),
             viewerControls: $('viewerControls'),
             muteBtn: $('muteBtn'),
             volSlider: $('volSlider'),
@@ -1286,6 +1310,11 @@
                 if ((opt.value === 'camera' || opt.value === 'both') && !canCamera) opt.disabled = true;
             }
             if (!canScreenShare && canCamera) els.sourceSelect.value = 'camera';
+        }
+        if (els.micToggle && !canCamera) {
+            els.micToggle.checked = false;
+            els.micToggle.disabled = true;
+            if (els.micPill) els.micPill.hidden = true;
         }
 
         function resolveInitialNick() {
@@ -1401,6 +1430,8 @@
             streamTitle: '',
             localStream: null,
             localCleanup: null,
+            micTrack: null,
+            micMuted: false,
             activeHost: null,
             peersOnline: [],
             hostPeers: new Map(), // viewerTabId -> { pc, iceQueue, remoteDescSet }
@@ -1773,9 +1804,14 @@
             if (els.audioToggle && els.audioToggle.parentElement) {
                 els.audioToggle.parentElement.hidden = !canAnyBroadcast && !state.isStreaming;
             }
+            if (els.micPill) {
+                els.micPill.hidden = !canCamera || (!canAnyBroadcast && !state.isStreaming);
+            }
             els.streamTitleInput.disabled = state.isStreaming;
             els.qualitySelect.disabled = state.isStreaming;
             els.audioToggle.disabled = state.isStreaming;
+            if (els.micToggle) els.micToggle.disabled = state.isStreaming || !canCamera;
+            updateMicLiveButton();
 
             if (state.isStreaming) {
                 setTopStatus('live', 'VYSÍLÁŠ ŽIVĚ');
@@ -1902,26 +1938,88 @@
             }
         }
 
-        async function captureBroadcastStream(mode, preset, includeAudio) {
+        const MIC_CONSTRAINTS = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+
+        function updateMicLiveButton() {
+            if (!els.micLiveBtn) return;
+            const show = state.isStreaming && Boolean(state.micTrack);
+            els.micLiveBtn.hidden = !show;
+            if (!show) return;
+            const muted = state.micMuted || !state.micTrack.enabled;
+            els.micLiveBtn.classList.toggle('is-muted', muted);
+            els.micLiveBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+            if (els.micLiveLabel) {
+                els.micLiveLabel.textContent = muted ? 'Mikrofon ztlumen' : 'Mikrofon ON';
+            }
+        }
+
+        async function captureMicStream() {
+            if (!canCamera) return null;
+            try {
+                return await navigator.mediaDevices.getUserMedia({ audio: MIC_CONSTRAINTS, video: false });
+            } catch (err) {
+                addSystemMessage('Mikrofon se nepodařilo připojit (zkontroluj oprávnění v prohlížeči). Stream poběží bez mikrofonu.');
+                return null;
+            }
+        }
+
+        function mixAudioTracks(tracks, audioCtxOut) {
+            const valid = tracks.filter(Boolean);
+            if (!valid.length) return [];
+            if (valid.length === 1) return [valid[0]];
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (typeof AC === 'function' && typeof MediaStream === 'function') {
+                try {
+                    const ctx = new AC();
+                    if (typeof ctx.resume === 'function') ctx.resume().catch(() => {});
+                    const dest = ctx.createMediaStreamDestination();
+                    valid.forEach(track => {
+                        ctx.createMediaStreamSource(new MediaStream([track])).connect(dest);
+                    });
+                    audioCtxOut.push(ctx);
+                    const mixed = dest.stream.getAudioTracks();
+                    if (mixed.length) return mixed;
+                } catch (e) {}
+            }
+            return valid;
+        }
+
+        async function captureBroadcastStream(mode, preset, includeSystemAudio, includeMic) {
             const rawStreams = [];
+            const audioCtxs = [];
             let timerId = null;
-            let audioCtx = null;
 
             const stopRaw = () => {
                 if (timerId) { clearInterval(timerId); timerId = null; }
                 rawStreams.forEach(s => s.getTracks().forEach(t => { try { t.stop(); } catch (e) {} }));
-                if (audioCtx && typeof audioCtx.close === 'function') {
-                    try { audioCtx.close(); } catch (e) {}
-                }
+                audioCtxs.forEach(ctx => {
+                    if (ctx && typeof ctx.close === 'function') {
+                        try { ctx.close(); } catch (e) {}
+                    }
+                });
             };
 
             if (mode === 'camera') {
-                const camStream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: { ideal: preset.width }, height: { ideal: preset.height }, frameRate: { ideal: preset.fps } },
-                    audio: includeAudio
-                });
+                let camStream;
+                try {
+                    camStream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: { ideal: preset.width }, height: { ideal: preset.height }, frameRate: { ideal: preset.fps } },
+                        audio: includeMic ? MIC_CONSTRAINTS : false
+                    });
+                } catch (err) {
+                    if (includeMic && err && err.name !== 'NotAllowedError') {
+                        camStream = await navigator.mediaDevices.getUserMedia({
+                            video: { width: { ideal: preset.width }, height: { ideal: preset.height }, frameRate: { ideal: preset.fps } },
+                            audio: false
+                        });
+                        addSystemMessage('Mikrofon nebyl dostupný — webkamera vysílá bez zvuku.');
+                    } else {
+                        throw err;
+                    }
+                }
                 rawStreams.push(camStream);
-                return { stream: camStream, contentHint: 'motion', label: 'Webkamera', cleanup: stopRaw };
+                const micTrack = camStream.getAudioTracks()[0] || null;
+                return { stream: camStream, contentHint: 'motion', label: 'Webkamera', micTrack, cleanup: stopRaw };
             }
 
             const screenStream = await navigator.mediaDevices.getDisplayMedia({
@@ -1931,26 +2029,42 @@
                     frameRate: { ideal: preset.fps },
                     cursor: 'always'
                 },
-                audio: includeAudio
+                audio: includeSystemAudio
             });
             rawStreams.push(screenStream);
 
             if (mode !== 'both' || !canCamera) {
-                return { stream: screenStream, contentHint: 'detail', label: 'Sdílení obrazovky', cleanup: stopRaw };
+                let micTrack = null;
+                if (includeMic && canCamera) {
+                    const micStream = await captureMicStream();
+                    if (micStream) {
+                        rawStreams.push(micStream);
+                        micTrack = micStream.getAudioTracks()[0] || null;
+                    }
+                }
+                const screenAudio = includeSystemAudio ? screenStream.getAudioTracks() : [];
+                const combinedAudio = mixAudioTracks([...screenAudio, micTrack], audioCtxs);
+                const videoTracks = screenStream.getVideoTracks();
+                const outStream = (micTrack && typeof MediaStream === 'function')
+                    ? new MediaStream([...videoTracks, ...combinedAudio])
+                    : screenStream;
+                const label = micTrack ? 'Sdílení obrazovky + Mikrofon' : 'Sdílení obrazovky';
+                return { stream: outStream, contentHint: 'detail', label, micTrack, cleanup: stopRaw, sourceStreams: rawStreams };
             }
 
             let camStream;
             try {
                 camStream = await navigator.mediaDevices.getUserMedia({
                     video: { width: { ideal: 640 }, height: { ideal: 360 }, frameRate: { ideal: preset.fps } },
-                    audio: includeAudio
+                    audio: includeMic ? MIC_CONSTRAINTS : false
                 });
             } catch (micErr) {
-                if (includeAudio) {
+                if (includeMic) {
                     camStream = await navigator.mediaDevices.getUserMedia({
                         video: { width: { ideal: 640 }, height: { ideal: 360 }, frameRate: { ideal: preset.fps } },
                         audio: false
                     });
+                    addSystemMessage('Mikrofon se nepodařilo připojit — kamera běží bez mikrofonu.');
                 } else {
                     throw micErr;
                 }
@@ -2021,29 +2135,17 @@
             timerId = setInterval(drawFrame, Math.max(30, Math.round(1000 / preset.fps)));
 
             const outStream = canvas.captureStream(preset.fps);
-            const screenAudio = screenStream.getAudioTracks();
-            const camAudio = camStream.getAudioTracks();
-            if (screenAudio.length && camAudio.length && (window.AudioContext || window.webkitAudioContext)) {
-                try {
-                    const AC = window.AudioContext || window.webkitAudioContext;
-                    audioCtx = new AC();
-                    const dest = audioCtx.createMediaStreamDestination();
-                    audioCtx.createMediaStreamSource(new MediaStream([screenAudio[0]])).connect(dest);
-                    audioCtx.createMediaStreamSource(new MediaStream([camAudio[0]])).connect(dest);
-                    dest.stream.getAudioTracks().forEach(t => outStream.addTrack(t));
-                } catch (e) {
-                    camAudio.concat(screenAudio).forEach(t => outStream.addTrack(t));
-                }
-            } else {
-                screenAudio.concat(camAudio).forEach(t => outStream.addTrack(t));
-            }
+            const screenAudio = includeSystemAudio ? screenStream.getAudioTracks() : [];
+            const micTrack = camStream.getAudioTracks()[0] || null;
+            mixAudioTracks([...screenAudio, micTrack], audioCtxs).forEach(t => outStream.addTrack(t));
 
             const fullCleanup = () => {
                 scrVid.srcObject = null;
                 camVid.srcObject = null;
                 stopRaw();
             };
-            return { stream: outStream, contentHint: 'detail', label: 'Obrazovka + Webkamera', cleanup: fullCleanup, sourceStreams: rawStreams };
+            const label = micTrack ? 'Obrazovka + Webkamera + Mikrofon' : 'Obrazovka + Webkamera';
+            return { stream: outStream, contentHint: 'detail', label, micTrack, cleanup: fullCleanup, sourceStreams: rawStreams };
         }
 
         async function startBroadcast() {
@@ -2067,9 +2169,10 @@
             }
 
             const preset = QUALITY_PRESETS[els.qualitySelect.value] || QUALITY_PRESETS['720p'];
+            const includeMic = Boolean(els.micToggle && els.micToggle.checked);
             let captured;
             try {
-                captured = await captureBroadcastStream(sourceMode, preset, els.audioToggle.checked);
+                captured = await captureBroadcastStream(sourceMode, preset, els.audioToggle.checked, includeMic);
             } catch (err) {
                 if (err && err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
                     addSystemMessage('Nepodařilo se spustit přenos: ' + err.message);
@@ -2103,6 +2206,8 @@
 
             state.localStream = stream;
             state.localCleanup = captured.cleanup;
+            state.micTrack = captured.micTrack || null;
+            state.micMuted = false;
             state.isStreaming = true;
             state.startedAt = Date.now();
             state.streamTitle = els.streamTitleInput.value.trim();
@@ -2122,6 +2227,8 @@
             if (!state.isStreaming) return;
             state.isStreaming = false;
             state.startedAt = null;
+            state.micTrack = null;
+            state.micMuted = false;
             closeAllHostPeers();
             if (typeof state.localCleanup === 'function') {
                 try { state.localCleanup(); } catch (e) {}
@@ -2445,6 +2552,14 @@
         els.startBtn.addEventListener('click', startBroadcast);
         els.heroStartBtn.addEventListener('click', startBroadcast);
         els.stopBtn.addEventListener('click', () => stopBroadcast(true));
+        if (els.micLiveBtn) {
+            els.micLiveBtn.addEventListener('click', () => {
+                if (!state.isStreaming || !state.micTrack) return;
+                state.micMuted = !state.micMuted;
+                state.micTrack.enabled = !state.micMuted;
+                updateMicLiveButton();
+            });
+        }
         els.reconnectBtn.addEventListener('click', () => {
             if (state.activeHost && state.activeHost.tabId !== tabId) {
                 requestStreamFromHost(state.activeHost.tabId);
