@@ -2,6 +2,8 @@
 
 Pokud vidíš tuhle stránku, **čtečka funguje**. Tohle je soubor `md/teorie.md`.
 
+# !Takže teďka jen potřebuju tu teorie aby mi někdo poslal
+
 ## Co se tu testuje
 
 - nadpisy, seznamy a *kurzíva*
