@@ -43,9 +43,43 @@
 </div>
 
 <script>window.ZAPISNIK_CFG={id:'kyber',type:'links',title:'Kybernetika',legacy:'kyb',file:'otahalik-data.js'};</script>
-<script src="../zarizeni.js" onerror="(window.__miss=window.__miss||[]).push('../zarizeni.js')"></script>
-<script src="otahalik-data.js"></script>
-<script src="../zapisnik/zapisnik.js" onerror="(window.__miss=window.__miss||[]).push('../zapisnik/zapisnik.js')"></script>
+<script>
+/* Zavaděč: zarizeni.js a zapisnik.js se hledají ve složce stránky, o úroveň výš a o dvě výš.
+   Díky tomu nezáleží na tom, kam je na webu dáš. */
+(function(){
+  function load(c,done){
+    var i=0;
+    (function next(){
+      if(i>=c.length)return done(null);
+      var s=document.createElement("script");
+      s.src=c[i++];
+      s.onload=function(){done(s.getAttribute("src"))};
+      s.onerror=function(){s.remove();next()};
+      document.head.appendChild(s);
+    })();
+  }
+  var miss=[];
+  load(["zarizeni.js","../zarizeni.js","../../zarizeni.js"],function(z){
+    if(!z)miss.push("zarizeni.js");
+    else{var pre=z.replace(/zarizeni\.js$/,"");var b=document.querySelector("a.back");if(b)b.href=pre+"index.html";}
+    load(["otahalik-data.js"],function(d){
+      if(!d)miss.push("otahalik-data.js");
+      load(["zapisnik/zapisnik.js","zapisnik.js","../zapisnik/zapisnik.js","../../zapisnik/zapisnik.js"],function(zs){
+        if(!zs)miss.push("zapisnik/zapisnik.js");
+        console.info("[kyber] zarizeni:",z,"| data:",d,"| zapisnik:",zs);
+        /* když je jen jedno zadání, rovnou ho rozbal, ať jsou rooms vidět hned */
+        var cards=document.querySelectorAll("#app details.card");
+        if(cards.length===1)cards[0].open=true;
+        if(miss.length){
+          var w=document.createElement("div");w.className="pvbar";
+          w.textContent="⚠ Nenačetl se soubor: "+miss.join(", ")+". Bez něj nefunguje ID zařízení ani admin režim.";
+          document.getElementById("top").appendChild(w);
+        }
+      });
+    });
+  });
+})();
+</script>
 
 <script>
 /* Čtečka teorie: .md soubory se berou ze složky md/ (podsložky, pokud existují, jsou skupiny v nabídce).
@@ -207,11 +241,6 @@ $("mdbox").addEventListener("click",function(e){
   if(/\.md(#.*)?$/i.test(href)){e.preventDefault();goWiki(decodeURIComponent(href.split("#")[0]))}
 });
 
-if(window.__miss&&window.__miss.length){
-  var w=document.createElement("div");w.className="pvbar";
-  w.textContent="⚠ Nenačetl se soubor: "+window.__miss.join(", ")+". Bez něj nefunguje ID zařízení ani admin režim. Zkontroluj cestu vůči složce stránky.";
-  $("top").appendChild(w);
-}
 (async function init(){
   FILES=await discover();
   buildWiki();buildNav();
