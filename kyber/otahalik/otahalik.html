@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<title>Kybernetika – OPS Portál</title>
+<link rel="stylesheet" href="ota.css">
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+</head>
+<body>
+<header class="header">
+  <div class="header-in">
+    <a class="back" href="../index.html" title="Zpět na hlavní stránku"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span>Hlavní stránka</span></a>
+    <div class="search-wrap"><input class="search" id="q" type="search" placeholder="Hledat v předmětu…" autocomplete="off" aria-label="Hledat"></div>
+  </div>
+</header>
+<div class="wrap">
+  <section class="hero">
+    <h1>Kybernetika</h1>
+    <p class="lead">Zadání z TryHackMe a dalších úloh, odkazy a odpovědi k nim, a teorie.</p>
+  </section>
+  <div id="top"></div>
+
+  <nav class="tabs" id="mdnav" role="tablist">
+    <button class="tab on" data-s="app" role="tab">Odkazy a úlohy</button>
+    <button class="tab" data-s="md" role="tab">Teorie <span class="cnt" id="mdcnt">0</span></button>
+  </nav>
+
+  <div class="sec on" id="s-app"><div id="app"></div></div>
+
+  <div class="sec" id="s-md">
+    <div class="mdlay">
+      <aside class="mdside">
+        <input id="mdq" type="search" placeholder="Hledat v názvech…" autocomplete="off" aria-label="Hledat v názvech souborů">
+        <div id="mdnavlist"><p class="mdnote">Načítám seznam materiálů…</p></div>
+      </aside>
+      <article class="mdbox" id="mdbox">
+        <div class="mdempty"><h2>Vyber téma</h2><p>Klikni na soubor v nabídce vlevo.</p></div>
+      </article>
+    </div>
+  </div>
+</div>
+
+<script>window.ZAPISNIK_CFG={id:'kyber',type:'links',title:'Kybernetika',legacy:'kyb',file:'otahalik-data.js'};</script>
+<script src="../zarizeni.js" onerror="(window.__miss=window.__miss||[]).push('../zarizeni.js')"></script>
+<script src="otahalik-data.js"></script>
+<script src="../zapisnik/zapisnik.js" onerror="(window.__miss=window.__miss||[]).push('../zapisnik/zapisnik.js')"></script>
+
+<script>
+/* Čtečka teorie: .md soubory se berou ze složky md/ (podsložky, pokud existují, jsou skupiny v nabídce).
+   Seznam se zjistí automaticky (výpis složky / GitHub Pages / md/index.json). */
+(function(){
+"use strict";
+var MD="md/",FILES=[],WIKI=new Map(),cur="";
+var $=function(id){return document.getElementById(id)};
+var esc=function(v){return String(v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})};
+var norm=function(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase()};
+var key=function(v){return norm(v).replace(/\\/g,"/").replace(/^\.?\/?md\//,"").replace(/\.md$/,"").replace(/[_\s-]+/g," ").trim()};
+var url=function(p){return MD+p.split("/").map(encodeURIComponent).join("/")};
+var pretty=function(n){return n.replace(/\.md$/i,"").replace(/_+/g," ").replace(/\s+/g," ").trim()};
+var mobile=function(){return matchMedia("(max-width:820px)").matches};
+
+/* ----- záložky ----- */
+document.querySelectorAll("#mdnav .tab").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll("#mdnav .tab").forEach(function(x){x.classList.toggle("on",x===b)});
+    ["app","md"].forEach(function(s){$("s-"+s).classList.toggle("on",s===b.dataset.s)});
+  });
+});
+function showMd(){document.querySelector('#mdnav .tab[data-s="md"]').click()}
+
+/* ----- zjištění souborů ----- */
+async function listDir(rel,depth){
+  var base=new URL(MD+rel,location.href);
+  var res=await fetch(base.href,{cache:"no-store"});
+  if(!res.ok||!/html/i.test(res.headers.get("content-type")||""))return null;
+  var doc=new DOMParser().parseFromString(await res.text(),"text/html"),out=[];
+  for(var a of doc.querySelectorAll("a[href]")){
+    var href=a.getAttribute("href");
+    if(!href||href[0]==="?"||href[0]==="#")continue;
+    var u,rest;
+    try{
+      u=new URL(href,base.href);
+      if(u.origin!==base.origin||!u.pathname.startsWith(base.pathname)||u.pathname===base.pathname)continue;
+      rest=decodeURIComponent(u.pathname.slice(base.pathname.length));
+    }catch(e){continue}
+    if(rest.endsWith("/")){
+      if(depth<3&&!rest.slice(0,-1).includes("/")){var sub=await listDir(rel+rest,depth+1);if(sub)out.push.apply(out,sub)}
+    }else if(/\.md$/i.test(rest)&&!rest.includes("/"))out.push(rel+rest);
+  }
+  return Array.from(new Set(out));
+}
+async function fromGitHub(){
+  if(!/\.github\.io$/i.test(location.hostname))return null;
+  var user=location.hostname.split(".")[0],parts=location.pathname.split("/").filter(Boolean);
+  if(parts.length&&/\.[a-z0-9]+$/i.test(parts[parts.length-1]))parts.pop();
+  var project=parts.length>0,repo=project?parts[0]:location.hostname;
+  var sub=(project?parts.slice(1):[]).concat("md").join("/")+"/";
+  var res=await fetch("https://api.github.com/repos/"+user+"/"+repo+"/git/trees/HEAD?recursive=1");
+  if(!res.ok)return null;
+  var data=await res.json();
+  return (data.tree||[]).filter(function(t){return t.type==="blob"&&t.path.startsWith(sub)&&/\.md$/i.test(t.path)}).map(function(t){return t.path.slice(sub.length)});
+}
+async function fromManifest(){
+  for(var n of ["index.json","manifest.json"]){
+    try{
+      var r=await fetch(MD+n,{cache:"no-store"});if(!r.ok)continue;
+      var d=await r.json(),l=(Array.isArray(d)?d:(d.files||[])).map(String).map(function(p){return p.replace(/^\.?\//,"").replace(/^md\//,"")}).filter(function(p){return /\.md$/i.test(p)});
+      if(l.length)return l;
+    }catch(e){}
+  }
+  return null;
+}
+async function discover(){
+  if(!/^https?:$/.test(location.protocol))return [];
+  for(var s of [function(){return listDir("",0)},fromGitHub,fromManifest]){
+    try{
+      var r=await s();
+      if(r&&r.length)return Array.from(new Set(r)).sort(function(a,b){return a.localeCompare(b,"cs",{numeric:true,sensitivity:"base"})}).map(function(p){
+        var i=p.lastIndexOf("/");
+        return {path:p,title:pretty(p.slice(i+1)),group:i>0?p.slice(0,p.indexOf("/")):""};
+      });
+    }catch(e){console.warn(e)}
+  }
+  return [];
+}
+
+/* ----- nabídka ----- */
+function buildNav(){
+  $("mdcnt").textContent=FILES.length;
+  var nav=$("mdnavlist");
+  if(!FILES.length){
+    nav.innerHTML='<p class="mdnote"><b>Žádné .md soubory.</b><br>Nahraj teorii do složky <code>md/</code> (např. <code>teorie.md</code>, <code>teorie1.md</code>).<br><br>Pokud server nezobrazuje obsah složek, spusť <code>node md-index.js</code> – vytvoří <code>md/index.json</code>.</p>';
+    return;
+  }
+  var groups=new Map();
+  FILES.forEach(function(f){if(!groups.has(f.group))groups.set(f.group,[]);groups.get(f.group).push(f)});
+  var names=Array.from(groups.keys()).sort(function(a,b){return a===""?-1:b===""?1:a.localeCompare(b,"cs",{numeric:true})});
+  nav.innerHTML=names.map(function(g){
+    return '<div class="ng"><div class="ngt">'+esc(g?pretty(g):"Teorie")+'</div><ul>'+
+      groups.get(g).map(function(f){return '<li><button class="fb" type="button" data-p="'+esc(f.path)+'">▤ '+esc(f.title)+'</button></li>'}).join("")+"</ul></div>";
+  }).join("");
+  mark();filter();
+}
+function mark(){document.querySelectorAll("#mdnavlist .fb").forEach(function(b){b.classList.toggle("on",b.dataset.p===cur)})}
+function filter(){
+  var f=norm($("mdq").value.trim());
+  document.querySelectorAll("#mdnavlist .ng").forEach(function(g){
+    var any=false;
+    g.querySelectorAll("li").forEach(function(li){
+      var b=li.querySelector(".fb"),ok=norm(b.dataset.p).includes(f);
+      li.style.display=ok?"":"none";if(ok)any=true;
+    });
+    g.style.display=any?"":"none";
+  });
+}
+
+/* ----- wiki odkazy [[…]] ----- */
+function buildWiki(){
+  WIKI=new Map();
+  FILES.forEach(function(f){
+    var b=f.path.split("/").pop();
+    [key(f.path),key(b),key(b).replace(/^\d+\s*/,"")].forEach(function(k){if(k&&!WIKI.has(k))WIKI.set(k,f.path)});
+  });
+}
+function wiki(raw){
+  return raw.replace(/!\[\[([^\]]+)\]\]/g,"")
+    .replace(/(?<!!)\[\[([^\]|]+)\|([^\]]+)\]\]/g,function(m,t,l){return '<a href="#" class="wiki-link" data-w="'+esc(t.trim())+'">'+esc(l.trim())+"</a>"})
+    .replace(/(?<!!)\[\[([^\]]+)\]\]/g,function(m,t){return '<a href="#" class="wiki-link" data-w="'+esc(t.trim())+'">'+esc(t.trim())+"</a>"});
+}
+function goWiki(t){
+  var k=key(t),p=WIKI.get(k);
+  if(!p)for(var e of WIKI){if(e[0].includes(k)||k.includes(e[0])){p=e[1];break}}
+  if(p)load(p);else{$("mdq").value=t;filter();$("mdq").focus()}
+}
+
+/* ----- načtení článku ----- */
+async function load(path){
+  cur=path;mark();
+  try{localStorage.setItem("kyberLastMd",path)}catch(e){}
+  var h="#md="+encodeURIComponent(path);
+  if(location.hash!==h)history.replaceState(null,"",h);
+  var box=$("mdbox");
+  box.innerHTML='<p class="mdnote" style="text-align:center;padding:40px">Načítám…</p>';
+  try{
+    var r=await fetch(url(path),{cache:"no-cache"});
+    if(!r.ok)throw 0;
+    var txt=await r.text();
+    if(cur!==path)return;
+    box.innerHTML='<div class="mdtop"><span class="mut">'+esc(path)+'</span><a class="btn sm" href="'+url(path)+'" download="'+esc(path.split("/").pop())+'">↓ Stáhnout .md</a></div>'+marked.parse(wiki(txt));
+    if(mobile())box.scrollIntoView({block:"start"});else window.scrollTo({top:0});
+  }catch(e){
+    box.innerHTML='<div class="mdempty"><h2>Soubor se nepodařilo načíst</h2><p>Zkontroluj, že existuje <code>'+esc(MD+path)+'</code>.<br>Z file:// fetch nefunguje – použij webový server.</p></div>';
+  }
+}
+
+$("mdnavlist").addEventListener("click",function(e){var b=e.target.closest(".fb");if(b)load(b.dataset.p)});
+$("mdq").addEventListener("input",filter);
+$("q").addEventListener("input",function(){if($("s-md").classList.contains("on")){$("mdq").value=$("q").value;filter()}});
+$("mdbox").addEventListener("click",function(e){
+  var a=e.target.closest("a");if(!a)return;
+  var w=a.getAttribute("data-w");
+  if(w){e.preventDefault();goWiki(w);return}
+  var href=a.getAttribute("href")||"";
+  if(/^https?:\/\//i.test(href)){a.target="_blank";a.rel="noopener noreferrer";return}
+  if(/\.md(#.*)?$/i.test(href)){e.preventDefault();goWiki(decodeURIComponent(href.split("#")[0]))}
+});
+
+if(window.__miss&&window.__miss.length){
+  var w=document.createElement("div");w.className="pvbar";
+  w.textContent="⚠ Nenačetl se soubor: "+window.__miss.join(", ")+". Bez něj nefunguje ID zařízení ani admin režim. Zkontroluj cestu vůči složce stránky.";
+  $("top").appendChild(w);
+}
+(async function init(){
+  FILES=await discover();
+  buildWiki();buildNav();
+  var m=location.hash.match(/^#md=(.+)$/),want="";
+  try{want=m?decodeURIComponent(m[1]):""}catch(e){}
+  var p=FILES.find(function(f){return f.path===want});
+  if(p){showMd();load(p.path)}
+})();
+})();
+</script>
+</body>
+</html>

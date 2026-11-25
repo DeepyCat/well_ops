@@ -1,4 +1,4 @@
-// Obsah předmětu Kybernetika. Nahraď tímto souborem juchelka-data.js ve složce stránky.
+// Obsah předmětu Kybernetika. Nahraď tímto souborem otahalik-data.js ve složce stránky.
 window.ZAPISNIK_DATA = {
   "zadani": [
     {
