@@ -422,6 +422,9 @@
             <h2 class="group" id="h-subjects">Předměty</h2>
             <div class="subjects" id="subjects"></div>
 
+            <h2 class="group" id="h-stream">Živý stream</h2>
+            <div class="subjects" id="stream-section"></div>
+
             <h2 class="group" id="h-games">Hry</h2>
             <div class="games" id="games"></div>
 
@@ -460,7 +463,8 @@
         chevleft:'<path d="M15 6l-6 6 6 6"/>',
         chevron: '<path d="M9 6l6 6-6 6"/>',
         arrow:   '<path d="M5 12h14M13 6l6 6-6 6"/>',
-        ext:     '<path d="M7 17L17 7M8 7h9v9"/>'
+        ext:     '<path d="M7 17L17 7M8 7h9v9"/>',
+        stream:  '<rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 18v3"/><polygon points="10 8 15 11 10 14 10 8" fill="currentColor" stroke="none"/>'
     };
     const icon = (name, size = 18, cls = 'ico') =>
         `<svg class="${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.grid}</svg>`;
@@ -554,12 +558,24 @@
 
     const MODE_KEY = 'selectedBgMode';
 
+    const STREAM_FEATURE = {
+        id: 'stream',
+        icon: 'stream',
+        title: 'Živý stream',
+        desc: 'Živé sdílení obrazovky v Chrome (až pro 10 diváků) a chat bez ukládání.',
+        links: [
+            { title: 'Otevřít místnost', href: 'stream.html', icon: 'stream', sub: 'Streamovat obrazovku nebo sledovat živě' }
+        ]
+    };
+
     const $subjects = document.getElementById('subjects');
+    const $streamSection = document.getElementById('stream-section');
     const $games = document.getElementById('games');
     const $sideNav = document.getElementById('side-nav');
     const $search = document.getElementById('search');
     const $empty = document.getElementById('empty');
     const $hSub = document.getElementById('h-subjects');
+    const $hStream = document.getElementById('h-stream');
     const $hGames = document.getElementById('h-games');
     const $modeBtn = document.getElementById('mode-btn');
     const $modeLabel = document.getElementById('mode-label');
@@ -625,11 +641,15 @@
         </div>`;
     }
 
-    function renderSide(visible, games, searching) {
+    function renderSide(visible, hasStream, games, searching) {
         let h = `<a class="side-item" href="#top" data-target="top">${icon('home')}<span>Domů</span></a>`;
         if (visible.length) {
             h += '<div class="side-label">Předměty</div>';
             h += visible.map(({ s, links }) => groupHtml(s.id, s.icon, s.title, links, s.id, searching || openGroups.has(s.id))).join('');
+        }
+        if (hasStream) {
+            h += '<div class="side-label">Živě</div>';
+            h += `<a class="side-item" href="stream.html">${icon('stream')}<span>Živý stream</span></a>`;
         }
         if (games.length) {
             h += '<div class="side-label">Zábava</div>';
@@ -637,6 +657,19 @@
         }
         $sideNav.innerHTML = h;
         spy();
+    }
+
+    function subjectCardHtml(s, links) {
+        return `<section class="subject" id="${s.id}">
+                <div class="subject-head">
+                    <div class="subject-ico">${icon(s.icon, 22)}</div>
+                    <div>
+                        <div class="subject-title">${esc(s.title)}</div>
+                        <div class="subject-desc">${esc(s.desc)}</div>
+                    </div>
+                </div>
+                <div class="links">${links.map(linkHtml).join('')}</div>
+            </section>`;
     }
 
     function render() {
@@ -649,27 +682,22 @@
             const links = s.links.filter(l => subjMatch || norm(l.title).includes(q) || norm(l.sub).includes(q));
             if (!links.length) return;
             visible.push({ s, links });
-            subjHtml += `<section class="subject" id="${s.id}">
-                <div class="subject-head">
-                    <div class="subject-ico">${icon(s.icon, 22)}</div>
-                    <div>
-                        <div class="subject-title">${esc(s.title)}</div>
-                        <div class="subject-desc">${esc(s.desc)}</div>
-                    </div>
-                </div>
-                <div class="links">${links.map(linkHtml).join('')}</div>
-            </section>`;
+            subjHtml += subjectCardHtml(s, links);
         });
         $subjects.innerHTML = subjHtml;
+
+        const streamMatch = !q || norm(STREAM_FEATURE.title + ' ' + STREAM_FEATURE.desc + ' ' + STREAM_FEATURE.links[0].title + ' ' + STREAM_FEATURE.links[0].sub).includes(q);
+        $streamSection.innerHTML = streamMatch ? subjectCardHtml(STREAM_FEATURE, STREAM_FEATURE.links) : '';
 
         const games = GAMES.filter(g => !q || norm(g.title).includes(q) || norm(g.sub).includes(q) || norm('hry hra').includes(q));
         $games.innerHTML = games.map(gameHtml).join('');
 
         $hSub.hidden = !visible.length;
+        $hStream.hidden = !streamMatch;
         $hGames.hidden = !games.length;
-        $empty.hidden = !!(visible.length || games.length);
+        $empty.hidden = !!(visible.length || streamMatch || games.length);
 
-        renderSide(visible, games, !!q);
+        renderSide(visible, streamMatch, games, !!q);
     }
 
     // zvýraznění aktivní položky v panelu podle scrollu

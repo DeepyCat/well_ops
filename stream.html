@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OPS Živý stream – sdílení obrazovky v Chrome přes WebRTC a živý chat bez ukládání.">
+    <meta name="theme-color" content="#111113">
+    <link rel="icon" type="image/png" href="img/bird.png">
+    <title>Živý stream | OPS Portál</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #111113;
+            --surface: #19191c;
+            --surface-2: #212125;
+            --surface-3: #2a2a30;
+            --border: rgba(255, 255, 255, .08);
+            --border-strong: rgba(255, 255, 255, .16);
+            --text: #f2f2f4;
+            --text-2: #c6c6cd;
+            --muted: #8d8d97;
+            --accent: #ef4444;
+            --accent-hover: #dc2626;
+            --accent-soft: rgba(239, 68, 68, .14);
+            --ok: #22c55e;
+            --ok-soft: rgba(34, 197, 94, .14);
+            --warn: #f59e0b;
+            --warn-soft: rgba(245, 158, 11, .14);
+            --font: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            line-height: 1.45;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+        }
+        a { color: inherit; text-decoration: none; }
+        button, input, select { font: inherit; color: inherit; }
+        .ico { display: block; flex: none; }
+        [hidden] { display: none !important; }
+
+        /* ---------- HORNI LISTA ---------- */
+        .topbar {
+            flex: none;
+            background: var(--surface);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-2);
+            font-size: 13px;
+            font-weight: 500;
+            transition: border-color .15s ease, color .15s ease;
+        }
+        .back-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: auto;
+        }
+        .brand-logo {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--accent);
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 11px;
+            color: #fff;
+        }
+        .brand-title { font-weight: 700; font-size: 15px; letter-spacing: -.01em; }
+        .brand-sub { font-size: 12px; color: var(--muted); }
+
+        .top-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-2);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--muted);
+            flex: none;
+        }
+        .status-chip.live {
+            background: var(--accent-soft);
+            border-color: rgba(239, 68, 68, .4);
+            color: #fca5a5;
+        }
+        .status-chip.live .status-dot { background: var(--accent); }
+        .status-chip.connecting {
+            background: var(--warn-soft);
+            border-color: rgba(245, 158, 11, .35);
+            color: #fcd34d;
+        }
+        .status-chip.connecting .status-dot { background: var(--warn); }
+
+        .viewer-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            font-size: 12.5px;
+            color: var(--text-2);
+            font-variant-numeric: tabular-nums;
+        }
+        .user-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 11px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 12.5px;
+            color: var(--text-2);
+            transition: border-color .15s ease, color .15s ease;
+        }
+        .user-btn:hover { border-color: var(--border-strong); color: var(--text); }
+        .user-btn b { color: var(--text); font-weight: 600; }
+
+        /* ---------- PRACOVNI PLOCHA ---------- */
+        .workspace {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 16px;
+            padding: 16px 20px;
+            max-width: 1680px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .stage-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 0;
+            min-height: 0;
+        }
+
+        /* Video ram */
+        .player-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            max-height: calc(100vh - 220px);
+            background: #09090b;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            display: grid;
+            place-items: center;
+        }
+        video#player {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #09090b;
+            display: block;
+        }
+        .stage-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+            gap: 10px;
+            background: #0c0c0f;
+            z-index: 2;
+        }
+        .stage-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            display: grid;
+            place-items: center;
+            color: var(--text-2);
+        }
+        .stage-overlay h1 {
+            margin: 4px 0 0;
+            font-size: 18px;
+            font-weight: 650;
+            color: var(--text);
+        }
+        .stage-overlay p {
+            margin: 0;
+            max-width: 440px;
+            color: var(--muted);
+            font-size: 13.5px;
+        }
+        .stage-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .unmute-bar {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 4;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            background: rgba(25, 25, 28, .94);
+            border: 1px solid var(--border-strong);
+            color: var(--text);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .unmute-bar:hover { border-color: var(--accent); }
+
+        .hud-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background: rgba(17, 17, 19, .86);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .hud-badge .live-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            color: #fca5a5;
+        }
+        .hud-badge .live-tag i {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        /* Ovladaci panel pod videem */
+        .dock {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .dock-left, .dock-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--border-strong);
+            background: var(--surface-2);
+            color: var(--text);
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .14s ease, border-color .14s ease, opacity .14s ease;
+        }
+        .btn:hover:not(:disabled) { background: var(--surface-3); border-color: rgba(255, 255, 255, .28); }
+        .btn:disabled { opacity: .45; cursor: not-allowed; }
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+        .btn-stop {
+            background: rgba(239, 68, 68, .16);
+            border-color: rgba(239, 68, 68, .45);
+            color: #fca5a5;
+        }
+        .btn-stop:hover:not(:disabled) { background: rgba(239, 68, 68, .26); }
+
+        .field {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 7px 10px;
+            font-size: 13px;
+            color: var(--text);
+            outline: none;
+        }
+        .field:focus { border-color: rgba(239, 68, 68, .6); }
+        .title-input { width: 200px; max-width: 100%; }
+        .quality-select { cursor: pointer; }
+
+        .check-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            font-size: 12.5px;
+            color: var(--text-2);
+            cursor: pointer;
+            user-select: none;
+        }
+        .check-pill input { accent-color: var(--accent); cursor: pointer; }
+
+        .vol-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+        }
+        .vol-slider { width: 76px; accent-color: var(--accent); cursor: pointer; }
+
+        .info-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 0 4px;
+            color: var(--muted);
+            font-size: 12.5px;
+        }
+        .info-strip span b { color: var(--text-2); font-weight: 600; }
+
+        /* ---------- PRAVY PANEL: DIVACI + CHAT ---------- */
+        .chat-col {
+            display: flex;
+            flex-direction: column;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            min-height: 420px;
+            max-height: calc(100vh - 96px);
+        }
+        .panel-head {
+            padding: 12px 14px 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .panel-title { font-weight: 650; font-size: 14px; }
+        .panel-sub { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+        .peers-bar {
+            margin: 0 10px 6px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            max-height: 82px;
+            overflow-y: auto;
+        }
+        .peer-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-2);
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .peer-pill.host {
+            border-color: rgba(239, 68, 68, .45);
+            background: var(--accent-soft);
+            color: #fca5a5;
+            font-weight: 600;
+        }
+        .peer-pill.me { border-color: var(--border-strong); color: var(--text); }
+
+        .chat-list {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #3a3a40 transparent;
+        }
+        .chat-empty {
+            margin: auto;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            padding: 20px 10px;
+        }
+        .msg {
+            background: var(--surface-2);
+            border-radius: 10px;
+            padding: 8px 10px;
+            word-break: break-word;
+        }
+        .msg.sys {
+            background: transparent;
+            border: 1px dashed var(--border);
+            color: var(--muted);
+            font-size: 12px;
+            padding: 6px 10px;
+        }
+        .msg-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 2px;
+        }
+        .msg-author { font-weight: 650; font-size: 12.5px; color: var(--text); }
+        .msg-author.host { color: #fca5a5; }
+        .msg-badge {
+            display: inline-block;
+            margin-left: 5px;
+            padding: 0 5px;
+            border-radius: 4px;
+            background: var(--accent-soft);
+            color: #fca5a5;
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+        .msg-time { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+        .msg-body { font-size: 13.5px; color: var(--text-2); white-space: pre-wrap; }
+
+        .chat-form {
+            padding: 10px 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: var(--surface-2);
+        }
+        .chat-input {
+            flex: 1;
+            min-width: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 8px 11px;
+            color: var(--text);
+            outline: none;
+            font-size: 13.5px;
+        }
+        .chat-input:focus { border-color: rgba(239, 68, 68, .6); }
+
+        /* Dialog pro zmenu prezdivky */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .65);
+            display: grid;
+            place-items: center;
+            z-index: 60;
+            padding: 16px;
+        }
+        .modal-card {
+            width: 100%;
+            max-width: 380px;
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .modal-card h2 { margin: 0; font-size: 16px; font-weight: 650; }
+        .modal-card p { margin: 0; font-size: 13px; color: var(--muted); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+
+        @media (max-width: 1020px) {
+            .workspace {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+            .player-wrap { max-height: none; }
+            .chat-col { max-height: 460px; min-height: 340px; }
+        }
+        @media (max-width: 600px) {
+            .topbar { padding: 10px 12px; }
+            .title-input { width: 100%; }
+        }
+        a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a class="back-btn" href="index.html">
+            <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+            <span>Zpět na portál</span>
+        </a>
+        <div class="brand">
+            <div class="brand-logo">OPS</div>
+            <div>
+                <div class="brand-title">Živý stream</div>
+                <div class="brand-sub">Sdílení obrazovky přes Chrome · bez ukládání</div>
+            </div>
+        </div>
+        <div class="top-meta">
+            <div class="status-chip connecting" id="statusChip">
+                <span class="status-dot"></span>
+                <span id="statusText">Připojuji se...</span>
+            </div>
+            <div class="viewer-chip" id="viewerChip" title="Online v místnosti">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span id="viewerCount">0 / 10</span>
+            </div>
+            <button class="user-btn" id="nickBtn" type="button" title="Změnit zobrazované jméno">
+                <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <b id="nickLabel">Host</b>
+            </button>
+        </div>
+    </header>
+
+    <main class="workspace">
+        <section class="stage-col" aria-label="Přehrávač streamu">
+            <div class="player-wrap">
+                <video id="player" autoplay playsinline></video>
+                <div class="hud-badge" id="hudBadge" hidden>
+                    <span class="live-tag"><i></i>LIVE</span>
+                    <span id="hudTitle">Sdílení obrazovky</span>
+                </div>
+                <button class="unmute-bar" id="unmuteBanner" type="button" hidden>
+                    <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                    <span>Prohlížeč ztlumil automatické přehrávání — klikni pro zapnutí zvuku</span>
+                </button>
+                <div class="stage-overlay" id="stageOverlay">
+                    <div class="stage-icon" aria-hidden="true">
+                        <svg class="ico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <h1 id="overlayTitle">Nikdo teď nestreamuje</h1>
+                    <p id="overlayDesc">Kdokoliv v místnosti může spustit sdílení obrazovky v Chrome. Video běží živě mezi prohlížeči a nikam se neukládá.</p>
+                    <div class="stage-actions">
+                        <button class="btn btn-primary" id="heroStartBtn" type="button">
+                            <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span>Streamovat obrazovku</span>
+                        </button>
+                        <button class="btn" id="reconnectBtn" type="button" hidden>Znovu připojit stream</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dock">
+                <div class="dock-left">
+                    <button class="btn btn-primary" id="startBtn" type="button">
+                        <svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Streamovat</span>
+                    </button>
+                    <button class="btn btn-stop" id="stopBtn" type="button" hidden>
+                        <svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                        <span>Ukončit stream</span>
+                    </button>
+                    <input class="field title-input" id="streamTitleInput" type="text" maxlength="48" placeholder="Název streamu (nepovinné)">
+                    <select class="field quality-select" id="qualitySelect" aria-label="Kvalita přenosu">
+                        <option value="720p">720p · 30 fps (Doporučeno)</option>
+                        <option value="480p">480p · 24 fps (Úsporný)</option>
+                        <option value="1080p">1080p · 30 fps (Ostrý text)</option>
+                    </select>
+                    <label class="check-pill" title="Chrome umí sdílet zvuk vybrané karty nebo systému">
+                        <input type="checkbox" id="audioToggle" checked>
+                        <span>Se zvukem</span>
+                    </label>
+                </div>
+                <div class="dock-right">
+                    <div class="vol-wrap" id="viewerControls">
+                        <button class="user-btn" id="muteBtn" type="button" style="border:0;padding:2px 4px;background:none;" title="Ztlumit / zapnout zvuk">
+                            <svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                        </button>
+                        <input class="vol-slider" id="volSlider" type="range" min="0" max="100" value="80" aria-label="Hlasitost přehrávače">
+                    </div>
+                    <button class="btn" id="pipBtn" type="button" title="Obraz v obraze">PiP</button>
+                    <button class="btn" id="fsBtn" type="button" title="Celá obrazovka">Celá obr.</button>
+                </div>
+            </div>
+
+            <div class="info-strip">
+                <span id="connInfo">Stav přenosu: <b>Čeká na spuštění</b></span>
+                <span>Přímý přenos P2P (WebRTC) · max 10 diváků · nic se neukládá</span>
+            </div>
+        </section>
+
+        <aside class="chat-col" aria-label="Živý chat a účastníci">
+            <div class="panel-head">
+                <span class="panel-title">Živý chat</span>
+                <span class="panel-sub" id="chatNotice">Jen v paměti</span>
+            </div>
+            <div class="peers-bar" id="peersBar" aria-label="Online účastníci"></div>
+            <div class="chat-list" id="chatList">
+                <div class="chat-empty" id="chatEmpty">Zatím tu nejsou žádné zprávy. Zprávy ze streamu se nikam neukládají.</div>
+            </div>
+            <form class="chat-form" id="chatForm" autocomplete="off">
+                <input class="chat-input" id="chatInput" type="text" maxlength="400" placeholder="Napiš zprávu do živého chatu...">
+                <button class="btn btn-primary" type="submit">Poslat</button>
+            </form>
+        </aside>
+    </main>
+
+    <div class="modal-backdrop" id="nickModal" hidden>
+        <form class="modal-card" id="nickForm">
+            <h2>Tvoje jméno v chatu a streamu</h2>
+            <p>Pokud jsi přihlášený v OPS Portálu, jméno se načte automaticky. Tady ho můžeš pro tuto relaci upravit.</p>
+            <input class="field" id="nickInput" type="text" maxlength="24" required placeholder="Např. Novak">
+            <div class="modal-actions">
+                <button class="btn" id="nickCancel" type="button">Zrušit</button>
+                <button class="btn btn-primary" type="submit">Uložit</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="/js/ops-stats.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+    (() => {
+        'use strict';
+
+        const SUPABASE_URL = (window.OPS_STATS && window.OPS_STATS.config && window.OPS_STATS.config.url)
+            || 'https://xtrykhppxqngfaqadypr.supabase.co';
+        const SUPABASE_KEY = (window.OPS_STATS && window.OPS_STATS.config && window.OPS_STATS.config.anonKey)
+            || 'sb_publishable_mTi5-8yRt7OqqLW5axZK8g_2lmsZCIO';
+
+        const CHANNEL_NAME = 'ops-live-stream-v1';
+        const MAX_VIEWERS = 10;
+        const MAX_CHAT_MESSAGES = 150;
+        const NICK_SESSION_KEY = 'ops_stream_nick';
+
+        const QUALITY_PRESETS = {
+            '480p':  { width: 854,  height: 480,  fps: 24, bitrate: 650000 },
+            '720p':  { width: 1280, height: 720,  fps: 30, bitrate: 1200000 },
+            '1080p': { width: 1920, height: 1080, fps: 30, bitrate: 2200000 }
+        };
+
+        const ICE_SERVERS = [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun.cloudflare.com:3478' }
+        ];
+
+        const tabId = (window.crypto && typeof window.crypto.randomUUID === 'function')
+            ? window.crypto.randomUUID()
+            : ('tab-' + Math.random().toString(36).slice(2, 11) + '-' + Date.now().toString(36));
+
+        const $ = id => document.getElementById(id);
+        const els = {
+            statusChip: $('statusChip'),
+            statusText: $('statusText'),
+            viewerCount: $('viewerCount'),
+            nickBtn: $('nickBtn'),
+            nickLabel: $('nickLabel'),
+            player: $('player'),
+            hudBadge: $('hudBadge'),
+            hudTitle: $('hudTitle'),
+            unmuteBanner: $('unmuteBanner'),
+            stageOverlay: $('stageOverlay'),
+            overlayTitle: $('overlayTitle'),
+            overlayDesc: $('overlayDesc'),
+            heroStartBtn: $('heroStartBtn'),
+            reconnectBtn: $('reconnectBtn'),
+            startBtn: $('startBtn'),
+            stopBtn: $('stopBtn'),
+            streamTitleInput: $('streamTitleInput'),
+            qualitySelect: $('qualitySelect'),
+            audioToggle: $('audioToggle'),
+            viewerControls: $('viewerControls'),
+            muteBtn: $('muteBtn'),
+            volSlider: $('volSlider'),
+            pipBtn: $('pipBtn'),
+            fsBtn: $('fsBtn'),
+            connInfo: $('connInfo'),
+            peersBar: $('peersBar'),
+            chatList: $('chatList'),
+            chatEmpty: $('chatEmpty'),
+            chatForm: $('chatForm'),
+            chatInput: $('chatInput'),
+            nickModal: $('nickModal'),
+            nickForm: $('nickForm'),
+            nickInput: $('nickInput'),
+            nickCancel: $('nickCancel')
+        };
+
+        function resolveInitialNick() {
+            const opsName = (window.OPS_STATS && typeof window.OPS_STATS.getUsername === 'function')
+                ? String(window.OPS_STATS.getUsername() || '').trim()
+                : '';
+            if (opsName && !/^host(_\d+)?$/i.test(opsName)) return opsName.slice(0, 24);
+            try {
+                const saved = sessionStorage.getItem(NICK_SESSION_KEY);
+                if (saved && saved.trim()) return saved.trim().slice(0, 24);
+            } catch (e) {}
+            return 'Host-' + tabId.slice(0, 4).toUpperCase();
+        }
+
+        const state = {
+            nick: resolveInitialNick(),
+            channel: null,
+            connected: false,
+            isStreaming: false,
+            startedAt: null,
+            streamTitle: '',
+            localStream: null,
+            activeHost: null,
+            peersOnline: [],
+            hostPeers: new Map(), // viewerTabId -> { pc, iceQueue, remoteDescSet }
+            viewerPc: null,
+            viewerHostTabId: null,
+            viewerIceQueue: [],
+            viewerRemoteDescSet: false,
+            viewerRetryTimer: null,
+            lastChatSentAt: 0,
+            chatCount: 0
+        };
+
+        els.nickLabel.textContent = state.nick;
+
+        function setConnInfo(label) {
+            els.connInfo.innerHTML = 'Stav přenosu: <b></b>';
+            els.connInfo.querySelector('b').textContent = label;
+        }
+
+        function setTopStatus(mode, text) {
+            els.statusChip.classList.remove('live', 'connecting');
+            if (mode === 'live') els.statusChip.classList.add('live');
+            else if (mode === 'connecting') els.statusChip.classList.add('connecting');
+            els.statusText.textContent = text;
+        }
+
+        function addSystemMessage(text) {
+            if (els.chatEmpty) els.chatEmpty.hidden = true;
+            const div = document.createElement('div');
+            div.className = 'msg sys';
+            div.textContent = text;
+            appendChatNode(div);
+        }
+
+        function addChatMessage({ name, text, ts, isHost }) {
+            if (els.chatEmpty) els.chatEmpty.hidden = true;
+            const wrap = document.createElement('div');
+            wrap.className = 'msg';
+
+            const head = document.createElement('div');
+            head.className = 'msg-head';
+
+            const author = document.createElement('span');
+            author.className = 'msg-author' + (isHost ? ' host' : '');
+            author.textContent = String(name || 'Host');
+            if (isHost) {
+                const badge = document.createElement('span');
+                badge.className = 'msg-badge';
+                badge.textContent = 'STREAMER';
+                author.appendChild(badge);
+            }
+
+            const time = document.createElement('span');
+            time.className = 'msg-time';
+            const d = ts ? new Date(ts) : new Date();
+            time.textContent = d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
+
+            const body = document.createElement('div');
+            body.className = 'msg-body';
+            body.textContent = String(text || '');
+
+            head.appendChild(author);
+            head.appendChild(time);
+            wrap.appendChild(head);
+            wrap.appendChild(body);
+            appendChatNode(wrap);
+        }
+
+        function appendChatNode(node) {
+            const list = els.chatList;
+            const nearBottom = (list.scrollHeight - list.scrollTop - list.clientHeight) < 60;
+            list.appendChild(node);
+            while (list.querySelectorAll('.msg').length > MAX_CHAT_MESSAGES) {
+                const first = list.querySelector('.msg');
+                if (first) first.remove();
+            }
+            if (nearBottom) list.scrollTop = list.scrollHeight;
+        }
+
+        function renderPeersBar() {
+            const list = state.peersOnline;
+            els.viewerCount.textContent = `${list.length} / ${MAX_VIEWERS}`;
+            els.peersBar.innerHTML = '';
+            list.forEach(p => {
+                const pill = document.createElement('span');
+                pill.className = 'peer-pill' + (p.streaming ? ' host' : '') + (p.tabId === tabId ? ' me' : '');
+                pill.textContent = p.streaming ? `LIVE · ${p.name}` : p.name;
+                els.peersBar.appendChild(pill);
+            });
+        }
+
+        function updateUiControls() {
+            const host = state.activeHost;
+            const someoneElseLive = Boolean(host && host.tabId !== tabId);
+
+            els.startBtn.hidden = state.isStreaming;
+            els.stopBtn.hidden = !state.isStreaming;
+            els.startBtn.disabled = !state.connected || someoneElseLive;
+            els.heroStartBtn.disabled = !state.connected || someoneElseLive;
+            els.heroStartBtn.hidden = state.isStreaming || someoneElseLive;
+            els.streamTitleInput.disabled = state.isStreaming;
+            els.qualitySelect.disabled = state.isStreaming;
+            els.audioToggle.disabled = state.isStreaming;
+
+            if (state.isStreaming) {
+                setTopStatus('live', 'VYSÍLÁŠ ŽIVĚ');
+                els.stageOverlay.hidden = true;
+                els.hudBadge.hidden = false;
+                els.hudTitle.textContent = state.streamTitle || `${state.nick} · Sdílení obrazovky`;
+                els.reconnectBtn.hidden = true;
+                els.unmuteBanner.hidden = true;
+                return;
+            }
+
+            if (someoneElseLive) {
+                setTopStatus('live', `ŽIVĚ · ${host.name}`);
+                els.hudBadge.hidden = false;
+                els.hudTitle.textContent = host.title || `${host.name} · Sdílení obrazovky`;
+                els.overlayTitle.textContent = `Připojuji se ke streamu (${host.name})...`;
+                els.overlayDesc.textContent = 'Navazuji přímé WebRTC spojení v prohlížeči.';
+                els.reconnectBtn.hidden = false;
+                return;
+            }
+
+            setTopStatus(state.connected ? 'idle' : 'connecting', state.connected ? 'OFFLINE · Slot volný' : 'Připojuji se...');
+            els.hudBadge.hidden = true;
+            els.unmuteBanner.hidden = true;
+            els.reconnectBtn.hidden = true;
+            els.stageOverlay.hidden = false;
+            els.overlayTitle.textContent = 'Nikdo teď nestreamuje';
+            els.overlayDesc.textContent = 'Kdokoliv v místnosti může spustit sdílení obrazovky v Chrome. Video běží živě mezi prohlížeči a nikam se neukládá.';
+            setConnInfo('Čeká na spuštění');
+        }
+
+        function sendSignal(event, payload) {
+            if (!state.channel || !state.connected) return;
+            state.channel.send({ type: 'broadcast', event, payload });
+        }
+
+        async function updatePresence() {
+            if (!state.channel || !state.connected) return;
+            try {
+                await state.channel.track({
+                    tabId,
+                    name: state.nick,
+                    streaming: state.isStreaming,
+                    startedAt: state.startedAt,
+                    title: state.streamTitle || '',
+                    quality: els.qualitySelect.value
+                });
+            } catch (e) {
+                console.warn('[Stream] Presence track error:', e);
+            }
+        }
+
+        /* ---------- HOST (STREAMER) LOGIKA ---------- */
+        function closeHostPeer(viewerTabId) {
+            const entry = state.hostPeers.get(viewerTabId);
+            if (!entry) return;
+            try { entry.pc.close(); } catch (e) {}
+            state.hostPeers.delete(viewerTabId);
+        }
+
+        function closeAllHostPeers() {
+            for (const id of Array.from(state.hostPeers.keys())) {
+                closeHostPeer(id);
+            }
+        }
+
+        async function createOfferForViewer(viewerTabId) {
+            if (!state.isStreaming || !state.localStream) return;
+            if (state.hostPeers.has(viewerTabId)) closeHostPeer(viewerTabId);
+            if (state.hostPeers.size >= MAX_VIEWERS + 2) {
+                addSystemMessage('Překročen limit P2P diváků pro jeden stream.');
+                return;
+            }
+
+            const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+            const peerEntry = { pc, iceQueue: [], remoteDescSet: false };
+            state.hostPeers.set(viewerTabId, peerEntry);
+
+            const preset = QUALITY_PRESETS[els.qualitySelect.value] || QUALITY_PRESETS['720p'];
+            for (const track of state.localStream.getTracks()) {
+                const sender = pc.addTrack(track, state.localStream);
+                if (track.kind === 'video' && sender && typeof sender.getParameters === 'function') {
+                    try {
+                        const params = sender.getParameters();
+                        if (!params.encodings || !params.encodings.length) params.encodings = [{}];
+                        params.encodings[0].maxBitrate = preset.bitrate;
+                        params.degradationPreference = 'maintain-resolution';
+                        await sender.setParameters(params);
+                    } catch (e) {}
+                }
+            }
+
+            pc.onicecandidate = e => {
+                if (e.candidate) {
+                    sendSignal('rtc-ice', { from: tabId, to: viewerTabId, candidate: e.candidate });
+                }
+            };
+            pc.onconnectionstatechange = () => {
+                if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+                    closeHostPeer(viewerTabId);
+                }
+                if (state.isStreaming) {
+                    const activeCount = Array.from(state.hostPeers.values()).filter(p => p.pc.connectionState === 'connected').length;
+                    setConnInfo(`Vysíláš (${activeCount} připojených diváků)`);
+                }
+            };
+
+            try {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                sendSignal('rtc-offer', { from: tabId, to: viewerTabId, sdp: pc.localDescription });
+            } catch (e) {
+                console.warn('[Stream] createOffer error:', e);
+                closeHostPeer(viewerTabId);
+            }
+        }
+
+        async function startBroadcast() {
+            if (!state.connected) {
+                addSystemMessage('Nejprve počkej na připojení k místnosti.');
+                return;
+            }
+            if (state.activeHost && state.activeHost.tabId !== tabId) {
+                addSystemMessage(`Stream už právě vysílá ${state.activeHost.name}.`);
+                return;
+            }
+            if (!navigator.mediaDevices || typeof navigator.mediaDevices.getDisplayMedia !== 'function') {
+                addSystemMessage('Tento prohlížeč nepodporuje sdílení obrazovky (getDisplayMedia). Použij desktopový Chrome nebo Edge.');
+                return;
+            }
+
+            const preset = QUALITY_PRESETS[els.qualitySelect.value] || QUALITY_PRESETS['720p'];
+            let stream;
+            try {
+                stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: {
+                        width: { ideal: preset.width },
+                        height: { ideal: preset.height },
+                        frameRate: { ideal: preset.fps },
+                        cursor: 'always'
+                    },
+                    audio: els.audioToggle.checked
+                });
+            } catch (err) {
+                if (err && err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+                    addSystemMessage('Nepodařilo se spustit sdílení obrazovky: ' + err.message);
+                }
+                return;
+            }
+
+            // Re-check slot right after picker closes
+            if (state.activeHost && state.activeHost.tabId !== tabId) {
+                stream.getTracks().forEach(t => t.stop());
+                addSystemMessage(`Mezitím začal streamovat ${state.activeHost.name}.`);
+                return;
+            }
+
+            closeViewerConnection();
+
+            const videoTrack = stream.getVideoTracks()[0];
+            if (videoTrack) {
+                try { videoTrack.contentHint = 'detail'; } catch (e) {}
+                videoTrack.addEventListener('ended', () => stopBroadcast(false));
+            }
+
+            state.localStream = stream;
+            state.isStreaming = true;
+            state.startedAt = Date.now();
+            state.streamTitle = els.streamTitleInput.value.trim();
+
+            els.player.muted = true; // mistni nahled bez ozveny
+            els.player.srcObject = stream;
+            try { await els.player.play(); } catch (e) {}
+
+            updateUiControls();
+            setConnInfo('Vysíláš (čeká na diváky)');
+            await updatePresence();
+            sendSignal('stream-started', { hostTabId: tabId, name: state.nick, title: state.streamTitle });
+            addSystemMessage('Spustil jsi živý stream obrazovky.');
+        }
+
+        async function stopBroadcast(announce = true) {
+            if (!state.isStreaming) return;
+            state.isStreaming = false;
+            state.startedAt = null;
+            closeAllHostPeers();
+            if (state.localStream) {
+                state.localStream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
+                state.localStream = null;
+            }
+            els.player.srcObject = null;
+            await updatePresence();
+            sendSignal('stream-ended', { hostTabId: tabId });
+            if (announce) addSystemMessage('Ukončil jsi stream.');
+            updateUiControls();
+        }
+
+        /* ---------- VIEWER (DIVAK) LOGIKA ---------- */
+        function closeViewerConnection() {
+            if (state.viewerRetryTimer) {
+                clearTimeout(state.viewerRetryTimer);
+                state.viewerRetryTimer = null;
+            }
+            if (state.viewerPc) {
+                try { state.viewerPc.close(); } catch (e) {}
+                state.viewerPc = null;
+            }
+            state.viewerHostTabId = null;
+            state.viewerIceQueue = [];
+            state.viewerRemoteDescSet = false;
+            if (!state.isStreaming) {
+                els.player.srcObject = null;
+            }
+        }
+
+        function requestStreamFromHost(hostTabId) {
+            if (!hostTabId || state.isStreaming) return;
+            closeViewerConnection();
+            state.viewerHostTabId = hostTabId;
+            setConnInfo('Připojování ke streamu...');
+            sendSignal('viewer-hello', { from: tabId, to: hostTabId });
+
+            state.viewerRetryTimer = setTimeout(() => {
+                if (state.activeHost && state.activeHost.tabId === hostTabId &&
+                    (!state.viewerPc || state.viewerPc.connectionState === 'new' || state.viewerPc.connectionState === 'connecting')) {
+                    sendSignal('viewer-hello', { from: tabId, to: hostTabId });
+                }
+            }, 3500);
+        }
+
+        async function handleIncomingOffer({ from, to, sdp }) {
+            if (to !== tabId || state.isStreaming) return;
+            if (!state.activeHost || state.activeHost.tabId !== from) return;
+
+            if (state.viewerPc) {
+                try { state.viewerPc.close(); } catch (e) {}
+            }
+            state.viewerHostTabId = from;
+            state.viewerIceQueue = [];
+            state.viewerRemoteDescSet = false;
+
+            const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+            state.viewerPc = pc;
+
+            pc.onicecandidate = e => {
+                if (e.candidate) {
+                    sendSignal('rtc-ice', { from: tabId, to: from, candidate: e.candidate });
+                }
+            };
+
+            pc.ontrack = async e => {
+                const remoteStream = (e.streams && e.streams[0]) ? e.streams[0] : new MediaStream([e.track]);
+                if (els.player.srcObject !== remoteStream) {
+                    els.player.srcObject = remoteStream;
+                    els.player.volume = Math.max(0, Math.min(1, Number(els.volSlider.value) / 100));
+                    els.player.muted = false;
+                    try {
+                        await els.player.play();
+                        els.unmuteBanner.hidden = true;
+                    } catch (err) {
+                        els.player.muted = true;
+                        try { await els.player.play(); } catch (e2) {}
+                        els.unmuteBanner.hidden = false;
+                    }
+                    els.stageOverlay.hidden = true;
+                    setConnInfo('Připojeno živě (WebRTC P2P)');
+                }
+            };
+
+            pc.onconnectionstatechange = () => {
+                const st = pc.connectionState;
+                if (st === 'connected') {
+                    setConnInfo('Připojeno živě (WebRTC P2P)');
+                } else if (st === 'disconnected' || st === 'failed') {
+                    setConnInfo('Spojení přerušeno (zkus Znovu připojit)');
+                    els.stageOverlay.hidden = false;
+                    els.overlayTitle.textContent = 'Spojení se streamem bylo přerušeno';
+                    els.overlayDesc.textContent = 'Možná přepojení sítě nebo přísný firewall. Klikni na Znovu připojit.';
+                    els.reconnectBtn.hidden = false;
+                }
+            };
+
+            try {
+                await pc.setRemoteDescription(new RTCSessionDescription(sdp));
+                state.viewerRemoteDescSet = true;
+                for (const c of state.viewerIceQueue) {
+                    try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch (e) {}
+                }
+                state.viewerIceQueue = [];
+
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                sendSignal('rtc-answer', { from: tabId, to: from, sdp: pc.localDescription });
+            } catch (err) {
+                console.warn('[Stream] handleIncomingOffer error:', err);
+            }
+        }
+
+        async function handleIncomingAnswer({ from, to, sdp }) {
+            if (to !== tabId || !state.isStreaming) return;
+            const entry = state.hostPeers.get(from);
+            if (!entry) return;
+            try {
+                await entry.pc.setRemoteDescription(new RTCSessionDescription(sdp));
+                entry.remoteDescSet = true;
+                for (const c of entry.iceQueue) {
+                    try { await entry.pc.addIceCandidate(new RTCIceCandidate(c)); } catch (e) {}
+                }
+                entry.iceQueue = [];
+            } catch (e) {
+                console.warn('[Stream] handleIncomingAnswer error:', e);
+            }
+        }
+
+        async function handleIncomingIce({ from, to, candidate }) {
+            if (to !== tabId || !candidate) return;
+            if (state.isStreaming) {
+                const entry = state.hostPeers.get(from);
+                if (!entry) return;
+                if (entry.remoteDescSet) {
+                    try { await entry.pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {}
+                } else {
+                    entry.iceQueue.push(candidate);
+                }
+            } else if (state.viewerPc && state.viewerHostTabId === from) {
+                if (state.viewerRemoteDescSet) {
+                    try { await state.viewerPc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {}
+                } else {
+                    state.viewerIceQueue.push(candidate);
+                }
+            }
+        }
+
+        /* ---------- PRESENCE SYNC ---------- */
+        function handlePresenceSync() {
+            if (!state.channel) return;
+            const raw = state.channel.presenceState();
+            const list = [];
+            for (const entries of Object.values(raw)) {
+                if (Array.isArray(entries) && entries.length) {
+                    list.push(entries[entries.length - 1]);
+                }
+            }
+            list.sort((a, b) => (b.streaming ? 1 : 0) - (a.streaming ? 1 : 0) || String(a.name).localeCompare(String(b.name), 'cs'));
+            state.peersOnline = list;
+
+            // Deterministicky vyber streamera (pokud by dva klikli presne soucasne)
+            const hosts = list.filter(p => p.streaming).sort((a, b) =>
+                ((a.startedAt || 0) - (b.startedAt || 0)) || String(a.tabId).localeCompare(String(b.tabId))
+            );
+            const winner = hosts[0] || null;
+
+            if (state.isStreaming && winner && winner.tabId !== tabId) {
+                // Kolize soucasneho startu: druhy byl drive
+                stopBroadcast(false);
+                addSystemMessage(`Slot obsadil dříve ${winner.name}. Přepínám do režimu diváka.`);
+            }
+
+            const prevHostId = state.activeHost ? state.activeHost.tabId : null;
+            state.activeHost = winner;
+
+            if (state.isStreaming) {
+                const onlineIds = new Set(list.map(p => p.tabId));
+                for (const viewerId of Array.from(state.hostPeers.keys())) {
+                    if (!onlineIds.has(viewerId)) closeHostPeer(viewerId);
+                }
+            } else {
+                if (winner && winner.tabId !== prevHostId) {
+                    requestStreamFromHost(winner.tabId);
+                } else if (!winner && prevHostId) {
+                    closeViewerConnection();
+                }
+            }
+
+            renderPeersBar();
+            updateUiControls();
+        }
+
+        /* ---------- INICIALIZACE REALTIME ---------- */
+        function initRealtime() {
+            if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                setTopStatus('idle', 'Chybí Supabase SDK');
+                setConnInfo('Nelze načíst realtime klienta');
+                addSystemMessage('Nepodařilo se načíst Supabase Realtime SDK. Zkontroluj připojení k internetu.');
+                return;
+            }
+
+            const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                realtime: { params: { eventsPerSecond: 20 } }
+            });
+
+            const ch = sb.channel(CHANNEL_NAME, {
+                config: {
+                    broadcast: { self: false },
+                    presence: { key: tabId }
+                }
+            });
+            state.channel = ch;
+
+            ch.on('presence', { event: 'sync' }, handlePresenceSync);
+
+            ch.on('broadcast', { event: 'viewer-hello' }, ({ payload }) => {
+                if (payload && payload.to === tabId && state.isStreaming && payload.from) {
+                    createOfferForViewer(payload.from);
+                }
+            });
+
+            ch.on('broadcast', { event: 'rtc-offer' }, ({ payload }) => {
+                if (payload) handleIncomingOffer(payload);
+            });
+
+            ch.on('broadcast', { event: 'rtc-answer' }, ({ payload }) => {
+                if (payload) handleIncomingAnswer(payload);
+            });
+
+            ch.on('broadcast', { event: 'rtc-ice' }, ({ payload }) => {
+                if (payload) handleIncomingIce(payload);
+            });
+
+            ch.on('broadcast', { event: 'stream-started' }, ({ payload }) => {
+                if (!payload || payload.hostTabId === tabId) return;
+                addSystemMessage(`${payload.name || 'Někdo'} spustil živý stream.`);
+            });
+
+            ch.on('broadcast', { event: 'stream-ended' }, ({ payload }) => {
+                if (!payload || payload.hostTabId === tabId) return;
+                if (state.activeHost && state.activeHost.tabId === payload.hostTabId) {
+                    addSystemMessage('Stream byl ukončen.');
+                    state.activeHost = null;
+                    closeViewerConnection();
+                    updateUiControls();
+                }
+            });
+
+            ch.on('broadcast', { event: 'chat' }, ({ payload }) => {
+                if (!payload || !payload.text) return;
+                addChatMessage(payload);
+            });
+
+            ch.subscribe(async status => {
+                if (status === 'SUBSCRIBED') {
+                    state.connected = true;
+                    await updatePresence();
+                    updateUiControls();
+                } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+                    state.connected = false;
+                    updateUiControls();
+                    setConnInfo('Realtime odpojeno');
+                }
+            });
+        }
+
+        /* ---------- UI OVLADACE ---------- */
+        els.startBtn.addEventListener('click', startBroadcast);
+        els.heroStartBtn.addEventListener('click', startBroadcast);
+        els.stopBtn.addEventListener('click', () => stopBroadcast(true));
+        els.reconnectBtn.addEventListener('click', () => {
+            if (state.activeHost && state.activeHost.tabId !== tabId) {
+                requestStreamFromHost(state.activeHost.tabId);
+            }
+        });
+
+        els.unmuteBanner.addEventListener('click', async () => {
+            els.player.muted = false;
+            els.player.volume = Math.max(0.2, Number(els.volSlider.value) / 100);
+            try { await els.player.play(); } catch (e) {}
+            els.unmuteBanner.hidden = true;
+        });
+
+        els.muteBtn.addEventListener('click', () => {
+            if (state.isStreaming) return;
+            els.player.muted = !els.player.muted;
+            els.unmuteBanner.hidden = !els.player.muted || !els.player.srcObject;
+        });
+
+        els.volSlider.addEventListener('input', () => {
+            const v = Math.max(0, Math.min(1, Number(els.volSlider.value) / 100));
+            els.player.volume = v;
+            if (!state.isStreaming && v > 0 && els.player.muted) {
+                els.player.muted = false;
+                els.unmuteBanner.hidden = true;
+            }
+        });
+
+        els.fsBtn.addEventListener('click', () => {
+            const target = els.player.parentElement;
+            if (!document.fullscreenElement) {
+                if (target && target.requestFullscreen) target.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen().catch(() => {});
+            }
+        });
+
+        els.pipBtn.addEventListener('click', async () => {
+            if (!document.pictureInPictureEnabled || !els.player.srcObject) return;
+            try {
+                if (document.pictureInPictureElement) await document.exitPictureInPicture();
+                else await els.player.requestPictureInPicture();
+            } catch (e) {}
+        });
+
+        els.chatForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const raw = els.chatInput.value.trim();
+            if (!raw) return;
+            const now = Date.now();
+            if (now - state.lastChatSentAt < 500) return;
+            if (!state.connected) {
+                addSystemMessage('Zprávu nelze poslat — nejsi připojený k chatu.');
+                return;
+            }
+            state.lastChatSentAt = now;
+            els.chatInput.value = '';
+            const msg = {
+                id: tabId + '-' + now,
+                name: state.nick,
+                text: raw.slice(0, 400),
+                ts: now,
+                isHost: state.isStreaming
+            };
+            addChatMessage(msg);
+            sendSignal('chat', msg);
+        });
+
+        els.nickBtn.addEventListener('click', () => {
+            els.nickInput.value = state.nick;
+            els.nickModal.hidden = false;
+            els.nickInput.focus();
+            els.nickInput.select();
+        });
+        els.nickCancel.addEventListener('click', () => { els.nickModal.hidden = true; });
+        els.nickModal.addEventListener('click', e => { if (e.target === els.nickModal) els.nickModal.hidden = true; });
+        els.nickForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const clean = els.nickInput.value.trim().slice(0, 24);
+            if (!clean) return;
+            state.nick = clean;
+            els.nickLabel.textContent = clean;
+            try { sessionStorage.setItem(NICK_SESSION_KEY, clean); } catch (err) {}
+            els.nickModal.hidden = true;
+            await updatePresence();
+            renderPeersBar();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (state.isStreaming) {
+                sendSignal('stream-ended', { hostTabId: tabId });
+            }
+        });
+
+        initRealtime();
+    })();
+    </script>
+</body>
+</html>
