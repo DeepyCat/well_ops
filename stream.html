@@ -637,6 +637,37 @@
         .modal-card p { margin: 0; font-size: 13px; color: var(--muted); }
         .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
 
+        .head-tools { display: inline-flex; align-items: center; gap: 8px; }
+        .popout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 9px;
+            border-radius: 7px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-2);
+            font-size: 12px;
+            font-weight: 500;
+            transition: border-color .15s ease, color .15s ease;
+        }
+        .popout-btn:hover { border-color: var(--border-strong); color: var(--text); }
+
+        body.chat-only .stage-col { display: none; }
+        body.chat-only .workspace {
+            grid-template-columns: 1fr;
+            max-width: 760px;
+            height: calc(100vh - 58px);
+        }
+        body.chat-only .chat-col { max-height: none; height: 100%; min-height: 0; }
+        body.chat-only #chatPopoutBtn { display: none; }
+        body.chat-only .chat-col .reaction-bar {
+            position: static;
+            margin: 6px 12px 0;
+            align-self: flex-start;
+            background: var(--surface-2);
+        }
+
         @media (max-width: 1020px) {
             .workspace {
                 grid-template-columns: 1fr;
@@ -717,7 +748,7 @@
                     <div class="stage-actions">
                         <button class="btn btn-primary" id="heroStartBtn" type="button">
                             <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-                            <span>Streamovat obrazovku</span>
+                            <span>Spustit stream</span>
                         </button>
                         <button class="btn btn-primary" id="playBtn" type="button" hidden>Spustit video</button>
                         <button class="btn" id="reconnectBtn" type="button" hidden>Znovu připojit stream</button>
@@ -735,13 +766,18 @@
                         <svg class="ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
                         <span>Ukončit stream</span>
                     </button>
+                    <select class="field quality-select" id="sourceSelect" aria-label="Zdroj videa">
+                        <option value="screen">Obrazovka</option>
+                        <option value="both">Obrazovka + Webkamera</option>
+                        <option value="camera">Pouze webkamera</option>
+                    </select>
                     <input class="field title-input" id="streamTitleInput" type="text" maxlength="48" placeholder="Název streamu (nepovinné)">
                     <select class="field quality-select" id="qualitySelect" aria-label="Kvalita přenosu">
                         <option value="720p">720p · 30 fps (Doporučeno)</option>
                         <option value="480p">480p · 24 fps (Úsporný)</option>
                         <option value="1080p">1080p · 30 fps (Ostrý text)</option>
                     </select>
-                    <label class="check-pill" title="Chrome umí sdílet zvuk vybrané karty nebo systému">
+                    <label class="check-pill" title="Sdílet zvuk z karty / mikrofonu">
                         <input type="checkbox" id="audioToggle" checked>
                         <span>Se zvukem</span>
                     </label>
@@ -767,7 +803,13 @@
         <aside class="chat-col" aria-label="Živý chat a účastníci">
             <div class="panel-head">
                 <span class="panel-title">Živý chat</span>
-                <span class="panel-sub" id="chatNotice">Jen v paměti</span>
+                <div class="head-tools">
+                    <span class="panel-sub" id="chatNotice">Jen v paměti</span>
+                    <a class="popout-btn" id="chatPopoutBtn" href="stream.html?chat=1" target="_blank" rel="noopener noreferrer" title="Otevřít živý chat v nové záložce">
+                        <svg class="ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        <span>Nová záložka</span>
+                    </a>
+                </div>
             </div>
             <div class="peers-bar" id="peersBar" aria-label="Online účastníci"></div>
             <div class="chat-list" id="chatList">
@@ -825,7 +867,10 @@
             { urls: 'turns:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
         ];
 
-        const canShareScreen = Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function');
+        const isChatOnly = new URLSearchParams(typeof window !== 'undefined' && window.location ? window.location.search : '').get('chat') === '1';
+        const canScreenShare = Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getDisplayMedia === 'function');
+        const canCamera = Boolean(navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function');
+        const canAnyBroadcast = !isChatOnly && (canScreenShare || canCamera);
 
         const tabId = (window.crypto && typeof window.crypto.randomUUID === 'function')
             ? window.crypto.randomUUID()
@@ -852,6 +897,7 @@
             reconnectBtn: $('reconnectBtn'),
             startBtn: $('startBtn'),
             stopBtn: $('stopBtn'),
+            sourceSelect: $('sourceSelect'),
             streamTitleInput: $('streamTitleInput'),
             qualitySelect: $('qualitySelect'),
             audioToggle: $('audioToggle'),
@@ -871,6 +917,21 @@
             nickInput: $('nickInput'),
             nickCancel: $('nickCancel')
         };
+
+        if (isChatOnly) {
+            if (document.body && document.body.classList) document.body.classList.add('chat-only');
+            document.title = 'Živý chat | OPS Portál';
+            if (els.reactionBar && els.chatForm && els.chatForm.parentElement && typeof els.chatForm.parentElement.insertBefore === 'function') {
+                els.chatForm.parentElement.insertBefore(els.reactionBar, els.chatForm);
+            }
+        }
+        if (els.sourceSelect && els.sourceSelect.options) {
+            for (const opt of Array.from(els.sourceSelect.options)) {
+                if ((opt.value === 'screen' || opt.value === 'both') && !canScreenShare) opt.disabled = true;
+                if ((opt.value === 'camera' || opt.value === 'both') && !canCamera) opt.disabled = true;
+            }
+            if (!canScreenShare && canCamera) els.sourceSelect.value = 'camera';
+        }
 
         function resolveInitialNick() {
             const opsName = (window.OPS_STATS && typeof window.OPS_STATS.getUsername === 'function')
@@ -908,6 +969,7 @@
             startedAt: null,
             streamTitle: '',
             localStream: null,
+            localCleanup: null,
             activeHost: null,
             peersOnline: [],
             hostPeers: new Map(), // viewerTabId -> { pc, iceQueue, remoteDescSet }
@@ -1023,12 +1085,13 @@
 
         function renderPeersBar() {
             const list = state.peersOnline;
-            els.viewerCount.textContent = `${list.length} / ${MAX_VIEWERS}`;
+            const streamPeers = list.filter(p => !p.chatOnly);
+            els.viewerCount.textContent = `${streamPeers.length} / ${MAX_VIEWERS}`;
             els.peersBar.innerHTML = '';
             list.forEach(p => {
                 const pill = document.createElement('span');
                 pill.className = 'peer-pill' + (p.streaming ? ' host' : '') + (p.tabId === tabId ? ' me' : '');
-                pill.textContent = p.streaming ? `LIVE · ${p.name}` : p.name;
+                pill.textContent = p.streaming ? `LIVE · ${p.name}` : (p.chatOnly ? `${p.name} (chat)` : p.name);
                 els.peersBar.appendChild(pill);
             });
         }
@@ -1037,15 +1100,28 @@
             const host = state.activeHost;
             const someoneElseLive = Boolean(host && host.tabId !== tabId);
 
-            els.startBtn.hidden = state.isStreaming || !canShareScreen;
+            if (isChatOnly) {
+                if (someoneElseLive) {
+                    setTopStatus('live', `ŽIVĚ · ${host.name}`);
+                } else {
+                    setTopStatus(state.connected ? 'idle' : 'connecting', state.connected ? 'CHAT ONLINE' : 'Připojuji se...');
+                }
+                return;
+            }
+
+            els.startBtn.hidden = state.isStreaming || !canAnyBroadcast;
             els.stopBtn.hidden = !state.isStreaming;
-            els.startBtn.disabled = !state.connected || someoneElseLive || !canShareScreen;
-            els.heroStartBtn.disabled = !state.connected || someoneElseLive || !canShareScreen;
-            els.heroStartBtn.hidden = state.isStreaming || someoneElseLive || !canShareScreen;
-            els.streamTitleInput.hidden = !canShareScreen && !state.isStreaming;
-            els.qualitySelect.hidden = !canShareScreen && !state.isStreaming;
+            els.startBtn.disabled = !state.connected || someoneElseLive || !canAnyBroadcast;
+            els.heroStartBtn.disabled = !state.connected || someoneElseLive || !canAnyBroadcast;
+            els.heroStartBtn.hidden = state.isStreaming || someoneElseLive || !canAnyBroadcast;
+            if (els.sourceSelect) {
+                els.sourceSelect.hidden = !canAnyBroadcast && !state.isStreaming;
+                els.sourceSelect.disabled = state.isStreaming;
+            }
+            els.streamTitleInput.hidden = !canAnyBroadcast && !state.isStreaming;
+            els.qualitySelect.hidden = !canAnyBroadcast && !state.isStreaming;
             if (els.audioToggle && els.audioToggle.parentElement) {
-                els.audioToggle.parentElement.hidden = !canShareScreen && !state.isStreaming;
+                els.audioToggle.parentElement.hidden = !canAnyBroadcast && !state.isStreaming;
             }
             els.streamTitleInput.disabled = state.isStreaming;
             els.qualitySelect.disabled = state.isStreaming;
@@ -1056,7 +1132,7 @@
                 els.stageOverlay.hidden = true;
                 els.playBtn.hidden = true;
                 els.hudBadge.hidden = false;
-                els.hudTitle.textContent = state.streamTitle || `${state.nick} · Sdílení obrazovky`;
+                els.hudTitle.textContent = state.streamTitle || `${state.nick} · Živý přenos`;
                 els.reconnectBtn.hidden = true;
                 els.unmuteBanner.hidden = true;
                 return;
@@ -1065,7 +1141,7 @@
             if (someoneElseLive) {
                 setTopStatus('live', `ŽIVĚ · ${host.name}`);
                 els.hudBadge.hidden = false;
-                els.hudTitle.textContent = host.title || `${host.name} · Sdílení obrazovky`;
+                els.hudTitle.textContent = host.title || `${host.name} · Živý přenos`;
                 if (!els.player.srcObject) {
                     els.overlayTitle.textContent = `Připojuji se ke streamu (${host.name})...`;
                     els.overlayDesc.textContent = 'Navazuji přímé WebRTC spojení v prohlížeči.';
@@ -1081,9 +1157,11 @@
             els.reconnectBtn.hidden = true;
             els.stageOverlay.hidden = false;
             els.overlayTitle.textContent = 'Nikdo teď nestreamuje';
-            els.overlayDesc.textContent = canShareScreen
-                ? 'Kdokoliv v místnosti může spustit sdílení obrazovky v Chrome. Video běží živě mezi prohlížeči a nikam se neukládá.'
-                : 'Čeká se na spuštění streamu z počítače (sdílení obrazovky podporuje Chrome/Edge na PC, na telefonu běží sledování a chat).';
+            els.overlayDesc.textContent = canScreenShare
+                ? 'Kdokoliv v místnosti může spustit sdílení obrazovky nebo webkameru. Video běží živě a nikam se neukládá.'
+                : (canCamera
+                    ? 'Kdokoliv může spustit webkameru nebo sledovat přenos z počítače.'
+                    : 'Čeká se na spuštění streamu. V tomto prohlížeči běží režim diváka a chat.');
             setConnInfo('Čeká na spuštění');
         }
 
@@ -1099,6 +1177,7 @@
                     tabId,
                     name: state.nick,
                     streaming: state.isStreaming,
+                    chatOnly: isChatOnly,
                     startedAt: state.startedAt,
                     title: state.streamTitle || '',
                     quality: els.qualitySelect.value
@@ -1173,7 +1252,152 @@
             }
         }
 
+        async function captureBroadcastStream(mode, preset, includeAudio) {
+            const rawStreams = [];
+            let timerId = null;
+            let audioCtx = null;
+
+            const stopRaw = () => {
+                if (timerId) { clearInterval(timerId); timerId = null; }
+                rawStreams.forEach(s => s.getTracks().forEach(t => { try { t.stop(); } catch (e) {} }));
+                if (audioCtx && typeof audioCtx.close === 'function') {
+                    try { audioCtx.close(); } catch (e) {}
+                }
+            };
+
+            if (mode === 'camera') {
+                const camStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: preset.width }, height: { ideal: preset.height }, frameRate: { ideal: preset.fps } },
+                    audio: includeAudio
+                });
+                rawStreams.push(camStream);
+                return { stream: camStream, contentHint: 'motion', label: 'Webkamera', cleanup: stopRaw };
+            }
+
+            const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                video: {
+                    width: { ideal: preset.width },
+                    height: { ideal: preset.height },
+                    frameRate: { ideal: preset.fps },
+                    cursor: 'always'
+                },
+                audio: includeAudio
+            });
+            rawStreams.push(screenStream);
+
+            if (mode !== 'both' || !canCamera) {
+                return { stream: screenStream, contentHint: 'detail', label: 'Sdílení obrazovky', cleanup: stopRaw };
+            }
+
+            let camStream;
+            try {
+                camStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 360 }, frameRate: { ideal: preset.fps } },
+                    audio: includeAudio
+                });
+            } catch (micErr) {
+                if (includeAudio) {
+                    camStream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: { ideal: 640 }, height: { ideal: 360 }, frameRate: { ideal: preset.fps } },
+                        audio: false
+                    });
+                } else {
+                    throw micErr;
+                }
+            }
+            rawStreams.push(camStream);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = preset.width;
+            canvas.height = preset.height;
+            const ctx = canvas.getContext('2d');
+
+            const makeSrcVideo = ms => {
+                const v = document.createElement('video');
+                v.muted = true;
+                v.playsInline = true;
+                v.autoplay = true;
+                v.srcObject = ms;
+                if (typeof v.play === 'function') v.play().catch(() => {});
+                return v;
+            };
+            const scrVid = makeSrcVideo(screenStream);
+            const camVid = makeSrcVideo(camStream);
+
+            const drawFrame = () => {
+                if (!ctx) return;
+                ctx.fillStyle = '#09090b';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const sw = scrVid.videoWidth || canvas.width;
+                const sh = scrVid.videoHeight || canvas.height;
+                const scale = Math.min(canvas.width / sw, canvas.height / sh);
+                const dw = sw * scale;
+                const dh = sh * scale;
+                ctx.drawImage(scrVid, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+
+                const cw = camVid.videoWidth || 16;
+                const ch = camVid.videoHeight || 9;
+                const pipW = Math.round(canvas.width * 0.22);
+                const pipH = Math.round(pipW * (ch / cw));
+                const pad = Math.round(canvas.width * 0.018);
+                const px = canvas.width - pipW - pad;
+                const py = canvas.height - pipH - pad;
+                const rad = 10;
+
+                ctx.save();
+                ctx.beginPath();
+                if (typeof ctx.roundRect === 'function') {
+                    ctx.roundRect(px, py, pipW, pipH, rad);
+                } else {
+                    ctx.rect(px, py, pipW, pipH);
+                }
+                ctx.clip();
+                ctx.drawImage(camVid, px, py, pipW, pipH);
+                ctx.restore();
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                if (typeof ctx.roundRect === 'function') {
+                    ctx.roundRect(px, py, pipW, pipH, rad);
+                } else {
+                    ctx.rect(px, py, pipW, pipH);
+                }
+                ctx.stroke();
+            };
+
+            drawFrame();
+            timerId = setInterval(drawFrame, Math.max(30, Math.round(1000 / preset.fps)));
+
+            const outStream = canvas.captureStream(preset.fps);
+            const screenAudio = screenStream.getAudioTracks();
+            const camAudio = camStream.getAudioTracks();
+            if (screenAudio.length && camAudio.length && (window.AudioContext || window.webkitAudioContext)) {
+                try {
+                    const AC = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AC();
+                    const dest = audioCtx.createMediaStreamDestination();
+                    audioCtx.createMediaStreamSource(new MediaStream([screenAudio[0]])).connect(dest);
+                    audioCtx.createMediaStreamSource(new MediaStream([camAudio[0]])).connect(dest);
+                    dest.stream.getAudioTracks().forEach(t => outStream.addTrack(t));
+                } catch (e) {
+                    camAudio.concat(screenAudio).forEach(t => outStream.addTrack(t));
+                }
+            } else {
+                screenAudio.concat(camAudio).forEach(t => outStream.addTrack(t));
+            }
+
+            const fullCleanup = () => {
+                scrVid.srcObject = null;
+                camVid.srcObject = null;
+                stopRaw();
+            };
+            return { stream: outStream, contentHint: 'detail', label: 'Obrazovka + Webkamera', cleanup: fullCleanup, sourceStreams: rawStreams };
+        }
+
         async function startBroadcast() {
+            if (isChatOnly) return;
             if (!state.connected) {
                 addSystemMessage('Nejprve počkej na připojení k místnosti.');
                 return;
@@ -1182,33 +1406,33 @@
                 addSystemMessage(`Stream už právě vysílá ${state.activeHost.name}.`);
                 return;
             }
-            if (!navigator.mediaDevices || typeof navigator.mediaDevices.getDisplayMedia !== 'function') {
-                addSystemMessage('Tento prohlížeč nepodporuje sdílení obrazovky (getDisplayMedia). Použij desktopový Chrome nebo Edge.');
+            const sourceMode = els.sourceSelect ? els.sourceSelect.value : 'screen';
+            if ((sourceMode === 'screen' || sourceMode === 'both') && !canScreenShare) {
+                addSystemMessage('Tento prohlížeč nepodporuje sdílení obrazovky (getDisplayMedia). Zkus volbu Pouze webkamera.');
+                return;
+            }
+            if ((sourceMode === 'camera' || sourceMode === 'both') && !canCamera) {
+                addSystemMessage('Tento prohlížeč nemá přístup ke kameře (getUserMedia).');
                 return;
             }
 
             const preset = QUALITY_PRESETS[els.qualitySelect.value] || QUALITY_PRESETS['720p'];
-            let stream;
+            let captured;
             try {
-                stream = await navigator.mediaDevices.getDisplayMedia({
-                    video: {
-                        width: { ideal: preset.width },
-                        height: { ideal: preset.height },
-                        frameRate: { ideal: preset.fps },
-                        cursor: 'always'
-                    },
-                    audio: els.audioToggle.checked
-                });
+                captured = await captureBroadcastStream(sourceMode, preset, els.audioToggle.checked);
             } catch (err) {
                 if (err && err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-                    addSystemMessage('Nepodařilo se spustit sdílení obrazovky: ' + err.message);
+                    addSystemMessage('Nepodařilo se spustit přenos: ' + err.message);
                 }
                 return;
             }
 
+            const stream = captured.stream;
+
             // Re-check slot right after picker closes
             if (state.activeHost && state.activeHost.tabId !== tabId) {
-                stream.getTracks().forEach(t => t.stop());
+                captured.cleanup();
+                stream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
                 addSystemMessage(`Mezitím začal streamovat ${state.activeHost.name}.`);
                 return;
             }
@@ -1217,11 +1441,18 @@
 
             const videoTrack = stream.getVideoTracks()[0];
             if (videoTrack) {
-                try { videoTrack.contentHint = 'detail'; } catch (e) {}
+                try { videoTrack.contentHint = captured.contentHint; } catch (e) {}
                 videoTrack.addEventListener('ended', () => stopBroadcast(false));
+            }
+            if (Array.isArray(captured.sourceStreams)) {
+                captured.sourceStreams.forEach(s => {
+                    const vt = s.getVideoTracks()[0];
+                    if (vt) vt.addEventListener('ended', () => stopBroadcast(false));
+                });
             }
 
             state.localStream = stream;
+            state.localCleanup = captured.cleanup;
             state.isStreaming = true;
             state.startedAt = Date.now();
             state.streamTitle = els.streamTitleInput.value.trim();
@@ -1231,10 +1462,10 @@
             try { await els.player.play(); } catch (e) {}
 
             updateUiControls();
-            setConnInfo('Vysíláš (čeká na diváky)');
+            setConnInfo(`Vysíláš · ${captured.label} (čeká na diváky)`);
             await updatePresence();
             sendSignal('stream-started', { hostTabId: tabId, name: state.nick, title: state.streamTitle });
-            addSystemMessage('Spustil jsi živý stream obrazovky.');
+            addSystemMessage(`Spustil jsi živý stream (${captured.label}).`);
         }
 
         async function stopBroadcast(announce = true) {
@@ -1242,6 +1473,10 @@
             state.isStreaming = false;
             state.startedAt = null;
             closeAllHostPeers();
+            if (typeof state.localCleanup === 'function') {
+                try { state.localCleanup(); } catch (e) {}
+                state.localCleanup = null;
+            }
             if (state.localStream) {
                 state.localStream.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
                 state.localStream = null;
@@ -1465,7 +1700,7 @@
                 for (const viewerId of Array.from(state.hostPeers.keys())) {
                     if (!onlineIds.has(viewerId)) closeHostPeer(viewerId);
                 }
-            } else {
+            } else if (!isChatOnly) {
                 if (winner && winner.tabId !== prevHostId) {
                     requestStreamFromHost(winner.tabId);
                 } else if (!winner && prevHostId) {
@@ -1501,21 +1736,21 @@
             ch.on('presence', { event: 'sync' }, handlePresenceSync);
 
             ch.on('broadcast', { event: 'viewer-hello' }, ({ payload }) => {
-                if (payload && payload.to === tabId && state.isStreaming && payload.from) {
+                if (!isChatOnly && payload && payload.to === tabId && state.isStreaming && payload.from) {
                     createOfferForViewer(payload.from);
                 }
             });
 
             ch.on('broadcast', { event: 'rtc-offer' }, ({ payload }) => {
-                if (payload) handleIncomingOffer(payload);
+                if (!isChatOnly && payload) handleIncomingOffer(payload);
             });
 
             ch.on('broadcast', { event: 'rtc-answer' }, ({ payload }) => {
-                if (payload) handleIncomingAnswer(payload);
+                if (!isChatOnly && payload) handleIncomingAnswer(payload);
             });
 
             ch.on('broadcast', { event: 'rtc-ice' }, ({ payload }) => {
-                if (payload) handleIncomingIce(payload);
+                if (!isChatOnly && payload) handleIncomingIce(payload);
             });
 
             ch.on('broadcast', { event: 'stream-started' }, ({ payload }) => {
