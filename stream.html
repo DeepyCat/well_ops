@@ -739,7 +739,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 295px;
+            max-height: 380px;
         }
         .media-picker[hidden] { display: none; }
         .picker-tabs {
@@ -763,15 +763,42 @@
             border-color: rgba(239, 68, 68, .55);
             color: var(--text);
         }
+        .picker-search {
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 10px;
+            color: var(--text);
+            font-size: 12.5px;
+            outline: none;
+        }
+        .picker-search:focus { border-color: rgba(239, 68, 68, .6); }
         .picker-grid {
             overflow-y: auto;
             display: grid;
             gap: 6px;
             scrollbar-width: thin;
-            max-height: 185px;
+            max-height: 225px;
         }
         .picker-grid.is-emoji { grid-template-columns: repeat(8, 1fr); }
         .picker-grid.is-media { grid-template-columns: repeat(3, 1fr); }
+        .picker-section-title {
+            grid-column: 1 / -1;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 2px 2px 0;
+        }
+        .picker-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--muted);
+            font-size: 12px;
+            padding: 18px 8px;
+        }
         .emoji-cell {
             height: 34px;
             border-radius: 8px;
@@ -791,6 +818,7 @@
             transform: scale(1.08);
         }
         .media-cell {
+            position: relative;
             border-radius: 9px;
             border: 1px solid var(--border);
             background: var(--surface);
@@ -825,6 +853,25 @@
             text-overflow: ellipsis;
             max-width: 100%;
         }
+        .media-del-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            border: 1px solid var(--border-strong);
+            background: rgba(9, 9, 11, .86);
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: .85;
+        }
+        .media-del-btn:hover { background: var(--accent); border-color: var(--accent); opacity: 1; }
         .gif-url-row {
             display: flex;
             gap: 6px;
@@ -843,6 +890,24 @@
             outline: none;
         }
         .gif-url-input:focus { border-color: rgba(239, 68, 68, .6); }
+        .scroll-bottom-btn {
+            position: absolute;
+            right: 14px;
+            bottom: 66px;
+            z-index: 20;
+            padding: 6px 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(239, 68, 68, .55);
+            background: rgba(24, 24, 27, .94);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+        .scroll-bottom-btn:hover { background: var(--accent); border-color: var(--accent); }
+        .chat-col.has-reply .scroll-bottom-btn { bottom: 118px; }
+        .scroll-bottom-btn[hidden] { display: none; }
         .chat-input {
             flex: 1;
             min-width: 0;
@@ -932,7 +997,7 @@
             .react-btn { width: 29px; height: 29px; font-size: 16px; }
             .unmute-bar { bottom: 50px; padding: 6px 10px; font-size: 12px; max-width: calc(100% - 20px); }
             .title-input { width: 100%; font-size: 16px; }
-            .chat-input, .gif-url-input, .modal-card .field { font-size: 16px; }
+            .chat-input, .gif-url-input, .picker-search, .modal-card .field { font-size: 16px; }
         }
         a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
             outline: 2px solid var(--accent);
@@ -1061,16 +1126,19 @@
             <div class="chat-list" id="chatList">
                 <div class="chat-empty" id="chatEmpty">Zatím tu nejsou žádné zprávy. Historie chatu se ukládá pouze lokálně v prohlížeči.</div>
             </div>
+            <button class="scroll-bottom-btn" id="scrollBottomBtn" type="button" hidden title="Přejít na nejnovější zprávy">↓ Dolů</button>
             <div class="media-picker" id="mediaPicker" hidden aria-label="Výběr emoji, stickerů a GIFů">
                 <div class="picker-tabs" role="tablist">
                     <button class="picker-tab active" type="button" data-picker-tab="emoji" role="tab" aria-selected="true">Emoji</button>
                     <button class="picker-tab" type="button" data-picker-tab="stickers" role="tab" aria-selected="false">Stickery</button>
                     <button class="picker-tab" type="button" data-picker-tab="gifs" role="tab" aria-selected="false">GIFy</button>
                 </div>
+                <input class="picker-search" id="pickerSearchInput" type="search" maxlength="60" placeholder="Hledat emoji, stickery nebo GIFy...">
                 <div class="picker-grid is-emoji" id="pickerGrid"></div>
                 <div class="gif-url-row" id="gifUrlRow" hidden>
-                    <input class="gif-url-input" id="gifUrlInput" type="url" maxlength="400" placeholder="Vlož HTTPS odkaz na GIF nebo obrázek...">
-                    <button class="btn btn-primary" id="gifUrlSendBtn" type="button">Poslat GIF</button>
+                    <input class="gif-url-input" id="gifUrlInput" type="url" maxlength="400" placeholder="Vlož odkaz na GIF (Giphy, Tenor, .gif)...">
+                    <button class="btn" id="gifUrlSaveBtn" type="button" title="Uložit do nedávných GIFů">+ Uložit</button>
+                    <button class="btn btn-primary" id="gifUrlSendBtn" type="button">Poslat</button>
                 </div>
             </div>
             <div class="reply-banner" id="replyBanner" hidden>
@@ -1118,6 +1186,8 @@
         const MAX_CHAT_MESSAGES = 150;
         const NICK_SESSION_KEY = 'ops_stream_nick';
         const CHAT_STORAGE_KEY = 'ops_stream_chat_history_v1';
+        const RECENT_GIFS_KEY = 'ops_stream_recent_gifs_v1';
+        const MAX_RECENT_GIFS = 24;
 
         const QUALITY_PRESETS = {
             '480p':  { width: 854,  height: 480,  fps: 24, bitrate: 650000 },
@@ -1181,6 +1251,7 @@
             peersBar: $('peersBar'),
             chatList: $('chatList'),
             chatEmpty: $('chatEmpty'),
+            scrollBottomBtn: $('scrollBottomBtn'),
             clearChatBtn: $('clearChatBtn'),
             replyBanner: $('replyBanner'),
             replyTargetName: $('replyTargetName'),
@@ -1188,9 +1259,11 @@
             replyCancelBtn: $('replyCancelBtn'),
             pickerToggleBtn: $('pickerToggleBtn'),
             mediaPicker: $('mediaPicker'),
+            pickerSearchInput: $('pickerSearchInput'),
             pickerGrid: $('pickerGrid'),
             gifUrlRow: $('gifUrlRow'),
             gifUrlInput: $('gifUrlInput'),
+            gifUrlSaveBtn: $('gifUrlSaveBtn'),
             gifUrlSendBtn: $('gifUrlSendBtn'),
             chatForm: $('chatForm'),
             chatInput: $('chatInput'),
@@ -1228,35 +1301,37 @@
         }
 
         const REACTION_PRESETS = [['👍','Palec nahoru'],['🔥','Oheň'],['😂','Smích'],['😮','Překvapení'],['❤️','Srdce'],['👏','Potlesk'],['💀','Lebka']]; // taste-skill-ignore
-        const CHAT_EMOJIS = ['😀','😂','🤣','😍','🥳','😎','🤔','😭','😡','🤯','👍','👎','👏','🙏','🔥','❤️','💯','💀','🎉','👀','🚀','🎮','💻','☕']; // taste-skill-ignore
+        const CHAT_EMOJIS = [['😀','usmev smajlik happy smile'],['😂','smich lol haha slzy'],['🤣','smich rofl lol'],['😍','srdce laska love'],['🥳','oslava party narozeniny'],['😎','cool frajer bryle sunglasses'],['🤩','hvezda wow super'],['🤔','mysli premysli hmm think'],['😮','prekvapeni wow omg'],['😱','strach sok omg'],['😭','plac smutny cry sad'],['😤','vztek pff'],['😡','nastvany angry rage'],['🤯','vybuch hlava mindblown'],['👍','palec ok super like yes'],['👎','nelibi palec dolu dislike'],['👏','potlesk bravo gg clap'],['🙌','ruce hura slava'],['🙏','prosim dekuji pls amen'],['🤝','potreseni dohoda gg'],['🔥','ohen top fire lit'],['❤️','srdce laska heart'],['💯','sto procent 100 perfect'],['💀','lebka mrtvy dead skull'],['🎉','konfety oslava party gg'],['👀','oci koukam look eyes'],['🚀','raketa letim rocket moon'],['⚡','blesk rychlost energy'],['✨','jiskry magie sparkle'],['🎮','hra gaming controller'],['💻','pocitac kod pc laptop'],['☕','kava kafe coffee'],['🍕','pizza jidlo'],['🍺','pivo beer'],['🏆','trofej vyhra vitez win'],['👑','koruna kral king'],['💩','hovno poop'],['🤡','klaun clown'],['🐱','kocka cat'],['🐶','pes dog']]; // taste-skill-ignore
         const CHAT_STICKERS = [
-            { url: 'hry/kasino/img/think.png', label: 'Myslí' },
-            { url: 'hry/kasino/img/point.png', label: 'Ukazuje' },
-            { url: 'hry/kasino/img/show.png', label: 'Show' },
-            { url: 'hry/kasino/img/petrova.webp', label: 'Petrová' },
-            { url: 'hry/kasino/img/B-Lahvac.png', label: 'Lahváč' },
-            { url: 'hry/kasino/img/S-Riven.png', label: 'Říven' },
-            { url: 'hry/kasino/img/Z-Reditel.png', label: 'Ředitel' },
-            { url: 'hry/kasino/img/Z-Rybar.png', label: 'Rybář' },
-            { url: 'hry/kasino/img/S-Chobot.png', label: 'Chobot' },
-            { url: 'hry/kasino/img/S-Vesper.png', label: 'Vesper' },
-            { url: 'img/bird.png', label: 'Pták' },
-            { url: 'hry/mc/juchelka_craft.png', label: 'Juchelka Craft' }
+            { url: 'hry/kasino/img/think.png', label: 'Myslí', tags: 'premysli think otazka' },
+            { url: 'hry/kasino/img/point.png', label: 'Ukazuje', tags: 'ukazat prst point' },
+            { url: 'hry/kasino/img/show.png', label: 'Show', tags: 'ukazka show prezentace' },
+            { url: 'hry/kasino/img/petrova.webp', label: 'Petrová', tags: 'ucitel petrova' },
+            { url: 'hry/kasino/img/B-Lahvac.png', label: 'Lahváč', tags: 'ucitel hlavac lahvac' },
+            { url: 'hry/kasino/img/S-Riven.png', label: 'Říven', tags: 'ucitel riven' },
+            { url: 'hry/kasino/img/Z-Reditel.png', label: 'Ředitel', tags: 'reditel skola' },
+            { url: 'hry/kasino/img/Z-Rybar.png', label: 'Rybář', tags: 'rybar ucitel' },
+            { url: 'hry/kasino/img/S-Chobot.png', label: 'Chobot', tags: 'chobot ucitel' },
+            { url: 'hry/kasino/img/S-Vesper.png', label: 'Vesper', tags: 'vesper ucitel' },
+            { url: 'img/bird.png', label: 'Pták', tags: 'ptak bird meme' },
+            { url: 'hry/mc/juchelka_craft.png', label: 'Juchelka Craft', tags: 'juchelka minecraft craft' }
         ];
         const CHAT_GIFS = [
-            { url: 'img/celebration/proud-of-you1.gif', label: 'Proud 1' },
-            { url: 'img/celebration/proud-of-you2.gif', label: 'Proud 2' },
-            { url: 'img/celebration/proud-of-you3.gif', label: 'Proud 3' },
-            { url: 'img/celebration/proud-of-you4.gif', label: 'Proud 4' },
-            { url: 'img/celebration/proud-of-you5.gif', label: 'Proud 5' },
-            { url: 'hry/kasino/img/mambo-hello.gif', label: 'Mambo Hello' },
-            { url: 'hry/hyperdrive/kokes_race.gif', label: 'Kokeš Race' }
+            { url: 'img/celebration/proud-of-you1.gif', label: 'Proud 1', tags: 'oslava proud tleskani' },
+            { url: 'img/celebration/proud-of-you2.gif', label: 'Proud 2', tags: 'oslava proud super' },
+            { url: 'img/celebration/proud-of-you3.gif', label: 'Proud 3', tags: 'oslava proud gg' },
+            { url: 'img/celebration/proud-of-you4.gif', label: 'Proud 4', tags: 'oslava proud' },
+            { url: 'img/celebration/proud-of-you5.gif', label: 'Proud 5', tags: 'oslava proud' },
+            { url: 'hry/kasino/img/mambo-hello.gif', label: 'Mambo Hello', tags: 'mambo ahoj hello meme' },
+            { url: 'hry/hyperdrive/kokes_race.gif', label: 'Kokeš Race', tags: 'kokes zavod race meme' }
         ];
         const LOCAL_MEDIA_SET = new Set([...CHAT_STICKERS, ...CHAT_GIFS].map(item => item.url));
         const ALLOWED_GIF_HOSTS = new Set([
             'media.tenor.com', 'media1.tenor.com', 'c.tenor.com',
             'i.giphy.com', 'media.giphy.com',
-            'media0.giphy.com', 'media1.giphy.com', 'media2.giphy.com', 'media3.giphy.com', 'media4.giphy.com'
+            'media0.giphy.com', 'media1.giphy.com', 'media2.giphy.com', 'media3.giphy.com', 'media4.giphy.com',
+            'cdn.discordapp.com', 'media.discordapp.net', 'i.imgur.com',
+            'klipy.com', 'static.klipy.com'
         ]);
 
         function sanitizeMediaUrl(rawUrl) {
@@ -1271,9 +1346,36 @@
                 return null;
             }
             if (parsed.protocol !== 'https:') return null;
-            if (ALLOWED_GIF_HOSTS.has(parsed.hostname)) return parsed.href;
+            const host = parsed.hostname.toLowerCase();
+            if (host === 'giphy.com' || host === 'www.giphy.com') {
+                const match = parsed.pathname.match(/\/(?:gifs|embed|clips)\/(?:[^/]*-)?([a-zA-Z0-9]+)\/?$/);
+                if (match && match[1]) {
+                    return `https://media.giphy.com/media/${match[1]}/giphy.gif`;
+                }
+            }
+            if (host === 'i.imgur.com' && /\.gifv$/i.test(parsed.pathname)) {
+                parsed.pathname = parsed.pathname.replace(/\.gifv$/i, '.gif');
+                return parsed.href;
+            }
+            if (ALLOWED_GIF_HOSTS.has(host)) return parsed.href;
             if (/\.(gif|webp|png|jpe?g)$/i.test(parsed.pathname)) return parsed.href;
             return null;
+        }
+
+        function deriveMediaLabel(url, fallback = 'GIF') {
+            if (!url) return fallback;
+            const localMatch = [...CHAT_GIFS, ...CHAT_STICKERS].find(x => x.url === url);
+            if (localMatch) return localMatch.label;
+            try {
+                const u = new URL(url);
+                const segs = u.pathname.split('/').filter(Boolean);
+                const last = segs[segs.length - 1] || '';
+                const stem = decodeURIComponent(last).replace(/\.(gif|webp|png|jpe?g)$/i, '').replace(/[-_]+/g, ' ').trim();
+                if (stem && !/^giphy$/i.test(stem)) return stem.slice(0, 26);
+                return u.hostname.replace(/^www\./, '').slice(0, 26);
+            } catch (err) {
+                return fallback;
+            }
         }
         const ALLOWED_REACTIONS = new Set(REACTION_PRESETS.map(([e]) => e));
         const MAX_FLOATING_REACTIONS = 25;
@@ -1370,6 +1472,35 @@
 
         let chatHistory = [];
         const seenMessageIds = new Set();
+        let chatPinnedToBottom = true;
+
+        function scrollChatToBottom() {
+            const list = els.chatList;
+            if (!list) return;
+            list.scrollTop = list.scrollHeight;
+            if (els.scrollBottomBtn) els.scrollBottomBtn.hidden = true;
+        }
+
+        if (els.chatList) {
+            els.chatList.addEventListener('scroll', () => {
+                const list = els.chatList;
+                const dist = list.scrollHeight - list.scrollTop - list.clientHeight;
+                chatPinnedToBottom = dist <= 40;
+                if (els.scrollBottomBtn) els.scrollBottomBtn.hidden = chatPinnedToBottom;
+            });
+            if (typeof ResizeObserver === 'function') {
+                new ResizeObserver(() => {
+                    if (chatPinnedToBottom) scrollChatToBottom();
+                }).observe(els.chatList);
+            }
+        }
+
+        if (els.scrollBottomBtn) {
+            els.scrollBottomBtn.addEventListener('click', () => {
+                chatPinnedToBottom = true;
+                scrollChatToBottom();
+            });
+        }
 
         function buildMessagePreview({ text, mediaType, mediaAlt }) {
             const clean = String(text || '').trim().replace(/\s+/g, ' ');
@@ -1440,9 +1571,11 @@
                 if (!Array.isArray(parsed)) return;
                 parsed.slice(-MAX_CHAT_MESSAGES).forEach(item => {
                     if (item && typeof item === 'object') {
-                        addChatMessage(item, { persist: false });
+                        addChatMessage(item, { persist: false, forceScroll: true });
                     }
                 });
+                chatPinnedToBottom = true;
+                scrollChatToBottom();
             } catch (err) {}
         }
 
@@ -1459,7 +1592,7 @@
 
         function addChatMessage(rawMsg, opts = {}) {
             if (!rawMsg || typeof rawMsg !== 'object') return;
-            const { persist = true } = opts;
+            const { persist = true, forceScroll = false } = opts;
             const { id, name, text, mediaType, mediaUrl, mediaAlt, replyTo, ts, isHost } = rawMsg;
             const cleanText = String(text || '').trim();
             const safeUrl = sanitizeMediaUrl(mediaUrl);
@@ -1562,6 +1695,9 @@
                 img.alt = safeAlt;
                 img.loading = 'lazy';
                 img.referrerPolicy = 'no-referrer';
+                const resyncScroll = () => { if (chatPinnedToBottom) scrollChatToBottom(); };
+                img.addEventListener('load', resyncScroll);
+                img.addEventListener('error', resyncScroll);
                 mediaWrap.appendChild(img);
                 wrap.appendChild(mediaWrap);
             }
@@ -1572,18 +1708,29 @@
             }
             if (persist) saveChatHistory();
 
-            appendChatNode(wrap);
+            appendChatNode(wrap, { forceScroll });
         }
 
-        function appendChatNode(node) {
+        function appendChatNode(node, opts = {}) {
             const list = els.chatList;
-            const nearBottom = (list.scrollHeight - list.scrollTop - list.clientHeight) < 60;
+            if (!list) return;
+            const shouldScroll = Boolean(opts.forceScroll || chatPinnedToBottom);
             list.appendChild(node);
             while (list.querySelectorAll('.msg').length > MAX_CHAT_MESSAGES) {
                 const first = list.querySelector('.msg');
                 if (first) first.remove();
             }
-            if (nearBottom) list.scrollTop = list.scrollHeight;
+            if (shouldScroll) {
+                chatPinnedToBottom = true;
+                scrollChatToBottom();
+                if (typeof requestAnimationFrame === 'function') {
+                    requestAnimationFrame(() => {
+                        if (chatPinnedToBottom) scrollChatToBottom();
+                    });
+                }
+            } else if (els.scrollBottomBtn) {
+                els.scrollBottomBtn.hidden = false;
+            }
         }
 
         function renderPeersBar() {
@@ -2366,13 +2513,72 @@
         });
 
         let activePickerTab = 'emoji';
+        let recentGifs = loadRecentGifs();
+
+        function normalizeSearch(str) {
+            return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        }
+
+        function loadRecentGifs() {
+            try {
+                const raw = localStorage.getItem(RECENT_GIFS_KEY);
+                if (!raw) return [];
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) return [];
+                const seen = new Set();
+                const out = [];
+                for (const item of parsed) {
+                    const safeUrl = sanitizeMediaUrl(item && item.url);
+                    if (!safeUrl || seen.has(safeUrl)) continue;
+                    seen.add(safeUrl);
+                    out.push({
+                        url: safeUrl,
+                        label: String((item && item.label) || deriveMediaLabel(safeUrl)).slice(0, 32),
+                        ts: Number(item && item.ts) || Date.now()
+                    });
+                    if (out.length >= MAX_RECENT_GIFS) break;
+                }
+                return out;
+            } catch (err) {
+                return [];
+            }
+        }
+
+        function persistRecentGifs() {
+            try {
+                localStorage.setItem(RECENT_GIFS_KEY, JSON.stringify(recentGifs.slice(0, MAX_RECENT_GIFS)));
+            } catch (err) {}
+        }
+
+        function saveRecentGif(url, customLabel = '') {
+            const safeUrl = sanitizeMediaUrl(url);
+            if (!safeUrl) return null;
+            const label = String(customLabel || deriveMediaLabel(safeUrl)).trim().slice(0, 32) || 'GIF';
+            recentGifs = [{ url: safeUrl, label, ts: Date.now() }, ...recentGifs.filter(item => item.url !== safeUrl)].slice(0, MAX_RECENT_GIFS);
+            persistRecentGifs();
+            if (els.mediaPicker && !els.mediaPicker.hidden && activePickerTab === 'gifs') {
+                renderMediaPickerTab('gifs');
+            }
+            return safeUrl;
+        }
+
+        function removeRecentGif(url) {
+            recentGifs = recentGifs.filter(item => item.url !== url);
+            persistRecentGifs();
+            if (els.mediaPicker && !els.mediaPicker.hidden && activePickerTab === 'gifs') {
+                renderMediaPickerTab('gifs');
+            }
+        }
 
         function setMediaPickerOpen(open) {
             if (!els.mediaPicker || !els.pickerToggleBtn) return;
             const show = !!open;
             els.mediaPicker.hidden = !show;
             els.pickerToggleBtn.setAttribute('aria-expanded', show ? 'true' : 'false');
-            if (show) renderMediaPickerTab(activePickerTab);
+            if (show) {
+                renderMediaPickerTab(activePickerTab);
+                if (els.pickerSearchInput) els.pickerSearchInput.focus();
+            }
         }
 
         function insertEmojiAtCursor(emoji) {
@@ -2397,21 +2603,60 @@
                 return false;
             }
             state.lastChatSentAt = now;
+            const kind = safeUrl ? (mediaType === 'sticker' ? 'sticker' : 'gif') : '';
+            const label = String(mediaAlt || (safeUrl && kind === 'gif' ? deriveMediaLabel(safeUrl) : '')).slice(0, 60);
+            if (safeUrl && kind === 'gif') {
+                saveRecentGif(safeUrl, label);
+            }
             const msg = {
                 id: tabId + '-' + now,
                 name: state.nick,
                 text: cleanText,
-                mediaType: safeUrl ? (mediaType === 'sticker' ? 'sticker' : 'gif') : '',
+                mediaType: kind,
                 mediaUrl: safeUrl || '',
-                mediaAlt: String(mediaAlt || '').slice(0, 60),
+                mediaAlt: label,
                 replyTo: state.replyTo ? { ...state.replyTo } : null,
                 ts: now,
                 isHost: state.isStreaming
             };
-            addChatMessage(msg);
+            addChatMessage(msg, { forceScroll: true });
             sendSignal('chat', msg);
             if (state.replyTo) setReplyTarget(null);
             return true;
+        }
+
+        function createMediaTile(item, kind, isRecent = false) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'media-cell' + (kind === 'gif' ? ' is-gif' : '') + (isRecent ? ' is-recent' : '');
+            btn.setAttribute('data-media-type', kind);
+            btn.setAttribute('data-media-url', item.url);
+            btn.setAttribute('data-media-alt', item.label);
+            btn.title = item.label;
+
+            const img = document.createElement('img');
+            img.src = item.url;
+            img.alt = item.label;
+            img.loading = 'lazy';
+            img.referrerPolicy = 'no-referrer';
+
+            const label = document.createElement('span');
+            label.className = 'media-label';
+            label.textContent = item.label;
+
+            btn.appendChild(img);
+            btn.appendChild(label);
+
+            if (isRecent) {
+                const del = document.createElement('span');
+                del.className = 'media-del-btn';
+                del.setAttribute('role', 'button');
+                del.setAttribute('aria-label', `Odebrat ${item.label} z nedávných`);
+                del.title = 'Odebrat z nedávných';
+                del.textContent = '×';
+                btn.appendChild(del);
+            }
+            return btn;
         }
 
         function renderMediaPickerTab(tab) {
@@ -2423,15 +2668,30 @@
                 btn.setAttribute('aria-selected', active ? 'true' : 'false');
             });
             if (els.gifUrlRow) els.gifUrlRow.hidden = tab !== 'gifs';
+            if (els.pickerSearchInput) {
+                els.pickerSearchInput.placeholder = tab === 'emoji'
+                    ? 'Hledat emoji (např. smich, ohen, gg)...'
+                    : (tab === 'stickers' ? 'Hledat stickery...' : 'Hledat v nedávných a portálových GIFech...');
+            }
+            const query = normalizeSearch(els.pickerSearchInput ? els.pickerSearchInput.value : '');
             els.pickerGrid.textContent = '';
 
             if (tab === 'emoji') {
                 els.pickerGrid.className = 'picker-grid is-emoji';
-                CHAT_EMOJIS.forEach(emoji => {
+                const filtered = CHAT_EMOJIS.filter(([emoji, tags]) => !query || emoji.includes(query) || normalizeSearch(tags).includes(query));
+                if (!filtered.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'picker-empty';
+                    empty.textContent = 'Žádné emoji neodpovídá hledání.';
+                    els.pickerGrid.appendChild(empty);
+                    return;
+                }
+                filtered.forEach(([emoji, tags]) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'emoji-cell';
                     btn.setAttribute('data-emoji', emoji);
+                    btn.title = tags;
                     btn.textContent = emoji;
                     els.pickerGrid.appendChild(btn);
                 });
@@ -2439,42 +2699,67 @@
             }
 
             els.pickerGrid.className = 'picker-grid is-media';
-            const list = tab === 'stickers' ? CHAT_STICKERS : CHAT_GIFS;
-            const kind = tab === 'stickers' ? 'sticker' : 'gif';
-            list.forEach(item => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'media-cell' + (kind === 'gif' ? ' is-gif' : '');
-                btn.setAttribute('data-media-type', kind);
-                btn.setAttribute('data-media-url', item.url);
-                btn.setAttribute('data-media-alt', item.label);
-                btn.title = item.label;
+            if (tab === 'stickers') {
+                const filtered = CHAT_STICKERS.filter(item => !query || normalizeSearch(`${item.label} ${item.tags || ''}`).includes(query));
+                if (!filtered.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'picker-empty';
+                    empty.textContent = 'Žádný sticker neodpovídá hledání.';
+                    els.pickerGrid.appendChild(empty);
+                    return;
+                }
+                filtered.forEach(item => els.pickerGrid.appendChild(createMediaTile(item, 'sticker', false)));
+                return;
+            }
 
-                const img = document.createElement('img');
-                img.src = item.url;
-                img.alt = item.label;
-                img.loading = 'lazy';
+            const recentFiltered = recentGifs.filter(item => !query || normalizeSearch(`${item.label} ${item.url}`).includes(query));
+            const portalFiltered = CHAT_GIFS.filter(item => !query || normalizeSearch(`${item.label} ${item.tags || ''}`).includes(query));
+            if (!recentFiltered.length && !portalFiltered.length) {
+                const empty = document.createElement('div');
+                empty.className = 'picker-empty';
+                empty.textContent = 'Žádný GIF neodpovídá hledání.';
+                els.pickerGrid.appendChild(empty);
+                return;
+            }
+            if (recentFiltered.length) {
+                const sec = document.createElement('div');
+                sec.className = 'picker-section-title';
+                sec.textContent = `Nedávné GIFy (${recentFiltered.length})`;
+                els.pickerGrid.appendChild(sec);
+                recentFiltered.forEach(item => els.pickerGrid.appendChild(createMediaTile(item, 'gif', true)));
+            }
+            if (portalFiltered.length) {
+                const sec = document.createElement('div');
+                sec.className = 'picker-section-title';
+                sec.textContent = 'Portálové GIFy';
+                els.pickerGrid.appendChild(sec);
+                portalFiltered.forEach(item => els.pickerGrid.appendChild(createMediaTile(item, 'gif', false)));
+            }
+        }
 
-                const label = document.createElement('span');
-                label.className = 'media-label';
-                label.textContent = item.label;
+        function readValidatedGifUrl() {
+            if (!els.gifUrlInput) return null;
+            const raw = els.gifUrlInput.value.trim();
+            if (!raw) return null;
+            const safeUrl = sanitizeMediaUrl(raw);
+            if (!safeUrl) {
+                addSystemMessage('Neplatný odkaz na GIF. Použij HTTPS odkaz na .gif/.webp/.png/.jpg nebo Giphy/Tenor/Imgur.');
+                return null;
+            }
+            return safeUrl;
+        }
 
-                btn.appendChild(img);
-                btn.appendChild(label);
-                els.pickerGrid.appendChild(btn);
-            });
+        function saveCustomGifUrl() {
+            const safeUrl = readValidatedGifUrl();
+            if (!safeUrl) return;
+            saveRecentGif(safeUrl);
+            els.gifUrlInput.value = '';
         }
 
         function sendCustomGifUrl() {
-            if (!els.gifUrlInput) return;
-            const raw = els.gifUrlInput.value.trim();
-            if (!raw) return;
-            const safeUrl = sanitizeMediaUrl(raw);
-            if (!safeUrl) {
-                addSystemMessage('Neplatný odkaz na GIF. Použij HTTPS odkaz na .gif/.webp/.png/.jpg nebo Giphy/Tenor.');
-                return;
-            }
-            if (sendChatPayload({ mediaType: 'gif', mediaUrl: safeUrl, mediaAlt: 'GIF' })) {
+            const safeUrl = readValidatedGifUrl();
+            if (!safeUrl) return;
+            if (sendChatPayload({ mediaType: 'gif', mediaUrl: safeUrl, mediaAlt: deriveMediaLabel(safeUrl) })) {
                 els.gifUrlInput.value = '';
                 setMediaPickerOpen(false);
             }
@@ -2492,11 +2777,21 @@
             });
         }
 
+        if (els.pickerSearchInput) {
+            els.pickerSearchInput.addEventListener('input', () => renderMediaPickerTab(activePickerTab));
+        }
+
         if (els.mediaPicker) {
             els.mediaPicker.addEventListener('click', e => {
                 const tabBtn = e.target && typeof e.target.closest === 'function' ? e.target.closest('.picker-tab') : null;
                 if (tabBtn) {
                     renderMediaPickerTab(tabBtn.getAttribute('data-picker-tab') || 'emoji');
+                    return;
+                }
+                const delBtn = e.target && typeof e.target.closest === 'function' ? e.target.closest('.media-del-btn') : null;
+                if (delBtn) {
+                    const card = delBtn.closest('.media-cell');
+                    if (card) removeRecentGif(card.getAttribute('data-media-url') || '');
                     return;
                 }
                 const emojiBtn = e.target && typeof e.target.closest === 'function' ? e.target.closest('.emoji-cell') : null;
@@ -2516,6 +2811,9 @@
             });
         }
 
+        if (els.gifUrlSaveBtn) {
+            els.gifUrlSaveBtn.addEventListener('click', saveCustomGifUrl);
+        }
         if (els.gifUrlSendBtn) {
             els.gifUrlSendBtn.addEventListener('click', sendCustomGifUrl);
         }
@@ -2537,6 +2835,13 @@
         }
 
         window.addEventListener('storage', e => {
+            if (e.key === RECENT_GIFS_KEY) {
+                recentGifs = loadRecentGifs();
+                if (els.mediaPicker && !els.mediaPicker.hidden && activePickerTab === 'gifs') {
+                    renderMediaPickerTab('gifs');
+                }
+                return;
+            }
             if (e.key !== CHAT_STORAGE_KEY) return;
             if (!e.newValue) {
                 resetChatUi();
