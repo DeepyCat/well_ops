@@ -485,6 +485,7 @@
 
         /* ---------- PRAVY PANEL: DIVACI + CHAT ---------- */
         .chat-col {
+            position: relative;
             display: flex;
             flex-direction: column;
             background: var(--surface);
@@ -590,7 +591,28 @@
             font-weight: 700;
         }
         .msg-time { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
-        .msg-body { font-size: 13.5px; color: var(--text-2); white-space: pre-wrap; }
+        .msg-body { font-size: 13.5px; color: var(--text-2); white-space: pre-wrap; word-break: break-word; }
+        .msg-media { margin-top: 6px; }
+        .chat-sticker {
+            display: block;
+            max-width: 112px;
+            max-height: 112px;
+            width: auto;
+            height: auto;
+            border-radius: 10px;
+            object-fit: contain;
+            background: var(--surface-2);
+            padding: 4px;
+        }
+        .chat-gif {
+            display: block;
+            max-width: 240px;
+            width: 100%;
+            max-height: 190px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: var(--surface-2);
+        }
 
         .chat-form {
             padding: 10px 12px;
@@ -599,6 +621,143 @@
             align-items: center;
             background: var(--surface-2);
         }
+        .picker-btn {
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+        .picker-btn:hover,
+        .picker-btn[aria-expanded="true"] {
+            background: var(--accent-soft);
+            border-color: rgba(239, 68, 68, .55);
+            color: var(--text);
+        }
+        .media-picker {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 62px;
+            z-index: 30;
+            background: var(--surface-2);
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 295px;
+        }
+        .media-picker[hidden] { display: none; }
+        .picker-tabs {
+            display: flex;
+            gap: 6px;
+        }
+        .picker-tab {
+            flex: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-2);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 8px;
+            cursor: pointer;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+        .picker-tab.active {
+            background: var(--accent-soft);
+            border-color: rgba(239, 68, 68, .55);
+            color: var(--text);
+        }
+        .picker-grid {
+            overflow-y: auto;
+            display: grid;
+            gap: 6px;
+            scrollbar-width: thin;
+            max-height: 185px;
+        }
+        .picker-grid.is-emoji { grid-template-columns: repeat(8, 1fr); }
+        .picker-grid.is-media { grid-template-columns: repeat(3, 1fr); }
+        .emoji-cell {
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: var(--surface);
+            font-size: 19px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background .12s, border-color .12s, transform .12s;
+        }
+        .emoji-cell:hover {
+            background: rgba(255, 255, 255, .1);
+            border-color: var(--border-strong);
+            transform: scale(1.08);
+        }
+        .media-cell {
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            color: var(--text-2);
+            overflow: hidden;
+            transition: border-color .15s, background .15s, color .15s;
+        }
+        .media-cell:hover {
+            border-color: rgba(239, 68, 68, .55);
+            background: rgba(255, 255, 255, .06);
+            color: var(--text);
+        }
+        .media-cell img {
+            width: 100%;
+            height: 62px;
+            object-fit: contain;
+            border-radius: 6px;
+            pointer-events: none;
+        }
+        .media-cell.is-gif img { object-fit: cover; }
+        .media-label {
+            font-size: 10.5px;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        .gif-url-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        .gif-url-row[hidden] { display: none; }
+        .gif-url-input {
+            flex: 1;
+            min-width: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 9px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+        }
+        .gif-url-input:focus { border-color: rgba(239, 68, 68, .6); }
         .chat-input {
             flex: 1;
             min-width: 0;
@@ -688,7 +847,7 @@
             .react-btn { width: 29px; height: 29px; font-size: 16px; }
             .unmute-bar { bottom: 50px; padding: 6px 10px; font-size: 12px; max-width: calc(100% - 20px); }
             .title-input { width: 100%; font-size: 16px; }
-            .chat-input, .modal-card .field { font-size: 16px; }
+            .chat-input, .gif-url-input, .modal-card .field { font-size: 16px; }
         }
         a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
             outline: 2px solid var(--accent);
@@ -790,6 +949,7 @@
                         <input class="vol-slider" id="volSlider" type="range" min="0" max="100" value="80" aria-label="Hlasitost přehrávače">
                     </div>
                     <button class="btn" id="pipBtn" type="button" title="Obraz v obraze">PiP</button>
+                    <button class="btn" id="dockChatBtn" type="button" title="Otevřít živý chat v nové záložce">Externí chat</button>
                     <button class="btn" id="fsBtn" type="button" title="Celá obrazovka">Celá obr.</button>
                 </div>
             </div>
@@ -807,7 +967,7 @@
                     <span class="panel-sub" id="chatNotice">Jen v paměti</span>
                     <a class="popout-btn" id="chatPopoutBtn" href="stream.html?chat=1" target="_blank" rel="noopener noreferrer" title="Otevřít živý chat v nové záložce">
                         <svg class="ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                        <span>Nová záložka</span>
+                        <span>Externí chat</span>
                     </a>
                 </div>
             </div>
@@ -815,7 +975,22 @@
             <div class="chat-list" id="chatList">
                 <div class="chat-empty" id="chatEmpty">Zatím tu nejsou žádné zprávy. Zprávy ze streamu se nikam neukládají.</div>
             </div>
+            <div class="media-picker" id="mediaPicker" hidden aria-label="Výběr emoji, stickerů a GIFů">
+                <div class="picker-tabs" role="tablist">
+                    <button class="picker-tab active" type="button" data-picker-tab="emoji" role="tab" aria-selected="true">Emoji</button>
+                    <button class="picker-tab" type="button" data-picker-tab="stickers" role="tab" aria-selected="false">Stickery</button>
+                    <button class="picker-tab" type="button" data-picker-tab="gifs" role="tab" aria-selected="false">GIFy</button>
+                </div>
+                <div class="picker-grid is-emoji" id="pickerGrid"></div>
+                <div class="gif-url-row" id="gifUrlRow" hidden>
+                    <input class="gif-url-input" id="gifUrlInput" type="url" maxlength="400" placeholder="Vlož HTTPS odkaz na GIF nebo obrázek...">
+                    <button class="btn btn-primary" id="gifUrlSendBtn" type="button">Poslat GIF</button>
+                </div>
+            </div>
             <form class="chat-form" id="chatForm" autocomplete="off">
+                <button class="picker-btn" id="pickerToggleBtn" type="button" aria-label="Emoji, stickery a GIFy" aria-expanded="false" aria-controls="mediaPicker" title="Emoji, stickery a GIFy">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                </button>
                 <input class="chat-input" id="chatInput" type="text" maxlength="400" placeholder="Napiš zprávu do živého chatu...">
                 <button class="btn btn-primary" type="submit">Poslat</button>
             </form>
@@ -905,11 +1080,18 @@
             muteBtn: $('muteBtn'),
             volSlider: $('volSlider'),
             pipBtn: $('pipBtn'),
+            dockChatBtn: $('dockChatBtn'),
             fsBtn: $('fsBtn'),
             connInfo: $('connInfo'),
             peersBar: $('peersBar'),
             chatList: $('chatList'),
             chatEmpty: $('chatEmpty'),
+            pickerToggleBtn: $('pickerToggleBtn'),
+            mediaPicker: $('mediaPicker'),
+            pickerGrid: $('pickerGrid'),
+            gifUrlRow: $('gifUrlRow'),
+            gifUrlInput: $('gifUrlInput'),
+            gifUrlSendBtn: $('gifUrlSendBtn'),
             chatForm: $('chatForm'),
             chatInput: $('chatInput'),
             nickModal: $('nickModal'),
@@ -946,6 +1128,53 @@
         }
 
         const REACTION_PRESETS = [['👍','Palec nahoru'],['🔥','Oheň'],['😂','Smích'],['😮','Překvapení'],['❤️','Srdce'],['👏','Potlesk'],['💀','Lebka']]; // taste-skill-ignore
+        const CHAT_EMOJIS = ['😀','😂','🤣','😍','🥳','😎','🤔','😭','😡','🤯','👍','👎','👏','🙏','🔥','❤️','💯','💀','🎉','👀','🚀','🎮','💻','☕']; // taste-skill-ignore
+        const CHAT_STICKERS = [
+            { url: 'hry/kasino/img/think.png', label: 'Myslí' },
+            { url: 'hry/kasino/img/point.png', label: 'Ukazuje' },
+            { url: 'hry/kasino/img/show.png', label: 'Show' },
+            { url: 'hry/kasino/img/petrova.webp', label: 'Petrová' },
+            { url: 'hry/kasino/img/B-Lahvac.png', label: 'Lahváč' },
+            { url: 'hry/kasino/img/S-Riven.png', label: 'Říven' },
+            { url: 'hry/kasino/img/Z-Reditel.png', label: 'Ředitel' },
+            { url: 'hry/kasino/img/Z-Rybar.png', label: 'Rybář' },
+            { url: 'hry/kasino/img/S-Chobot.png', label: 'Chobot' },
+            { url: 'hry/kasino/img/S-Vesper.png', label: 'Vesper' },
+            { url: 'img/bird.png', label: 'Pták' },
+            { url: 'hry/mc/juchelka_craft.png', label: 'Juchelka Craft' }
+        ];
+        const CHAT_GIFS = [
+            { url: 'img/celebration/proud-of-you1.gif', label: 'Proud 1' },
+            { url: 'img/celebration/proud-of-you2.gif', label: 'Proud 2' },
+            { url: 'img/celebration/proud-of-you3.gif', label: 'Proud 3' },
+            { url: 'img/celebration/proud-of-you4.gif', label: 'Proud 4' },
+            { url: 'img/celebration/proud-of-you5.gif', label: 'Proud 5' },
+            { url: 'hry/kasino/img/mambo-hello.gif', label: 'Mambo Hello' },
+            { url: 'hry/hyperdrive/kokes_race.gif', label: 'Kokeš Race' }
+        ];
+        const LOCAL_MEDIA_SET = new Set([...CHAT_STICKERS, ...CHAT_GIFS].map(item => item.url));
+        const ALLOWED_GIF_HOSTS = new Set([
+            'media.tenor.com', 'media1.tenor.com', 'c.tenor.com',
+            'i.giphy.com', 'media.giphy.com',
+            'media0.giphy.com', 'media1.giphy.com', 'media2.giphy.com', 'media3.giphy.com', 'media4.giphy.com'
+        ]);
+
+        function sanitizeMediaUrl(rawUrl) {
+            if (typeof rawUrl !== 'string') return null;
+            const clean = rawUrl.trim();
+            if (!clean || clean.length > 400 || /[\s"'<>]/.test(clean)) return null;
+            if (LOCAL_MEDIA_SET.has(clean)) return clean;
+            let parsed;
+            try {
+                parsed = new URL(clean);
+            } catch (err) {
+                return null;
+            }
+            if (parsed.protocol !== 'https:') return null;
+            if (ALLOWED_GIF_HOSTS.has(parsed.hostname)) return parsed.href;
+            if (/\.(gif|webp|png|jpe?g)$/i.test(parsed.pathname)) return parsed.href;
+            return null;
+        }
         const ALLOWED_REACTIONS = new Set(REACTION_PRESETS.map(([e]) => e));
         const MAX_FLOATING_REACTIONS = 25;
 
@@ -1038,7 +1267,10 @@
             appendChatNode(div);
         }
 
-        function addChatMessage({ name, text, ts, isHost }) {
+        function addChatMessage({ name, text, mediaType, mediaUrl, mediaAlt, ts, isHost }) {
+            const cleanText = String(text || '').trim();
+            const safeUrl = sanitizeMediaUrl(mediaUrl);
+            if (!cleanText && !safeUrl) return;
             if (els.chatEmpty) els.chatEmpty.hidden = true;
             const wrap = document.createElement('div');
             wrap.className = 'msg';
@@ -1061,14 +1293,30 @@
             const d = ts ? new Date(ts) : new Date();
             time.textContent = d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
 
-            const body = document.createElement('div');
-            body.className = 'msg-body';
-            body.textContent = String(text || '');
-
             head.appendChild(author);
             head.appendChild(time);
             wrap.appendChild(head);
-            wrap.appendChild(body);
+
+            if (cleanText) {
+                const body = document.createElement('div');
+                body.className = 'msg-body';
+                body.textContent = cleanText;
+                wrap.appendChild(body);
+            }
+
+            if (safeUrl) {
+                const mediaWrap = document.createElement('div');
+                mediaWrap.className = 'msg-media';
+                const img = document.createElement('img');
+                img.className = mediaType === 'sticker' ? 'chat-sticker' : 'chat-gif';
+                img.src = safeUrl;
+                img.alt = String(mediaAlt || (mediaType === 'sticker' ? 'Sticker' : 'GIF')).slice(0, 60);
+                img.loading = 'lazy';
+                img.referrerPolicy = 'no-referrer';
+                mediaWrap.appendChild(img);
+                wrap.appendChild(mediaWrap);
+            }
+
             appendChatNode(wrap);
         }
 
@@ -1769,7 +2017,7 @@
             });
 
             ch.on('broadcast', { event: 'chat' }, ({ payload }) => {
-                if (!payload || !payload.text) return;
+                if (!payload || (!payload.text && !payload.mediaUrl)) return;
                 addChatMessage(payload);
             });
 
@@ -1862,27 +2110,191 @@
             } catch (e) {}
         });
 
-        els.chatForm.addEventListener('submit', e => {
-            e.preventDefault();
-            const raw = els.chatInput.value.trim();
-            if (!raw) return;
+        let activePickerTab = 'emoji';
+
+        function setMediaPickerOpen(open) {
+            if (!els.mediaPicker || !els.pickerToggleBtn) return;
+            const show = !!open;
+            els.mediaPicker.hidden = !show;
+            els.pickerToggleBtn.setAttribute('aria-expanded', show ? 'true' : 'false');
+            if (show) renderMediaPickerTab(activePickerTab);
+        }
+
+        function insertEmojiAtCursor(emoji) {
+            const input = els.chatInput;
+            if (!input) return;
+            const start = typeof input.selectionStart === 'number' ? input.selectionStart : input.value.length;
+            const end = typeof input.selectionEnd === 'number' ? input.selectionEnd : input.value.length;
+            input.value = (input.value.slice(0, start) + emoji + input.value.slice(end)).slice(0, 400);
+            const pos = Math.min(start + emoji.length, input.value.length);
+            input.focus();
+            if (typeof input.setSelectionRange === 'function') input.setSelectionRange(pos, pos);
+        }
+
+        function sendChatPayload({ text = '', mediaType = '', mediaUrl = '', mediaAlt = '' }) {
+            const cleanText = String(text || '').trim().slice(0, 400);
+            const safeUrl = mediaUrl ? sanitizeMediaUrl(mediaUrl) : null;
+            if (!cleanText && !safeUrl) return false;
             const now = Date.now();
-            if (now - state.lastChatSentAt < 500) return;
+            if (now - state.lastChatSentAt < 500) return false;
             if (!state.connected) {
                 addSystemMessage('Zprávu nelze poslat — nejsi připojený k chatu.');
-                return;
+                return false;
             }
             state.lastChatSentAt = now;
-            els.chatInput.value = '';
             const msg = {
                 id: tabId + '-' + now,
                 name: state.nick,
-                text: raw.slice(0, 400),
+                text: cleanText,
+                mediaType: safeUrl ? (mediaType === 'sticker' ? 'sticker' : 'gif') : '',
+                mediaUrl: safeUrl || '',
+                mediaAlt: String(mediaAlt || '').slice(0, 60),
                 ts: now,
                 isHost: state.isStreaming
             };
             addChatMessage(msg);
             sendSignal('chat', msg);
+            return true;
+        }
+
+        function renderMediaPickerTab(tab) {
+            activePickerTab = tab;
+            if (!els.mediaPicker || !els.pickerGrid) return;
+            els.mediaPicker.querySelectorAll('.picker-tab').forEach(btn => {
+                const active = btn.getAttribute('data-picker-tab') === tab;
+                btn.classList.toggle('active', active);
+                btn.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            if (els.gifUrlRow) els.gifUrlRow.hidden = tab !== 'gifs';
+            els.pickerGrid.textContent = '';
+
+            if (tab === 'emoji') {
+                els.pickerGrid.className = 'picker-grid is-emoji';
+                CHAT_EMOJIS.forEach(emoji => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'emoji-cell';
+                    btn.setAttribute('data-emoji', emoji);
+                    btn.textContent = emoji;
+                    els.pickerGrid.appendChild(btn);
+                });
+                return;
+            }
+
+            els.pickerGrid.className = 'picker-grid is-media';
+            const list = tab === 'stickers' ? CHAT_STICKERS : CHAT_GIFS;
+            const kind = tab === 'stickers' ? 'sticker' : 'gif';
+            list.forEach(item => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'media-cell' + (kind === 'gif' ? ' is-gif' : '');
+                btn.setAttribute('data-media-type', kind);
+                btn.setAttribute('data-media-url', item.url);
+                btn.setAttribute('data-media-alt', item.label);
+                btn.title = item.label;
+
+                const img = document.createElement('img');
+                img.src = item.url;
+                img.alt = item.label;
+                img.loading = 'lazy';
+
+                const label = document.createElement('span');
+                label.className = 'media-label';
+                label.textContent = item.label;
+
+                btn.appendChild(img);
+                btn.appendChild(label);
+                els.pickerGrid.appendChild(btn);
+            });
+        }
+
+        function sendCustomGifUrl() {
+            if (!els.gifUrlInput) return;
+            const raw = els.gifUrlInput.value.trim();
+            if (!raw) return;
+            const safeUrl = sanitizeMediaUrl(raw);
+            if (!safeUrl) {
+                addSystemMessage('Neplatný odkaz na GIF. Použij HTTPS odkaz na .gif/.webp/.png/.jpg nebo Giphy/Tenor.');
+                return;
+            }
+            if (sendChatPayload({ mediaType: 'gif', mediaUrl: safeUrl, mediaAlt: 'GIF' })) {
+                els.gifUrlInput.value = '';
+                setMediaPickerOpen(false);
+            }
+        }
+
+        if (els.dockChatBtn) {
+            els.dockChatBtn.addEventListener('click', () => {
+                window.open('stream.html?chat=1', '_blank', 'noopener,noreferrer');
+            });
+        }
+
+        if (els.pickerToggleBtn) {
+            els.pickerToggleBtn.addEventListener('click', () => {
+                setMediaPickerOpen(els.mediaPicker.hidden);
+            });
+        }
+
+        if (els.mediaPicker) {
+            els.mediaPicker.addEventListener('click', e => {
+                const tabBtn = e.target && typeof e.target.closest === 'function' ? e.target.closest('.picker-tab') : null;
+                if (tabBtn) {
+                    renderMediaPickerTab(tabBtn.getAttribute('data-picker-tab') || 'emoji');
+                    return;
+                }
+                const emojiBtn = e.target && typeof e.target.closest === 'function' ? e.target.closest('.emoji-cell') : null;
+                if (emojiBtn) {
+                    insertEmojiAtCursor(emojiBtn.getAttribute('data-emoji') || '');
+                    return;
+                }
+                const mediaBtn = e.target && typeof e.target.closest === 'function' ? e.target.closest('.media-cell') : null;
+                if (mediaBtn) {
+                    const sent = sendChatPayload({
+                        mediaType: mediaBtn.getAttribute('data-media-type') || 'gif',
+                        mediaUrl: mediaBtn.getAttribute('data-media-url') || '',
+                        mediaAlt: mediaBtn.getAttribute('data-media-alt') || ''
+                    });
+                    if (sent) setMediaPickerOpen(false);
+                }
+            });
+        }
+
+        if (els.gifUrlSendBtn) {
+            els.gifUrlSendBtn.addEventListener('click', sendCustomGifUrl);
+        }
+        if (els.gifUrlInput) {
+            els.gifUrlInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendCustomGifUrl();
+                }
+            });
+        }
+
+        document.addEventListener('click', e => {
+            if (!els.mediaPicker || els.mediaPicker.hidden) return;
+            if (els.mediaPicker.contains(e.target) || (els.pickerToggleBtn && els.pickerToggleBtn.contains(e.target))) return;
+            setMediaPickerOpen(false);
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && els.mediaPicker && !els.mediaPicker.hidden) {
+                setMediaPickerOpen(false);
+            }
+        });
+
+        els.chatForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const raw = els.chatInput.value.trim();
+            if (!raw) return;
+            const isDirectMedia = !/\s/.test(raw) && sanitizeMediaUrl(raw);
+            const sent = isDirectMedia
+                ? sendChatPayload({ mediaType: 'gif', mediaUrl: raw, mediaAlt: 'GIF' })
+                : sendChatPayload({ text: raw });
+            if (sent) {
+                els.chatInput.value = '';
+                setMediaPickerOpen(false);
+            }
         });
 
         if (els.reactionBar) {
