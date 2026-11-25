@@ -20,4 +20,5 @@ window.POVOLENA_ZARIZENI = [
   //"ZAP-5SFX5M", //skola_kybernetika
   //"ZAP-5SFX5M", //skola_kybernetika V504
   "ZAP-TCP2YQ", // skola_V2 T3
+  "ZAP-LLAYVL",
 ];
