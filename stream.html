@@ -243,7 +243,7 @@
 
         .unmute-bar {
             position: absolute;
-            bottom: 14px;
+            bottom: 62px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 4;
@@ -287,6 +287,99 @@
             height: 7px;
             border-radius: 50%;
             background: var(--accent);
+        }
+
+        /* Rychle emoji reakce v okne streamu */
+        .reaction-layer {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 3;
+        }
+        .reaction-bar {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            z-index: 4;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 4px 6px;
+            border-radius: 999px;
+            background: rgba(17, 17, 19, .86);
+            border: 1px solid var(--border-strong);
+        }
+        .react-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 0;
+            background: transparent;
+            font-size: 18px;
+            line-height: 1;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: transform .12s ease, background .12s ease;
+            user-select: none;
+        }
+        .react-btn:hover:not(:disabled) {
+            background: var(--surface-3);
+            transform: scale(1.18);
+        }
+        .react-btn:active:not(:disabled) { transform: scale(.94); }
+        .react-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .reaction-float {
+            position: absolute;
+            bottom: 54px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            pointer-events: none;
+            will-change: transform, opacity;
+            animation: reaction-fly 2.4s cubic-bezier(.22, .8, .36, 1) forwards;
+        }
+        .reaction-ico {
+            font-size: 28px;
+            line-height: 1;
+        }
+        .reaction-who {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--text);
+            background: rgba(17, 17, 19, .78);
+            padding: 1px 6px;
+            border-radius: 999px;
+            max-width: 110px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        @keyframes reaction-fly {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, 12px, 0) scale(.6);
+            }
+            14% {
+                opacity: 1;
+                transform: translate3d(calc(var(--drift, 0px) * .25), -24px, 0) scale(1.12) rotate(var(--rot, 0deg));
+            }
+            100% {
+                opacity: 0;
+                transform: translate3d(var(--drift, 0px), -260px, 0) scale(.92) rotate(calc(var(--rot, 0deg) * -1));
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .reaction-float {
+                animation: reaction-fade 1.6s ease-out forwards;
+            }
+            @keyframes reaction-fade {
+                0% { opacity: 0; }
+                15% { opacity: 1; }
+                100% { opacity: 0; }
+            }
         }
 
         /* Ovladaci panel pod videem */
@@ -599,6 +692,8 @@
                     <span class="live-tag"><i></i>LIVE</span>
                     <span id="hudTitle">Sdílení obrazovky</span>
                 </div>
+                <div class="reaction-layer" id="reactionLayer" aria-hidden="true"></div>
+                <div class="reaction-bar" id="reactionBar" role="toolbar" aria-label="Rychlé reakce"></div>
                 <button class="unmute-bar" id="unmuteBanner" type="button" hidden>
                     <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
                     <span>Prohlížeč ztlumil automatické přehrávání — klikni pro zapnutí zvuku</span>
@@ -728,6 +823,8 @@
             player: $('player'),
             hudBadge: $('hudBadge'),
             hudTitle: $('hudTitle'),
+            reactionLayer: $('reactionLayer'),
+            reactionBar: $('reactionBar'),
             unmuteBanner: $('unmuteBanner'),
             stageOverlay: $('stageOverlay'),
             overlayTitle: $('overlayTitle'),
@@ -768,6 +865,22 @@
             return 'Host-' + tabId.slice(0, 4).toUpperCase();
         }
 
+        const REACTION_PRESETS = [['👍','Palec nahoru'],['🔥','Oheň'],['😂','Smích'],['😮','Překvapení'],['❤️','Srdce'],['👏','Potlesk'],['💀','Lebka']]; // taste-skill-ignore
+        const ALLOWED_REACTIONS = new Set(REACTION_PRESETS.map(([e]) => e));
+        const MAX_FLOATING_REACTIONS = 25;
+
+        if (els.reactionBar) {
+            REACTION_PRESETS.forEach(([emoji, label]) => {
+                const btn = document.createElement('button');
+                btn.className = 'react-btn';
+                btn.type = 'button';
+                btn.setAttribute('data-emoji', emoji);
+                btn.setAttribute('aria-label', label);
+                btn.textContent = emoji;
+                els.reactionBar.appendChild(btn);
+            });
+        }
+
         const state = {
             nick: resolveInitialNick(),
             channel: null,
@@ -785,10 +898,43 @@
             viewerRemoteDescSet: false,
             viewerRetryTimer: null,
             lastChatSentAt: 0,
+            lastReactionSentAt: 0,
             chatCount: 0
         };
 
         els.nickLabel.textContent = state.nick;
+
+        function spawnReaction(emoji, senderName) {
+            if (!ALLOWED_REACTIONS.has(emoji) || !els.reactionLayer) return;
+            while (els.reactionLayer.children.length >= MAX_FLOATING_REACTIONS) {
+                els.reactionLayer.removeChild(els.reactionLayer.firstElementChild || els.reactionLayer.firstChild);
+            }
+
+            const item = document.createElement('span');
+            item.className = 'reaction-float';
+            const rightPx = Math.floor(20 + Math.random() * 190);
+            const driftPx = Math.round((Math.random() - 0.5) * 72);
+            const rotDeg = Math.round((Math.random() - 0.5) * 26);
+            item.style.right = `${rightPx}px`;
+            item.style.setProperty('--drift', `${driftPx}px`);
+            item.style.setProperty('--rot', `${rotDeg}deg`);
+
+            const ico = document.createElement('span');
+            ico.className = 'reaction-ico';
+            ico.textContent = emoji;
+
+            const who = document.createElement('span');
+            who.className = 'reaction-who';
+            who.textContent = String(senderName || 'Host').slice(0, 24);
+
+            item.appendChild(ico);
+            item.appendChild(who);
+            els.reactionLayer.appendChild(item);
+
+            const cleanup = () => { if (item.parentNode) item.remove(); };
+            item.addEventListener('animationend', cleanup, { once: true });
+            setTimeout(cleanup, 2600);
+        }
 
         function setConnInfo(label) {
             els.connInfo.innerHTML = 'Stav přenosu: <b></b>';
@@ -1318,6 +1464,11 @@
                 addChatMessage(payload);
             });
 
+            ch.on('broadcast', { event: 'reaction' }, ({ payload }) => {
+                if (!payload || !payload.emoji) return;
+                spawnReaction(payload.emoji, payload.name);
+            });
+
             ch.subscribe(async status => {
                 if (status === 'SUBSCRIBED') {
                     state.connected = true;
@@ -1402,6 +1553,20 @@
             addChatMessage(msg);
             sendSignal('chat', msg);
         });
+
+        if (els.reactionBar) {
+            els.reactionBar.addEventListener('click', e => {
+                const btn = e.target && typeof e.target.closest === 'function' ? e.target.closest('.react-btn') : null;
+                if (!btn) return;
+                const emoji = btn.getAttribute('data-emoji') || btn.dataset.emoji;
+                if (!ALLOWED_REACTIONS.has(emoji)) return;
+                const now = Date.now();
+                if (now - state.lastReactionSentAt < 220) return;
+                state.lastReactionSentAt = now;
+                spawnReaction(emoji, state.nick);
+                sendSignal('reaction', { emoji, name: state.nick, ts: now });
+            });
+        }
 
         els.nickBtn.addEventListener('click', () => {
             els.nickInput.value = state.nick;
