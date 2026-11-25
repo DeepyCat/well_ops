@@ -573,10 +573,16 @@
         }
         .msg-head {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             justify-content: space-between;
             gap: 8px;
             margin-bottom: 2px;
+        }
+        .msg-head-right {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex: none;
         }
         .msg-author { font-weight: 650; font-size: 12.5px; color: var(--text); }
         .msg-author.host { color: #fca5a5; }
@@ -591,6 +597,46 @@
             font-weight: 700;
         }
         .msg-time { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+        .msg-reply-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            color: var(--muted);
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color .15s, background .15s, border-color .15s;
+        }
+        .msg:hover .msg-reply-btn,
+        .msg:focus-within .msg-reply-btn { color: var(--text-2); }
+        .msg-reply-btn:hover {
+            background: var(--surface);
+            border-color: var(--border);
+            color: var(--text);
+        }
+        .msg-quote {
+            margin: 4px 0 6px;
+            padding: 5px 8px;
+            border-radius: 7px;
+            background: var(--surface);
+            border-left: 3px solid var(--accent);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            transition: background .15s;
+        }
+        .msg-quote:hover { background: rgba(255, 255, 255, .07); }
+        .msg-quote-author { font-size: 11px; font-weight: 650; color: #fca5a5; }
+        .msg-quote-text {
+            font-size: 11.5px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .msg.highlight { background: rgba(239, 68, 68, .18); }
         .msg-body { font-size: 13.5px; color: var(--text-2); white-space: pre-wrap; word-break: break-word; }
         .msg-media { margin-top: 6px; }
         .chat-sticker {
@@ -613,6 +659,45 @@
             object-fit: cover;
             background: var(--surface-2);
         }
+
+        .chat-col.has-reply .media-picker { bottom: 114px; }
+        .reply-banner {
+            margin: 0 10px 6px;
+            padding: 7px 10px;
+            border-radius: 9px;
+            background: var(--surface-2);
+            border-left: 3px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .reply-banner[hidden] { display: none; }
+        .reply-banner-info { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 1px; }
+        .reply-banner-label { font-size: 11px; font-weight: 650; color: #fca5a5; }
+        .reply-banner-preview {
+            font-size: 12px;
+            color: var(--text-2);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .reply-cancel-btn {
+            flex: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-2);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            line-height: 1;
+        }
+        .reply-cancel-btn:hover { border-color: var(--border-strong); color: var(--text); }
 
         .chat-form {
             padding: 10px 12px;
@@ -956,7 +1041,7 @@
 
             <div class="info-strip">
                 <span id="connInfo">Stav přenosu: <b>Čeká na spuštění</b></span>
-                <span>Přímý přenos P2P (WebRTC) · max 10 diváků · nic se neukládá</span>
+                <span>Přímý přenos P2P (WebRTC) · max 10 diváků · stream se neukládá · chat lokálně</span>
             </div>
         </section>
 
@@ -964,7 +1049,8 @@
             <div class="panel-head">
                 <span class="panel-title">Živý chat</span>
                 <div class="head-tools">
-                    <span class="panel-sub" id="chatNotice">Jen v paměti</span>
+                    <span class="panel-sub" id="chatNotice">Uloženo lokálně</span>
+                    <button class="popout-btn" id="clearChatBtn" type="button" title="Vymazat lokální historii chatu">Vymazat</button>
                     <a class="popout-btn" id="chatPopoutBtn" href="stream.html?chat=1" target="_blank" rel="noopener noreferrer" title="Otevřít živý chat v nové záložce">
                         <svg class="ico" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                         <span>Externí chat</span>
@@ -973,7 +1059,7 @@
             </div>
             <div class="peers-bar" id="peersBar" aria-label="Online účastníci"></div>
             <div class="chat-list" id="chatList">
-                <div class="chat-empty" id="chatEmpty">Zatím tu nejsou žádné zprávy. Zprávy ze streamu se nikam neukládají.</div>
+                <div class="chat-empty" id="chatEmpty">Zatím tu nejsou žádné zprávy. Historie chatu se ukládá pouze lokálně v prohlížeči.</div>
             </div>
             <div class="media-picker" id="mediaPicker" hidden aria-label="Výběr emoji, stickerů a GIFů">
                 <div class="picker-tabs" role="tablist">
@@ -986,6 +1072,13 @@
                     <input class="gif-url-input" id="gifUrlInput" type="url" maxlength="400" placeholder="Vlož HTTPS odkaz na GIF nebo obrázek...">
                     <button class="btn btn-primary" id="gifUrlSendBtn" type="button">Poslat GIF</button>
                 </div>
+            </div>
+            <div class="reply-banner" id="replyBanner" hidden>
+                <div class="reply-banner-info">
+                    <span class="reply-banner-label" id="replyTargetName">Odpověď</span>
+                    <span class="reply-banner-preview" id="replyTargetPreview"></span>
+                </div>
+                <button class="reply-cancel-btn" id="replyCancelBtn" type="button" aria-label="Zrušit odpověď" title="Zrušit odpověď">×</button>
             </div>
             <form class="chat-form" id="chatForm" autocomplete="off">
                 <button class="picker-btn" id="pickerToggleBtn" type="button" aria-label="Emoji, stickery a GIFy" aria-expanded="false" aria-controls="mediaPicker" title="Emoji, stickery a GIFy">
@@ -1024,6 +1117,7 @@
         const MAX_VIEWERS = 10;
         const MAX_CHAT_MESSAGES = 150;
         const NICK_SESSION_KEY = 'ops_stream_nick';
+        const CHAT_STORAGE_KEY = 'ops_stream_chat_history_v1';
 
         const QUALITY_PRESETS = {
             '480p':  { width: 854,  height: 480,  fps: 24, bitrate: 650000 },
@@ -1083,9 +1177,15 @@
             dockChatBtn: $('dockChatBtn'),
             fsBtn: $('fsBtn'),
             connInfo: $('connInfo'),
+            chatCol: document.querySelector('.chat-col'),
             peersBar: $('peersBar'),
             chatList: $('chatList'),
             chatEmpty: $('chatEmpty'),
+            clearChatBtn: $('clearChatBtn'),
+            replyBanner: $('replyBanner'),
+            replyTargetName: $('replyTargetName'),
+            replyTargetPreview: $('replyTargetPreview'),
+            replyCancelBtn: $('replyCancelBtn'),
             pickerToggleBtn: $('pickerToggleBtn'),
             mediaPicker: $('mediaPicker'),
             pickerGrid: $('pickerGrid'),
@@ -1210,7 +1310,8 @@
             viewerRetryTimer: null,
             lastChatSentAt: 0,
             lastReactionSentAt: 0,
-            chatCount: 0
+            chatCount: 0,
+            replyTo: null
         };
 
         els.nickLabel.textContent = state.nick;
@@ -1267,35 +1368,183 @@
             appendChatNode(div);
         }
 
-        function addChatMessage({ name, text, mediaType, mediaUrl, mediaAlt, ts, isHost }) {
+        let chatHistory = [];
+        const seenMessageIds = new Set();
+
+        function buildMessagePreview({ text, mediaType, mediaAlt }) {
+            const clean = String(text || '').trim().replace(/\s+/g, ' ');
+            if (clean) return clean.length > 110 ? clean.slice(0, 107) + '...' : clean;
+            if (mediaType === 'sticker') return `[Sticker${mediaAlt ? ': ' + String(mediaAlt).slice(0, 40) : ''}]`;
+            if (mediaType === 'gif') return '[GIF]';
+            return 'Zpráva';
+        }
+
+        function sanitizeReplyTo(raw) {
+            if (!raw || typeof raw !== 'object') return null;
+            const name = String(raw.name || '').trim().slice(0, 24);
+            const preview = String(raw.preview || '').trim().slice(0, 120);
+            const id = String(raw.id || '').trim().slice(0, 80);
+            if (!name || !preview) return null;
+            return { id, name, preview };
+        }
+
+        function setReplyTarget(msgObj) {
+            if (!msgObj) {
+                state.replyTo = null;
+            } else {
+                state.replyTo = {
+                    id: String(msgObj.id || '').slice(0, 80),
+                    name: String(msgObj.name || 'Host').slice(0, 24),
+                    preview: buildMessagePreview(msgObj)
+                };
+            }
+            if (els.replyBanner) els.replyBanner.hidden = !state.replyTo;
+            if (els.chatCol) els.chatCol.classList.toggle('has-reply', !!state.replyTo);
+            if (els.replyTargetName) {
+                els.replyTargetName.textContent = state.replyTo ? `Odpověď pro ${state.replyTo.name}` : 'Odpověď';
+            }
+            if (els.replyTargetPreview) {
+                els.replyTargetPreview.textContent = state.replyTo ? state.replyTo.preview : '';
+            }
+            if (state.replyTo && els.chatInput) els.chatInput.focus();
+        }
+
+        function saveChatHistory() {
+            try {
+                localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(chatHistory.slice(-MAX_CHAT_MESSAGES)));
+            } catch (err) {}
+        }
+
+        function resetChatUi() {
+            chatHistory = [];
+            seenMessageIds.clear();
+            if (els.chatList) {
+                els.chatList.querySelectorAll('.msg').forEach(node => node.remove());
+            }
+            if (els.chatEmpty) els.chatEmpty.hidden = false;
+            setReplyTarget(null);
+        }
+
+        function clearChatHistory() {
+            resetChatUi();
+            try {
+                localStorage.removeItem(CHAT_STORAGE_KEY);
+            } catch (err) {}
+        }
+
+        function loadChatHistory() {
+            try {
+                const raw = localStorage.getItem(CHAT_STORAGE_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) return;
+                parsed.slice(-MAX_CHAT_MESSAGES).forEach(item => {
+                    if (item && typeof item === 'object') {
+                        addChatMessage(item, { persist: false });
+                    }
+                });
+            } catch (err) {}
+        }
+
+        function jumpToQuotedMessage(targetId) {
+            if (!targetId || !els.chatList) return;
+            const target = els.chatList.querySelectorAll('.msg').find(node => node.getAttribute('data-msg-id') === targetId);
+            if (!target) return;
+            if (typeof target.scrollIntoView === 'function') {
+                target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+            target.classList.add('highlight');
+            setTimeout(() => target.classList.remove('highlight'), 1400);
+        }
+
+        function addChatMessage(rawMsg, opts = {}) {
+            if (!rawMsg || typeof rawMsg !== 'object') return;
+            const { persist = true } = opts;
+            const { id, name, text, mediaType, mediaUrl, mediaAlt, replyTo, ts, isHost } = rawMsg;
             const cleanText = String(text || '').trim();
             const safeUrl = sanitizeMediaUrl(mediaUrl);
             if (!cleanText && !safeUrl) return;
+
+            const safeTs = Number(ts) || Date.now();
+            const safeName = String(name || 'Host').trim().slice(0, 24) || 'Host';
+            const msgId = String(id || `${safeTs}-${safeName}`).slice(0, 80);
+            if (seenMessageIds.has(msgId)) return;
+
+            const safeKind = safeUrl ? (mediaType === 'sticker' ? 'sticker' : 'gif') : '';
+            const safeAlt = safeUrl ? String(mediaAlt || (safeKind === 'sticker' ? 'Sticker' : 'GIF')).slice(0, 60) : '';
+            const safeReply = sanitizeReplyTo(replyTo);
+
+            seenMessageIds.add(msgId);
             if (els.chatEmpty) els.chatEmpty.hidden = true;
+
+            const normalizedMsg = {
+                id: msgId,
+                name: safeName,
+                text: cleanText,
+                mediaType: safeKind,
+                mediaUrl: safeUrl || '',
+                mediaAlt: safeAlt,
+                replyTo: safeReply,
+                ts: safeTs,
+                isHost: Boolean(isHost)
+            };
+
             const wrap = document.createElement('div');
             wrap.className = 'msg';
+            wrap.setAttribute('data-msg-id', msgId);
 
             const head = document.createElement('div');
             head.className = 'msg-head';
 
             const author = document.createElement('span');
-            author.className = 'msg-author' + (isHost ? ' host' : '');
-            author.textContent = String(name || 'Host');
-            if (isHost) {
+            author.className = 'msg-author' + (normalizedMsg.isHost ? ' host' : '');
+            author.textContent = safeName;
+            if (normalizedMsg.isHost) {
                 const badge = document.createElement('span');
                 badge.className = 'msg-badge';
                 badge.textContent = 'STREAMER';
                 author.appendChild(badge);
             }
 
+            const rightHead = document.createElement('span');
+            rightHead.className = 'msg-head-right';
+
+            const replyBtn = document.createElement('button');
+            replyBtn.type = 'button';
+            replyBtn.className = 'msg-reply-btn';
+            replyBtn.setAttribute('aria-label', `Odpovědět uživateli ${safeName}`);
+            replyBtn.title = `Odpovědět (${safeName})`;
+            replyBtn.textContent = 'Odpovědět';
+            replyBtn.addEventListener('click', () => setReplyTarget(normalizedMsg));
+
             const time = document.createElement('span');
             time.className = 'msg-time';
-            const d = ts ? new Date(ts) : new Date();
+            const d = new Date(safeTs);
             time.textContent = d.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' });
 
+            rightHead.appendChild(replyBtn);
+            rightHead.appendChild(time);
             head.appendChild(author);
-            head.appendChild(time);
+            head.appendChild(rightHead);
             wrap.appendChild(head);
+
+            if (safeReply) {
+                const quote = document.createElement('div');
+                quote.className = 'msg-quote';
+                if (safeReply.id) quote.title = 'Přejít na původní zprávu';
+                const qAuthor = document.createElement('span');
+                qAuthor.className = 'msg-quote-author';
+                qAuthor.textContent = safeReply.name;
+                const qText = document.createElement('span');
+                qText.className = 'msg-quote-text';
+                qText.textContent = safeReply.preview;
+                quote.appendChild(qAuthor);
+                quote.appendChild(qText);
+                if (safeReply.id) {
+                    quote.addEventListener('click', () => jumpToQuotedMessage(safeReply.id));
+                }
+                wrap.appendChild(quote);
+            }
 
             if (cleanText) {
                 const body = document.createElement('div');
@@ -1308,14 +1557,20 @@
                 const mediaWrap = document.createElement('div');
                 mediaWrap.className = 'msg-media';
                 const img = document.createElement('img');
-                img.className = mediaType === 'sticker' ? 'chat-sticker' : 'chat-gif';
+                img.className = safeKind === 'sticker' ? 'chat-sticker' : 'chat-gif';
                 img.src = safeUrl;
-                img.alt = String(mediaAlt || (mediaType === 'sticker' ? 'Sticker' : 'GIF')).slice(0, 60);
+                img.alt = safeAlt;
                 img.loading = 'lazy';
                 img.referrerPolicy = 'no-referrer';
                 mediaWrap.appendChild(img);
                 wrap.appendChild(mediaWrap);
             }
+
+            chatHistory.push(normalizedMsg);
+            if (chatHistory.length > MAX_CHAT_MESSAGES) {
+                chatHistory = chatHistory.slice(-MAX_CHAT_MESSAGES);
+            }
+            if (persist) saveChatHistory();
 
             appendChatNode(wrap);
         }
@@ -2149,11 +2404,13 @@
                 mediaType: safeUrl ? (mediaType === 'sticker' ? 'sticker' : 'gif') : '',
                 mediaUrl: safeUrl || '',
                 mediaAlt: String(mediaAlt || '').slice(0, 60),
+                replyTo: state.replyTo ? { ...state.replyTo } : null,
                 ts: now,
                 isHost: state.isStreaming
             };
             addChatMessage(msg);
             sendSignal('chat', msg);
+            if (state.replyTo) setReplyTarget(null);
             return true;
         }
 
@@ -2271,6 +2528,28 @@
             });
         }
 
+        if (els.replyCancelBtn) {
+            els.replyCancelBtn.addEventListener('click', () => setReplyTarget(null));
+        }
+
+        if (els.clearChatBtn) {
+            els.clearChatBtn.addEventListener('click', clearChatHistory);
+        }
+
+        window.addEventListener('storage', e => {
+            if (e.key !== CHAT_STORAGE_KEY) return;
+            if (!e.newValue) {
+                resetChatUi();
+                return;
+            }
+            try {
+                const parsed = JSON.parse(e.newValue);
+                if (Array.isArray(parsed)) {
+                    parsed.slice(-MAX_CHAT_MESSAGES).forEach(item => addChatMessage(item, { persist: false }));
+                }
+            } catch (err) {}
+        });
+
         document.addEventListener('click', e => {
             if (!els.mediaPicker || els.mediaPicker.hidden) return;
             if (els.mediaPicker.contains(e.target) || (els.pickerToggleBtn && els.pickerToggleBtn.contains(e.target))) return;
@@ -2278,8 +2557,11 @@
         });
 
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && els.mediaPicker && !els.mediaPicker.hidden) {
+            if (e.key !== 'Escape') return;
+            if (els.mediaPicker && !els.mediaPicker.hidden) {
                 setMediaPickerOpen(false);
+            } else if (state.replyTo) {
+                setReplyTarget(null);
             }
         });
 
@@ -2337,6 +2619,7 @@
             }
         });
 
+        loadChatHistory();
         initRealtime();
     })();
     </script>
