@@ -2,11 +2,149 @@
 window.ZAPISNIK_DATA = {
   "zadani": [
     {
-      "id": "t1avmft5",
-      "title": "MTA-Wireshark:Traffic Analysis",
-      "desc": "Naučte se základy analýzy síťového provozu s Wireshark a jak najít anomálie ve vaší síti!\n\n",
+      "id": "lc27jaaq",
+      "title": "FGP - Cyber Kill Chain",
+      "desc": "Cyber Kill Chain je framework specificky navržený pro identifikaci a prevenci síťových útoků. Poskytuje náhled na systematické kroky, které útočníci podnikají v kyberprostoru za účelem přípravy a provedení kybernetického útoku.",
       "done": false,
       "links": [
+        {
+          "id": "ll6d05t3",
+          "label": "Cyber Kill Chain",
+          "url": "https://tryhackme.com/room/mtavncyberkillchain-v01-00uqz",
+          "tasks": [
+            {
+              "id": "tzfqodl9",
+              "title": "Úvod",
+              "note": "",
+              "items": [
+                {
+                  "id": "9xhn54bz",
+                  "q": "Přečtěte si výše uvedený text.",
+                  "a": ""
+                }
+              ]
+            },
+            {
+              "id": "m6ex0u5d",
+              "title": "Reconnaissance - \"Průzkum\"",
+              "note": "",
+              "items": [
+                {
+                  "id": "evtndkyg",
+                  "q": "Jak se jmenuje nástroj pro sběr informací, který prostřednictvím webového rozhraní zpřístupňuje běžné nástroje a zdroje pro open-source inteligenci? [anglický výraz]",
+                  "a": "OSINT Framework"
+                },
+                {
+                  "id": "pk412uw6",
+                  "q": "Jaká je definice procesu shromažďování e-mailů během fáze průzkumu?",
+                  "a": "Sběr e-mailů"
+                }
+              ]
+            },
+            {
+              "id": "1ev84dvz",
+              "title": " Weaponization - \"Příprava\"",
+              "note": "",
+              "items": [
+                {
+                  "id": "p9epxgf8",
+                  "q": "Tento termín je označován jako skupina příkazů, které provádějí konkrétní úkol. Můžete si je představit jako podprogramy nebo funkce, které obsahují kód, Uživatelé je většinou používají k automatizaci rutinních úloh. Zlomyslní útočníci je však mají tendenci používat pro škodlivé účely a zahrnout je do dokumentů Microsoft Office. Můžete uvést termín? ",
+                  "a": "Makro"
+                }
+              ]
+            },
+            {
+              "id": "9m725h6s",
+              "title": " Delivery - \"Doručení\"",
+              "note": "",
+              "items": [
+                {
+                  "id": "ogplmp5m",
+                  "q": "Jak se nazývá útok, když je prováděn proti konkrétní skupině lidí a útočník se snaží infikovat web, který zmíněná skupina lidí neustále navštěvuje. [anglický výraz]",
+                  "a": "Watering hole attack"
+                }
+              ]
+            },
+            {
+              "id": "pbd7w7gg",
+              "title": "Exploitation - \"Zneužití\"",
+              "note": "",
+              "items": [
+                {
+                  "id": "53asw7e3",
+                  "q": "Můžete uvést název kybernetického útoku zaměřeného na softwarovou zranitelnost, kterou dodavatelé antivirových programů nebo softwaru neznají? [anglický výraz]",
+                  "a": "Zero-day Exploit"
+                }
+              ]
+            },
+            {
+              "id": "2i6o63xx",
+              "title": "Installation - \"Instalace\"",
+              "note": "",
+              "items": [
+                {
+                  "id": "zn9r1jhm",
+                  "q": "Můžete uvést techniku používanou k úpravě časových atributů souboru, aby se skryly nové soubory nebo změny stávajících souborů? [anglický výraz]",
+                  "a": "Timestomping"
+                },
+                {
+                  "id": "9gmk8huw",
+                  "q": "Pojmenujte  - škodlivý skript, který útočník umístí na webový server, aby udržel přístup ke kompromitovanému systému a umožnil vzdálený přístup k webovému serveru? [anglický výraz]",
+                  "a": "Web shell"
+                }
+              ]
+            },
+            {
+              "id": "kwf4bykz",
+              "title": "Command & Control - \"Ovládání\"",
+              "note": "",
+              "items": [
+                {
+                  "id": "nzi39ops",
+                  "q": "Jak se nazývá C2 komunikace, při které oběť pravidelně odesílá DNS požadavky na DNS server a doménu patřící útočníkovi? [anglický výraz]",
+                  "a": "DNS Tunneling"
+                }
+              ]
+            },
+            {
+              "id": "ktihl6pb",
+              "title": "Actions on Objectives (Akce)",
+              "note": "",
+              "items": [
+                {
+                  "id": "cibmx2bp",
+                  "q": "Uveďte technologii zahrnutou v Microsoft Windows, která dokáže vytvářet záložní kopie nebo snímky souborů nebo svazků na počítači, i když jsou právě používány? [anglický výraz]",
+                  "a": "Shadow Copy"
+                }
+              ]
+            },
+            {
+              "id": "pzi3u98z",
+              "title": " Praktická analýza",
+              "note": "",
+              "items": [
+                {
+                  "id": "izrj2wre",
+                  "q": "Jaký je příznak po dokončení statického webu?",
+                  "a": "THM{7HR347_1N73L_12_4w35om3}",
+                  "sol": "0. Reconnaissance - \"Průzkum\" - \"empty\"\n1. Weaponization - \"Vyzbrojení\" - powershell\n2. Delivery - \"Doručení\" - spearphishing attachment\n3. Exploitation - \"Zneužití\" - exploit public-facing application\n4. Installation - \"Instalace\" - dynamic linker hijacking\n5. Command & Control - \"Řízení a ovládání\" - fallback channels\n6. Actions on Objectives - \"Akce k dosažení cílů\" - data from local system"
+                }
+              ]
+            },
+            {
+              "id": "qgq9tbg8",
+              "title": "Supeer! Zvládli jsme to!",
+              "note": "",
+              "items": [
+                {
+                  "id": "70kmmaeh",
+                  "q": "Supeer! Zvládli jsme to!",
+                  "a": ""
+                }
+              ]
+            }
+          ]
+        },
         {
           "id": "5wmr8cdc",
           "label": "MTA-Wireshark:Traffic Analysis",
@@ -265,3 +403,4 @@ window.ZAPISNIK_DATA = {
     }
   ]
 };
+
